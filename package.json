@@ -7,9 +7,9 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js",
+    "dev": "cross-env NODE_ENV=development nodemon app.js",
     "dev:kill": "fkill :3000 :443 --force --silent || echo 'No process found on ports or fkill failed.'",
-    "setup-admin": "node setupAdmin.js",
+    "setup-admin": "cross-env NODE_ENV=development node setupAdmin.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -61,6 +61,7 @@
     "winston": "^3.13.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "nodemon": "^3.1.2"
   },
   "engines": {
