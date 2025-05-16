@@ -126,7 +126,13 @@ const cspDirectives = {
     styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud"],
     fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
     imgSrc: ["'self'", "data:", "blob:", "https://res.cloudinary.com", "https:"],
-    connectSrc: ["'self'", "https://*.tiny.cloud", "https://www.googleapis.com"],
+    connectSrc: [
+        "'self'",
+        "https://*.tiny.cloud",
+        "https://www.googleapis.com",
+        "https://www.google-analytics.com", // <-- ADDED FOR GA DATA SENDING
+        "https://*.googletagmanager.com"    // <-- ADDED FOR GA SCRIPT ORIGIN (good practice)
+    ],
     frameSrc: ["'self'", "https://*.tiny.cloud"],
     workerSrc: ["'self'", "blob:"],
     objectSrc: ["'none'"],
@@ -146,56 +152,52 @@ app.use(helmet({
 logger.debug('[INIT] Applied helmet.');
 
 logger.debug('[INIT] Applying CORS...');
-const productionCorsOrigin = process.env.CORS_ORIGIN; // This should be your custom domain like https://www.fndautomations.com
-const herokuAppDomain = process.env.HEROKU_APP_NAME ? `https://$process.env.HEROKU_APP_NAME}.herokuapp.com` : null;
 
 const allowedOrigins = [];
+const productionCustomDomain = process.env.CORS_ORIGIN; // Should be https://www.fndautomations.com
+const herokuAppName = process.env.HEROKU_APP_NAME;     // Should be fnd-automations-webapp-3138eaed6f23
 
-if (productionCorsOrigin) {
-    allowedOrigins.push(productionCorsOrigin);
-} else if (process.env.NODE_ENV === 'production') {
-    // Fallback if CORS_ORIGIN isn't set in prod, but this is not ideal.
-    // You should always set CORS_ORIGIN to your custom domain in production.
-    logger.warn('[CORS] CORS_ORIGIN environment variable is not set for production! Using a default which might be insecure or incorrect.');
-    allowedOrigins.push('https://www.yourdefaultdomain.com'); // Replace with your actual default
-}
-
-if (herokuAppDomain) { // Add Heroku domain if HEROKU_APP_NAME is set
-    allowedOrigins.push(herokuAppDomain);
-}
-
-
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'production') {
+    if (productionCustomDomain) {
+        allowedOrigins.push(productionCustomDomain);
+        logger.info(`[CORS] Added production custom domain to allowed origins: ${productionCustomDomain}`);
+    }
+    if (herokuAppName) {
+        const herokuDomain = `https://${herokuAppName}.herokuapp.com`;
+        if (!allowedOrigins.includes(herokuDomain)) { // Avoid duplicates if CORS_ORIGIN was the heroku domain
+            allowedOrigins.push(herokuDomain);
+        }
+        logger.info(`[CORS] Added Heroku app domain to allowed origins: ${herokuDomain}`);
+    }
+    if (allowedOrigins.length === 0) {
+        logger.error('[CORS] CRITICAL: No production CORS origins defined (CORS_ORIGIN or HEROKU_APP_NAME not set). This will likely block all cross-origin requests.');
+    }
+} else { // Development
     allowedOrigins.push('http://localhost:3000');
     allowedOrigins.push(`https://localhost:${process.env.HTTPS_PORT || 3443}`);
     allowedOrigins.push(`http://localhost:${process.env.PORT || 3000}`);
     allowedOrigins.push('https://localhost');
-    logger.info('[CORS] Development mode: Added localhost origins:', allowedOrigins);
-} else {
-    logger.info('[CORS] Production mode: Allowed origins:', allowedOrigins);
 }
 
+logger.info(`[CORS] Final allowed origins: ${allowedOrigins.join(', ')}`);
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-
-    // logger.debug(`CORS Check: Request Origin='${origin}', Allowed='${allowedOrigins.join(', ')}'`);
-    if (allowedOrigins.length === 0 && process.env.NODE_ENV !== 'development') {
-        logger.warn('[CORS] No allowed origins configured for production and request has an origin. Blocking.');
-        return callback(new Error('Not allowed by CORS configuration (no origins defined).'));
+    if (!origin && process.env.NODE_ENV !== 'production') { // Allow no-origin for local dev tools like Postman
+        logger.debug('[CORS] Allowing request with no origin in non-production environment.');
+        return callback(null, true);
     }
     if (allowedOrigins.includes(origin)) {
+      logger.debug(`[CORS] Allowed origin: ${origin}`);
       return callback(null, true);
     } else {
-      logger.warn(`CORS blocked for origin: ${origin}. Allowed: ${allowedOrigins.join(', ')}`);
+      logger.warn(`[CORS] Blocked origin: '${origin}'. Allowed: [${allowedOrigins.join(', ')}]`);
       return callback(new Error('Not allowed by CORS configuration.'));
     }
   },
   credentials: true
 }));
-logger.debug('[INIT] Applied CORS.'); // Moved your log here
+logger.debug('[INIT] Applied CORS.');
 
 
 logger.debug('[INIT] Applying body parsers...');
