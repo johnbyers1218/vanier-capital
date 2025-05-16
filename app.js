@@ -83,6 +83,11 @@ if (process.env.NODE_ENV === 'development') {
 // --- Initialize Express App ---
 const app = express();
 
+
+app.set('trust proxy', 1);
+logger.info('[INIT] Express "trust proxy" setting configured.');
+
+
 // --- Make Utilities Available to EJS Templates ---
 app.locals.escapeHtml = escapeHtml;
 app.locals.formatDate = (date) => { // Simplified

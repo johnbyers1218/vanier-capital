@@ -504,56 +504,84 @@ function displayFieldErrors(errors) {
 
 function initContactAndScheduleForm() {
     const mainForm = document.getElementById('contact-form');
-    const submitButton = mainForm?.querySelector('button[type="submit"]');
+    const submitButton = mainForm?.querySelector('button[type="submit"]'); // Ensure your button has type="submit"
     const messageContainer = document.getElementById('contact-form-message');
     const scheduleFieldsContainer = document.getElementById('schedule-fields-container');
     const requestMeetingCheckbox = document.getElementById('request-meeting-checkbox');
+    // Ensure the inner grid for scheduling fields exists and has this class if you're targeting it specifically for display
+    const scheduleInnerGrid = document.querySelector('#schedule-fields-container .schedule-fields-inner-grid');
 
-    if (!mainForm || !submitButton || !messageContainer || !scheduleFieldsContainer || !requestMeetingCheckbox) {
-        console.warn('Main contact form or its critical elements not found. Form not initialized.');
+
+    if (!mainForm || !submitButton || !messageContainer || !scheduleFieldsContainer || !requestMeetingCheckbox || !scheduleInnerGrid) {
+        console.warn('Main contact form or one of its critical elements/containers not found. Form not initialized.', {
+            mainFormExists: !!mainForm,
+            submitButtonExists: !!submitButton,
+            messageContainerExists: !!messageContainer,
+            scheduleFieldsContainerExists: !!scheduleFieldsContainer,
+            requestMeetingCheckboxExists: !!requestMeetingCheckbox,
+            scheduleInnerGridExists: !!scheduleInnerGrid
+        });
         return;
     }
 
-    const originalButtonHtml = submitButton.innerHTML; // Store original button content
+    const originalButtonHtml = submitButton.innerHTML;
 
+    // Hidden input to track if meeting is requested
     const hiddenRequestedMeetingInput = document.createElement('input');
     hiddenRequestedMeetingInput.type = 'hidden';
     hiddenRequestedMeetingInput.name = 'requestedMeeting';
-    hiddenRequestedMeetingInput.value = 'false';
+    hiddenRequestedMeetingInput.value = 'false'; // Default to false
     mainForm.appendChild(hiddenRequestedMeetingInput);
 
+    // Event listener for the "request meeting" checkbox
     requestMeetingCheckbox.addEventListener('change', function() {
-        // ... (your existing checkbox logic to show/hide schedule fields) ...
         if (this.checked) {
-            scheduleFieldsContainer.style.display = 'block';
-            document.querySelector('.schedule-fields-inner-grid').style.display = 'grid';
+            scheduleFieldsContainer.style.display = 'block'; // Or your preferred display style for the container
+            scheduleInnerGrid.style.display = 'grid';    // Make the inner grid visible
             hiddenRequestedMeetingInput.value = 'true';
-            document.getElementById('schedule-contactName-mirror').value = document.getElementById('name').value || '';
-            document.getElementById('schedule-contactEmail-mirror').value = document.getElementById('email').value || '';
-            document.getElementById('schedule-companyName').value = document.getElementById('schedule-contactName-mirror').value ? (document.getElementById('name').value + ' Company') : '';
-            populateTimezoneDropdown('schedule-timezone');
+            // Pre-fill logic for schedule form fields
+            const nameFieldValue = document.getElementById('name')?.value || '';
+            const emailFieldValue = document.getElementById('email')?.value || '';
+            const scheduleContactNameMirror = document.getElementById('schedule-contactName-mirror');
+            const scheduleContactEmailMirror = document.getElementById('schedule-contactEmail-mirror');
+            const scheduleCompanyNameInput = document.getElementById('schedule-companyName');
+
+            if (scheduleContactNameMirror) scheduleContactNameMirror.value = nameFieldValue;
+            if (scheduleContactEmailMirror) scheduleContactEmailMirror.value = emailFieldValue;
+            if (scheduleCompanyNameInput) scheduleCompanyNameInput.value = nameFieldValue ? (nameFieldValue + ' Company') : ''; // Basic default
+
+            populateTimezoneDropdown('schedule-timezone'); // Ensure dropdown is populated
         } else {
             scheduleFieldsContainer.style.display = 'none';
-            document.querySelector('.schedule-fields-inner-grid').style.display = 'none';
+            scheduleInnerGrid.style.display = 'none';
             hiddenRequestedMeetingInput.value = 'false';
         }
     });
 
+    // Main form submission handler
     mainForm.addEventListener('submit', async (event) => {
         event.preventDefault();
-        
+
+        if (submitButton.disabled) {
+            console.log('Form already submitting, ignoring additional click.');
+            return;
+        }
+        console.log('Main form submitted. Preventing default.');
 
         submitButton.disabled = true;
         submitButton.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Sending...`;
-        displayStatusMessage('contact-form-message', ''); // Clear general message area
-        clearFieldErrors(); // Clear individual field errors
+        displayStatusMessage('contact-form-message', ''); // Clear previous general messages
+        clearFieldErrors(); // Clear previous individual field errors
 
         const formData = new FormData(mainForm);
         const formObject = Object.fromEntries(formData.entries());
+
+        // Explicitly get checkbox values
         const privacyCheckbox = document.getElementById('privacy');
         formObject.privacy = privacyCheckbox ? (privacyCheckbox.checked ? 'on' : 'off') : 'off';
         formObject.requestedMeeting = (hiddenRequestedMeetingInput.value === 'true');
 
+        // Remove schedule fields from submission if not requested
         if (!formObject.requestedMeeting) {
             delete formObject.scheduleCompanyName;
             delete formObject.schedulePreferredTimes;
@@ -561,52 +589,74 @@ function initContactAndScheduleForm() {
             delete formObject.scheduleSelectedTime;
             delete formObject.scheduleTimeZone;
         } else {
+            // Ensure scheduleCompanyName is sourced correctly if it's a separate input
+            // formData.get will get the value from the input field with that name
             formObject.scheduleCompanyName = formData.get('scheduleCompanyName');
         }
 
-     
+        console.log('Submitting combined form data:', formObject);
+        let dataFromApi; // To store API response for use in finally block
 
         try {
-            const data = await fetchData('/api/contact', {
+            dataFromApi = await fetchData('/api/contact', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formObject)
             });
 
-        
+            console.log('Combined form API response:', dataFromApi);
 
-            if (data.success) {
-                displayStatusMessage('contact-form-message', data.message, true);
-                mainForm.reset();
+            if (dataFromApi.success) {
+                displayStatusMessage('contact-form-message', dataFromApi.message, true);
+                mainForm.reset(); // Reset all fields in the form
+                // Reset UI state for scheduling section
                 requestMeetingCheckbox.checked = false;
                 scheduleFieldsContainer.style.display = 'none';
-                document.querySelector('.schedule-fields-inner-grid').style.display = 'none';
+                scheduleInnerGrid.style.display = 'none';
                 hiddenRequestedMeetingInput.value = 'false';
 
+                // Success message stays visible for a while
                 setTimeout(() => {
-                    if (document.getElementById('contact-form-message')) {
+                    if (document.getElementById('contact-form-message') &&
+                        document.getElementById('contact-form-message').querySelector('.success')) { // Only clear if it's a success message
                         // displayStatusMessage('contact-form-message', ''); // Optionally clear global success
                     }
-                }, 7000);
+                }, 7000); // Message visible for 7 seconds
             } else {
-                // Display general error message
-                displayStatusMessage('contact-form-message', data.message || 'Please correct the errors below.', false);
+                // Display general error message at the top
+                displayStatusMessage('contact-form-message', dataFromApi.message || 'Please correct the errors below.', false);
                 // Display individual field errors
-                if (data.errors) {
-                    displayFieldErrors(data.errors);
+                if (dataFromApi.errors) {
+                    displayFieldErrors(dataFromApi.errors);
                 }
             }
         } catch (error) {
             console.error('Error submitting combined form:', error);
-            displayStatusMessage('contact-form-message', error.message || 'An unexpected error occurred.', false);
+            displayStatusMessage('contact-form-message', error.message || 'An unexpected error occurred. Please try again.', false);
+            // In case of a network error or fetchData throwing before 'dataFromApi' is set
+            dataFromApi = { success: false }; // Assume failure for the finally block
         } finally {
-            // ALWAYS reset button text and enabled state
-            submitButton.disabled = false;
-            submitButton.innerHTML = originalButtonHtml;
+            // Reset button based on the outcome
+            const wasSuccessful = dataFromApi && dataFromApi.success;
+            if (!wasSuccessful) {
+                // If there was an error or API returned success: false, re-enable immediately
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonHtml;
+            } else {
+                // If successful, form is reset. Re-enable button after a short delay
+                // so user can submit again if they wish (e.g., for a different inquiry)
+                setTimeout(() => {
+                    if (submitButton && document.body.contains(submitButton)) { // Check if button still exists
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = originalButtonHtml;
+                    }
+                }, 1000); // Delay of 1 second
+            }
         }
     });
-    
+    console.log('Combined contact and schedule form initialized.');
 }
+
 document.addEventListener('DOMContentLoaded', () => {
     // ...
     if (document.getElementById('contact-form')) {
