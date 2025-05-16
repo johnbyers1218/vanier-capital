@@ -1,0 +1,49 @@
+<!-- views/public-error.ejs -->
+<!-- Simplified version for debugging EJS compilation errors -->
+
+<%
+    // Basic variable setting - simplified defaults
+    const errStatusCode = typeof status !== 'undefined' ? status : 500;
+    const displayTitle = typeof pageTitle !== 'undefined' ? pageTitle : 'Error';
+    const displayMessage = typeof message !== 'undefined' ? message : 'An error occurred.';
+    // Note: Complex title/message logic based on status code removed for now
+%>
+
+<%- include('partials/header', { pageTitle: `Error ${errStatusCode}`, path: '/error' }) %>
+
+<!-- Simplified Error Content -->
+<section class="section error-section" style="padding: 4rem 0;">
+    <div class="container error-content-wrapper">
+        <div class="error-container">
+            <!-- Minimal Icon Logic -->
+            <div class="error-icon">
+                 <i class="fas fa-exclamation-triangle"></i> <!-- Default Error Icon -->
+            </div>
+
+            <!-- Basic Title and Message Output -->
+            <h2 class="error-message"><%= displayTitle %> (<%= errStatusCode %>)</h2>
+            <p class="error-description">
+                <%= displayMessage %>
+            </p>
+
+            <!-- Stack Trace (Development Only - Simplified Check) -->
+            <% if (process.env.NODE_ENV !== 'production' && typeof error !== 'undefined' && error && error.stack) { %>
+                <pre class="error-stack-trace" style="max-height: 150px;"><%= error.stack %></pre>
+            <% } %>
+
+            <!-- Actions -->
+            <div class="error-actions">
+                 <a href="javascript:history.back()" class="cta-button secondary-btn">
+                     <i class="fas fa-arrow-left"></i> Go Back
+                 </a>
+                <a href="/" class="cta-button primary-btn">
+                    <i class="fas fa-home"></i> Return to Homepage
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<%- include('partials/footer') %>
+
+<!-- Styles should be in style.css -->

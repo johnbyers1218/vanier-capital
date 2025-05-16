@@ -1,0 +1,41 @@
+<%# views/admin/partials/footer.ejs %>
+<%# Footer partial specifically for the Admin Panel layout %>
+
+            <%# End of page-specific content (placed before this include in other files) %>
+
+        </main> <!-- /.admin-main-content -->
+
+    </div> <!-- /.admin-page-wrapper -->
+
+    <%# ======================================== %>
+    <%# JavaScript Files                       %>
+    <%# ======================================== %>
+
+    <%# Include main public JS file if it contains functionality needed in admin %>
+    <%# e.g., simple DOM manipulations, but be cautious about public-specific logic %>
+    <%# Consider if a separate admin JS bundle is cleaner %>
+    <%# <script src="/js/apps.js"></script> %>
+
+    <%# Add any admin-specific JavaScript files here %>
+    <%# Example: JS for a rich text editor, confirmation dialogs, etc. %>
+    <%# <script src="/js/admin-scripts.js"></script> %>
+
+    <%# Example: Confirmation for delete buttons %>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const deleteForms = document.querySelectorAll('form.delete-form'); // Assuming delete buttons are inside forms with this class
+
+            deleteForms.forEach(form => {
+                form.addEventListener('submit', (event) => {
+                    const confirmed = confirm('Are you sure you want to delete this item? This action cannot be undone.');
+                    if (!confirmed) {
+                        event.preventDefault(); // Stop form submission if not confirmed
+                    }
+                    // If confirmed, the form submits as usual
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

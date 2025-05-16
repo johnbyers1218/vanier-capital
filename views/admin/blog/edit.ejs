@@ -1,0 +1,250 @@
+<%# views/admin/blog/edit.ejs %>
+<%# Form for adding or editing a blog post with TinyMCE & Cover Image Upload %>
+
+<%- include('../partials/header', { pageTitle: editing ? 'Edit Blog Post' : 'Add New Blog Post' }) %>
+
+<div class="admin-form-container">
+    <h2 style="text-align: center; margin-bottom: 2rem;"><%= editing ? 'Edit Blog Post' : 'Add New Blog Post' %></h2>
+
+    <% if (typeof errorMessages !== 'undefined' && errorMessages && errorMessages.length > 0) { %>
+        <div class="validation-errors">
+            <p><strong>Please correct the following errors:</strong></p>
+            <ul><% errorMessages.forEach(err => { %><li><%= err.msg %> <%= err.param ? '('+err.param+')' : '' %></li><% }) %></ul>
+        </div>
+    <% } %>
+
+    <form action="<%= editing ? '/admin/blog/edit/' + post._id : '/admin/blog' %>" method="POST" class="admin-form" id="blogPostForm"> {/* ID ADDED HERE */}
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <div class="form-group">
+            <label for="title">Post Title <span style="color: #dc3545;">*</span></label>
+            <input type="text" id="title" name="title" value="<%= post && post.title ? post.title : '' %>" required maxlength="200">
+        </div>
+
+        <div class="form-group">
+            <label for="slug">URL Slug</label>
+            <input type="text" id="slug" name="slug" value="<%= post && post.slug ? post.slug : '' %>" maxlength="250" pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$" placeholder="auto-generated-if-blank">
+            <small>URL-friendly ID. Leave blank to auto-generate. Unique, lowercase, numbers, hyphens only.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="authorDisplayName">Author Display Name (Public)</label>
+            <input type="text" id="authorDisplayName" name="authorDisplayName"
+                   value="<%= post && post.authorDisplayName ? post.authorDisplayName : '' %>"
+                   placeholder="Defaults to: <%= typeof currentAdminFullName !== 'undefined' ? currentAdminFullName : 'Your Name' %>"
+                   maxlength="100">
+            <small>Name shown publicly as the author. Leave blank to use: <%= typeof currentAdminFullName !== 'undefined' ? currentAdminFullName : 'your full name' %>.</small>
+        </div>
+
+        <%# ****** COVER IMAGE UPLOAD SECTION ****** %>
+        <div class="form-group">
+            <label for="coverImageFile">Upload Cover Image (for Featured Image)</label>
+            <input type="file" id="coverImageFile" name="coverImageFile" accept="image/jpeg,image/png,image/gif,image/webp">
+            <small>This will populate the 'Featured Image URL' below. Max 5MB. Overwrites existing URL if a new file is uploaded.</small>
+            <div id="coverImagePreviewContainer" style="margin-top: 10px;">
+                <% if (post && post.featuredImage) { %>
+                    <img src="<%= post.featuredImage %>" alt="Current Cover Image" style="max-width: 200px; max-height: 200px; border-radius: 4px; display: block;">
+                    <button type="button" id="removeCoverImageBtn" class="delete-btn" style="font-size: 0.8em; padding: 4px 8px; margin-top: 5px;">Remove Image</button>
+                <% } %>
+            </div>
+            <div id="coverImageUploadStatus" style="font-size: 0.85em; margin-top: 5px;"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="featuredImage">Featured Image URL (Optional)</label>
+            <input type="url" id="featuredImage" name="featuredImage" value="<%= post && post.featuredImage ? post.featuredImage : '' %>" placeholder="Auto-populated by upload or enter URL manually">
+            <small>URL for the main post image. Can be auto-filled by "Upload Cover Image" above.</small>
+        </div>
+        <%# ****** END COVER IMAGE SECTION ****** %>
+
+        <div class="form-group">
+            <label for="blog-content-editor">Content <span style="color: #dc3545;">*</span></label>
+            <textarea id="blog-content-editor" name="content" class="richtext-editor" style="visibility: hidden; min-height: 500px;" required minlength="50"><%= post && post.content ? post.content : '' %></textarea>
+            <small>Use the editor toolbar for formatting.</small>
+        </div>
+
+         <div class="form-group">
+            <label for="excerpt">Excerpt / Summary (Optional)</label>
+            <textarea id="excerpt" name="excerpt" rows="3" maxlength="500"><%= post && post.excerpt ? post.excerpt : '' %></textarea>
+            <small>Short summary for blog listing (max 500 chars).</small>
+        </div>
+
+        <div class="form-group">
+            <label for="tags">Tags (Optional)</label>
+            <input type="text" id="tags" name="tags" value="<%= post && post.tags ? (Array.isArray(post.tags) ? post.tags.join(', ') : post.tags) : '' %>" placeholder="e.g., ai, automation, business">
+            <small>Comma-separated list of relevant tags (lowercase).</small>
+        </div>
+
+        <div class="form-group">
+            <input type="checkbox" id="isPublished" name="isPublished" value="true" <%= (post && post.isPublished) ? 'checked' : '' %> style="width: auto; margin-right: 10px; vertical-align: middle;">
+            <label for="isPublished" class="checkbox-label" style="display: inline-block; margin-bottom: 0;">Publish this post?</label>
+            <small>Check to make the post visible on the public blog.</small>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="submit-btn cta-button primary-btn">
+                <i class="fas fa-save" style="margin-right: 8px;"></i> <%= editing ? 'Update Post' : 'Save New Post' %>
+            </button>
+             <% if (editing && post && post.isPublished && post.slug) { %>
+                 <a href="/blog/<%= post.slug %>" target="_blank" class="cta-button secondary-btn" style="margin-left: 1rem;">
+                     <i class="fas fa-eye" style="margin-right: 8px;"></i> View Live
+                 </a>
+             <% } %>
+            <a href="/admin/blog" class="cancel-btn" style="margin-left: 1rem; background-color: #6c757d; color: white;">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.tiny.cloud/1/<%= typeof tinymceApiKey !== 'undefined' ? tinymceApiKey : 'no-api-key' %>/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- TinyMCE Initialization ---
+    const checkTinyMCE = setInterval(() => {
+        if (typeof tinymce !== 'undefined') {
+            clearInterval(checkTinyMCE);
+            initializeTinyMCE();
+        }
+    }, 100);
+
+    function initializeTinyMCE() {
+        tinymce.init({
+            selector: 'textarea#blog-content-editor',
+            promotion: false,
+            plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount codesample',
+            toolbar: 'undo redo | blocks | bold italic underline strikethrough | link image media table | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | code codesample | preview fullscreen | help',
+            content_style: 'body { font-family:Montserrat,Arial,sans-serif; font-size:16px; line-height: 1.7; color: #ccc; background-color: #2d2d2d; } a { color: #00a8e8; } code { background-color: rgba(255,255,255,0.1); padding: 0.1em 0.3em; border-radius: 3px; } pre code { background-color: transparent; padding: 0;}',
+            height: 600,
+            menubar: false,
+            statusbar: true,
+            skin: (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'oxide-dark' : 'oxide',
+            content_css: (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'default',
+            images_upload_url: '/admin/blog/upload-image', // For in-content images
+            images_upload_credentials: true,
+            automatic_uploads: true,
+            file_picker_types: 'image',
+            file_picker_callback: function (cb, value, meta) {
+                 if (meta.filetype === 'image') {
+                    var input = document.createElement('input');
+                    input.setAttribute('type', 'file');
+                    input.setAttribute('accept', 'image/jpeg,image/png,image/gif,image/webp');
+                    input.onchange = function () {
+                        var file = this.files[0];
+                        const maxSize = 5 * 1024 * 1024;
+                        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                        if (!allowedTypes.includes(file.type)) { tinymce.activeEditor.notificationManager.open({ text: 'Invalid file type.', type: 'error' }); return; }
+                        if (file.size > maxSize) { tinymce.activeEditor.notificationManager.open({ text: `Image too large (Max ${maxSize / 1024 / 1024}MB).`, type: 'error'}); return; }
+                        var reader = new FileReader();
+                        reader.onload = function () {
+                            var id = 'blobid' + (new Date()).getTime();
+                            var blobCache = tinymce.activeEditor.editorUpload.blobCache;
+                            var base64 = reader.result.split(',')[1];
+                            var blobInfo = blobCache.create(id, file, base64);
+                            blobCache.add(blobInfo);
+                            cb(blobInfo.blobUri(), { title: file.name });
+                        };
+                        reader.readAsDataURL(file);
+                    };
+                    input.click();
+                }
+            },
+            setup: function (editor) {
+                editor.on('init', function () { editor.getContainer().style.visibility = 'visible'; });
+                editor.on('change', function () { editor.save(); });
+            }
+        });
+    }
+    setTimeout(() => {
+        if (typeof tinymce === 'undefined') {
+             logger.error("TinyMCE failed to load for blog posts.");
+             const editorTextarea = document.getElementById('blog-content-editor');
+             if(editorTextarea) { editorTextarea.style.visibility = 'visible'; editorTextarea.placeholder = "Error loading Rich Text Editor."; }
+        }
+    }, 5000);
+
+    // --- Cover Image Upload Logic ---
+    const coverImageFileInput = document.getElementById('coverImageFile');
+    const featuredImageInput = document.getElementById('featuredImage'); // The URL input field
+    const previewContainer = document.getElementById('coverImagePreviewContainer');
+    const uploadStatusDiv = document.getElementById('coverImageUploadStatus');
+    const removeCoverImageBtn = document.getElementById('removeCoverImageBtn'); // For initially loaded image
+    const form = document.getElementById('blogPostForm'); // Get the form element
+
+    function attachRemoveListenerToNewButton() {
+        const newRemoveBtn = document.getElementById('newRemoveCoverImageBtn');
+        if (newRemoveBtn) {
+            newRemoveBtn.addEventListener('click', handleRemoveImage);
+        }
+    }
+
+    function handleRemoveImage() {
+        if (featuredImageInput) featuredImageInput.value = '';
+        if (previewContainer) previewContainer.innerHTML = '';
+        if (uploadStatusDiv) {
+            uploadStatusDiv.textContent = 'Image removed. Save post to confirm changes.';
+            uploadStatusDiv.style.color = 'var(--gray-text)';
+        }
+        if (coverImageFileInput) coverImageFileInput.value = null; // Reset the file input
+    }
+
+    if (removeCoverImageBtn) { // Attach to existing remove button on page load
+        removeCoverImageBtn.addEventListener('click', handleRemoveImage);
+    }
+
+    if (coverImageFileInput && featuredImageInput && previewContainer && uploadStatusDiv && form) {
+        coverImageFileInput.addEventListener('change', async function(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                uploadStatusDiv.textContent = '';
+                return;
+            }
+
+            uploadStatusDiv.textContent = 'Uploading...';
+            uploadStatusDiv.style.color = 'var(--gray-text)';
+
+            const formData = new FormData();
+            formData.append('coverImageFile', file); // Must match Multer field name on backend
+            const csrfToken = form.querySelector('input[name="_csrf"]')?.value;
+
+            if (!csrfToken) {
+                logger.error('CSRF token not found for blog cover image upload!');
+                uploadStatusDiv.textContent = 'Error: Missing security token. Please refresh.';
+                uploadStatusDiv.style.color = 'var(--danger-color)';
+                return;
+            }
+
+            try {
+                const response = await fetch('/admin/blog/upload-cover-image', { // Correct endpoint for blog covers
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'CSRF-Token': csrfToken // Send CSRF token as a header
+                    }
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success && result.location) {
+                    featuredImageInput.value = result.location;
+                    previewContainer.innerHTML = `<img src="${result.location}" alt="Cover Image Preview" style="max-width: 200px; max-height: 200px; border-radius: 4px; display: block;"> <button type="button" id="newRemoveCoverImageBtn" class="delete-btn" style="font-size: 0.8em; padding: 4px 8px; margin-top: 5px;">Remove Image</button>`;
+                    uploadStatusDiv.textContent = 'Upload successful!';
+                    uploadStatusDiv.style.color = 'var(--success-color)';
+                    attachRemoveListenerToNewButton(); // Attach listener for the new button
+                } else {
+                    uploadStatusDiv.textContent = `Upload failed: ${result.message || 'Server error or invalid response'}`;
+                    uploadStatusDiv.style.color = 'var(--danger-color)';
+                }
+            } catch (error) {
+                logger.error('Blog cover image upload fetch error:', error);
+                uploadStatusDiv.textContent = 'Upload network error. See console.';
+                uploadStatusDiv.style.color = 'var(--danger-color)';
+            }
+        });
+    } else {
+        if (!form) logger.warn("Blog form with ID 'blogPostForm' not found for cover image uploader.");
+        if (!coverImageFileInput) logger.warn("File input 'coverImageFile' for blog not found.");
+        // ... add more checks if needed
+    }
+});
+</script>
+
+<%- include('../partials/footer') %>

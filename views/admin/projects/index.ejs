@@ -1,0 +1,60 @@
+<%# views/admin/projects/index.ejs %>
+<%# Admin page to list and manage projects %>
+
+<%- include('../partials/header', { pageTitle: 'Manage Projects' }) %>
+
+<div class="admin-actions-bar" style="margin-bottom: 1.5rem; text-align: right;">
+    <a href="/admin/projects/new" class="cta-button primary-btn">
+        <i class="fas fa-plus"></i> Add New Project
+    </a>
+</div>
+
+<div class="admin-content-container"> <%# Optional container for table %>
+    <% if (projects && projects.length > 0) { %>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Featured</th>
+                    <th>Created</th>
+                    <th>Last Updated</th>
+                    <th class="actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% projects.forEach(project => { %>
+                    <tr>
+                        <td><%= project.title %></td>
+                        <td><%= project.category %></td>
+                        <td>
+                            <% if (project.isFeatured) { %>
+                                <i class="fas fa-check-circle" style="color: #28a745;" title="Featured"></i>
+                            <% } else { %>
+                                <i class="fas fa-times-circle" style="color: #6c757d;" title="Not Featured"></i>
+                            <% } %>
+                        </td>
+                        <td><%= project.createdAt.toLocaleDateString() %></td>
+                        <td><%= project.updatedAt.toLocaleDateString() %></td>
+                        <td class="actions">
+                            <a href="/admin/projects/edit/<%= project._id %>" class="edit-btn" title="Edit Project">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <%# Delete action is a POST request handled via a form %>
+                            <form action="/admin/projects/delete/<%= project._id %>" method="POST" style="display: inline;" class="delete-form">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                <button type="submit" class="delete-btn" title="Delete Project">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    <% } else { %>
+        <p style="text-align: center; padding: 2rem; background-color: var(--card-bg); border-radius: 5px;">No projects found. <a href="/admin/projects/new" style="color: var(--primary-color);">Add the first one!</a></p>
+    <% } %>
+</div>
+
+<%- include('../partials/footer') %>

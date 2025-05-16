@@ -1,0 +1,50 @@
+<!-- views/partials/header.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof pageTitle !== 'undefined' ? pageTitle : 'FND Automations' %> | FND Automations</title>
+    <meta name="description" content="<%= typeof pageDescription !== 'undefined' ? pageDescription : 'FND Automations empowers businesses...' %>">
+    <meta name="author" content="FND Automations">
+
+     <!-- ========== FAVICON LINKS START ========== -->
+    <link rel="icon" href="/images/FND_LOGO_SVG_STRIPPED.svg" sizes="any"> <!-- ICO format, any size -->
+    <!-- You might also have a manifest.json for PWAs which can define icons -->
+    <!-- <link rel="manifest" href="/manifest.json"> -->
+    <!-- ========== FAVICON LINKS END ========== -->
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Favicon Links -->
+</head>
+<body>
+    <div class="page-wrapper">
+        <header>
+            <nav class="container">
+                <div class="logo">
+                    <%# OLD Text Logo: <a href="/index" title="FND Automations Home">FND Automations</a> %>
+                    <%# NEW Image Logo: %>
+                    <a href="/" title="FND Automations Home">
+                        <img src="/images/FND_LOGO_SVG_WHITE.svg" alt="FND Automations Logo" id="header-logo">
+                    </a>
+                </div>
+                <ul class="nav-links" id="nav-links-list"> <!-- Added ID -->
+                     <% const currentPath = typeof path !== 'undefined' ? path : ''; %>
+                     <li><a href="/" class="<%= currentPath === '/' ? 'active' : '' %>">Home</a></li>
+                     <li><a href="/services" class="<%= currentPath === '/services' ? 'active' : '' %>">Services</a></li>
+                     <li><a href="/projects" class="<%= currentPath === '/projects' ? 'active' : '' %>">Projects</a></li>
+                     <li><a href="/testimonials" class="<%= currentPath === '/testimonials' ? 'active' : '' %>">Testimonials</a></li>
+                     <li><a href="/about" class="<%= currentPath === '/about' ? 'active' : '' %>">About Us</a></li>
+                     <li><a href="/blog" class="<%= currentPath.startsWith('/blog') ? 'active' : '' %>">Blog</a></li>
+                     <li><a href="/contact" class="<%= currentPath === '/contact' ? 'active' : '' %>">Contact</a></li>
+                 </ul>
+                 <button class="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-links-list">
+                     <span></span><span></span><span></span>
+                 </button>
+            </nav>
+        </header>
+         <main> <!-- Opening main tag -->

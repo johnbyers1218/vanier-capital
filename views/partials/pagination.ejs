@@ -1,0 +1,60 @@
+<!-- views/partials/pagination.ejs -->
+<%# Reusable pagination controls %>
+<%# Expects: currentPage, hasNextPage, hasPreviousPage, nextPage, previousPage, lastPage, baseUrl, tagQuery (optional) %>
+
+<% if (lastPage > 1) { %> <%# Only show pagination if there's more than one page %>
+    <nav class="pagination" aria-label="Page navigation">
+
+        <!-- Previous Page Link -->
+        <% if (hasPreviousPage) { %>
+             <% const prevUrl = `${baseUrl}?page=${previousPage}` + (tagQuery ? `&tag=${encodeURIComponent(tagQuery)}` : ''); %>
+             <a href="<%= prevUrl %>" class="page-link prev" aria-label="Previous Page">← Previous</a>
+        <% } else { %>
+            <span class="page-link disabled prev" aria-disabled="true">← Previous</span>
+        <% } %>
+
+        <!-- Page Number Links (Example: Simple, could be extended with ellipsis ...) -->
+        <%
+            const maxPagesToShow = 5; // Max number links shown around current page
+            let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+            let endPage = Math.min(lastPage, startPage + maxPagesToShow - 1);
+            // Adjust startPage if endPage reaches the limit first
+            if (endPage === lastPage && (endPage - startPage + 1) < maxPagesToShow) {
+                 startPage = Math.max(1, endPage - maxPagesToShow + 1);
+            }
+        %>
+
+        <%# Link to First Page (if not shown in main range) %>
+        <% if (startPage > 1) { %>
+             <% const firstUrl = `${baseUrl}?page=1` + (tagQuery ? `&tag=${encodeURIComponent(tagQuery)}` : ''); %>
+             <a href="<%= firstUrl %>" class="page-link" aria-label="Page 1">1</a>
+             <% if (startPage > 2) { %> <span class="page-link disabled">...</span> <% } %>
+        <% } %>
+
+        <%# Main Page Number Range %>
+        <% for (let i = startPage; i <= endPage; i++) { %>
+            <% if (i === currentPage) { %>
+                 <span class="page-link active" aria-current="page"><%= i %></span>
+            <% } else { %>
+                 <% const pageUrl = `${baseUrl}?page=${i}` + (tagQuery ? `&tag=${encodeURIComponent(tagQuery)}` : ''); %>
+                 <a href="<%= pageUrl %>" class="page-link" aria-label="Page <%= i %>"><%= i %></a>
+            <% } %>
+        <% } %>
+
+         <%# Link to Last Page (if not shown in main range) %>
+        <% if (endPage < lastPage) { %>
+             <% if (endPage < lastPage - 1) { %> <span class="page-link disabled">...</span> <% } %>
+              <% const lastUrl = `${baseUrl}?page=${lastPage}` + (tagQuery ? `&tag=${encodeURIComponent(tagQuery)}` : ''); %>
+              <a href="<%= lastUrl %>" class="page-link" aria-label="Page <%= lastPage %>"><%= lastPage %></a>
+        <% } %>
+
+        <!-- Next Page Link -->
+        <% if (hasNextPage) { %>
+             <% const nextUrl = `${baseUrl}?page=${nextPage}` + (tagQuery ? `&tag=${encodeURIComponent(tagQuery)}` : ''); %>
+             <a href="<%= nextUrl %>" class="page-link next" aria-label="Next Page">Next →</a>
+        <% } else { %>
+            <span class="page-link disabled next" aria-disabled="true">Next →</span>
+        <% } %>
+
+    </nav>
+<% } %>

@@ -1,0 +1,69 @@
+<!-- views/projects.ejs -->
+<%# Projects Portfolio Page Listing for FND Automations %>
+
+<%- include('partials/header', {
+    pageTitle: 'Our Projects - Automation Case Studies',
+    pageDescription: 'Explore case studies and examples of successful AI and process automation projects by FND Automations.',
+    path: '/projects'
+}) %>
+
+<section class="page-header">
+    <div class="container">
+        <h1>Our Projects</h1>
+        <div class="breadcrumbs">
+            <a href="/">Home</a> <span class="separator">/</span> <span class="current">Projects</span>
+        </div>
+    </div>
+</section>
+
+ <!-- Featured Project Section (Keep dynamic loading as is from apps.js) -->
+ <section id="featured-project" class="section">
+    <div class="container">
+       <div class="section-header"><h2 class="section-title">Featured Project</h2></div>
+       <div id="featured-project-container">
+            <p style="text-align: center; padding: 1rem; color: var(--gray-text);">Loading featured project...</p>
+       </div>
+    </div>
+</section>
+
+<section id="projects-grid-section" class="section section-darker">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Project Portfolio</h2>
+            <p class="section-description">Explore our diverse range of automation solutions.</p>
+        </div>
+
+        <div class="projects-filter" style="display: flex; justify-content: center; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 3rem;">
+            <button class="filter-btn cta-button secondary-btn active" data-filter="all">All</button>
+            <button class="filter-btn cta-button secondary-btn" data-filter="real-estate">Real Estate</button>
+            <button class="filter-btn cta-button secondary-btn" data-filter="finance">Finance</button>
+            <button class="filter-btn cta-button secondary-btn" data-filter="legal">Legal</button>
+            <button class="filter-btn cta-button secondary-btn" data-filter="e-commerce">E-commerce</button>
+            <button class="filter-btn cta-button secondary-btn" data-filter="advertising">Advertising</button>
+            <!-- Add more categories as needed -->
+        </div>
+        <style>
+            .projects-filter .filter-btn { padding: 8px 18px; font-size: 0.9rem; border-width: 1px; text-transform: capitalize; }
+            .projects-filter .filter-btn.active { background-color: var(--primary-color); border-color: var(--primary-color); color: var(--darker-bg); font-weight: 600;}
+        </style>
+
+        <div id="projects-grid-container" class="grid-container grid-3-col">
+             <div class="content-card is-loading" style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem;">
+                 <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-color);"></i>
+                 <p style="margin-top: 1rem; color: var(--gray-text);">Loading Projects...</p>
+             </div>
+        </div>
+    </div>
+</section>
+
+<section id="cta" class="cta-section">
+     <div class="container">
+         <div class="cta-content">
+             <h2>Have a Similar Challenge?</h2>
+             <p>Let's discuss a custom automation solution for your business needs.</p>
+             <a href="/contact" class="cta-button primary-btn glow-button">Request a Consultation</a>
+         </div>
+     </div>
+</section>
+
+<%- include('partials/footer') %>

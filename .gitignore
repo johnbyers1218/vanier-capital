@@ -1,0 +1,15 @@
+# Add any other sensitive files like downloaded service account keys if not in .env
+node_modules/
+.env*
+.env.production
+.env.development
+*.log
+key.pem
+cert.pem
+service-account-key.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+# Add any other OS-specific or editor-specific files (e.g., .DS_Store, .vscode/)
+.DS_Store
+.vscode/

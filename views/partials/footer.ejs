@@ -1,0 +1,129 @@
+<!-- views/partials/footer.ejs -->
+
+</main> <!-- Closing main tag opened in header.ejs -->
+
+<!-- ======================================== -->
+<!-- Site Footer                          -->
+<!-- ======================================== -->
+<footer>
+    <!-- Container for consistent padding and max-width -->
+    <div class="container">
+        <div class="footer-content"> <!-- Grid layout for footer sections -->
+
+            <!-- Footer Section 1: Logo & Brand -->
+            <div class="footer-section footer-logo">
+                <div class="logo">
+                    <%# OLD Text Logo: <a href="/index" title="FND Automations Home">FND Automations</a> %>
+                    <%# NEW Image Logo: %>
+                    <a href="/" title="FND Automations Home">
+                        <img src="/images/FND_LOGO_SVG_WHITE.svg" alt="FND Automations Logo" id="header-logo">
+                    </a>
+                </div>
+                <p style="color: var(--gray-text); font-size: 0.9rem; line-height: 1.6;">
+                    Empowering businesses through innovative AI and process automation solutions designed for efficiency and growth.
+                </p>
+                 <!-- Optional: Add mission snippet or tagline -->
+            </div>
+
+            <!-- Footer Section 2: Quick Links -->
+            <div class="footer-section footer-links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/services">Services</a></li>
+                    <li><a href="/projects">Projects</a></li>
+                    <li><a href="/testimonials">Testimonials</a></li>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/blog">Blog</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                     <li><a href="/privacy-policy">Privacy Policy</a></li>
+                     <li><a href="/terms-of-service">Terms of Service</a></li>
+                </ul>
+            </div>
+
+            <!-- Footer Section 3: Contact Info & Social -->
+            <div class="footer-section footer-contact">
+                <h3>Get In Touch</h3>
+                <p>
+                    <i class="fas fa-envelope fa-fw" style="color: var(--primary-color); margin-right: 8px;"></i>
+                    <a href="mailto:logan.mayfield@fndautomations.com" style="color: inherit; text-decoration: none;">logan.mayfield@fndautomations.com</a>
+                </p>
+                <p>
+                     <i class="fas fa-phone fa-fw" style="color: var(--primary-color); margin-right: 8px;"></i>
+                     <a href="tel:+11234567890" style="color: inherit; text-decoration: none;">(209) 402-0089</a> <%# Update phone # %>
+                 </p>
+                                <!-- Social Media Icons -->
+                <div class="social-icons" style="margin-top: 1.5rem;"> <!-- Added margin-top -->
+                     <!-- <a href="https://www.facebook.com/yourprofile" target="_blank" rel="noopener noreferrer" aria-label="FND Automations on Facebook" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                     <a href="https://twitter.com/yourprofile" target="_blank" rel="noopener noreferrer" aria-label="FND Automations on Twitter" title="Twitter"><i class="fab fa-twitter"></i></a> -->
+                     <a href="https://www.instagram.com/fndautomations" target="_blank" rel="noopener noreferrer" aria-label="FND Automations on Instagram" title="Instagram"><i class="fab fa-instagram"></i></a>
+                     <!-- <a href="https://www.linkedin.com/in/yourprofile" target="_blank" rel="noopener noreferrer" aria-label="FND Automations on LinkedIn" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a> -->
+                     <a href="https://www.tiktok.com/@fnd.automations?lang=en" target="_blank" rel="noopener noreferrer" aria-label="FND Automations on TikTok" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                     <!-- Add other relevant social media links (GitHub?) -->
+                </div>
+            </div>
+
+        </div> <!-- /.footer-content -->
+     </div> <!-- /.container -->
+
+     <!-- Footer Bottom Bar -->
+     <div class="footer-bottom">
+         <!-- Copyright text with dynamic year -->
+         <p>© <span id="current-year">2025</span> FND Automations. All rights reserved.</p>
+     </div>
+ </footer>
+ <!-- End Site Footer -->
+
+</div> <!-- /.page-wrapper -->
+
+<!-- ======================================== -->
+<!-- JavaScript Files                       -->
+<!-- ======================================== -->
+
+<!-- Main application script (should contain most JS logic) -->
+<script src="/js/apps.js"></script>
+
+<!-- Inline script for essential immediate execution (like dynamic year) -->
+<script>
+ // Set Dynamic Copyright Year
+ const yearSpan = document.getElementById('current-year');
+ if(yearSpan) { yearSpan.textContent = new Date().getFullYear(); }
+
+ // Basic Hamburger Menu Toggle Logic (RECOMMENDATION: Move to apps.js)
+ // This ensures basic nav works even if apps.js has an error or is deferred
+ const hamburger = document.querySelector('.hamburger');
+ const navLinks = document.querySelector('.nav-links');
+ const bodyForNav = document.body;
+
+ if(hamburger && navLinks) {
+     if (!navLinks.id) { navLinks.id = 'nav-links-list'; } // Ensure ID for aria
+     hamburger.setAttribute('aria-controls', navLinks.id);
+     hamburger.setAttribute('aria-expanded', 'false');
+
+     hamburger.addEventListener('click', () => {
+         const isActive = navLinks.classList.toggle('active');
+         hamburger.setAttribute('aria-expanded', isActive);
+         bodyForNav.classList.toggle('nav-active', isActive);
+     });
+ } else {
+      logger.warn('Hamburger menu elements (.hamburger, .nav-links) not found for inline script.');
+ }
+</script>
+
+<!-- Optional: Analytics Script (Conditional for Production) -->
+<% if (process.env.NODE_ENV === 'production' && process.env.GA_MEASUREMENT_ID) { %> <!-- Check for ID -->
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=<%= process.env.GA_MEASUREMENT_ID %>"></script>
+<script>
+ window.dataLayer = window.dataLayer || [];
+ function gtag(){dataLayer.push(arguments);}
+ gtag('js', new Date());
+ gtag('config', '<%= process.env.GA_MEASUREMENT_ID %>'); // Use env variable
+</script>
+<% } else if (process.env.NODE_ENV === 'production' && !process.env.GA_MEASUREMENT_ID) { %>
+<!-- Warning if in production but ID is missing -->
+<script>logger.warn('Google Analytics Measurement ID (GA_MEASUREMENT_ID) is not configured for production.');</script>
+<% } %>
+
+</body>
+</html>

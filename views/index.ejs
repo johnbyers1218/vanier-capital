@@ -1,0 +1,121 @@
+<!-- views/index.ejs -->
+<%# Homepage for FND Automations %>
+
+<%- include('partials/header', {
+    pageTitle: 'FND Automations - AI & Process Automation Solutions',
+    pageDescription: 'FND Automations provides innovative AI and process automation services to boost efficiency, reduce costs, and drive business growth. Contact us for custom solutions.',
+    path: '/'
+}) %>
+
+<!-- Hero Section -->
+<section id="hero" class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title glowing-text">FND AUTOMATIONS</h1>
+        <p class="hero-subtitle">Empowering businesses through innovative automation solutions</p>
+        <div class="hero-buttons">
+            <a href="/services" class="cta-button primary-btn">Our Services</a>
+            <a href="/contact" class="cta-button secondary-btn">Get Started</a>
+        </div>
+    </div>
+    <div class="hero-overlay"></div>
+</section>
+
+<!-- Intro Section -->
+<section id="intro" class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Welcome to FND Automations</h2>
+        <p class="section-description">We transform how businesses operate through custom automation solutions, combining technical expertise with industry knowledge to deliver results that matter.</p>
+      </div>
+      <!-- Optional: Add more descriptive text if needed -->
+      <!-- <div class="intro-text" style="max-width: 850px; text-align: center; margin-bottom: 3rem;"> ... </div> -->
+
+      <!-- Features Grid -->
+      <div class="grid-container grid-3-col">
+          <div class="content-card feature-card">
+            <div class="card-icon"><i class="fas fa-rocket fa-fw"></i></div> <!-- Added fa-fw for fixed width -->
+            <h3>Efficiency</h3>
+            <p>Streamline operations, reduce manual tasks, and cut operational costs significantly.</p>
+          </div>
+          <div class="content-card feature-card">
+            <div class="card-icon"><i class="fas fa-cogs fa-fw"></i></div>
+            <h3>Innovation</h3>
+            <p>Implement cutting-edge AI and automation solutions tailored to modern business challenges.</p>
+          </div>
+          <div class="content-card feature-card">
+            <div class="card-icon"><i class="fas fa-chart-line fa-fw"></i></div>
+            <h3>Growth</h3>
+            <p>Scale your business effectively by leveraging smart automation for revenue generation.</p>
+          </div>
+      </div>
+    </div>
+</section>
+
+<!-- Services Preview Section -->
+<section id="services-preview" class="section section-darker">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">What We Offer</h2>
+            <p class="section-description">A glimpse into our comprehensive automation solutions designed for your business needs.</p>
+        </div>
+        <div class="grid-container grid-3-col">
+            <div class="content-card service-card">
+                <div class="card-icon"><i class="fas fa-robot fa-fw"></i></div>
+                <h3>Process Automation</h3>
+                <p>Automate repetitive tasks and workflows using tools like n8n and Make to increase productivity and reduce errors.</p>
+                <a href="/services#process-automation" class="card-link">Learn More →</a>
+            </div>
+            <div class="content-card service-card">
+                <div class="card-icon"><i class="fas fa-brain fa-fw"></i></div>
+                <h3>AI Integration</h3>
+                <p>Leverage AI models (OpenAI, Claude) for tasks like data analysis, content generation, and intelligent decision-making.</p>
+                 <a href="/services#ai-integration" class="card-link">Learn More →</a>
+            </div>
+            <div class="content-card service-card">
+                <div class="card-icon"><i class="fas fa-database fa-fw"></i></div>
+                <h3>Custom Solutions</h3>
+                <p>Tailored software and integrations connecting tools like Airtable, CRMs, and APIs for your specific workflows.</p>
+                 <a href="/services#custom-solutions" class="card-link">Learn More →</a>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 3rem;">
+            <a href="/services" class="cta-button secondary-btn">View All Services</a>
+        </div>
+    </div>
+</section>
+
+ <!-- Dynamic Projects Preview -->
+ <section id="projects-preview" class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Recent Projects</h2>
+            <p class="section-description">See how we've helped businesses like yours achieve tangible results.</p>
+        </div>
+         <!-- Container where JS will inject project cards -->
+        <div id="projects-preview-grid" class="grid-container grid-3-col">
+             <!-- Example placeholder structure for JS target -->
+             <div class="content-card project-card is-loading" style="justify-content: center; align-items: center;">
+                <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-color);"></i>
+                <p style="margin-top: 1rem; color: var(--gray-text);">Loading Projects...</p>
+            </div>
+             <div class="content-card project-card is-loading" style="justify-content: center; align-items: center; display: none; /* Hide extra placeholders on larger screens */"></div>
+             <div class="content-card project-card is-loading" style="justify-content: center; align-items: center; display: none;"></div>
+        </div>
+         <div style="text-align: center; margin-top: 3rem;">
+            <a href="/projects" class="cta-button secondary-btn">View All Projects</a>
+        </div>
+    </div>
+ </section>
+
+<!-- Call to Action Section -->
+<section id="cta" class="cta-section">
+     <div class="container">
+         <div class="cta-content">
+             <h2>Ready to Transform Your Business?</h2>
+             <p>Contact us today for a free consultation and discover how automation can drive your success.</p>
+             <a href="/contact" class="cta-button primary-btn glow-button">Get Started Now</a>
+         </div>
+     </div>
+</section>
+
+<%- include('partials/footer') %>

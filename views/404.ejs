@@ -1,0 +1,39 @@
+<!-- views/404.ejs -->
+<%# Custom 404 Page Not Found %>
+
+<%- include('partials/header', {
+    pageTitle: 'Page Not Found (404)',
+    pageDescription: 'The page you were looking for could not be found on FND Automations.',
+    path: '/404' <!-- Special path for potential styling/logic -->
+}) %>
+
+<!-- Main Content Section for Error -->
+<section class="section error-section" style="padding: 4rem 0;"> <!-- Add padding -->
+    <div class="container error-content-wrapper">
+        <div class="error-container">
+            <div class="error-code">404</div>
+            <h2 class="error-message">Oops! Page Not Found</h2>
+            <p class="error-description">
+                Sorry, the page you are looking for might have been removed, had its name changed,
+                or is temporarily unavailable. Please check the URL or use the navigation below.
+            </p>
+
+            <!-- Button back to homepage -->
+            <a href="/" class="cta-button primary-btn glow-button">
+                <i class="fas fa-home"></i> Return to Homepage
+            </a>
+
+            <!-- Quick navigation links -->
+            <div class="navigation-links">
+                <a href="/services">Our Services</a>
+                <a href="/projects">View Projects</a>
+                <a href="/blog">Read Blog</a>
+                <a href="/contact">Contact Us</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<%- include('partials/footer') %>
+
+<!-- Ensure error page styles from style.css are sufficient -->

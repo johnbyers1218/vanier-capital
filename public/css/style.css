@@ -1,0 +1,1254 @@
+/* ======================================== */
+/* FND Automations - Public Stylesheet      */
+/* ======================================== */
+
+/* ---------------------------------------- */
+/* 1. Base Styles & Variables               */
+/* ---------------------------------------- */
+:root {
+    --primary-color: #00a8e8;
+    --secondary-color: #0077b6;
+    --dark-bg: #0f0f0f;
+    --darker-bg: #080808;
+    --light-text: #ffffff;
+    --gray-text: #cccccc;
+    --card-bg: rgba(20, 20, 25, 0.4); /* Slightly lighter dark card */
+    --card-hover-bg: rgba(0, 168, 232, 0.1);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --primary-glow: rgba(0, 168, 232, 0.5);
+    --primary-glow-hover: rgba(0, 168, 232, 0.8);
+    --danger-color: #dc3545;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --body-font: 'Montserrat', Arial, sans-serif;
+    --heading-font: 'Montserrat', Arial, sans-serif;
+    --base-font-size: 16px;
+    --border-radius: 5px;
+    --container-max-width: 1200px;
+    --section-padding-y: 4rem;
+    --transition-speed: 0.3s;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: var(--base-font-size);
+    scroll-behavior: smooth;
+    overflow-x: hidden; /* Prevent horizontal scroll globally */
+}
+
+body {
+    font-family: var(--body-font);
+    line-height: 1.7;
+    color: var(--light-text);
+    background-color: var(--dark-bg);
+    background-image: linear-gradient(135deg, #1a1a1a 0%, var(--dark-bg) 100%);
+    min-height: 100vh;
+    font-size: 1rem; /* Base */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex-grow: 1; /* Push footer down */
+}
+
+/* ======================================== */
+/* 2. Typography & Basic Elements           */
+/* ======================================== */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--heading-font);
+    color: var(--primary-color);
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+}
+
+/* Responsive Heading Sizes using clamp(MIN, VAL, MAX) */
+h1 { font-size: clamp(2.2rem, 5vw, 3.2rem); }
+h2 { font-size: clamp(1.8rem, 4vw, 2.5rem); } /* e.g., Section Titles */
+h3 { font-size: clamp(1.3rem, 3vw, 1.6rem); } /* e.g., Card Titles */
+h4 { font-size: clamp(1.1rem, 2.5vw, 1.25rem); }
+
+p {
+    margin-bottom: 1.25rem;
+    color: var(--gray-text);
+    font-size: clamp(0.95rem, 1.5vw, 1.05rem);
+}
+p:last-child { margin-bottom: 0; }
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color var(--transition-speed) ease;
+}
+a:hover {
+    color: var(--secondary-color);
+}
+
+ul, ol {
+    margin-bottom: 1.25rem;
+    padding-left: 1.5rem; /* Indentation */
+}
+li {
+    margin-bottom: 0.5rem;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block; /* Prevents bottom spacing */
+   
+}
+
+hr {
+    border: none;
+    border-top: 1px solid var(--card-border);
+    margin: 2.5rem 0; /* Increased margin */
+}
+
+/* Screen-reader only text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+
+/* ======================================== */
+/* 3. Layout & Container                    */
+/* ======================================== */
+.container {
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    padding: 0 1.5rem; /* Consistent horizontal padding */
+    width: 100%;
+}
+
+/* General Section Styling */
+.section {
+    padding: var(--section-padding-y) 0;
+}
+.section-darker { background-color: rgba(0, 0, 0, 0.2); }
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+.section-title {
+    /* Inherits h2 sizing */
+    margin-bottom: 1rem;
+    position: relative;
+    display: inline-block;
+}
+.section-title::after { /* Underline */
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70px;
+    height: 3px;
+    background-color: var(--primary-color);
+    border-radius: 1px;
+}
+.section-description {
+    font-size: clamp(1rem, 2.5vw, 1.15rem);
+    color: var(--gray-text);
+    max-width: 750px;
+    margin: 1rem auto 0 auto; /* Margin top added */
+}
+
+/* ======================================== */
+/* 4. Header & Navigation                   */
+/* ======================================== */
+header {
+    background-color: rgba(10, 10, 10, 0.85);
+    padding: 0.8rem 0; /* Adjust padding as needed for logo height */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--card-border);
+}
+
+/* In style.css */
+.page-header.about-header { /* Add a specific class to the about page header section */
+    background: linear-gradient(rgba(15, 15, 15, 0.85), rgba(15, 15, 15, 0.85)), url('https://im.runwahttps://im.runware.ai/image/ws/2/ii/f8b365da-29a4-479d-a110-49824c8a2837.png') center center / cover no-repeat;
+}
+
+nav { /* Already in .container via partial */
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Vertically align logo and nav links */
+}
+/* public/css/style.css */
+
+/* ... existing styles ... */
+
+/* 4. Header & Navigation */
+header {
+    background-color: rgba(10, 10, 10, 0.85);
+    padding: 0.8rem 0; /* Adjust padding as needed for logo height */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--card-border);
+}
+
+nav { /* Already in .container via partial */
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Vertically align logo and nav links */
+}
+
+/* Logo Styling */
+header .logo {
+    /* Remove text-specific styles if they were here */
+    /* font-size: 1.4rem; */
+    /* font-weight: 700; */
+    /* color: var(--primary-color); */
+    /* text-transform: uppercase; */
+    /* letter-spacing: 1px; */
+    /* text-decoration: none; */
+    display: flex; /* Helps with vertical alignment if needed */
+    align-items: center;
+}
+
+header .logo a {
+    display: inline-block; /* Important for image link */
+    text-decoration: none;
+}
+
+header .logo img#header-logo { /* Target the logo image specifically */
+    height: 3.5rem; /* ADJUST THIS VALUE: Set your desired logo height */
+    width: auto;  /* Let width adjust automatically to maintain aspect ratio */
+    max-height: 200px; /* Optional: safety max height */
+    display: block; /* Removes any extra space below the image */
+    /* Add any other styling like margin if needed */
+    /* margin-right: 10px; */ /* If you want space between logo and potential tagline */
+}
+
+.nav-links { display: flex; list-style: none; padding: 0; margin: 0; }
+.nav-links li { margin: 0 0 0 1.8rem; }
+.nav-links li a {
+    color: var(--light-text); font-weight: 500; position: relative;
+    padding: 0.5rem 0.2rem; text-decoration: none;
+    transition: color var(--transition-speed) ease; display: inline-block;
+}
+.nav-links li a::after { /* Underline effect */
+    content: ''; position: absolute; width: 100%; height: 2px; bottom: 0; left: 0;
+    background-color: var(--primary-color); transform: scaleX(0);
+    transform-origin: left; transition: transform var(--transition-speed) ease-in-out;
+}
+.nav-links li a:hover, .nav-links li a.active { color: var(--primary-color); }
+.nav-links li a:hover::after, .nav-links li a.active::after { transform: scaleX(1); }
+
+/* Hamburger Menu */
+.hamburger { display: none; cursor: pointer; padding: 5px; background: none; border: none; z-index: 1001;}
+.hamburger span { display: block; width: 25px; height: 3px; background-color: var(--light-text); margin: 5px 0; transition: all 0.3s ease-in-out; border-radius: 1px;}
+/* Active state for hamburger (toggled by JS on body/header) */
+.nav-active .hamburger span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+.nav-active .hamburger span:nth-child(2) { opacity: 0; }
+.nav-active .hamburger span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+/* Mobile Nav Overlay (Toggled by JS) */
+@media (max-width: 768px) {
+    .hamburger { display: block; }
+    .nav-links {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: rgba(10, 10, 10, 0.98);
+        flex-direction: column; align-items: center; justify-content: center;
+        transform: translateX(-100%); transition: transform 0.3s ease-in-out;
+        padding-top: 60px; z-index: 999;
+        margin-left: 0; /* Reset margin */
+    }
+    .nav-links.active { transform: translateX(0); }
+    .nav-links li { margin: 0 0 2rem 0; }
+    .nav-links li a { font-size: 1.3rem; padding: 0.5rem 1rem; }
+    .nav-links li a::after { display: none; } /* No underline on mobile overlay */
+}
+
+/* ======================================== */
+/* 5. Hero Section                          */
+/* ======================================== */
+.hero-section { position: relative; height: 80vh; min-height: 500px; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; background-color: #000; color: var(--light-text); }
+.hero-section::before { /* Pattern Overlay */ content: ''; position: absolute; inset: 0; z-index: 0; opacity: 0.6; background-image: linear-gradient(30deg, rgba(0, 168, 232, 0.08) 12%, transparent 12.5%, transparent 87%, rgba(0, 168, 232, 0.08) 87.5%, rgba(0, 168, 232, 0.08)), linear-gradient(150deg, rgba(0, 168, 232, 0.08) 12%, transparent 12.5%, transparent 87%, rgba(0, 168, 232, 0.08) 87.5%, rgba(0, 168, 232, 0.08)), linear-gradient(30deg, rgba(0, 168, 232, 0.08) 12%, transparent 12.5%, transparent 87%, rgba(0, 168, 232, 0.08) 87.5%, rgba(0, 168, 232, 0.08)), linear-gradient(150deg, rgba(0, 168, 232, 0.08) 12%, transparent 12.5%, transparent 87%, rgba(0, 168, 232, 0.08) 87.5%, rgba(0, 168, 232, 0.08)), linear-gradient(60deg, rgba(0, 168, 232, 0.1) 25%, transparent 25.5%, transparent 75%, rgba(0, 168, 232, 0.1) 75%, rgba(0, 168, 232, 0.1)), linear-gradient(60deg, rgba(0, 168, 232, 0.1) 25%, transparent 25.5%, transparent 75%, rgba(0, 168, 232, 0.1) 75%, rgba(0, 168, 232, 0.1)); background-size: 40px 70px; background-position: 0 0, 0 0, 20px 35px, 20px 35px, 0 0, 20px 35px; animation: patternMove 60s linear infinite; }
+@keyframes patternMove { 0% { background-position: 0 0, 0 0, 20px 35px, 20px 35px, 0 0, 20px 35px; } 100% { background-position: 500px 500px, 500px 500px, 520px 535px, 520px 535px, 500px 500px, 520px 535px; } }
+.hero-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.8) 90%); z-index: 1; }
+.hero-content { position: relative; z-index: 2; max-width: 900px; padding: 0 1.5rem; }
+.hero-title { font-size: clamp(2.5rem, 6vw, 4rem); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--light-text); text-shadow: 0 0 8px var(--primary-glow); }
+.glowing-text { /* Additive class for glow effect */ text-shadow: 0 0 5px var(--primary-glow), 0 0 10px var(--primary-glow); }
+.hero-subtitle { font-size: clamp(1.1rem, 3vw, 1.5rem); margin-bottom: 2.5rem; color: var(--gray-text); font-weight: 300; max-width: 600px; margin-left: auto; margin-right: auto; }
+.hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+/* ======================================== */
+/* Buttons                                  */
+/* ======================================== */
+.cta-button { display: inline-block; padding: 10px 25px; border-radius: var(--border-radius); font-weight: 600; text-decoration: none; transition: all var(--transition-speed) ease; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; border: 2px solid transparent; font-size: 0.95rem; line-height: 1.5; text-align: center; }
+.cta-button i { margin-right: 8px; }
+.primary-btn { background-color: var(--primary-color); border-color: var(--primary-color); color: white; }
+.primary-btn:hover { background-color: var(--secondary-color); border-color: var(--secondary-color); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 168, 232, 0.3); }
+.secondary-btn { background-color: transparent; border-color: var(--primary-color); color: var(--primary-color); }
+.secondary-btn:hover { background-color: var(--card-hover-bg); color: var(--light-text); transform: translateY(-2px); border-color: var(--primary-color); }
+.glow-button { box-shadow: 0 0 15px var(--primary-glow); }
+.glow-button:hover { box-shadow: 0 0 25px var(--primary-glow-hover); }
+.read-more-btn { /* Specific style for blog/card read more */ margin-top: auto; align-self: flex-start; padding: 8px 18px; font-size: 0.9rem; } /* Inherits .cta-button */
+
+/* ======================================== */
+/* Grids & Cards                            */
+/* ======================================== */
+.grid-container { display: grid; gap: 2rem; margin-top: 3rem; }
+.grid-3-col { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.grid-2-col { grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); }
+.content-card {
+    background-color: var(--card-bg); border-radius: var(--border-radius); padding: 2rem;
+    text-align: center; transition: transform var(--transition-speed) ease, background-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    position: relative; overflow:visible; border: 1px solid var(--card-border); display: flex; flex-direction: column; height: 100%;
+}
+.content-card:hover { background-color: var(--card-hover-bg); transform: translateY(-6px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); }
+.content-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: var(--primary-color); transform: scaleX(0); transform-origin: center; transition: transform 0.3s ease-out; }
+.content-card:hover::before { transform: scaleX(1); }
+.card-icon { color: var(--primary-color); font-size: 2.8rem; margin-bottom: 1.5rem; line-height: 1; }
+.content-card h3 { font-size: 1.4rem; margin-bottom: 1rem; color: var(--primary-color); }
+.content-card p { font-size: 0.95rem; color: var(--gray-text); margin-bottom: 1.5rem; flex-grow: 1; }
+.card-link { margin-top: auto; font-weight: 600; color: var(--primary-color); text-decoration: none; transition: color 0.3s, transform 0.3s; display: inline-block; }
+.card-link:hover { color: var(--secondary-color); transform: translateX(4px); }
+
+/* Specific Card Types (Project, Testimonial, Blog Summary) */
+.project-card,
+.testimonial-card,
+.blog-post-summary {
+    text-align: left;
+    padding: 0; /* Let inner containers handle padding */
+    /* Ensure these specific card types also behave as flex containers if they are the primary card element */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Styling for the content area within each card type */
+.project-card .project-info,
+.testimonial-card .testimonial-content,
+.blog-post-summary-content {
+    padding: 1.5rem;
+    flex-grow: 1; /* Allows this section to take available vertical space */
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+}
+
+.project-card h3,
+.testimonial-card h3,
+.blog-post-summary h3 { /* Titles within the cards */
+    font-size: 1.25rem; /* Or clamp(1.1rem, 2.5vw, 1.25rem); if you want responsive titles */
+    margin-bottom: 0.8rem;
+    color: var(--primary-color); /* Ensure consistent title color */
+}
+
+/* Project Card Specific Content Styling */
+.project-card .project-info .project-category {
+    font-size: 0.85rem;
+    color: var(--primary-color);
+    display: block;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.project-card .project-info p { /* Project description paragraph */
+    font-size: 0.9rem;
+    color: var(--gray-text);
+    margin-bottom: 1.5rem;
+    flex-grow: 3; /* Allows description to take available space */
+    line-height: 1.6; /* Improved readability */
+}
+
+.project-card .project-info .card-link { /* "View Details" or "More Projects" button */
+    margin-top: auto; /* Pushes button to the bottom */
+    align-self: flex-start; /* Aligns button to the left */
+    /* Inherits .cta-button styles for appearance */
+}
+
+/* Ensure image containers inside these cards are styled */
+.project-image-preview img, /* Assuming .project-image-preview is the direct wrapper if image is not first child of .project-card */
+.blog-post-summary-image {
+    height: 200px; /* Fixed height for images */
+    width: 100%;
+    object-fit: cover;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    margin-bottom: 0; /* Images usually don't need bottom margin if followed by a padded content div */
+    transition: transform 0.4s ease;
+    display: block; /* Good practice for images */
+}
+
+.project-card:hover .project-image-preview img,
+.blog-post-summary:hover .blog-post-summary-image {
+    transform: scale(1.03);
+}
+ /* Basic styling for the single project page - can be moved to style.css */
+ .project-details-section .project-header h1 {
+    font-size: clamp(2rem, 5vw, 2.8rem); /* Responsive title */
+    color: var(--light-text);
+    margin-bottom: 1rem;
+    text-align: center; /* Center the main project title */
+}
+.project-meta-info span {
+    font-size: 0.95rem;
+    color: var(--gray-text);
+}
+.project-content h2, .project-content h3, .project-content h4 { /* Style headings within the description */
+    color: var(--light-text);
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+}
+.project-content ul, .project-content ol {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+.project-content li {
+    margin-bottom: 0.5rem;
+}
+
+/* Testimonial Card Specific Content Styling */
+.testimonial-card .testimonial-content .testimonial-quote p { /* The quote itself */
+    flex-grow: 1; /* Allows the quote to take available space */
+    margin-bottom: 1rem; /* Or adjust as needed */
+    line-height: 1.7; /* Good for quotes */
+    font-style: italic; /* Optional styling for quote */
+    color: var(--gray-text);
+}
+/* Ensure .testimonial-quote itself doesn't have conflicting flex properties if it's an intermediate wrapper */
+
+.testimonial-author-info {
+    display: flex;
+    align-items: center;
+    margin-top: auto; /* Pushes this whole block to the bottom of .testimonial-content */
+    padding-top: 1rem;
+    border-top: 1px solid var(--card-border);
+}
+
+.testimonial-author-info img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 1rem;
+    object-fit: cover;
+    border: 2px solid var(--card-border);
+}
+
+.testimonial-author-info h3 { /* Author's name */
+    font-size: 1.1rem;
+    margin-bottom: 0.2rem;
+    color: var(--light-text);
+}
+
+.testimonial-author-info p { /* Author's company/title */
+    font-size: 0.9rem;
+    color: var(--primary-color);
+    font-weight: 500;
+    margin-bottom: 0;
+}
+
+.rating {
+    margin-top: 0.5rem;
+}
+
+.rating .star {
+    color: #ffc107;
+    margin-right: 2px;
+    font-size: 1.1rem;
+}
+
+/* Blog Post Summary Card Specific Content Styling */
+.blog-post-summary-content .blog-post-date,
+.blog-post-summary-content .blog-post-author {
+    font-size: 0.85rem;
+    color: var(--muted-text); /* Or var(--gray-text) */
+    margin-bottom: 0.75rem; /* Add some space below meta info */
+}
+.blog-post-summary-content .blog-post-author {
+    margin-left: 10px;
+}
+
+
+.blog-post-summary-content .blog-post-excerpt { /* The excerpt paragraph */
+    font-size: 0.9rem;
+    color: var(--gray-text);
+    flex-grow: 1; /* Allows excerpt to take available space */
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.blog-post-summary-content .blog-tags {
+    margin-bottom: 1.5rem; /* Space before the read more button */
+}
+.blog-post-summary-content .blog-tags .tag-link {
+    /* Your existing tag link styles */
+    display: inline-block;
+    background-color: rgba(0, 168, 232, 0.1);
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 0.85em;
+    color: var(--primary-color);
+    text-decoration: none;
+    border: none;
+    margin-right: 5px; /* Use margin-right for spacing between tags */
+    margin-bottom: 5px; /* Allow tags to wrap nicely */
+    transition: background-color 0.3s;
+}
+.blog-post-summary-content .blog-tags .tag-link:hover {
+    background-color: rgba(0, 168, 232, 0.3);
+    color: #fff;
+}
+
+
+.blog-post-summary-content .read-more-btn { /* The "Read More" button */
+    margin-top: auto; /* Pushes button to the bottom */
+    align-self: flex-start; /* Aligns button to the left */
+    /* Inherits .cta-button and .secondary-btn styles */
+}
+
+/* ======================================== */
+/* Component Specific Styles (Add/Modify)   */
+/* ======================================== */
+
+/* CTA Section */
+.cta-section { background-color: rgba(0, 0, 0, 0.5); padding: 4rem 0; text-align: center; }
+.cta-content h2 { font-size: clamp(1.8rem, 4vw, 2.2rem); margin-bottom: 1rem; color: var(--primary-color); }
+.cta-content p { font-size: clamp(1rem, 2.5vw, 1.15rem); margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto; color: var(--gray-text);}
+
+/* Page Header */
+.page-header { padding: 4rem 0 2.5rem; text-align: center; background: linear-gradient(rgba(15, 15, 15, 0.8), rgba(15, 15, 15, 0.8)); border-bottom: 1px solid var(--card-border); margin-bottom: 3rem; }
+.page-header h1 { font-size: clamp(2.2rem, 5vw, 2.8rem); margin-bottom: 0.5rem; color: var(--light-text); }
+.breadcrumbs { display: flex; justify-content: center; gap: 0.5rem; font-size: 0.9rem; }
+.breadcrumbs a { color: var(--gray-text); } .breadcrumbs a:hover { color: var(--primary-color); }
+.breadcrumbs .separator { color: var(--gray-text); } .breadcrumbs .current { color: var(--primary-color); font-weight: 500; }
+
+/* Single Blog Post */
+.blog-post-container { max-width: 800px; margin: 2rem auto; background-color: var(--card-bg); padding: 2.5rem; border-radius: var(--border-radius); border: 1px solid var(--card-border); }
+.blog-post-header h1 { font-size: 2.4rem; color: var(--light-text); margin-bottom: 0.5rem; text-align: left; }
+.blog-post-meta { font-size: 0.9rem; color: var(--gray-text); margin-bottom: 2rem; border-bottom: 1px solid var(--card-border); padding-bottom: 1.5rem; }
+.blog-post-meta span { margin-right: 15px; display: inline-block; } .blog-post-meta span:last-child { margin-right: 0; }
+.blog-post-meta i { margin-right: 5px; color: var(--primary-color); width: 15px; text-align: center;}
+.blog-tags .tag-link { display: inline-block; background-color: rgba(0, 168, 232, 0.1); padding: 2px 8px; border-radius: 3px; font-size: 0.85em; color: var(--primary-color); text-decoration: none; border: none; margin-left: 5px; transition: background-color 0.3s; }
+.blog-tags .tag-link:hover { background-color: rgba(0, 168, 232, 0.3); color: #fff; }
+.featured-image img { border-radius: var(--border-radius); margin-bottom: 2rem; }
+/* Blog Content Element Styles */
+.blog-post-content { font-size: 1.05rem; line-height: 1.8; color: var(--gray-text); }
+.blog-post-content h2, .blog-post-content h3, .blog-post-content h4, .blog-post-content h5, .blog-post-content h6 { color: var(--light-text); font-weight: 600; margin-top: 2.5rem; margin-bottom: 1rem; line-height: 1.4; }
+.blog-post-content h2 { font-size: 1.8em; } .blog-post-content h3 { font-size: 1.5em; } .blog-post-content h4 { font-size: 1.25em; color: var(--primary-color); }
+.blog-post-content p { margin-bottom: 1.5rem; }
+.blog-post-content a { color: var(--primary-color); text-decoration: none; border-bottom: 1px dashed var(--primary-color); transition: color 0.3s, border-bottom-color 0.3s; }
+.blog-post-content a:hover { color: var(--secondary-color); border-bottom-color: var(--secondary-color); }
+.blog-post-content ul, .blog-post-content ol { margin-bottom: 1.5rem; padding-left: 2rem; }
+.blog-post-content li { margin-bottom: 0.75rem; } .blog-post-content ul { list-style: disc; } .blog-post-content ol { list-style: decimal; }
+.blog-post-content ul ul, .blog-post-content ol ol { margin-top: 0.75rem; margin-bottom: 0.75rem; }
+.blog-post-content strong, .blog-post-content b { font-weight: 600; color: var(--light-text); }
+.blog-post-content em, .blog-post-content i { font-style: italic; }
+.blog-post-content blockquote { margin: 1.5rem 0 1.5rem 1rem; padding: 1rem 1.5rem; border-left: 4px solid var(--primary-color); background-color: rgba(0, 168, 232, 0.05); color: var(--gray-text); font-style: italic; }
+.blog-post-content blockquote p { margin-bottom: 0.5rem; } .blog-post-content blockquote p:last-child { margin-bottom: 0; }
+.blog-post-content code { background-color: rgba(255, 255, 255, 0.1); color: var(--primary-color); padding: 0.2em 0.4em; border-radius: 3px; font-size: 0.9em; font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; }
+.blog-post-content pre { background-color: #282c34; color: #abb2bf; padding: 1.5rem; border-radius: 5px; margin-bottom: 1.5rem; overflow-x: auto; font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; font-size: 0.9em; line-height: 1.6; }
+.blog-post-content pre code { background-color: transparent; color: inherit; padding: 0; border-radius: 0; font-size: inherit; }
+.blog-post-content img { max-width: 100%; height: auto; border-radius: var(--border-radius); margin: 2rem auto; display: block; box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
+.blog-post-content figure { margin: 2rem 0; text-align: center; }
+.blog-post-content figcaption { font-size: 0.9em; color: var(--gray-text); margin-top: 0.75rem; font-style: italic; }
+.blog-post-content hr { border: none; border-top: 1px solid var(--card-border); margin: 2.5rem 0; }
+.blog-post-content table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.95em; }
+.blog-post-content th, .blog-post-content td { border: 1px solid var(--card-border); padding: 10px 12px; text-align: left; }
+.blog-post-content th { background-color: rgba(255, 255, 255, 0.08); font-weight: 600; color: var(--light-text); }
+
+/* ======================================== */
+/* Contact Page Specific Styles             */
+/* ======================================== */
+
+.contact-form-container {
+    max-width: 800px;
+    margin: 2rem auto 3rem auto;
+    padding: 2rem 2.5rem;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--card-border);
+}
+
+.form-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+.form-header h3 {
+    font-size: 1.8rem;
+    color: var(--light-text);
+    margin-bottom: 0.5rem;
+}
+.form-header p {
+    font-size: 0.9em;
+    color: var(--gray-text);
+    margin-top: 0.5rem;
+}
+
+/* Main Form Grid Layout */
+form#contact-form {
+    display: grid;
+    grid-template-columns: 1fr; /* Mobile first: single column */
+    gap: 1.5rem;
+    width: 100%;
+}
+
+/* Scheduling Fields Section - also a grid when visible */
+/* This container itself will span full width due to .form-group-full (applied in HTML)
+   when form#contact-form is in its 2-column layout on desktop. */
+#schedule-fields-container {
+    /* display: none; */ /* Initially hidden by JS or inline style in EJS */
+    /* No grid properties here directly; it acts as a full-width item in the parent form grid.
+       The grid for its children is on .schedule-fields-inner-grid */
+    padding-top: 1.5rem; /* Space above schedule fields */
+    margin-top: 1.5rem; /* Space above schedule fields */
+    border-top: 1px solid var(--card-border); /* Separator */
+}
+
+.schedule-fields-inner-grid { /* This is the NEW grid for the schedule inputs */
+    display: grid;
+    grid-template-columns: 1fr; /* Mobile first: single column */
+    gap: 1.5rem; /* Same gap as parent form */
+}
+
+
+/* General Form Group styling for ALL form groups */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+/* ... (Keep all your existing .form-group label, input, textarea, select, small, etc. styles as they were - they are good) ... */
+.form-group label { font-weight: 500; color: var(--light-text); font-size: 0.95rem; margin-bottom: 0; }
+.form-group input[type="text"], .form-group input[type="email"], .form-group input[type="tel"], .form-group input[type="date"], .form-group input[type="time"], .form-group textarea, .form-group select { width: 100%; padding: 12px 15px; background-color: rgba(255, 255, 255, 0.08); border: 1px solid var(--card-border); border-radius: var(--border-radius); color: var(--light-text); font-size: 1rem; font-family: inherit; transition: border-color 0.3s, box-shadow 0.3s; box-sizing: border-box; }
+.form-group textarea { min-height: 120px; resize: vertical; }
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0, 168, 232, 0.2); }
+.form-group select option { background-color: var(--darker-bg); color: var(--light-text); }
+.form-group small { font-size: 0.85em; color: var(--gray-text); display: block; margin-top: 4px; }
+
+
+/* Checkbox Specific Styling */
+.form-checkbox { flex-direction: row; align-items: center; gap: 0.8rem; }
+.form-checkbox input[type="checkbox"] { width: auto; margin-right: 0; flex-shrink: 0; height: 1em; width: 1em; vertical-align: middle;}
+.form-checkbox label { font-size: 0.9rem; font-weight: normal; margin-bottom: 0; color: var(--gray-text); line-height: 1.4; }
+.form-checkbox label a { color: var(--primary-color); text-decoration: underline; }
+.form-checkbox label a:hover { text-decoration: none; }
+
+
+/* Submit Button Styling (targets the button within the main form) */
+form#contact-form .submit-btn {
+    width: 100%;
+}
+
+
+.form-group input[type="date"],
+.form-group input[type="time"] {
+    accent-color: var(--primary-color); /* Your electric blue */
+    /* This *might* color the calendar/clock icon in some browsers */
+}
+
+/* Responsive Grid for Forms (Desktop and up) */
+@media (min-width: 768px) {
+    form#contact-form, /* Main form becomes 2-column */
+    .schedule-fields-inner-grid { /* Inner grid for schedule fields also becomes 2-column */
+        grid-template-columns: 1fr 1fr;
+    }
+
+    /* Class to make a form group span both columns in EITHER form structure */
+    /* This applies to elements directly under form#contact-form OR .schedule-fields-inner-grid */
+    .form-group-full { /* Simplified selector, will apply if parent is a grid */
+        grid-column: span 2;
+    }
+
+    form#contact-form .submit-btn-container {
+        /* This rule ensures the button container spans full width if form#contact-form is 2-col */
+        grid-column: span 2;
+        text-align: center;
+    }
+    form#contact-form .submit-btn {
+        width: auto;
+        min-width: 200px;
+    }
+}
+
+/* Flash Messages */
+/* Style for input fields with validation errors */
+.form-group input.error,
+.form-group textarea.error,
+.form-group select.error {
+    border-color: var(--danger-color) !important; /* Ensure it overrides other border colors */
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2) !important; /* Optional: error glow */
+}
+
+/* Style for individual field error messages */
+.field-error-message {
+    color: var(--danger-color); /* Defined in your :root variables */
+    font-size: 0.85em;
+    display: block; /* Ensure it takes its own line */
+    margin-top: 4px; /* Space above the message if it's below input */
+    /* Add to .form-group if you want it at the bottom of the group */
+}
+
+.flash-message {
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: var(--border-radius);
+    font-size: 0.95rem;
+    border-width: 1px;
+    border-style: solid;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.flash-message.success {
+    background-color: rgba(40, 167, 69, 0.15);
+    border-color: rgba(40, 167, 69, 0.4);
+    color: #a3d9b1; /* Lighter green text for dark theme */
+}
+
+.flash-message.error {
+    background-color: rgba(220, 53, 69, 0.15);
+    border-color: rgba(220, 53, 69, 0.4);
+    color: #f8d7da; /* Lighter red text for dark theme */
+}
+.flash-message.error p, /* If errors are wrapped in p tags by JS */
+.flash-message.error ul,
+.flash-message.error li {
+    color: inherit; /* Ensure error text within lists/p inherits the red color */
+    margin-bottom: 0.3rem;
+}
+.flash-message.error ul {
+    padding-left: 1.2rem;
+    margin-top: 0.5rem;
+}
+
+
+.flash-message i { /* For Font Awesome icons */
+    font-size: 1.2em;
+    flex-shrink: 0; /* Prevent icon from shrinking */
+}
+
+/* If you're using Font Awesome for icons in flash messages via JS: */
+.flash-message.success i.fa-check-circle::before {
+    content: "\f058"; /* Font Awesome check-circle */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+}
+.flash-message.error i.fa-exclamation-circle::before {
+    content: "\f06a"; /* Font Awesome exclamation-circle */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+}
+
+
+/* --- Contact Info Items (Below the Form) --- */
+.contact-info-container {
+    display: flex;
+    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+    justify-content: space-around; /* Distribute space around items */
+    gap: 2rem; /* Space between items */
+    margin: 3rem 0; /* Space above and below this section */
+    padding: 0 1rem; /* Add some horizontal padding for smaller screens */
+}
+
+.contact-info-item {
+    text-align: center;
+    flex-basis: 220px; /* Base width for each item, allows for 4-across on wider screens */
+    flex-grow: 1;      /* Allow items to grow to fill space */
+    min-width: 200px;  /* Prevent items from becoming too narrow */
+}
+
+.contact-info-item h3 {
+    font-size: 1.3rem; /* Or clamp(1.1rem, 2.8vw, 1.3rem); */
+    color: var(--primary-color); /* Make title stand out */
+    margin-bottom: 0.8rem;
+    display: flex; /* To align icon and text */
+    align-items: center;
+    justify-content: center; /* Center icon and text */
+}
+
+.contact-info-item h3 i { /* Icon within the h3 */
+    margin-right: 10px; /* Space between icon and text */
+    font-size: 1.1em; /* Relative to h3 font size */
+}
+
+.contact-info-item p {
+    margin: 0.3rem 0;
+    color: var(--gray-text); /* Changed from light-text for better contrast/hierarchy */
+    font-size: 0.95rem; /* Or clamp(0.9rem, 2vw, 0.95rem); */
+    line-height: 1.6;
+}
+
+.contact-info-item p a {
+    color: var(--gray-text); /* Links initially match paragraph text */
+    text-decoration: none;
+    transition: color var(--transition-speed);
+}
+
+.contact-info-item p a:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+
+
+/* --- Team Section Styles --- */
+/* .team-section { */
+    /* Inherits .section styles for padding, etc. */
+    /* You might add specific background or other styles here if needed */
+/* } */
+
+.team-grid {
+    display: grid;
+    gap: 2rem; /* Consistent gap */
+    /* grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); */ /* Original */
+    /* Updated from about.ejs for potentially wider cards if desired, adjust as needed */
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Allows slightly wider cards before wrapping */
+}
+
+.team-member {
+    position: relative; /* Crucial for absolute positioning of overlays */
+    overflow: hidden;   /* Hide overflowing overlay parts for clean effect */
+    border-radius: var(--border-radius);
+    background-color: var(--darker-bg); /* Fallback bg if image is missing or for design */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    /* Ensure the card itself can be a flex container for its direct children (image wrapper) */
+    display: flex;
+    flex-direction: column;
+}
+
+.team-member:hover {
+    transform: translateY(-6px); /* Slightly increased hover effect */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); /* Enhanced shadow */
+}
+
+.member-image { /* This is the wrapper for the img and the overlays */
+    display: block;   /* Behaves like a block for layout */
+    line-height: 0;   /* Removes extra space below image if it were inline */
+    position: relative; /* Make this the positioning context for the overlays */
+    width: 100%;      /* Ensure it takes full width of .team-member */
+    aspect-ratio: 3 / 4; /* Maintain professional portrait ratio for the image area */
+    border-radius: var(--border-radius); /* Ensure wrapper respects border radius */
+    overflow: hidden; /* Clip image zoom within this container */
+}
+
+.member-image img {
+    display: block;
+    width: 100%;
+    height: 100%; /* Make image fill the aspect-ratio container */
+    object-fit: cover; /* Ensure image covers the area without distortion */
+    /* border-radius: var(--border-radius); REMOVED: Apply to .member-image wrapper to avoid double radius on zoom */
+    transition: transform 0.4s ease; /* Smooth zoom effect */
+}
+
+.team-member:hover .member-image img {
+    transform: scale(1.08); /* Slightly increased zoom on hover */
+}
+
+/* Base Overlay Styles - Common properties for initial and hover overlays */
+.member-details-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2; /* Ensure overlays are above the image */
+    color: var(--light-text);
+    transition: opacity var(--transition-speed) ease-in-out, transform var(--transition-speed) ease-in-out;
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+/* Initial Overlay (Name & Title - visible by default) */
+.initial-overlay {
+    background: linear-gradient(to middle, rgba(8, 8, 8, 0.98) 25%, rgba(8, 8, 8, 0.75) 70%, transparent 100%);
+    opacity: 1;
+    transform: translateY(0);
+    padding: 1.5rem; /* Padding for initial content */
+    /* Align text to bottom of this overlay naturally */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%; /* Cover the entire image area */
+}
+
+.initial-overlay h3 { /* Member Name */
+    font-size: clamp(1.4rem, 3vw, 1.8rem); /* Responsive font size */
+    color: var(--light-text);
+    margin-bottom: 0.3rem; /* Reduced margin */
+    font-weight: 600;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.8); /* Slightly stronger shadow */
+    line-height: 1.2;
+}
+
+.initial-overlay .member-role { /* Member Role */
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    color: var(--primary-color);
+    font-weight: 500;
+    margin: 0;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+    line-height: 1.3;
+}
+
+/* Hover Overlay (Bio & Socials - hidden initially, slides up) */
+.hover-overlay {
+    background-color: rgba(10, 10, 12, 0.97); /* Darker, more opaque */
+    opacity: 0;
+    transform: translateY(100%); /* Start fully below the card viewport */
+    pointer-events: none; /* Not interactive when hidden */
+    min-height: 50%; /* Ensure it takes at least half the card height */
+    max-height: 80%; /* Prevent it from taking over too much on very tall cards, adjust as needed */
+    height: auto;    /* Let content dictate height within min/max */
+    padding: 1.5rem; /* Consistent padding with initial overlay */
+    border-radius: 0 0 var(--border-radius) var(--border-radius); /* Round bottom corners if it doesn't fill whole card */
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Key change: Pushes content to top, social to bottom */
+}
+
+.team-member:hover .hover-overlay {
+    opacity: 1;
+    transform: translateY(0); /* Slide up to cover */
+    pointer-events: auto;
+}
+
+/* Hide initial overlay smoothly on hover */
+.team-member:hover .initial-overlay {
+    opacity: 0;
+    transform: translateY(10px); /* Optional subtle slide down/fade out */
+    transition-delay: 0s; /* Start hiding immediately when hover-overlay starts animating in */
+}
+
+/* Content within Hover Overlay (Name, Role, Bio) */
+.hover-overlay-content {
+    overflow-y: auto; /* Allow scrolling ONLY for this content block if bio is very long */
+    flex-grow: 1;     /* Allows this block to take up available space before social links */
+    /* margin-bottom: 1rem; Removed, rely on space-between of parent or padding-top of .member-social */
+    line-height: 1.5; /* General line height for readability */
+}
+
+.hover-overlay h3 { /* Name repeated in hover overlay */
+    font-size: clamp(1.2rem, 2.8vw, 1.5rem); /* Slightly smaller than initial if desired */
+    color: var(--light-text);
+    margin-bottom: 0.2rem;
+    font-weight: 600;
+}
+
+.hover-overlay .member-role { /* Role repeated */
+    font-size: clamp(0.9rem, 2.2vw, 1.1rem);
+    color: var(--primary-color);
+    font-weight: 500;
+    margin-bottom: 0.75rem; /* Space before bio */
+}
+
+.hover-overlay .member-bio {
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+    color: var(--gray-text);
+    line-height: 1.6; /* Good for readability of paragraph text */
+    margin-bottom: 0; /* No extra margin needed, parent flex handles spacing */
+    /* max-height: 150px; Example: If you need to limit bio height and rely on overflow-y: auto */
+}
+
+/* Social Icons in Hover Overlay */
+.member-social {
+    display: flex;
+    gap: 1rem; /* Slightly increased gap */
+    justify-content: flex-start; /* Align left, or center if preferred */
+    padding-top: 1rem; /* Space above icons from bio or top of this section */
+    border-top: 1px solid var(--card-border);
+    margin-top: 1rem; /* Ensure some space if bio is very short and flex-grow doesn't push this down much */
+    flex-shrink: 0; /* Prevent social links from shrinking if content above is too much */
+}
+
+.member-social a {
+    color: var(--gray-text);
+    font-size: 1.2rem; /* Slightly larger icons */
+    transition: color var(--transition-speed) ease, transform var(--transition-speed) ease;
+    display: inline-block;
+}
+
+.member-social a:hover {
+    color: var(--primary-color);
+    transform: translateY(-2px) scale(1.05); /* More noticeable hover */
+}
+
+/* Responsive adjustments for team grid */
+@media (max-width: 992px) {
+    .team-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Adjust minmax for tablets */
+        gap: 1.5rem;
+    }
+    .hover-overlay {
+        padding: 1rem; /* Adjust padding for smaller overlays */
+    }
+}
+
+@media (max-width: 768px) {
+    .team-grid {
+        /* Already stacks to 1 column due to auto-fit, minmax(280px, 1fr) */
+        /* You might want to adjust the minmax further if 280px is too wide for very small mobiles */
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    .initial-overlay h3 { font-size: 1.3rem; }
+    .initial-overlay .member-role { font-size: 1rem; }
+    .hover-overlay h3 { font-size: 1.1rem; }
+    .hover-overlay .member-role { font-size: 0.9rem; }
+    .hover-overlay .member-bio { font-size: 0.85rem; line-height: 1.5; }
+}
+
+
+/* ======================================== */
+/* Footer                                   */
+/* ======================================== */
+footer {
+    background-color: var(--darker-bg);
+    padding: 4rem 0 0 0; /* Increased top padding */
+    margin-top: auto;
+    font-size: 0.9rem;
+    border-top: 1px solid var(--card-border); /* Add subtle top border */
+}
+
+.footer-content {
+    display: grid;
+    /* Create 3 columns, with the first potentially wider */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive columns */
+    gap: 3rem; /* Gap between grid columns/rows */
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    padding: 0 1.5rem; /* Consistent with container padding */
+}
+
+/* Adjust specific sections if needed for grid 
+.footer-section {}
+    /* No specific grid properties needed here now */
+
+
+/* Make logo section potentially span more or have different alignment if desired */
+/* .footer-logo { grid-column: span 2; } */ /* Example: Make logo span 2 columns */
+
+.footer-section h3 {
+    font-size: 1.15rem; /* Slightly larger */
+    margin-bottom: 1.5rem;
+    position: relative;
+    color: var(--light-text);
+    padding-bottom: 0.5rem; /* Add space below heading */
+    /* Keep underline style */
+}
+.footer-section h3::after {
+    content: ''; position: absolute; bottom: 0; left: 0; /* Align underline below text */
+    width: 40px; height: 2px; background-color: var(--primary-color);
+}
+
+.footer-logo .logo { margin-bottom: 0.5rem; font-size: 1.3rem; }
+.footer-logo p { color: var(--gray-text); margin-top: 0.8rem; font-size: 0.9rem; line-height: 1.6;}
+
+.footer-links ul { list-style: none; padding: 0; margin: 0; }
+.footer-links ul li { margin-bottom: 0.8rem; /* Slightly more space */ }
+.footer-links ul li a { color: var(--gray-text); text-decoration: none; transition: color 0.3s ease, padding-left 0.3s ease; display: inline-block; /* Needed for padding effect */ }
+.footer-links ul li a:hover { color: var(--primary-color); padding-left: 6px; /* Subtle indent */ }
+
+.footer-contact p { margin-bottom: 0.8rem; color: var(--gray-text); display: flex; align-items: center; /* Align icon and text */ }
+.footer-contact p i { margin-right: 10px; color: var(--primary-color); width: 18px; /* Fixed width icon */ text-align: center; flex-shrink: 0; }
+.footer-contact p a { color: inherit; text-decoration: none; } /* Make links look like text */
+.footer-contact p a:hover { color: var(--primary-color); text-decoration: underline; } /* Underline on hover */
+
+.social-icons { display: flex; gap: 3rem; /* Increased gap */ margin-top: 1.5rem; justify-content: flex-start; }
+.social-icons a { color: var(--gray-text); font-size: 3rem; /* Larger icons */ transition: color 0.3s ease, transform 0.3s ease; }
+.social-icons a:hover { transform: translateY(-5px); color: var(--primary-color); }
+
+.footer-bottom {
+    text-align: center; padding: 1.5rem 1rem; margin-top: 4rem; /* Increased margin */
+    border-top: 1px solid var(--card-border); color: var(--muted-text); /* Use muted text */ font-size: 0.85rem;
+}
+
+/* Responsive Footer Adjustments */
+@media (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: 1fr; /* Stack columns on mobile */
+        text-align: center; /* Center text content */
+        gap: 2.5rem; /* Adjust gap */
+    }
+    .footer-section h3::after {
+        left: 50%; /* Center the underline */
+        transform: translateX(-50%);
+    }
+    .footer-contact p {
+        justify-content: center; /* Center icon/text lines */
+    }
+    .social-icons {
+        justify-content: center; /* Center social icons */
+    }
+}
+
+/* ======================================== */
+/* Component Specific Styles (Add/Modify)   */
+/* ======================================== */
+
+/* ... Keep other styles ... */
+
+/* --- FAQ Accordion Styles --- */
+/*
+.faq-section {}
+    /* Uses .section base padding */
+/*
+.faq-title {}*/
+    /* Uses .section-title base */
+
+.faq-underline { /* Simple underline below title */
+    height: 3px;
+    width: 70px;
+    background-color: var(--primary-color);
+    margin: -5px auto 40px auto; /* Adjust spacing */
+}
+.faq-list {
+    max-width: 850px; /* Constrain width */
+    margin: 0 auto;
+}
+.faq-item {
+    border-bottom: 1px solid var(--card-border); /* Separator line */
+    margin-bottom: 0; /* Remove default margin */
+}
+.faq-item:last-child {
+    border-bottom: none;
+}
+.faq-question {
+    font-size: 1.1rem; /* Adjusted size */
+    font-weight: 500; /* Less bold */
+    color: var(--light-text);
+    cursor: pointer;
+    padding: 1.25rem 2.5rem 1.25rem 0; /* More padding, space for icon */
+    position: relative;
+    transition: color var(--transition-speed) ease;
+    margin-bottom: 0; /* Remove default h3 margin */
+    width: 100%; /* Ensure it takes full width */
+    text-align: left; /* Align question text left */
+}
+.faq-question:hover {
+    color: var(--primary-color);
+}
+.faq-question::after { /* Toggle icon (Chevron) */
+    content: '\f078'; /* Font Awesome chevron-down */
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 0; /* Position icon to the right */
+    top: 50%;
+    transform: translateY(-50%) rotate(0deg); /* Initial state */
+    transition: transform var(--transition-speed) ease-in-out;
+    color: var(--primary-color);
+    font-size: 0.9em; /* Adjust icon size */
+}
+.faq-question[aria-expanded="true"]::after {
+    transform: translateY(-50%) rotate(180deg); /* Rotate icon when open */
+}
+/* Remove focus outline if visually jarring, ensure focus state is clear */
+.faq-question:focus {
+    outline: none;
+    color: var(--primary-color); /* Indicate focus */
+}
+.faq-question:focus-visible { /* Modern focus indicator */
+     outline: 2px solid var(--primary-color);
+     outline-offset: 3px;
+     border-radius: 3px; /* Match outline to element */
+}
+
+.faq-answer {
+    overflow: hidden;
+    max-height: 0; /* Initially hidden */
+    transition: max-height 0.4s ease-out, padding 0.4s ease-out; /* Smooth transition */
+    /* padding: 0 0.5rem; Remove padding when collapsed */
+}
+/* Add padding only when expanded */
+.faq-question[aria-expanded="true"] + .faq-answer {
+     padding-bottom: 1.5rem; /* Add padding below content when open */
+     /* Max height set by JS */
+}
+.faq-answer p {
+    padding: 0.5rem 0 0 0; /* Top padding added */
+    font-size: 0.95rem;
+    color: var(--gray-text);
+    line-height: 1.7;
+    margin-bottom: 0; /* Remove default margin */
+}
+.faq-answer p:last-child {
+     padding-bottom: 0; /* No extra padding after last paragraph */
+}
+
+/* Responsive FAQ adjustments */
+@media (max-width: 768px) {
+    .faq-question {
+        font-size: 1.05rem;
+        padding-right: 2rem; /* Ensure space for icon */
+    }
+    .faq-answer p {
+         font-size: 0.9rem;
+    }
+}
+
+/* --- End FAQ Styles --- */
+
+/* ... Keep other styles ... */
+
+
+/* 404 & Public Error Page Styles */
+.error-section { background-color: var(--darker-bg); /* Distinct background */ }
+.error-content-wrapper { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 60vh; padding: 2rem 0; }
+.error-container { background-color: var(--card-bg); border-radius: var(--border-radius); padding: 3rem; text-align: center; max-width: 700px; width: 90%; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); border: 1px solid var(--card-border); }
+.error-code { font-size: clamp(5rem, 15vw, 7rem); font-weight: 700; color: var(--primary-color); margin-bottom: 0.5rem; text-shadow: 0 0 10px var(--primary-glow); }
+.error-message { font-size: clamp(1.5rem, 4vw, 2rem); color: var(--light-text); margin-bottom: 1rem; font-weight: 500; }
+.error-description { font-size: 1rem; color: var(--gray-text); margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+.error-container .cta-button { margin-bottom: 2rem; } /* Uses button styles */
+.navigation-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 1.5rem; }
+.navigation-links a { /* Use .secondary-btn visual */ display: inline-block; padding: 8px 18px; border-radius: var(--border-radius); font-weight: 500; text-decoration: none; transition: all 0.3s ease; background-color: transparent; border: 1px solid var(--primary-color); color: var(--primary-color); font-size: 0.9rem; }
+.navigation-links a:hover { background-color: var(--card-hover-bg); color: var(--light-text); }
+.error-stack-trace { background-color: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 4px; color: #ccc; font-size: 0.85em; text-align: left; max-height: 200px; overflow-y: auto; margin-bottom: 2rem; white-space: pre-wrap; word-break: break-all; }
+
+
+/* Pagination */
+.pagination { display: flex; justify-content: center; gap: 0.6rem; margin-top: 3rem; flex-wrap: wrap;}
+.pagination .page-link { display: flex; align-items: center; justify-content: center; min-width: 40px; height: 40px; padding: 0 0.5rem; background-color: var(--card-bg); color: var(--light-text); text-decoration: none; border-radius: var(--border-radius); transition: all 0.3s ease; border: 1px solid var(--card-border); font-size: 0.9rem; cursor: pointer; }
+.pagination .page-link.next, .pagination .page-link.prev { width: auto; padding: 0 1.2rem; }
+.pagination .page-link:hover { background-color: var(--card-hover-bg); border-color: var(--primary-color); }
+.pagination .page-link.active { background-color: var(--primary-color); border-color: var(--primary-color); color: white; font-weight: 600; cursor: default;}
+.pagination .page-link.disabled { background-color: transparent; border-color: transparent; color: var(--gray-text); opacity: 0.5; cursor: default; pointer-events: none; }
+
+/* ======================================== */
+/* Responsive Overrides (Place Last)        */
+/* ======================================== */
+@media (max-width: 992px) { /* Tablet */
+    html { font-size: 15px; }
+    .grid-3-col { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); } /* Adjust grid */
+}
+@media (max-width: 768px) { /* Mobile */
+    html { font-size: 14px; }
+    .section { padding: 3rem 0; }
+    .page-header { padding: 3rem 0 2rem; margin-bottom: 2rem;}
+    .grid-3-col, .grid-2-col { grid-template-columns: 1fr; } /* Stack grids */
+    .hero-section { height: auto; min-height: 60vh; padding: 4rem 0;}
+    .hero-content { max-width: 90%; }
+    .hero-buttons { flex-direction: column; align-items: center; gap: 0.8rem;}
+    .cta-button { width: 80%; max-width: 300px; }
+    .footer-content { text-align: center; }
+    .footer-section h3::after { left: 50%; transform: translateX(-50%); }
+    .social-icons { justify-content: center; }
+    .contact-form { grid-template-columns: 1fr; }
+    .contact-form .submit-btn-container { text-align: center; }
+    .contact-form .submit-btn { width: 100%; }
+    .error-actions { flex-direction: column; }
+}

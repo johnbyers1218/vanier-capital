@@ -1,0 +1,79 @@
+<%# views/admin/testimonials/edit.ejs %>
+<%# Form for adding or editing a testimonial %>
+
+<%- include('../partials/header', { pageTitle: editing ? 'Edit Testimonial' : 'Add New Testimonial' }) %>
+
+<div class="admin-form-container">
+
+    <h2><%= editing ? 'Edit Testimonial' : 'Add New Testimonial' %></h2>
+
+    <%# Display Validation Errors %>
+    <% if (typeof errorMessages !== 'undefined' && errorMessages && errorMessages.length > 0) { %>
+        <div class="validation-errors">
+            <p><strong>Please correct the following errors:</strong></p>
+            <ul>
+                <% errorMessages.forEach(err => { %>
+                    <li><%= err.msg %></li>
+                <% }) %>
+            </ul>
+        </div>
+    <% } %>
+
+    <form action="<%= editing ? '/admin/testimonials/edit/' + testimonial._id : '/admin/testimonials' %>" method="POST" class="admin-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <div class="form-group">
+            <label for="author">Author Name <span style="color: #dc3545;">*</span></label>
+            <input type="text" id="author" name="author" value="<%= testimonial && testimonial.author ? testimonial.author : '' %>" required maxlength="100">
+        </div>
+
+        <div class="form-group">
+            <label for="content">Testimonial Content <span style="color: #dc3545;">*</span></label>
+            <textarea id="content" name="content" rows="7" required maxlength="2000"><%= testimonial && testimonial.content ? testimonial.content : '' %></textarea>
+             <small>Max 2000 characters. Plain text only.</small>
+        </div>
+
+         <div class="form-group">
+            <label for="company">Company Name (Optional)</label>
+            <input type="text" id="company" name="company" value="<%= testimonial && testimonial.company ? testimonial.company : '' %>" maxlength="100">
+        </div>
+
+         <div class="form-group">
+            <label for="position">Author's Position (Optional)</label>
+            <input type="text" id="position" name="position" value="<%= testimonial && testimonial.position ? testimonial.position : '' %>" maxlength="100">
+        </div>
+
+        <div class="form-group">
+            <label for="rating">Rating (Optional)</label>
+            <select id="rating" name="rating">
+                <option value="" <%= (!testimonial || !testimonial.rating) ? 'selected' : '' %>>-- No Rating --</option>
+                <% for(let i = 1; i <= 5; i++) { %>
+                    <option value="<%= i %>" <%= (testimonial && testimonial.rating == i) ? 'selected' : '' %>><%= i %> Star<%= i > 1 ? 's' : '' %></option>
+                <% } %>
+            </select>
+             <small>Select a rating from 1 to 5 stars.</small>
+        </div>
+
+        <div class="form-group">
+             <input type="checkbox" id="isFeatured" name="isFeatured" value="true" <%= (testimonial && testimonial.isFeatured) ? 'checked' : '' %> style="width: auto; margin-right: 10px; vertical-align: middle;">
+             <label for="isFeatured" class="checkbox-label" style="display: inline-block; margin-bottom: 0;">Feature this testimonial?</label>
+             <small style="display: block; margin-top: 4px;">Check to mark as featured (e.g., for homepage display).</small>
+        </div>
+
+        <div class="form-group">
+             <input type="checkbox" id="isVisible" name="isVisible" value="true" <%= (testimonial && testimonial.isVisible !== undefined) ? (testimonial.isVisible ? 'checked' : '') : 'checked' %> style="width: auto; margin-right: 10px; vertical-align: middle;">
+             <label for="isVisible" class="checkbox-label" style="display: inline-block; margin-bottom: 0;">Make this testimonial visible?</label>
+             <small style="display: block; margin-top: 4px;">Uncheck to hide from the public site without deleting. Checked by default for new testimonials.</small>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="submit-btn cta-button primary-btn">
+                 <i class="fas fa-save" style="margin-right: 8px;"></i> <%= editing ? 'Update Testimonial' : 'Save New Testimonial' %>
+            </button>
+            <a href="/admin/testimonials" class="cancel-btn" style="margin-left: 1rem; background-color: #6c757d; color: white;">Cancel</a>
+        </div>
+
+    </form>
+</div>
+
+<%- include('../partials/footer') %>

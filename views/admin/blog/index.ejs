@@ -1,0 +1,79 @@
+<%# views/admin/blog/index.ejs %>
+<%# Admin page to list and manage blog posts %>
+
+<%- include('../partials/header', { pageTitle: 'Manage Blog Posts' }) %>
+
+<div class="admin-actions-bar" style="margin-bottom: 1.5rem; text-align: right;">
+    <a href="/admin/blog/new" class="cta-button primary-btn">
+        <i class="fas fa-plus"></i> Add New Blog Post
+    </a>
+</div>
+
+<div class="admin-content-container">
+    <% if (posts && posts.length > 0) { %>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Title & Slug</th>
+                    <th>Author</th>
+                    <th>Status</th> {/* Moved Status header here */}
+                    <th>Published Date</th>
+                    <th>Last Updated</th>
+                    <th class="actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% posts.forEach(post => { %>
+                    <tr>
+                        <td>
+                            <a href="/admin/blog/edit/<%= post._id %>" title="Edit: <%= post.title %>" style="font-weight: 500; color: var(--light-text); text-decoration: none;">
+                                <%= post.title %>
+                            </a>
+                            <br>
+                            <small style="color: var(--gray-text); font-size: 0.8em;">Slug: <%= post.slug %></small>
+                            <% if(post.isPublished && post.slug) { %>
+                                 <a href="/blog/<%= post.slug %>" target="_blank" title="View Live Post" style="margin-left: 10px; font-size: 0.8em; color: var(--primary-color); text-decoration:none;">
+                                     <i class="fas fa-external-link-alt fa-xs"></i> View
+                                 </a>
+                            <% } %>
+                        </td>
+                        <td>
+                            <%# Display authorDisplayName first, then fallback %>
+                            <%= post.authorDisplayName || (post.author ? (post.author.fullName || post.author.username) : 'N/A') %>
+                        </td>
+                        <td> {/* MOVED STATUS DISPLAY LOGIC INSIDE THE LOOP PER POST */}
+                            <% if (post.isPublished) { %>
+                                <span style="color: #28a745; font-weight: bold; background-color: rgba(40, 167, 69, 0.1); padding: 3px 6px; border-radius: 3px; font-size: 0.85em;">Published</span>
+                            <% } else { %>
+                                <span style="color: #ffc107; font-weight: bold; background-color: rgba(255, 193, 7, 0.1); padding: 3px 6px; border-radius: 3px; font-size: 0.85em;">Draft</span>
+                            <% } %>
+                        </td>
+                        <td>
+                             <% if (post.publishedDate) { %>
+                                <%= new Date(post.publishedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %>
+                             <% } else { %>
+                                 -
+                             <% } %>
+                        </td>
+                        <td><%= post.updatedAt ? new Date(post.updatedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '-' %></td>
+                        <td class="actions">
+                            <a href="/admin/blog/edit/<%= post._id %>" class="edit-btn" title="Edit Blog Post">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <form action="/admin/blog/delete/<%= post._id %>" method="POST" style="display: inline;" class="delete-form">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                <button type="submit" class="delete-btn" title="Delete Blog Post">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    <% } else { %>
+        <p style="text-align: center; padding: 2rem; background-color: var(--card-bg); border-radius: 5px;">No blog posts found. <a href="/admin/blog/new" style="color: var(--primary-color);">Write the first one!</a></p>
+    <% } %>
+</div>
+
+<%- include('../partials/footer') %>

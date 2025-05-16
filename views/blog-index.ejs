@@ -1,0 +1,103 @@
+<!-- views/blog-index.ejs -->
+<%# Public Blog Listing Page %>
+
+<%- include('partials/header', {
+    pageTitle: pageTitle || 'FND Automations Blog', /* Dynamic title passed from route */
+    pageDescription: 'Read the latest insights on AI, automation, business efficiency, and technology trends from FND Automations.',
+    path: '/blog'
+}) %>
+
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <!-- Display dynamic title (e.g., includes page number or tag name) -->
+        <h1><%= pageTitle %></h1>
+        <div class="breadcrumbs">
+            <a href="/">Home</a> <span class="separator">/</span> <span class="current">Blog</span>
+             <% if (typeof tagQuery !== 'undefined' && tagQuery) { %>
+                 <span class="separator">/</span> <span class="current">Tag: <%= tagQuery %></span>
+             <% } %>
+        </div>
+    </div>
+</section>
+
+<!-- Main Blog Content Section -->
+<section class="section blog-posts-section">
+    <div class="container">
+
+        <%# Display Tag filter info if applicable %>
+        <% if (typeof tagQuery !== 'undefined' && tagQuery) { %>
+            <h2 style="text-align: center; font-size: 1.5rem; margin-bottom: 2rem; color: var(--light-text); font-weight: 400;">
+                Showing posts tagged with: <span style="background-color: rgba(0, 168, 232, 0.1); padding: 3px 8px; border-radius: 3px; color: var(--primary-color); font-weight: 500;"><%= tagQuery %></span>
+            </h2>
+        <% } %>
+
+
+        <% if (posts && posts.length > 0) { %>
+            <!-- Blog Post Grid -->
+            <div class="grid-container grid-2-col blog-list"> <%# Use 2 columns for blog list %>
+                <% posts.forEach(post => { %>
+                    <article class="content-card blog-post-summary"> <%# Reusable card styles %>
+                        <%# Optional Featured Image Link %>
+                        <% if (post.featuredImage) { %>
+                          <a href="/blog/<%= post.slug %>" class="blog-post-image-link" aria-hidden="true" tabindex="-1">
+                              <img src="<%= post.featuredImage %>" alt="" class="blog-post-summary-image"> <%# Alt left empty as title link serves purpose %>
+                          </a>
+                        <% } else { %>
+                           <%# Placeholder if no image? Optional %>
+                           <!-- <div style="height: 200px; background-color: #222; border-radius: 5px 5px 0 0;"></div> -->
+                        <% } %>
+
+                        <div class="blog-post-summary-content">
+                             <%# Meta Info: Date & Author %>
+                            <div style="margin-bottom: 0.75rem;">
+                                <span class="blog-post-date"><i class="far fa-calendar-alt fa-fw" style="margin-right: 4px;"></i><%= post.publishedDate ? post.publishedDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'Date N/A' %></span>
+                                <% if (post.authorDisplayName || (post.author && (post.author.fullName || post.author.username))) { %>
+                                    <span class="blog-post-author" style="margin-left: 10px;"><i class="far fa-user fa-fw" style="margin-right: 4px;"></i><%= post.authorDisplayName || post.author.fullName || post.author.username %></span>
+                               <% } %>
+                             </div>
+
+                             <%# Post Title (Link) %>
+                             <h3 style="margin-bottom: 0.5rem;"><a href="/blog/<%= post.slug %>"><%= post.title %></a></h3>
+
+                             <%# Excerpt %>
+                             <p class="blog-post-excerpt">
+                                 <%= post.excerpt || (post.content ? post.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...' : 'Read more...') %> <%# Use excerpt or generate from content %>
+                             </p>
+
+                             <%# Tags (Optional) %>
+                             <% if (post.tags && post.tags.length > 0) { %>
+                                 <div class="blog-tags" style="margin-bottom: 1.5rem;">
+                                      <i class="fas fa-tags fa-fw" style="color: var(--primary-color); margin-right: 5px;"></i>
+                                     <% post.tags.forEach((tag, index) => { %>
+                                         <a href="/blog/tag/<%= tag %>" class="tag-link"><%= tag %></a>
+                                     <% }) %>
+                                 </div>
+                             <% } %>
+
+                            <%# Read More Button %>
+                            <a href="/blog/<%= post.slug %>" class="cta-button secondary-btn read-more-btn">Read More →</a>
+                        </div>
+                    </article>
+                <% }) %>
+            </div> <!-- /.blog-list -->
+
+            <!-- Pagination Controls -->
+            <%- include('partials/pagination', { currentPage, hasNextPage, hasPreviousPage, nextPage, previousPage, lastPage, baseUrl: '/blog', tagQuery: (typeof tagQuery !== 'undefined' ? tagQuery : null) }) %>
+
+        <% } else { %>
+            <%# Message if no posts found (e.g., for a specific tag or empty blog) %>
+            <p style="text-align: center; padding: 3rem; background-color: var(--card-bg); border-radius: 5px;">
+                <% if (typeof tagQuery !== 'undefined' && tagQuery) { %>
+                    No posts found matching the tag "<%= tagQuery %>".
+                <% } else { %>
+                    No blog posts published yet. Check back soon!
+                <% } %>
+                <br><br>
+                <a href="/blog" class="cta-button secondary-btn">View All Posts</a>
+            </p>
+        <% } %>
+    </div> <!-- /.container -->
+</section> <!-- /.blog-posts-section -->
+
+<%- include('partials/footer') %>

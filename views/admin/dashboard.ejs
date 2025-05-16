@@ -1,0 +1,184 @@
+<%# views/admin/dashboard.ejs %>
+<%# Admin Dashboard - Main landing page after login %>
+
+<%- include('partials/header', { pageTitle: 'Admin Dashboard' }) %> <%# Includes admin header/nav %>
+
+<div class="admin-dashboard-content">
+
+    <%# Welcome message using res.locals.adminUser %>
+    <% if (isAuthenticated && adminUser) { %>
+        <h2 style="font-weight: 300; margin-bottom: 2rem;">Welcome back, <strong style="font-weight: 600;"><%= adminUser.username %></strong>!</h2>
+    <% } else { %>
+         <!-- Fallback/Error state if user somehow isn't set -->
+         <h2 style="font-weight: 300; margin-bottom: 2rem;">Admin Dashboard</h2>
+         <div class="flash-message error"><i></i> <span>Error: User data not found. Please try logging in again.</span></div>
+    <% } %>
+
+    <p style="color: var(--gray-text); margin-bottom: 3rem; font-size: 1.1em;">
+        Manage your website content and view recent activity from the sidebar navigation.
+    </p>
+
+    <!-- Quick Action Links Section -->
+    <div class="dashboard-section">
+        <h3 class="dashboard-section-title">Quick Actions</h3>
+        <div class="quick-actions-grid">
+            <a href="/admin/blog/new" class="quick-action-card">
+                <i class="fas fa-plus-circle fa-fw"></i>
+                <span>New Blog Post</span>
+            </a>
+            <a href="/admin/projects/new" class="quick-action-card">
+                <i class="fas fa-plus-circle fa-fw"></i>
+                <span>New Project</span>
+            </a>
+            <a href="/admin/testimonials/new" class="quick-action-card">
+                <i class="fas fa-plus-circle fa-fw"></i>
+                <span>New Testimonial</span>
+            </a>
+             <a href="/admin/blog?status=draft" class="quick-action-card"> <%# Example link %>
+                 <i class="fas fa-pencil-alt fa-fw"></i>
+                 <span>View Drafts</span>
+             </a>
+        </div>
+    </div>
+
+    <!-- Content Overview / Stats Section -->
+    <div class="dashboard-section">
+        <h3 class="dashboard-section-title">Content Overview</h3>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h4>Total Projects</h4>
+                <!-- Display count, default to '--' if null/undefined/error -->
+                <span class="stat-number"><%= (typeof projectCount === 'number') ? projectCount : '--' %></span>
+            </div>
+            <div class="stat-card">
+                 <h4>Published Posts</h4>
+                 <span class="stat-number"><%= (typeof blogPostCount === 'number') ? blogPostCount : '--' %></span>
+            </div>
+            <div class="stat-card">
+                 <h4>Visible Testimonials</h4>
+                 <span class="stat-number"><%= (typeof testimonialCount === 'number') ? testimonialCount : '--' %></span>
+            </div>
+             <div class="stat-card">
+                 <h4>Draft Posts</h4>
+                 <span class="stat-number"><%= (typeof draftPostCount === 'number') ? draftPostCount : '--' %></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================================== -->
+    <!-- NEW: Recent Admin Activity Section -->
+    <!-- ==================================== -->
+    <div class="dashboard-section">
+        <h3 class="dashboard-section-title">Recent Admin Activity</h3>
+        <div class="activity-log-container">
+            <%# Check if recentLogs array exists and has items %>
+            <% if (typeof recentLogs !== 'undefined' && recentLogs && recentLogs.length > 0) { %>
+                <ul class="admin-log-list">
+                    <% recentLogs.forEach(log => { %>
+                        <li class="admin-log-item">
+                            <!-- Log Details Column -->
+                            <div class="log-details">
+                                <span class="log-action">
+                                    <%# Format action type nicely %>
+                                    <%= log.action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) %>
+                                </span>
+                                <!-- Display admin user who performed the action -->
+                                <span class="log-user">
+                                    by <strong style="color: #fff;"><%= log.adminUser ? escapeHtml(log.adminUser.username) : 'System/Unknown' %></strong> <!-- Now works! -->
+                                </span>
+                                <%# Display optional details if they exist %>
+                                <% if (log.details) { %>
+                                    <span class="log-action-details">
+                                        : <%= escapeHtml(log.details.replace(`User '${log.adminUser ? log.adminUser.username : ''}'. `, '')) %> <%# Remove repetitive user part %>
+                                    </span>
+                                <% } %>
+                            </div>
+                            <!-- Timestamp & IP Column -->
+                            <div class="log-meta">
+                                 <% if (log.createdAt) { %>
+                                     <span class="log-timestamp" title="<%= log.createdAt.toISOString() %>">
+                                         <i class="far fa-clock fa-fw"></i>
+                                         <%# Format date nicely %>
+                                         <%= log.createdAt.toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short'}) %>
+                                     </span>
+                                 <% } %>
+                                 <% if (log.ipAddress) { %>
+                                     <span class="log-ip" title="IP Address">
+                                        <i class="fas fa-network-wired fa-fw"></i>
+                                        <%= escapeHtml(log.ipAddress) %> <%# Escape IP just in case %>
+                                     </span>
+                                 <% } %>
+                            </div>
+                        </li>
+                    <% }) %>
+                </ul>
+                <%# Optional: Add a link to view all logs if you create a separate log page %>
+                <!-- <div style="text-align: right; margin-top: 1rem;"><a href="/admin/logs" class="card-link">View All Activity →</a></div> -->
+            <% } else { %>
+                <%# Message shown if no logs are found %>
+                <p style="color: var(--muted-text); text-align: center; padding: 1.5rem; background-color: rgba(0,0,0,0.1); border-radius: var(--border-radius);">No recent admin activity recorded.</p>
+            <% } %>
+        </div> <!-- /.activity-log-container -->
+    </div>
+    <!-- End Recent Admin Activity Section -->
+
+</div> <!-- /.admin-dashboard-content -->
+
+<%- include('partials/footer') %> <%# Includes admin footer %>
+
+<!-- Add specific styles for dashboard components -->
+<style>
+    /* Keep styles from previous dashboard version */
+    .dashboard-section { margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+    .dashboard-section:last-child { border-bottom: none; margin-bottom: 0; }
+    .dashboard-section-title { color: var(--primary-color); font-size: 1.4rem; font-weight: 500; margin-bottom: 1.5rem; }
+    .quick-actions-grid, .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; }
+    .quick-action-card { display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: var(--card-bg); padding: 1.5rem 1rem; border-radius: var(--border-radius); text-decoration: none; color: var(--light-text); transition: all 0.3s ease; border: 1px solid var(--card-border); min-height: 120px; }
+    .quick-action-card:hover { transform: translateY(-5px); background-color: var(--card-hover-bg); border-color: var(--primary-color); box-shadow: 0 5px 15px rgba(0, 168, 232, 0.1); color: var(--primary-color); }
+    .quick-action-card i { font-size: 2rem; margin-bottom: 0.75rem; color: var(--primary-color); transition: color 0.3s ease; }
+    .quick-action-card:hover i { color: inherit; }
+    .quick-action-card span { font-weight: 500; text-align: center; font-size: 0.95rem; }
+    .stat-card { background-color: rgba(255, 255, 255, 0.03); padding: 1.5rem; border-radius: var(--border-radius); text-align: center; border: 1px solid rgba(255, 255, 255, 0.08); }
+    .stat-card h4 { color: var(--gray-text); font-size: 0.9rem; font-weight: 400; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-card .stat-number { font-size: 2.2rem; font-weight: 600; color: var(--primary-color); display: block; line-height: 1.2; }
+
+    /* NEW: Styles for Admin Activity Log */
+    /*.activity-log-container { }/* Optional wrapper */ 
+    .admin-log-list {
+        list-style: none; padding: 0; margin: 0;
+        max-height: 450px; /* Limit height and make scrollable */
+        overflow-y: auto;
+        border: 1px solid var(--card-border);
+        border-radius: var(--border-radius);
+        background-color: rgba(0,0,0,0.15); /* Slightly different bg */
+    }
+    .admin-log-item {
+        padding: 12px 15px;
+        border-bottom: 1px solid var(--card-border);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start; /* Align items top */
+        flex-wrap: wrap; /* Wrap on small screens */
+        gap: 10px; /* Gap between details and meta */
+        font-size: 0.9rem;
+    }
+    .admin-log-item:last-child { border-bottom: none; }
+    .log-details { flex-grow: 1; /* Allow details to take up space */ }
+    .log-action { color: var(--primary-color); font-weight: 500; }
+    .log-user { color: var(--light-text); margin: 0 5px; }
+    .log-action-details { color: var(--muted-text); font-size: 0.9em; display: block; margin-top: 3px; word-break: break-word;}
+    .log-meta { flex-shrink: 0; /* Prevent meta from shrinking */ text-align: right; }
+    .log-timestamp { color: var(--muted-text); font-size: 0.85em; white-space: nowrap; margin-right: 10px;}
+    .log-ip { color: var(--muted-text); font-size: 0.85em; white-space: nowrap; }
+    .log-meta i { margin-right: 4px; }
+
+     @media (max-width: 768px) {
+        .admin-log-item { flex-direction: column; align-items: flex-start; gap: 5px;}
+        .log-meta { text-align: left; margin-top: 5px; }
+     }
+     @media (max-width: 576px) {
+         .quick-actions-grid, .stats-grid { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; }
+         .quick-action-card i { font-size: 1.5rem; } .quick-action-card span { font-size: 0.9rem; }
+         .stat-card .stat-number { font-size: 1.8rem; }
+     }
+</style>

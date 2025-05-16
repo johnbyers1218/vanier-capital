@@ -1,0 +1,79 @@
+<!-- views/admin/partials/nav.ejs -->
+<!-- Sidebar Navigation for Admin Panel -->
+
+<aside class="admin-sidebar">
+    <div class="logo" style="padding: 0 1.5rem 1.5rem 1.5rem; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1.5rem;">
+        <a href="/admin/dashboard" style="text-decoration: none; color: var(--primary-color); font-size: 1.2em; font-weight: bold;">FND Admin</a>
+    </div>
+    <nav class="admin-nav">
+        <ul style="list-style: none; padding: 0; margin: 0;">
+
+            <!-- Dashboard Link -->
+            <li style="margin-bottom: 0.5rem;">
+                <% const isDashboardActive = (typeof path !== 'undefined' && path === '/admin/dashboard'); %>
+                <a href="/admin/dashboard" class="nav-link <%= isDashboardActive ? 'active' : '' %>">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+
+            <!-- Projects Link -->
+            <li style="margin-bottom: 0.5rem;">
+                 <% const isProjectsActive = (typeof path !== 'undefined' && path.startsWith('/admin/projects')); %>
+                <a href="/admin/projects" class="nav-link <%= isProjectsActive ? 'active' : '' %>">
+                    <i class="fas fa-project-diagram"></i> Projects
+                </a>
+            </li>
+
+            <!-- Testimonials Link -->
+            <li style="margin-bottom: 0.5rem;">
+                 <% const isTestimonialsActive = (typeof path !== 'undefined' && path.startsWith('/admin/testimonials')); %>
+                <a href="/admin/testimonials" class="nav-link <%= isTestimonialsActive ? 'active' : '' %>">
+                    <i class="fas fa-comment-dots"></i> Testimonials
+                </a>
+            </li>
+
+            <!-- Blog Posts Link -->
+            <li style="margin-bottom: 0.5rem;">
+                 <% const isBlogActive = (typeof path !== 'undefined' && path.startsWith('/admin/blog')); %>
+                <a href="/admin/blog" class="nav-link <%= isBlogActive ? 'active' : '' %>">
+                    <i class="fas fa-newspaper"></i> Blog Posts
+                </a>
+            </li>
+
+            <!-- Example: Users Link (Commented Out using HTML comments) -->
+            <!--
+            <li style="margin-bottom: 0.5rem;">
+                 <% const isUsersActive = (typeof path !== 'undefined' && path.startsWith('/admin/users')); %>
+                <a href="/admin/users" class="nav-link <%= isUsersActive ? 'active' : '' %>">
+                    <i class="fas fa-users"></i> Users
+                </a>
+            </li>
+            -->
+
+            <!-- Logout and View Site Links -->
+            <li style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
+                 <a href="/admin/logout" class="nav-link logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
+             <li style="margin-top: 1rem;">
+                 <a href="/" target="_blank" class="nav-link view-site">
+                    <i class="fas fa-external-link-alt"></i> View Public Site
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <!-- Styles should ideally be moved to admin-style.css -->
+    <style>
+        .admin-nav .nav-link {
+            display: block; padding: 10px 1.5rem; color: var(--light-text);
+            text-decoration: none; transition: background-color 0.2s, color 0.2s, border-left-color 0.2s;
+            border-left: 3px solid transparent; font-size: 0.95em;
+        }
+        .admin-nav .nav-link i { margin-right: 12px; width: 18px; text-align: center; }
+        .admin-nav .nav-link:hover { background-color: rgba(255, 255, 255, 0.05); color: var(--primary-color); }
+        .admin-nav .nav-link.active { color: var(--primary-color); font-weight: 600; border-left-color: var(--primary-color); background-color: rgba(0, 168, 232, 0.08); }
+        .admin-nav .nav-link.logout:hover, .admin-nav .nav-link.view-site:hover { background-color: rgba(255, 255, 255, 0.05); color: #eee; }
+        .admin-nav .nav-link.view-site { color: var(--gray-text); }
+    </style>
+</aside>

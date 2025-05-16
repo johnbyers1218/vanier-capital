@@ -1,0 +1,272 @@
+<%# views/admin/projects/edit.ejs %>
+<%# Form for adding or editing a project with Rich Text Editor & Cover Image Upload %>
+
+<%- include('../partials/header', { pageTitle: editing ? 'Edit Project' : 'Add New Project' }) %>
+
+<div class="admin-form-container">
+    <h2><%= editing ? 'Edit Project' : 'Add New Project' %></h2>
+
+    <% if (typeof errorMessages !== 'undefined' && errorMessages && errorMessages.length > 0) { %>
+        <div class="validation-errors">
+            <p><strong>Please correct the following errors:</strong></p>
+            <ul><% errorMessages.forEach(err => { %><li><%= err.msg %> <%= err.param ? '('+err.param+')' : '' %></li><% }) %></ul>
+        </div>
+    <% } %>
+
+    <form action="<%= editing ? '/admin/projects/edit/' + project._id : '/admin/projects' %>" method="POST" class="admin-form" id="projectForm">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <div class="form-group">
+            <label for="title">Project Title <span style="color: #dc3545;">*</span></label>
+            <input type="text" id="title" name="title" value="<%= project && project.title ? project.title : '' %>" required maxlength="150">
+        </div>
+
+        <div class="form-group">
+            <label for="slug">URL Slug</label>
+            <input type="text" id="slug" name="slug" value="<%= project && project.slug ? project.slug : '' %>" maxlength="200" pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$" placeholder="auto-generated-if-blank-from-title">
+            <small>URL-friendly ID. Leave blank to auto-generate from title. Unique, lowercase, numbers, hyphens only.</small>
+        </div>
+
+        <%# ****** COVER IMAGE UPLOAD SECTION FOR PROJECTS ****** %>
+        <div class="form-group">
+            <label for="projectCoverImageFile">Upload Cover Image (for Main Project Image)</label>
+            <input type="file" id="projectCoverImageFile" name="projectCoverImageFile" accept="image/jpeg,image/png,image/gif,image/webp">
+            <small>This will populate the 'Main Project Image URL' below. Max 5MB. Overwrites existing URL if a new file is uploaded.</small>
+            <div id="projectCoverImagePreviewContainer" style="margin-top: 10px;">
+                <% if (project && project.image) { %>
+                    <img src="<%= project.image %>" alt="Current Project Image" style="max-width: 200px; max-height: 200px; border-radius: 4px; display: block;">
+                    <button type="button" id="removeProjectCoverImageBtn" class="delete-btn" style="font-size: 0.8em; padding: 4px 8px; margin-top: 5px;">Remove Image</button>
+                <% } %>
+            </div>
+            <div id="projectCoverImageUploadStatus" style="font-size: 0.85em; margin-top: 5px;"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="image">Main Project Image URL (Thumbnail)</label>
+            <input type="url" id="image" name="image" value="<%= project && project.image ? project.image : '' %>" placeholder="Auto-populated by upload or enter URL manually">
+            <small>Main image shown in listings. Can be auto-filled by "Upload Cover Image" above.</small>
+        </div>
+        <%# ****** END COVER IMAGE SECTION ****** %>
+
+        <div class="form-group">
+            <label for="project-description-editor">Full Description / Case Study <span style="color: #dc3545;">*</span></label>
+            <textarea id="project-description-editor" name="description" class="richtext-editor" style="visibility: hidden; min-height: 400px;" required minlength="50"><%= project && project.description ? project.description : '' %></textarea>
+            <small>Detailed project information. Use the editor for formatting.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="category">Category <span style="color: #dc3545;">*</span></label>
+            <input type="text" id="category" name="category" value="<%= project && project.category ? project.category : '' %>" required maxlength="50" placeholder="e.g., manufacturing, real-estate">
+            <small>Used for filtering (e.g., real-estate, finance). Will be lowercased.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="link">External Project Link (Optional)</label>
+            <input type="url" id="link" name="link" value="<%= project && project.link ? project.link : '' %>" placeholder="https://live-project-example.com">
+            <small>Link to a live version or client site if applicable.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="clientName">Client Name (Optional)</label>
+            <input type="text" id="clientName" name="clientName" value="<%= project && project.clientName ? project.clientName : '' %>" maxlength="100">
+        </div>
+
+        <div class="form-group">
+            <label for="technologiesUsed">Technologies Used (Optional)</label>
+            <input type="text" id="technologiesUsed" name="technologiesUsed" value="<%= project && project.technologiesUsed ? (Array.isArray(project.technologiesUsed) ? project.technologiesUsed.join(', ') : project.technologiesUsed) : '' %>" placeholder="e.g., Make.com, OpenAI GPT-4, Airtable">
+            <small>Comma-separated list of key technologies.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="projectDate">Project Completion Date (Optional)</label>
+            <input type="date" id="projectDate" name="projectDate" value="<%= project && project.projectDate ? new Date(project.projectDate).toISOString().split('T')[0] : '' %>">
+        </div>
+
+        <div class="form-group">
+            <input type="checkbox" id="isFeatured" name="isFeatured" value="true" <%= (project && project.isFeatured) ? 'checked' : '' %>>
+            <label for="isFeatured" class="checkbox-label">Feature this project?</label>
+            <small style="display: block;">Check to mark as featured (e.g., on homepage).</small>
+        </div>
+
+        <div class="form-group">
+            <input type="checkbox" id="isPubliclyVisible" name="isPubliclyVisible" value="true" <%= (typeof project !== 'undefined' && project.isPubliclyVisible !== undefined) ? (project.isPubliclyVisible ? 'checked' : '') : 'checked' %>>
+            <label for="isPubliclyVisible" class="checkbox-label">Make publicly visible?</label>
+            <small style="display: block;">Uncheck to hide from public site without deleting. Checked by default for new projects.</small>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="submit-btn cta-button primary-btn">
+                <i class="fas fa-save" style="margin-right: 8px;"></i> <%= editing ? 'Update Project' : 'Save New Project' %>
+            </button>
+            <% if (editing && project && project.isPubliclyVisible && project.slug) { %>
+                 <a href="/projects/<%= project.slug %>" target="_blank" class="cta-button secondary-btn" style="margin-left: 1rem;">
+                     <i class="fas fa-eye" style="margin-right: 8px;"></i> View Live
+                 </a>
+             <% } %>
+            <a href="/admin/projects" class="cancel-btn" style="margin-left: 1rem; background-color: #6c757d; color: white;">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<%# TinyMCE Initialization Script %>
+<script src="https://cdn.tiny.cloud/1/<%= typeof tinymceApiKey !== 'undefined' ? tinymceApiKey : 'no-api-key' %>/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const checkTinyMCE = setInterval(() => {
+        if (typeof tinymce !== 'undefined') {
+            clearInterval(checkTinyMCE);
+            initializeTinyMCE();
+        }
+    }, 100);
+
+    function initializeTinyMCE() {
+        tinymce.init({
+            selector: 'textarea#project-description-editor', // Target the project description editor
+            promotion: false,
+            plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount codesample',
+            toolbar: 'undo redo | blocks | bold italic underline strikethrough | link image media table | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | code codesample | preview fullscreen | help',
+            content_style: 'body { font-family:Montserrat,Arial,sans-serif; font-size:16px; line-height: 1.7; color: #ccc; background-color: #2d2d2d; } a { color: #00a8e8; } code { background-color: rgba(255,255,255,0.1); padding: 0.1em 0.3em; border-radius: 3px; } pre code { background-color: transparent; padding: 0;}',
+            height: 400, // Adjusted height if different from blog
+            menubar: false,
+            statusbar: true,
+            skin: (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'oxide-dark' : 'oxide', // Auto dark/light mode
+            content_css: (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'default',
+            images_upload_url: '/admin/blog/upload-image', // Can reuse blog image uploader for in-content images
+            images_upload_credentials: true,
+            automatic_uploads: true,
+            file_picker_types: 'image',
+            file_picker_callback: function (cb, value, meta) {
+                 if (meta.filetype === 'image') {
+                    var input = document.createElement('input');
+                    input.setAttribute('type', 'file');
+                    input.setAttribute('accept', 'image/jpeg,image/png,image/gif,image/webp');
+                    input.onchange = function () {
+                        var file = this.files[0];
+                        const maxSize = 5 * 1024 * 1024;
+                        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                        if (!allowedTypes.includes(file.type)) { tinymce.activeEditor.notificationManager.open({ text: 'Invalid file type.', type: 'error' }); return; }
+                        if (file.size > maxSize) { tinymce.activeEditor.notificationManager.open({ text: `Image too large (Max ${maxSize / 1024 / 1024}MB).`, type: 'error'}); return; }
+                        var reader = new FileReader();
+                        reader.onload = function () {
+                            var id = 'blobid' + (new Date()).getTime();
+                            var blobCache = tinymce.activeEditor.editorUpload.blobCache;
+                            var base64 = reader.result.split(',')[1];
+                            var blobInfo = blobCache.create(id, file, base64);
+                            blobCache.add(blobInfo);
+                            cb(blobInfo.blobUri(), { title: file.name });
+                        };
+                        reader.readAsDataURL(file);
+                    };
+                    input.click();
+                }
+            },
+            setup: function (editor) {
+                editor.on('init', function () { editor.getContainer().style.visibility = 'visible'; });
+                editor.on('change', function () { editor.save(); }); // Keep textarea updated
+            }
+        });
+    }
+    setTimeout(() => {
+        if (typeof tinymce === 'undefined') {
+             logger.error("TinyMCE failed to load for projects.");
+             const editorTextarea = document.getElementById('project-description-editor');
+             if(editorTextarea) { editorTextarea.style.visibility = 'visible'; editorTextarea.placeholder = "Error loading Rich Text Editor. Basic textarea enabled."; }
+        }
+    }, 5000);
+  });
+</script>
+
+<%# ****** JAVASCRIPT FOR PROJECT COVER IMAGE UPLOAD ****** %>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const coverImageFileInput = document.getElementById('projectCoverImageFile');
+    const imageInput = document.getElementById('image'); // Target 'image' field for projects (main project image URL)
+    const previewContainer = document.getElementById('projectCoverImagePreviewContainer');
+    const uploadStatusDiv = document.getElementById('projectCoverImageUploadStatus');
+    const removeCoverImageBtn = document.getElementById('removeProjectCoverImageBtn'); // Button for an initially loaded image
+    const form = document.getElementById('projectForm'); // Ensure the form has this ID
+
+    // Helper function to re-attach event listener to a dynamically created remove button
+    function attachRemoveListener(buttonId) {
+        const btn = document.getElementById(buttonId);
+        if (btn) {
+            btn.addEventListener('click', handleRemoveProjectImage);
+        }
+    }
+
+    function handleRemoveProjectImage() {
+        if (imageInput) imageInput.value = ''; // Clear the URL input field
+        if (previewContainer) previewContainer.innerHTML = ''; // Clear the preview
+        if (uploadStatusDiv) {
+            uploadStatusDiv.textContent = 'Image removed. Save the project to confirm changes.';
+            uploadStatusDiv.style.color = 'var(--gray-text)';
+        }
+        if (coverImageFileInput) coverImageFileInput.value = null; // Reset the file input so the same file can be re-selected if needed
+    }
+
+    // Attach to existing remove button if present on page load
+    if (removeCoverImageBtn) {
+        removeCoverImageBtn.addEventListener('click', handleRemoveProjectImage);
+    }
+
+    if (coverImageFileInput && imageInput && previewContainer && uploadStatusDiv && form) {
+        coverImageFileInput.addEventListener('change', async function(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                uploadStatusDiv.textContent = '';
+                return;
+            }
+            uploadStatusDiv.textContent = 'Uploading...';
+            uploadStatusDiv.style.color = 'var(--gray-text)';
+
+            const formData = new FormData();
+            formData.append('coverImageFile', file); // This name 'coverImageFile' must match Multer on backend
+            const csrfToken = form.querySelector('input[name="_csrf"]')?.value;
+
+            if (!csrfToken) {
+                logger.error('CSRF token not found for cover image upload!');
+                uploadStatusDiv.textContent = 'Error: Missing security token. Please refresh.';
+                uploadStatusDiv.style.color = 'var(--danger-color)';
+                return;
+            }
+
+            try {
+                const response = await fetch('/admin/projects/upload-cover-image', { // Ensure this endpoint is correct
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'CSRF-Token': csrfToken // Send CSRF token as a header
+                    }
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success && result.location) {
+                    imageInput.value = result.location; // Populate the main image URL field
+                    previewContainer.innerHTML = `<img src="${result.location}" alt="Cover Image Preview" style="max-width: 200px; max-height: 200px; border-radius: 4px; display: block;"> <button type="button" id="newRemoveProjectCoverBtn" class="delete-btn" style="font-size: 0.8em; padding: 4px 8px; margin-top: 5px;">Remove Image</button>`;
+                    uploadStatusDiv.textContent = 'Upload successful!';
+                    uploadStatusDiv.style.color = 'var(--success-color)';
+                    attachRemoveListener('newRemoveProjectCoverBtn'); // Attach listener to the NEW remove button
+                } else {
+                    uploadStatusDiv.textContent = `Upload failed: ${result.message || 'Server error or invalid response'}`;
+                    uploadStatusDiv.style.color = 'var(--danger-color)';
+                }
+            } catch (error) {
+               logger.error('Project cover image upload fetch error:', error);
+                uploadStatusDiv.textContent = 'Upload network error. See console.';
+                uploadStatusDiv.style.color = 'var(--danger-color)';
+            }
+        });
+    } else {
+        // Log if any critical elements for the upload script are missing
+        if (!form) logger.warn("Project form with ID 'projectForm' not found for cover image uploader.");
+        if (!coverImageFileInput) logger.warn("File input 'projectCoverImageFile' not found.");
+        if (!imageInput) logger.warn("URL input 'image' not found for cover image uploader.");
+        if (!previewContainer) logger.warn("Preview container 'projectCoverImagePreviewContainer' not found.");
+        if (!uploadStatusDiv) logger.warn("Upload status div 'projectCoverImageUploadStatus' not found.");
+    }
+});
+</script>
+<%# ****** END JAVASCRIPT FOR PROJECT COVER IMAGE UPLOAD ****** %>
+
+<%- include('../partials/footer') %>

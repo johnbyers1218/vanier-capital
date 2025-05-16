@@ -1,0 +1,119 @@
+// models/BlogPost.js (ESM Version)
+
+import mongoose from 'mongoose';
+// Optional: Import slugify if you plan to use it for auto-generation
+import slugify from 'slugify'; // Run: npm install slugify
+
+const Schema = mongoose.Schema;
+
+const BlogPostSchema = new Schema({
+    title: {
+        type: String,
+        required: [true, 'Blog post title is required.'],
+        trim: true,
+        unique: true, // Creates a unique index automatically
+        maxlength: [200, 'Blog post title cannot exceed 200 characters.']
+    },
+    slug: {
+        type: String,
+        required: [true, 'Slug is required.'],
+        unique: true, // Creates a unique index automatically
+        lowercase: true,
+        trim: true,
+        match: [/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug can only contain lowercase letters, numbers, and hyphens.']
+    },
+    content: {
+        type: String,
+        required: [true, 'Blog post content is required.'],
+        minlength: [50, 'Blog content must be at least 50 characters.']
+    },
+    excerpt: {
+        type: String,
+        trim: true,
+        maxlength: [500, 'Excerpt cannot exceed 500 characters.']
+    },
+    author: {
+        type: Schema.Types.ObjectId,
+        ref: 'AdminUser', // Links to the AdminUser model (ensure AdminUser model uses default export)
+        required: true
+    },
+    authorDisplayName: { // This is the name to be publicly displayed
+        type: String,
+        trim: true,
+        maxlength: [100, 'Author display name cannot exceed 100 characters.'],
+        default: '' // Will be populated by route logic
+    },
+    isPublished: {
+        type: Boolean,
+        default: false
+    },
+    publishedDate: {
+        type: Date
+    },
+    featuredImage: {
+        type: String,
+        trim: true,
+        match: [/^https?:\/\/.+\..+/, 'Please enter a valid image URL.']
+    },
+    tags: [{
+        type: String,
+        trim: true,
+        lowercase: true
+    }],
+    metaDescription: { // Optional SEO field
+        type: String,
+        trim: true,
+        maxlength: 160
+    },
+    // Add viewCount/likeCount here later if implementing
+    // viewCount: { type: Number, default: 0 },
+    // likeCount: { type: Number, default: 0 },
+
+}, { timestamps: true }); // Adds createdAt and updatedAt
+
+// --- Middleware (Hooks) ---
+
+// Optional: Auto-generate slug from title BEFORE validation if slug is empty
+// Uncomment this block and 'import slugify' if using this feature
+
+BlogPostSchema.pre('validate', function(next) {
+  // Only run if creating new or slug is explicitly cleared
+  if ((this.isNew || this.isModified('title')) && this.title && !this.slug) {
+    let potentialSlug = slugify(this.title, { lower: true, strict: true, remove: /[*+~.()'"!:@]/g });
+    // Basic check for empty slug after processing
+    if (!potentialSlug) {
+         potentialSlug = Date.now().toString(); // Fallback slug
+    }
+     this.slug = potentialSlug;
+     // Note: Uniqueness check should ideally happen here or be handled robustly in the route
+     // Mongoose unique validator will catch duplicates on save attempt anyway
+    
+  }
+  next();
+});
+
+
+// Set publishedDate when isPublished goes from false/undefined to true
+BlogPostSchema.pre('save', function(next) {
+  if (this.isModified('isPublished') && this.isPublished && !this.publishedDate) {
+    this.publishedDate = new Date();
+    
+  }
+  // Optional: Clear publishedDate if unpublishing?
+  // else if (this.isModified('isPublished') && !this.isPublished) {
+  //   this.publishedDate = null;
+  // }
+  next();
+});
+
+// --- Indexes ---
+// Index for common query used in public blog list (isPublished + publishedDate)
+BlogPostSchema.index({ isPublished: 1, publishedDate: -1 });
+// NOTE: Removed BlogPostSchema.index({ slug: 1 }); because unique:true already creates it.
+
+// --- Model Export ---
+// Handles HMR (Hot Module Replacement) correctly by checking if model exists
+const BlogPost = mongoose.models.BlogPost || mongoose.model('BlogPost', BlogPostSchema);
+
+// Use ESM default export
+export default BlogPost;

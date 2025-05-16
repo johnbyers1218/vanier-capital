@@ -1,0 +1,79 @@
+<%# views/admin/error.ejs %>
+<%# Generic Error Page for Admin Panel %>
+
+<%# Set default title and message if not provided %>
+<% const displayTitle = typeof pageTitle !== 'undefined' ? pageTitle : 'An Error Occurred'; %>
+<% const displayMessage = typeof message !== 'undefined' ? message : 'An unexpected error occurred while processing your request.'; %>
+<%# Determine a status code if possible (passed from route handler) %>
+<% const statusCode = typeof status !== 'undefined' ? status : 500; %>
+
+<%- include('partials/header', { pageTitle: displayTitle }) %> <%# Includes admin header/nav %>
+
+<div class="admin-error-container">
+    <div class="error-icon">
+        <% if (statusCode === 404) { %>
+            <i class="fas fa-search"></i> <!-- Not Found Icon -->
+        <% } else if (statusCode === 403) { %>
+             <i class="fas fa-user-lock"></i> <!-- Forbidden Icon -->
+        <% } else if (statusCode >= 400 && statusCode < 500) { %>
+            <i class="fas fa-exclamation-triangle"></i> <!-- Generic Client Error Icon -->
+        <% } else { %>
+            <i class="fas fa-server"></i> <!-- Server Error Icon -->
+        <% } %>
+    </div>
+
+    <h2 class="error-title">
+        <% if (statusCode === 404) { %>
+            Resource Not Found
+        <% } else if (statusCode === 403) { %>
+             Access Denied
+        <% } else { %>
+             Oops! Something Went Wrong
+        <% } %>
+    </h2>
+
+    <p class="error-message-text">
+        <%= displayMessage %> <%# Escaped output for safety %>
+    </p>
+
+    <%# Optionally display more details in development %>
+    <% if (process.env.NODE_ENV !== 'production' && typeof error !== 'undefined' && error && error.stack) { %>
+        <pre class="error-stack-trace"><%= error.stack %></pre> <%# Display stack trace %>
+    <% } %>
+
+    <div class="error-actions">
+        <a href="javascript:history.back()" class="cta-button secondary-btn">
+             <i class="fas fa-arrow-left"></i> Go Back
+        </a>
+        <a href="/admin/dashboard" class="cta-button primary-btn">
+            <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+        </a>
+    </div>
+
+     <p class="error-support-info">
+         If the problem persists, please contact technical support or your administrator.
+         <br> <!-- Standard HTML line break -->
+         <!-- Correctly check if errorId exists and has a value before displaying -->
+         <% if (typeof errorId !== 'undefined' && errorId) { %>
+              Error Reference: <%= errorId %>
+         <% } %>
+     </p>
+
+</div>
+
+<%- include('partials/footer') %> <%# Includes admin footer %>
+
+<!-- Add specific styles here or preferably in admin-style.css -->
+<style>
+    /* Keep the styles defined previously for .admin-error-container etc. */
+    .admin-error-container { max-width: 700px; margin: 3rem auto; padding: 2.5rem 3rem; background-color: var(--card-bg); border-radius: 8px; text-align: center; border: 1px solid rgba(220, 53, 69, 0.2); }
+    .error-icon { font-size: 3.5rem; margin-bottom: 1.5rem; }
+    .error-icon .fa-search { color: #ffc107; } .error-icon .fa-user-lock { color: #dc3545; } .error-icon .fa-exclamation-triangle { color: #ffc107; } .error-icon .fa-server { color: #6c757d; }
+    .error-title { font-size: 1.8rem; color: var(--light-text); margin-bottom: 1rem; font-weight: 500; }
+    .error-message-text { color: var(--gray-text); font-size: 1.1rem; line-height: 1.7; margin-bottom: 2rem; }
+    .error-stack-trace { background-color: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 4px; color: #ccc; font-size: 0.85em; text-align: left; max-height: 200px; overflow-y: auto; margin-bottom: 2rem; white-space: pre-wrap; word-break: break-all; }
+    .error-actions { display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; }
+    .error-actions .cta-button i { margin-right: 8px; }
+    .error-support-info { font-size: 0.9em; color: var(--gray-text); margin-top: 1rem; }
+     @media (max-width: 576px) { .admin-error-container { padding: 2rem 1.5rem; } .error-icon { font-size: 3rem; } .error-title { font-size: 1.5rem; } .error-message-text { font-size: 1rem; } .error-actions { flex-direction: column; } }
+</style>

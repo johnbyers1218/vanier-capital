@@ -1,0 +1,142 @@
+<%# views/blog-post.ejs %>
+<%# Template for displaying a single public blog post - UPDATED with conditional prev/next links %>
+
+<%# Use the PUBLIC header partial %>
+<%- include('partials/header', { pageTitle: pageTitle }) %>
+
+<main>
+    <%# Standard Page Header Section - Provides context %>
+    <section class="page-header" style="padding-bottom: 1.5rem; margin-bottom: 0;">
+        <div class="container">
+             <%# Use a less prominent title here if the main title is in the article %>
+             <%# <h1>Blog Post</h1> %>
+             <%# Adjust breadcrumb margin if needed %>
+             <div class="breadcrumbs" style="margin-top: 1rem;">
+                 <a href="/">Home</a>
+                 <span class="separator">/</span>
+                 <a href="/blog">Blog</a>
+                 <span class="separator">/</span>
+                 <%# Display truncated title or a generic "Post" if title is too long %>
+                 <span class="current"><%= post.title.length > 50 ? post.title.substring(0, 50) + '...' : post.title %></span>
+            </div>
+        </div>
+    </section>
+
+    <%# Main Content Section for the Blog Post %>
+    <section class="content-section">
+        <div class="container">
+            <%# Reuse the styling from the static blog post example for consistency %>
+            <article class="blog-post-full">
+                <header class="blog-post-header">
+                    <%# Main Post Title %>
+                    <h1><%= post.title %></h1>
+                    <%# Post Metadata %>
+                    <span class="blog-post-meta">
+                        <% if (post.publishedDate) { %>
+                            <span>
+                                <i class="fas fa-calendar-alt"></i>
+                                <%= post.publishedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %>
+                            </span>
+                        <% } %>
+                        <% if (post.authorDisplayName || (post.author && (post.author.fullName || post.author.username))) { %>
+                            <span>
+                                <i class="fas fa-user"></i> By <%= post.authorDisplayName || post.author.fullName || post.author.username %>
+                            </span>
+                        <% } %>
+                         <%# Display tags if they exist %>
+                         <% if (post.tags && post.tags.length > 0) { %>
+                             <span class="blog-tags">
+                                 <i class="fas fa-tags"></i>
+                                 <% post.tags.forEach((tag, index) => { %>
+                                     <a href="/blog/tag/<%= tag %>" class="tag-link"><%= tag %></a><%= index < post.tags.length - 1 ? ', ' : '' %>
+                                 <% }) %>
+                             </span>
+                         <% } %>
+                    </span>
+                </header>
+
+                <%# Featured Image (Optional) %>
+                <% if (post.featuredImage) { %>
+                    <figure class="featured-image">
+                        <img src="<%= post.featuredImage %>" alt="<%= post.title %> - Featured Image">
+                         <%# Optional: Add figcaption if relevant %>
+                         <%# <figcaption>Optional caption for the image</figcaption> %>
+                    </figure>
+                <% } %>
+
+                <%# Main Blog Post Content - Render sanitized HTML %>
+                <%# IMPORTANT: Use unescaped output for SANITIZED HTML %>
+                <div class="blog-post-content">
+                    <%- post.content %>
+                </div>
+
+                <%# Optional: Add related posts, comments section, or social sharing buttons here %>
+                <hr style="border: none; border-top: 1px solid rgba(255, 255, 255, 0.1); margin: 3rem 0;">
+                 <div class="post-navigation" style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;"> <%# Added wrap & gap %>
+
+                     <%# Conditionally render Previous Post link %>
+                     <% if (prevPostSlug) { %>
+                         <a href="/blog/<%= prevPostSlug %>" class="cta-button secondary-btn">← Previous Post</a>
+                     <% } else { %>
+                         <%# Optional: Add an empty span or div as a placeholder if you want to maintain alignment %>
+                         <span style="visibility: hidden;" class="cta-button secondary-btn">← Previous Post</span>
+                     <% } %>
+
+                     <%# Always show link back to blog list %>
+                     <a href="/blog" class="cta-button secondary-btn" style="margin-left: auto; margin-right: auto;">Back to Blog List</a>
+
+                     <%# Conditionally render Next Post link %>
+                     <% if (nextPostSlug) { %>
+                         <a href="/blog/<%= nextPostSlug %>" class="cta-button secondary-btn">Next Post →</a>
+                     <% } else { %>
+                          <%# Optional: Placeholder for alignment %>
+                         <span style="visibility: hidden;" class="cta-button secondary-btn">Next Post →</span>
+                     <% } %>
+
+                 </div>
+
+            </article>
+        </div>
+    </section>
+</main>
+
+<%# Use the PUBLIC footer partial %>
+<%- include('partials/footer') %>
+
+<%# Add specific CSS overrides here if needed, or ensure styles in style.css cover .blog-post-full %>
+<style>
+    /* Ensure styles from starting-ai-automation-agency-considerations.html are applied or moved to style.css */
+    /* Example: Make sure links within the post content are styled correctly */
+    .blog-post-content a {
+        color: var(--primary-color);
+        text-decoration: none;
+        border-bottom: 1px dashed var(--primary-color);
+        transition: color 0.3s, border-bottom-color 0.3s;
+    }
+    .blog-post-content a:hover {
+        color: var(--secondary-color);
+        border-bottom-color: var(--secondary-color);
+    }
+     .blog-tags .tag-link {
+         display: inline-block;
+         background-color: rgba(0, 168, 232, 0.1);
+         padding: 2px 8px;
+         border-radius: 3px;
+         font-size: 0.85em;
+         color: var(--primary-color);
+         text-decoration: none;
+         border: none;
+         margin-left: 5px;
+         transition: background-color 0.3s;
+     }
+    .blog-tags .tag-link:hover {
+        background-color: rgba(0, 168, 232, 0.3);
+        color: #fff;
+    }
+     .blog-post-meta > span { /* Add spacing between meta items */
+         margin-right: 15px;
+     }
+    .blog-post-meta > span:last-child {
+        margin-right: 0;
+    }
+</style>

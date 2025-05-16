@@ -1,0 +1,79 @@
+<%# views/admin/testimonials/index.ejs %>
+<%# Admin page to list and manage testimonials %>
+
+<%- include('../partials/header', { pageTitle: 'Manage Testimonials' }) %>
+
+<div class="admin-actions-bar" style="margin-bottom: 1.5rem; text-align: right;">
+    <a href="/admin/testimonials/new" class="cta-button primary-btn">
+        <i class="fas fa-plus"></i> Add New Testimonial
+    </a>
+</div>
+
+<div class="admin-content-container">
+    <% if (testimonials && testimonials.length > 0) { %>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Author</th>
+                    <th>Company</th>
+                    <th>Content (Excerpt)</th>
+                    <th>Visible</th>
+                    <th>Featured</th>
+                    <th>Rating</th>
+                    <th>Created</th>
+                    <th class="actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% testimonials.forEach(testimonial => { %>
+                    <tr>
+                        <td><%= testimonial.author %></td>
+                        <td><%= testimonial.company || 'N/A' %></td>
+                        <td>
+                            <%# Display a truncated version of the content %>
+                            <%= testimonial.content.length > 80 ? testimonial.content.substring(0, 80) + '...' : testimonial.content %>
+                        </td>
+                        <td>
+                            <%# Display visibility status %>
+                             <% if (testimonial.isVisible) { %>
+                                <i class="fas fa-eye" style="color: #28a745;" title="Visible"></i>
+                            <% } else { %>
+                                <i class="fas fa-eye-slash" style="color: #6c757d;" title="Hidden"></i>
+                            <% } %>
+                        </td>
+                         <td>
+                             <%# Display featured status %>
+                            <% if (testimonial.isFeatured) { %>
+                                <i class="fas fa-star" style="color: #ffc107;" title="Featured"></i>
+                            <% } else { %>
+                                <i class="far fa-star" style="color: #6c757d;" title="Not Featured"></i>
+                            <% } %>
+                        </td>
+                        <td>
+                            <%# Display rating if available %>
+                            <%= testimonial.rating ? `${testimonial.rating} / 5` : '-' %> <%# Use dash instead of N/A %>
+                        </td>
+                        <td><%= testimonial.createdAt ? testimonial.createdAt.toLocaleDateString() : '-' %></td>
+                        <td class="actions">
+                            <a href="/admin/testimonials/edit/<%= testimonial._id %>" class="edit-btn" title="Edit Testimonial">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <%# Delete action form %>
+                            <form action="/admin/testimonials/delete/<%= testimonial._id %>" method="POST" style="display: inline;" class="delete-form">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                <button type="submit" class="delete-btn" title="Delete Testimonial">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+         <%# TODO: Implement pagination if list becomes large %>
+    <% } else { %>
+        <p style="text-align: center; padding: 2rem; background-color: var(--card-bg); border-radius: 5px;">No testimonials found. <a href="/admin/testimonials/new" style="color: var(--primary-color);">Add the first one!</a></p>
+    <% } %>
+</div>
+
+<%- include('../partials/footer') %>
