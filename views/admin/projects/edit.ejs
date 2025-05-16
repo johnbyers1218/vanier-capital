@@ -168,7 +168,7 @@
     }
     setTimeout(() => {
         if (typeof tinymce === 'undefined') {
-             logger.error("TinyMCE failed to load for projects.");
+             console.error("TinyMCE failed to load for projects.");
              const editorTextarea = document.getElementById('project-description-editor');
              if(editorTextarea) { editorTextarea.style.visibility = 'visible'; editorTextarea.placeholder = "Error loading Rich Text Editor. Basic textarea enabled."; }
         }
@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const csrfToken = form.querySelector('input[name="_csrf"]')?.value;
 
             if (!csrfToken) {
-                logger.error('CSRF token not found for cover image upload!');
+                console.error('CSRF token not found for cover image upload!');
                 uploadStatusDiv.textContent = 'Error: Missing security token. Please refresh.';
                 uploadStatusDiv.style.color = 'var(--danger-color)';
                 return;
@@ -252,18 +252,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     uploadStatusDiv.style.color = 'var(--danger-color)';
                 }
             } catch (error) {
-               logger.error('Project cover image upload fetch error:', error);
+               console.error('Project cover image upload fetch error:', error);
                 uploadStatusDiv.textContent = 'Upload network error. See console.';
                 uploadStatusDiv.style.color = 'var(--danger-color)';
             }
         });
     } else {
         // Log if any critical elements for the upload script are missing
-        if (!form) logger.warn("Project form with ID 'projectForm' not found for cover image uploader.");
-        if (!coverImageFileInput) logger.warn("File input 'projectCoverImageFile' not found.");
-        if (!imageInput) logger.warn("URL input 'image' not found for cover image uploader.");
-        if (!previewContainer) logger.warn("Preview container 'projectCoverImagePreviewContainer' not found.");
-        if (!uploadStatusDiv) logger.warn("Upload status div 'projectCoverImageUploadStatus' not found.");
+        if (!form) console.warn("Project form with ID 'projectForm' not found for cover image uploader.");
+        if (!coverImageFileInput) console.warn("File input 'projectCoverImageFile' not found.");
+        if (!imageInput) console.warn("URL input 'image' not found for cover image uploader.");
+        if (!previewContainer) console.warn("Preview container 'projectCoverImagePreviewContainer' not found.");
+        if (!uploadStatusDiv) console.warn("Upload status div 'projectCoverImageUploadStatus' not found.");
     }
 });
 </script>

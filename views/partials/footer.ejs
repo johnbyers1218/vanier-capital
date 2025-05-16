@@ -106,7 +106,7 @@
          bodyForNav.classList.toggle('nav-active', isActive);
      });
  } else {
-      logger.warn('Hamburger menu elements (.hamburger, .nav-links) not found for inline script.');
+      console.warn('Hamburger menu elements (.hamburger, .nav-links) not found for inline script.');
  }
 </script>
 
@@ -122,7 +122,7 @@
 </script>
 <% } else if (process.env.NODE_ENV === 'production' && !process.env.GA_MEASUREMENT_ID) { %>
 <!-- Warning if in production but ID is missing -->
-<script>logger.warn('Google Analytics Measurement ID (GA_MEASUREMENT_ID) is not configured for production.');</script>
+<script>console.warn('Google Analytics Measurement ID (GA_MEASUREMENT_ID) is not configured for production.');</script>
 <% } %>
 
 </body>

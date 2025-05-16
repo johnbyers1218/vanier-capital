@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     setTimeout(() => {
         if (typeof tinymce === 'undefined') {
-             logger.error("TinyMCE failed to load for blog posts.");
+             console.error("TinyMCE failed to load for blog posts.");
              const editorTextarea = document.getElementById('blog-content-editor');
              if(editorTextarea) { editorTextarea.style.visibility = 'visible'; editorTextarea.placeholder = "Error loading Rich Text Editor."; }
         }
@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const csrfToken = form.querySelector('input[name="_csrf"]')?.value;
 
             if (!csrfToken) {
-                logger.error('CSRF token not found for blog cover image upload!');
+                console.error('CSRF token not found for blog cover image upload!');
                 uploadStatusDiv.textContent = 'Error: Missing security token. Please refresh.';
                 uploadStatusDiv.style.color = 'var(--danger-color)';
                 return;
@@ -234,14 +234,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     uploadStatusDiv.style.color = 'var(--danger-color)';
                 }
             } catch (error) {
-                logger.error('Blog cover image upload fetch error:', error);
+                console.error('Blog cover image upload fetch error:', error);
                 uploadStatusDiv.textContent = 'Upload network error. See console.';
                 uploadStatusDiv.style.color = 'var(--danger-color)';
             }
         });
     } else {
-        if (!form) logger.warn("Blog form with ID 'blogPostForm' not found for cover image uploader.");
-        if (!coverImageFileInput) logger.warn("File input 'coverImageFile' for blog not found.");
+        if (!form) console.warn("Blog form with ID 'blogPostForm' not found for cover image uploader.");
+        if (!coverImageFileInput) console.warn("File input 'coverImageFile' for blog not found.");
         // ... add more checks if needed
     }
 });
