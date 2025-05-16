@@ -154,46 +154,72 @@ logger.debug('[INIT] Applied helmet.');
 logger.debug('[INIT] Applying CORS...');
 
 const allowedOrigins = [];
-const productionCustomDomain = process.env.CORS_ORIGIN; // Should be https://www.fndautomations.com
-const herokuAppName = process.env.HEROKU_APP_NAME;     // Should be fnd-automations-webapp-3138eaed6f23
+const productionCustomDomain = process.env.CORS_ORIGIN; // e.g., https://www.fndautomations.com
+const herokuAppName = process.env.HEROKU_APP_NAME;     // e.g., fnd-automations-webapp-3138eaed6f23
 
 if (process.env.NODE_ENV === 'production') {
     if (productionCustomDomain) {
-        allowedOrigins.push(productionCustomDomain);
+        allowedOrigins.push(productionCustomDomain.toLowerCase()); // Store lowercase for case-insensitive compare
         logger.info(`[CORS] Added production custom domain to allowed origins: ${productionCustomDomain}`);
     }
     if (herokuAppName) {
         const herokuDomain = `https://${herokuAppName}.herokuapp.com`;
-        if (!allowedOrigins.includes(herokuDomain)) { // Avoid duplicates if CORS_ORIGIN was the heroku domain
-            allowedOrigins.push(herokuDomain);
+        if (!allowedOrigins.includes(herokuDomain.toLowerCase())) {
+            allowedOrigins.push(herokuDomain.toLowerCase());
         }
         logger.info(`[CORS] Added Heroku app domain to allowed origins: ${herokuDomain}`);
     }
     if (allowedOrigins.length === 0) {
-        logger.error('[CORS] CRITICAL: No production CORS origins defined (CORS_ORIGIN or HEROKU_APP_NAME not set). This will likely block all cross-origin requests.');
+        logger.error('[CORS] CRITICAL: No production CORS origins defined (CORS_ORIGIN or HEROKU_APP_NAME not set). This will likely block most cross-origin API requests.');
+        // Consider adding a default or a warning if this state is not intended.
+        // For now, it will block external origins if this array is empty.
     }
 } else { // Development
+    // In development, be more permissive for local tools and various port setups
     allowedOrigins.push('http://localhost:3000');
     allowedOrigins.push(`https://localhost:${process.env.HTTPS_PORT || 3443}`);
     allowedOrigins.push(`http://localhost:${process.env.PORT || 3000}`);
-    allowedOrigins.push('https://localhost');
+    allowedOrigins.push('https://localhost'); // Common for browser requests to localhost
+    // No need to log development origins every time, it's for dev convenience
 }
 
-logger.info(`[CORS] Final allowed origins: ${allowedOrigins.join(', ')}`);
+logger.info(`[CORS] Final effective allowed origins for cross-origin requests: ${allowedOrigins.length > 0 ? allowedOrigins.join(', ') : 'NONE (will rely on same-origin or no-origin behavior)'}`);
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin && process.env.NODE_ENV !== 'production') { // Allow no-origin for local dev tools like Postman
-        logger.debug('[CORS] Allowing request with no origin in non-production environment.');
+    // logger.debug(`[CORS Check] Request Origin: '${origin}'`);
+
+    // Rule 1: Allow requests with no origin (like curl requests, mobile apps, server-to-server, or same-origin browser sub-resource requests where Origin header might be absent)
+    // This is generally safe for GET requests for static assets.
+    // For POST/PUT/DELETE to API, you might want stricter checks even for no-origin if concerned about CSRF from non-browser clients,
+    // but CSRF protection middleware should handle browser-based CSRF.
+    if (!origin) {
+        // logger.debug('[CORS] Allowing request with no origin header.');
         return callback(null, true);
     }
-    if (allowedOrigins.includes(origin)) {
-      logger.debug(`[CORS] Allowed origin: ${origin}`);
+
+    // Rule 2: Check if the provided origin is in our explicit list
+    // Normalize to lowercase for case-insensitive comparison, as domain names are case-insensitive.
+    const normalizedOrigin = origin.toLowerCase();
+    if (allowedOrigins.map(o => o.toLowerCase()).includes(normalizedOrigin)) {
+    //   logger.debug(`[CORS] Allowed origin (explicit list): ${origin}`);
       return callback(null, true);
-    } else {
-      logger.warn(`[CORS] Blocked origin: '${origin}'. Allowed: [${allowedOrigins.join(', ')}]`);
-      return callback(new Error('Not allowed by CORS configuration.'));
     }
+
+    // Rule 3: If it's a production environment and origin is not in the explicit list, block it.
+    // (This also implicitly blocks if allowedOrigins is empty and there's an origin)
+    if (process.env.NODE_ENV === 'production') {
+        logger.warn(`[CORS] Production: Blocked origin: '${origin}'. Allowed: [${allowedOrigins.join(', ')}]`);
+        return callback(new Error('Not allowed by CORS configuration.'));
+    }
+
+    // Rule 4: In development, if origin is not in the explicit list, but it's a localhost variant,
+    // you might choose to allow it for convenience, though the explicit list is better.
+    // For now, if it's not in the dev allowedOrigins list, it will be blocked by default by the final else.
+    // If you are getting blocked in dev from an unexpected localhost port, add it to allowedOrigins.
+
+    logger.warn(`[CORS] Default Block: Origin '${origin}' not in allowed list and not explicitly handled. Allowed: [${allowedOrigins.join(', ')}]`);
+    return callback(new Error('Not allowed by CORS configuration (default block).'));
   },
   credentials: true
 }));
