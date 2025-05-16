@@ -660,7 +660,7 @@ async function loadFeaturedTestimonial() {
             const featuredTestimonial = data.testimonials[0]; // Assuming the API returns it sorted
             container.innerHTML = createFeaturedTestimonialHtml(featuredTestimonial);
         } else {
-            console.warn('No featured testimonial found or API success was false.'); // Changed from console.log to logger
+            console.warn('No featured testimonial found or API success was false.');
             // Display a more user-friendly message or hide the section
             container.innerHTML = '<p style="text-align: center; color: var(--gray-text); padding: 1rem;">No featured testimonial available at the moment.</p>';
             // container.style.display = 'none'; // Or hide section

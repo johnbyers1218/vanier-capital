@@ -146,25 +146,57 @@ app.use(helmet({
 logger.debug('[INIT] Applied helmet.');
 
 logger.debug('[INIT] Applying CORS...');
-const allowedOriginsList = [process.env.CORS_ORIGIN || (process.env.NODE_ENV === 'production' ? 'https://www.yourdomain.com' : `https://localhost:${process.env.HTTPS_PORT || 3443}`)];
-if (process.env.NODE_ENV === 'development') {
-    allowedOriginsList.push('http://localhost:3000');
-    allowedOriginsList.push(`http://localhost:${process.env.PORT || 3000}`);
-    allowedOriginsList.push('https://localhost');
+const productionCorsOrigin = process.env.CORS_ORIGIN; // This should be your custom domain like https://www.fndautomations.com
+const herokuAppDomain = process.env.HEROKU_APP_NAME ? `https://$process.env.HEROKU_APP_NAME}.herokuapp.com` : null;
+
+const allowedOrigins = [];
+
+if (productionCorsOrigin) {
+    allowedOrigins.push(productionCorsOrigin);
+} else if (process.env.NODE_ENV === 'production') {
+    // Fallback if CORS_ORIGIN isn't set in prod, but this is not ideal.
+    // You should always set CORS_ORIGIN to your custom domain in production.
+    logger.warn('[CORS] CORS_ORIGIN environment variable is not set for production! Using a default which might be insecure or incorrect.');
+    allowedOrigins.push('https://www.yourdefaultdomain.com'); // Replace with your actual default
 }
+
+if (herokuAppDomain) { // Add Heroku domain if HEROKU_APP_NAME is set
+    allowedOrigins.push(herokuAppDomain);
+}
+
+
+if (process.env.NODE_ENV === 'development') {
+    allowedOrigins.push('http://localhost:3000');
+    allowedOrigins.push(`https://localhost:${process.env.HTTPS_PORT || 3443}`);
+    allowedOrigins.push(`http://localhost:${process.env.PORT || 3000}`);
+    allowedOrigins.push('https://localhost');
+    logger.info('[CORS] Development mode: Added localhost origins:', allowedOrigins);
+} else {
+    logger.info('[CORS] Production mode: Allowed origins:', allowedOrigins);
+}
+
+
 app.use(cors({
   origin: function (origin, callback) {
-    // logger.debug(`CORS Check: Origin='${origin}', Allowed='${allowedOriginsList.join(', ')}'`);
-    if (!origin || allowedOriginsList.includes(origin)) {
-      callback(null, true);
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    // logger.debug(`CORS Check: Request Origin='${origin}', Allowed='${allowedOrigins.join(', ')}'`);
+    if (allowedOrigins.length === 0 && process.env.NODE_ENV !== 'development') {
+        logger.warn('[CORS] No allowed origins configured for production and request has an origin. Blocking.');
+        return callback(new Error('Not allowed by CORS configuration (no origins defined).'));
+    }
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
     } else {
-      logger.warn(`CORS blocked for origin: ${origin}`);
-      callback(new Error('Not allowed by CORS configuration.'));
+      logger.warn(`CORS blocked for origin: ${origin}. Allowed: ${allowedOrigins.join(', ')}`);
+      return callback(new Error('Not allowed by CORS configuration.'));
     }
   },
   credentials: true
 }));
-logger.debug('[INIT] Applied CORS.');
+logger.debug('[INIT] Applied CORS.'); // Moved your log here
+
 
 logger.debug('[INIT] Applying body parsers...');
 app.use(express.json({ limit: '5mb' }));
@@ -338,26 +370,53 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // --- Graceful Shutdown Handler ---
-const gracefulShutdown = (signal) => {
+const gracefulShutdown = async (signal) => { // Made the handler async
   logger.info(`${signal} received. Initiating graceful shutdown...`);
+  let serverClosed = false;
+  let dbClosed = false;
+
+  const attemptExit = () => {
+    if (serverClosed && dbClosed) {
+      logger.info('Graceful shutdown complete. Exiting.');
+      process.exit(0);
+    }
+  };
+
+  // Close HTTP/S server
   if (serverInstance && serverInstance.listening) {
     logger.info('Closing active HTTP/S server...');
-    serverInstance.close((err) => {
-      if(err) logger.error('Error closing HTTP/S server:', err);
-      else logger.info('HTTP/S server closed.');
-      mongoose.connection.close(false, () => {
-        logger.info('MongoDB connection closed.');
-        logger.info('Graceful shutdown complete. Exiting.');
-        process.exit(0);
-      });
+    serverInstance.close((err) => { // server.close() still uses a callback
+      if (err) {
+        logger.error('Error closing HTTP/S server:', err);
+      } else {
+        logger.info('HTTP/S server closed.');
+      }
+      serverClosed = true;
+      attemptExit();
     });
   } else {
-    logger.warn('Server instance not found or not listening. Closing MongoDB connection.');
-    mongoose.connection.close(false, () => {
-      logger.info('MongoDB connection closed.');
-      process.exit(0);
-    });
+    logger.warn('Server instance not found or not listening for graceful shutdown.');
+    serverClosed = true; // Consider it "done" for the logic
   }
+
+  // Close Mongoose connection
+  if (mongoose.connection.readyState === 1) { // 1 === connected
+    logger.info('Closing MongoDB connection...');
+    try {
+      await mongoose.connection.close(); // Use await, no callback
+      logger.info('MongoDB connection closed.');
+    } catch (dbCloseError) {
+      logger.error('Error closing MongoDB connection:', dbCloseError);
+    } finally {
+      dbClosed = true;
+      attemptExit();
+    }
+  } else {
+    logger.info('MongoDB connection already closed or not established.');
+    dbClosed = true;
+  }
+
+  // Fallback timeout
   setTimeout(() => {
      logger.warn('Graceful shutdown timeout (10s). Forcing exit.');
      process.exit(1);
