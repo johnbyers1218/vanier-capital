@@ -13,7 +13,7 @@
         </div>
     <% } %>
 
-    <form action="<%= editing ? '/admin/blog/edit/' + post._id : '/admin/blog' %>" method="POST" class="admin-form" id="blogPostForm"> {/* ID ADDED HERE */}
+    <form action="<%= editing ? '/admin/blog/edit/' + post._id : '/admin/blog' %>" method="POST" class="admin-form" id="blogPostForm"> 
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
         <div class="form-group">

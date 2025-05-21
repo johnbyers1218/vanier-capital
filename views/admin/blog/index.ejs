@@ -16,7 +16,7 @@
                 <tr>
                     <th>Title & Slug</th>
                     <th>Author</th>
-                    <th>Status</th> {/* Moved Status header here */}
+                    <th>Status</th> 
                     <th>Published Date</th>
                     <th>Last Updated</th>
                     <th class="actions">Actions</th>
@@ -41,7 +41,7 @@
                             <%# Display authorDisplayName first, then fallback %>
                             <%= post.authorDisplayName || (post.author ? (post.author.fullName || post.author.username) : 'N/A') %>
                         </td>
-                        <td> {/* MOVED STATUS DISPLAY LOGIC INSIDE THE LOOP PER POST */}
+                        <td> 
                             <% if (post.isPublished) { %>
                                 <span style="color: #28a745; font-weight: bold; background-color: rgba(40, 167, 69, 0.1); padding: 3px 6px; border-radius: 3px; font-size: 0.85em;">Published</span>
                             <% } else { %>
