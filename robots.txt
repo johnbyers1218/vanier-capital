@@ -1,0 +1,54 @@
+# FND Automations - Guiding Bots to a Brighter, Automated Future!
+#
+#   FFFFF  N   N  DDDD
+#   F      NN  N  D   D
+#   FFFF   N N N  D   D
+#   F      N  NN  D   D
+#   F      N   N  DDDD
+#
+#   AAA   U   U  TTTTT   OOO   M   M   AAA   TTTTT  III   OOO   N   N   SSS
+#  A   A  U   U    T    O   O  MM MM  A   A    T     I   O   O  NN  N  S
+#  AAAAA  U   U    T    O   O  M M M  AAAAA    T     I   O   O  N N N   SSS
+#  A   A  U   U    T    O   O  M   M  A   A    T     I   O   O  N  NN      S
+#  A   A   UUU     T     OOO   M   M  A   A    T    III   OOO   N   N  SSSS
+#
+# We believe in open access for helpful bots that contribute to a better web!
+
+User-agent: *
+# By default, allow all content to be crawled.
+Allow: /
+# Add any specific Disallow directives here if needed for standard crawlers.
+# For example, if you had an /admin/ section:
+# Disallow: /admin/
+# Based on your current site structure from the CSV, there are no obvious
+# general content pages that need disallowing.
+
+# Location of your XML Sitemap (very important for all crawlers)
+Sitemap: https://www.fndautomations.com/sitemap.xml
+
+# ---------------------------------------------------------------------
+# AI Engine Optimization (AEO) & Specific Bot Instructions
+# Granting explicit access to AI crawlers to help your content
+# be discoverable and usable by LLMs and AI-powered search.
+# ---------------------------------------------------------------------
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+# Google's crawler for its generative AI models (Bard, Vertex AI, etc.)
+User-agent: Google-Extended
+Allow: /
+
+# Perplexity AI
+User-agent: PerplexityBot
+Allow: /
+
+# Common Crawl - data from CCBot is used to train many LLMs.
+# Allowing CCBot can help your content be part of future model training.
+User-agent: CCBot
+Allow: /
+
+# --- End of FND Automations robots.txt ---
