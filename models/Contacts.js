@@ -59,45 +59,6 @@ const ContactSchema = new Schema(
             ],
              default: 'New'
          },
-
-        // --- OPTIONAL SCHEDULING FIELDS ---
-        requestedMeeting: { // Boolean to indicate if they filled out scheduling part
-            type: Boolean,
-            default: false
-        },
-        scheduleCompanyName: { // Company name specifically for the meeting request part
-            type: String,
-            trim: true,
-            maxlength: 100
-        },
-        schedulePreferredTimes: { // User's free-form text suggestion for alternatives
-            type: String,
-            trim: true,
-            maxlength: 1000
-        },
-        scheduleSelectedDate: { // Specific date chosen by user for meeting
-            type: Date,
-        },
-        scheduleSelectedTime: { // Specific time chosen by user (store as string like HH:MM)
-            type: String,
-            match: [/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format (HH:MM required).'],
-            validate: { // Ensure this is only required if requestedMeeting is true
-                validator: function(v) {
-                    return !this.requestedMeeting || (this.requestedMeeting && v);
-                },
-                message: 'Selected time is required if requesting a meeting.'
-            }
-        },
-        scheduleTimeZone: { // User's reported timezone for meeting
-            type: String,
-            validate: {
-                validator: function(v) {
-                    return !this.requestedMeeting || (this.requestedMeeting && v);
-                },
-                message: 'Timezone is required if requesting a meeting.'
-            }
-        }
-        // --- END OPTIONAL SCHEDULING FIELDS ---
     },
     {
         timestamps: true

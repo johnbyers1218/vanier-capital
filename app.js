@@ -127,18 +127,20 @@ logger.debug('[INIT] Applied httpLoggerMiddleware.');
 logger.debug('[INIT] Applying helmet...');
 const cspDirectives = {
     defaultSrc: ["'self'"],
-    scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud", "https://www.googletagmanager.com"],
-    styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud"],
+    scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud", "https://www.googletagmanager.com", "https://calendar.google.com", "https://apis.google.com","https://www.gstatic.com"],
+    styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud", "https://calendar.google.com","https://apis.google.com"],
     fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
-    imgSrc: ["'self'", "data:", "blob:", "https://res.cloudinary.com", "https:"],
+    imgSrc: ["'self'", "data:", "blob:", "https://res.cloudinary.com", "https:", "https://apis.google.com"],
     connectSrc: [
         "'self'",
         "https://*.tiny.cloud",
         "https://www.googleapis.com",
         "https://www.google-analytics.com", // <-- ADDED FOR GA DATA SENDING
-        "https://*.googletagmanager.com"    // <-- ADDED FOR GA SCRIPT ORIGIN (good practice)
+        "https://*.googletagmanager.com",    // <-- ADDED FOR GA SCRIPT ORIGIN (good practice)
+        "https://calendar.google.com",
+        "https://apis.google.com"
     ],
-    frameSrc: ["'self'", "https://*.tiny.cloud"],
+    frameSrc: ["'self'", "https://*.tiny.cloud", "https://calendar.google.com","https://accounts.google.com"],
     workerSrc: ["'self'", "blob:"],
     objectSrc: ["'none'"],
 };

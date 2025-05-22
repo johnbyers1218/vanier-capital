@@ -16,9 +16,34 @@
         <div class="contact-intro section-header" style="margin-bottom: 3rem;">
             <h2 class="section-title">Get In Touch</h2>
             <p class="section-description">Have questions or want to discuss
-                your automation needs? Reach out using the form below.</p>
+                your automation needs?</p>
         </div>
-
+        <div class="form-header">
+                <h3>Schedule a free consultation call</h3>
+        </div>
+        <div class="form-header submit-btn-container"><!-- Google Calendar Appointment Scheduling begin -->
+                <link
+                    href="https://calendar.google.com/calendar/scheduling-button-script.css"
+                    rel="stylesheet">
+                <script
+                    src="https://calendar.google.com/calendar/scheduling-button-script.js"
+                    async></script>
+                <script>
+                    (function() {
+                    var target = document.currentScript;
+                    window.addEventListener('load', function() {
+                        calendar.schedulingButton.load({
+                        url: 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ335AVuGBH_NJglKI3iiThB8cP6sHwnzkeg6aJjyEGEKEVJkIQuUCWFOaL1UpBPp_YbVAfTY4dI?gv=true',
+                        color: '#00a8e8',
+                        label: "Schedule Now",
+                        width: '3rem',
+                        target,
+                        });
+                    });
+                    })();
+                </script>
+                <!-- end Google Calendar Appointment Scheduling -->
+            </div>
         <div class="contact-form-container">
             <div class="form-header">
                 <h3>Send Us a Message</h3>
@@ -70,14 +95,6 @@
                 </div>
 
                 <div class="form-group form-checkbox form-group-full"
-                    style="border-bottom: 1px solid var(--card-border); padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
-                    <input type="checkbox" id="request-meeting-checkbox"
-                        name="requestMeetingToggle">
-                    <label for="request-meeting-checkbox">I'd also like to
-                        schedule a meeting</label>
-                </div>
-
-                <div class="form-group form-checkbox form-group-full"
                     style="margin-top: 1.5rem;">
                     <input type="checkbox" id="privacy" name="privacy" required>
                     <label for="privacy">I agree to the <a
@@ -94,29 +111,11 @@
                     </button>
                 </div>
             </form>
-            <!-- Google Calendar Appointment Scheduling begin -->
-            <link
-                href="https://calendar.google.com/calendar/scheduling-button-script.css"
-                rel="stylesheet">
-            <script
-                src="https://calendar.google.com/calendar/scheduling-button-script.js"
-                async></script>
-            <script>
-            (function() {
-            var target = document.currentScript;
-            window.addEventListener('load', function() {
-                calendar.schedulingButton.load({
-                url: 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ335AVuGBH_NJglKI3iiThB8cP6sHwnzkeg6aJjyEGEKEVJkIQuUCWFOaL1UpBPp_YbVAfTY4dI?gv=true',
-                color: '#039BE5',
-                label: "Book an Appointment",
-                target,
-                });
-            });
-            })();
-            </script>
-            <!-- end Google Calendar Appointment Scheduling -->
-        </div>
 
+           
+
+        </div>
+ 
         <!-- Contact Information Section -->
         <div class="contact-info-container">
             <!-- <div class="contact-info-item">
