@@ -655,6 +655,23 @@ form#contact-form .submit-btn {
     width: 100%;
 }
 
+/* Google calendar scheduler button forced styling */
+.qxCTlb { /* Example, replace with actual class found */
+    /* Try to increase padding or font-size here */
+    padding: 15px 30px !important; /* !important might be needed to override Google's styles */
+    font-size: 1.5rem !important;
+    background-color: var(--primary-color); 
+    border-color: var(--primary-color); 
+    color: white;
+}
+.qxCTlb:hover { 
+    background-color: var(--secondary-color); 
+    border-color: var(--secondary-color); 
+    transform: translateY(-2px); 
+    box-shadow: 0 4px 15px rgba(0, 168, 232, 0.3); 
+}
+
+
 
 .form-group input[type="date"],
 .form-group input[type="time"] {
