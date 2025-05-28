@@ -288,15 +288,92 @@ header .logo img#header-logo { /* Target the logo image specifically */
 /* ======================================== */
 /* 5. Hero Section                          */
 /* ======================================== */
-.hero-section { position: relative; height: 80vh; min-height: 500px; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; background-color: #000; color: var(--light-text); }
-.hero-section::before { /* Pattern Overlay */ content: ''; position: absolute; inset: 0; z-index: 0; opacity: 0.6; background-image: linear-gradient(30deg, rgba(0, 168, 232, 0.08) 12%, transparent 12.5%, transparent 87%, rgba(0, 168, 232, 0.08) 87.5%, rgba(0, 168, 232, 0.08)), linear-gradient(150deg, rgba(0, 168, 232, 0.08) 12%, transparent 12.5%, transparent 87%, rgba(0, 168, 232, 0.08) 87.5%, rgba(0, 168, 232, 0.08)), linear-gradient(30deg, rgba(0, 168, 232, 0.08) 12%, transparent 12.5%, transparent 87%, rgba(0, 168, 232, 0.08) 87.5%, rgba(0, 168, 232, 0.08)), linear-gradient(150deg, rgba(0, 168, 232, 0.08) 12%, transparent 12.5%, transparent 87%, rgba(0, 168, 232, 0.08) 87.5%, rgba(0, 168, 232, 0.08)), linear-gradient(60deg, rgba(0, 168, 232, 0.1) 25%, transparent 25.5%, transparent 75%, rgba(0, 168, 232, 0.1) 75%, rgba(0, 168, 232, 0.1)), linear-gradient(60deg, rgba(0, 168, 232, 0.1) 25%, transparent 25.5%, transparent 75%, rgba(0, 168, 232, 0.1) 75%, rgba(0, 168, 232, 0.1)); background-size: 40px 70px; background-position: 0 0, 0 0, 20px 35px, 20px 35px, 0 0, 20px 35px; animation: patternMove 60s linear infinite; }
-@keyframes patternMove { 0% { background-position: 0 0, 0 0, 20px 35px, 20px 35px, 0 0, 20px 35px; } 100% { background-position: 500px 500px, 500px 500px, 520px 535px, 520px 535px, 500px 500px, 520px 535px; } }
-.hero-overlay { position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.8) 90%); z-index: 1; }
-.hero-content { position: relative; z-index: 2; max-width: 900px; padding: 0 1.5rem; }
-.hero-title { font-size: clamp(2.5rem, 6vw, 4rem); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--light-text); text-shadow: 0 0 8px var(--primary-glow); }
-.glowing-text { /* Additive class for glow effect */ text-shadow: 0 0 5px var(--primary-glow), 0 0 10px var(--primary-glow); }
-.hero-subtitle { font-size: clamp(1.1rem, 3vw, 1.5rem); margin-bottom: 2.5rem; color: var(--gray-text); font-weight: 300; max-width: 600px; margin-left: auto; margin-right: auto; }
-.hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+.hero-section {
+    position: relative; /* Stays the same, crucial for absolute positioning of children */
+    height: 80vh;
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden; /* Stays the same, clips the video if it's larger */
+    /* background-color: #000; */ /* Removed, video will be the background */
+    color: var(--light-text);
+}
+
+/* NEW: Styles for the video background */
+.hero-video-background {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translateX(-50%) translateY(-50%);
+    object-fit: cover;
+    z-index: 0;
+}
+
+/* REMOVED: Pattern Overlay and its animation */
+/* .hero-section::before { ... } */
+/* @keyframes patternMove { ... } */
+
+.hero-overlay {
+    position: absolute;
+    inset: 0; /* shorthand for top: 0; right: 0; bottom: 0; left: 0; */
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.8) 90%);
+    z-index: 1; /* Sits on top of the video (z-index: 0) */
+}
+
+.hero-content {
+    position: relative; /* Or position: absolute; if you prefer for fine-tuning */
+    z-index: 2;         /* Sits on top of the overlay (z-index: 1) */
+    max-width: 900px;
+    padding: 0 1.5rem;
+}
+
+.hero-title {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--light-text);
+    text-shadow: 0 0 8px var(--primary-glow);
+}
+
+.glowing-text {
+    /* Additive class for glow effect */
+    text-shadow: 0 0 5px var(--primary-glow), 0 0 10px var(--primary-glow);
+}
+
+.hero-subtitle {
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
+    margin-bottom: 2.5rem;
+    color: var(--gray-text);
+    font-weight: 300;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.hero-fallback-image {
+    /* Ensure it behaves like the video background */
+    position: absolute; /* If its parent <video> is the container for it */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Same as the video */
+    z-index: 0; /* Match video's z-index or ensure it's behind overlay */
+}
 
 /* ======================================== */
 /* Buttons                                  */

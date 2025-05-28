@@ -9,6 +9,58 @@
 
 <!-- Hero Section -->
 <section id="hero" class="hero-section">
+    <!-- Video Background -->
+    <video class="hero-video-background" autoplay loop muted playsinline poster="image/HeroImage.png">
+        <!-- MP4 source (Primary and Only Video Choice) -->
+        <source src="/images/HeroVideo.mp4" type="video/mp4">
+
+        <!-- Fallback for browsers that don't support the <video> tag AT ALL,
+             or if they can't play MP4 -->
+        <img src="image/HeroImage.png" alt="Hero Background Image" class="hero-fallback-image">
+        Your browser does not support the video tag. <!-- This text is also a fallback -->
+    </video>
+
+    <!-- Your existing script -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const heroVideo = document.querySelector('.hero-video-background');
+        let isVideoPlaying = false; // Flag to track if we've intentionally started it
+
+        if (heroVideo) {
+            // Check if the video element has actually loaded a video source
+            // and isn't just showing the fallback image.
+            // If heroVideo.currentSrc is empty, it means no video source was loaded.
+            if (heroVideo.currentSrc) {
+                heroVideo.addEventListener('ended', function() {
+                    console.log("Video ended, explicitly replaying.");
+                    this.currentTime = 0;
+                    this.play().catch(error => {
+                        console.warn("Error replaying video on 'ended' event:", error);
+                    });
+                }, false);
+
+                // Try to play initially
+                const playPromise = heroVideo.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        isVideoPlaying = true; // Successfully started playing
+                        console.log("Video playback started successfully.");
+                    }).catch(error => {
+                        console.warn("Initial video autoplay was prevented or failed:", error);
+                        // If autoplay fails, the poster image (or img fallback) should be visible.
+                    });
+                }
+            } else {
+                console.log("No video source loaded, fallback image should be showing.");
+            }
+        }
+    });
+    </script>
+
+    <!-- Overlay: This will sit on top of the video to darken it for text readability -->
+    <div class="hero-overlay"></div>
+
+    <!-- Content: This will sit on top of the overlay -->
     <div class="hero-content">
         <h1 class="hero-title glowing-text">FND AUTOMATIONS</h1>
         <p class="hero-subtitle">Empowering businesses through innovative automation solutions</p>
@@ -17,7 +69,6 @@
             <a href="/contact" class="cta-button secondary-btn">Get Started</a>
         </div>
     </div>
-    <div class="hero-overlay"></div>
 </section>
 
 <!-- Intro Section -->
