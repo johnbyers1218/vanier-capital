@@ -1,112 +1,115 @@
 <!-- views/testimonials.ejs -->
-<%# Testimonials Page Shell for FND Automations %>
+<%# Modern Testimonials Page with Carousel Design %>
 
 <%- include('partials/header', {
     pageTitle: 'Client Testimonials - FND Automations',
     pageDescription: 'Read what our clients say about FND Automations\' impact on their business through successful AI and process automation solutions.',
-    path: '/testimonials' /* Pass path for active nav highlighting */
+    path: '/testimonials'
 }) %>
 
-<!-- Page Header -->
+<!-- Hero Section -->
 <section class="page-header">
     <div class="container">
-        <h1>Client Testimonials</h1>
-        <div class="breadcrumbs">
-            <a href="/">Home</a> <span class="separator">/</span> <span class="current">Testimonials</span>
-        </div>
+    <h1>Client Testimonials</h1>
+    <p class="page-subtitle">Real results from businesses we’ve helped with AI and automation</p>
     </div>
 </section>
 
-<!-- Intro Section -->
-<section id="testimonials-intro" class="section testimonials-intro-section">
-    <div class="container section-header">
-        <h2 class="section-title">What Our Clients Say</h2>
-        <p class="section-description">Don't just take our word for it. Here's what our clients have to say about our automation solutions and the impact they've had on their businesses.</p>
-    </div>
-</section>
-
- <!-- Optional Featured Testimonial Section (Static Example - Make dynamic via JS/API if desired) -->
- <section id="featured-testimonial" class="section featured-testimonial-section" style="padding-top: 0;">
-     <div class="container">
-           <!-- Featured Testimonial Section -->
- <section id="featured-testimonial-section-dynamic" class="section" style="padding-top: 0;"> <!-- Changed ID slightly -->
+<!-- Featured Testimonial Carousel -->
+<section class="testimonial-carousel-section">
     <div class="container">
-        <!-- Container for dynamic featured testimonial -->
-        <div id="featured-testimonial-container">
-             <!-- Loading message inserted by JS -->
-            <p style="text-align: center; padding: 1rem; color: var(--gray-text);">Loading featured testimonial...</p>
+        <div class="testimonial-carousel-container">
+            <div class="carousel-header">
+                <h2 class="section-title">Client Success Stories</h2>
+                <div class="carousel-controls">
+                    <button class="carousel-btn prev-btn" aria-label="Previous testimonial">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <button class="carousel-btn next-btn" aria-label="Next testimonial">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="testimonial-carousel" id="testimonials-carousel" role="region" aria-roledescription="carousel" aria-label="Client Success Stories" tabindex="0" aria-live="off">
+                <div class="carousel-track" id="carousel-track">
+                    <!-- Loading state -->
+                    <div class="testimonial-loading">
+                        <div class="loading-spinner"></div>
+                        <p>Loading testimonials...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="carousel-dots" id="carousel-dots">
+                <!-- Dots will be generated dynamically -->
+            </div>
+
+            <!-- Progress bar removed in favor of dots-only indicators -->
+
+            <!-- Screen reader announcer for slide changes -->
+            <div id="carousel-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
         </div>
     </div>
 </section>
-      </div>
- </section>
 
-<!-- Testimonials Grid Section -->
-<section id="testimonials-grid-section" class="section section-darker">
+<!-- Stats Section -->
+<section class="testimonial-stats-section">
     <div class="container">
-         <div class="section-header" style="margin-bottom: 2rem;">
-             <h2 class="section-title">More Client Feedback</h2>
-             <!-- Optional: Add intro text for this specific grid if needed -->
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number" data-prefix="$" data-count="<%= metrics ? Math.max(0, Math.round((metrics.totalValuation || 0) / 1000000)) : 0 %>" data-suffix="M+">$0M+</div>
+                <div class="stat-label">Combined Partner Valuation</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-prefix="$" data-count="<%= metrics ? Math.max(0, Math.round((metrics.totalRevenue || 0) / 1000000)) : 0 %>" data-suffix="M+">$0M+</div>
+                <div class="stat-label">Combined Partner Revenue</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="<%= metrics && metrics.projectsCompleted || 0 %>" data-suffix="+">0+</div>
+                <div class="stat-label">Projects Completed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="<%= metrics && metrics.manualHoursAutomated || 0 %>" data-suffix="+">0+</div>
+                <div class="stat-label">Manual Hours Automated</div>
+            </div>
         </div>
-
-        <!-- Container where JavaScript (apps.js) will inject testimonial cards -->
-        <!-- The loadTestimonials function in apps.js targets this ID -->
-        <div id="testimonials-grid-container" class="grid-container grid-2-col">
-             <!-- Initial Loading State (Rendered by JS) -->
-             <div class="content-card is-loading" style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; justify-content: center; align-items: center;">
-                 <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-color);"></i>
-                 <p style="margin-top: 1rem; color: var(--gray-text);">Loading Testimonials...</p>
-             </div>
-             <!-- JS will clear this and append actual testimonial cards -->
-        </div>
-         <!-- Optional: Pagination for testimonials if needed -->
-         <!-- <nav class="pagination" id="testimonials-pagination"></nav> -->
     </div>
 </section>
 
-<!-- Optional: Video Testimonials Section (Keep static or make dynamic) -->
- <!-- <section id="video-testimonials" class="section video-testimonials-section">
-     <div class="container">
-         <div class="section-header">
-            <h2 class="section-title">Video Testimonials</h2>
+<!-- All Testimonials Grid -->
+<section class="all-testimonials-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">All Client Feedback</h2>
+            <p class="section-subtitle">Explore our complete collection of client testimonials and success stories</p>
         </div>
-         <div class="grid-container grid-3-col video-grid">
-             Static Video Placeholders -->
-            <!-- <div class="video-item content-card" style="text-align: center; padding: 1rem;">
-                 <div class="video-thumbnail" style="position: relative; margin-bottom: 1rem; cursor: pointer; background-color: #333; aspect-ratio: 16 / 9; border-radius: var(--border-radius); display:flex; align-items:center; justify-content:center;">
-                     <img src="/images/placeholder-video.jpg" alt="Video Testimonial 1" style="max-width: 100%; max-height: 100%; border-radius: var(--border-radius); object-fit: cover;">
-                     <div class="play-button" style="position: absolute; font-size: 3rem; color: rgba(255,255,255,0.8); text-shadow: 0 0 10px black;">►</div>
-                 </div>
-                 <h3 style="font-size: 1.1rem;">How FND Transformed Our Process</h3>
-                 <p style="font-size: 0.9em; color: var(--gray-text);">John Doe, CEO of TechCorp</p>
-             </div>
-              <div class="video-item content-card" style="text-align: center; padding: 1rem;">
-                 <div class="video-thumbnail" style="position: relative; margin-bottom: 1rem; cursor: pointer; background-color: #333; aspect-ratio: 16 / 9; border-radius: var(--border-radius); display:flex; align-items:center; justify-content:center;">
-                      <img src="/images/placeholder-video.jpg" alt="Video Testimonial 2" style="max-width: 100%; max-height: 100%; border-radius: var(--border-radius); object-fit: cover;">
-                      <div class="play-button" style="position: absolute; font-size: 3rem; color: rgba(255,255,255,0.8); text-shadow: 0 0 10px black;">►</div>
-                  </div>
-                 <h3 style="font-size: 1.1rem;">Retail Inventory Success</h3>
-                 <p style="font-size: 0.9em; color: var(--gray-text);">Mike Johnson, ShopSmart</p>
-             </div>
-              <div class="video-item content-card" style="text-align: center; padding: 1rem;">
-                 <div class="video-thumbnail" style="position: relative; margin-bottom: 1rem; cursor: pointer; background-color: #333; aspect-ratio: 16 / 9; border-radius: var(--border-radius); display:flex; align-items:center; justify-content:center;">
-                      <img src="/images/placeholder-video.jpg" alt="Video Testimonial 3" style="max-width: 100%; max-height: 100%; border-radius: var(--border-radius); object-fit: cover;">
-                      <div class="play-button" style="position: absolute; font-size: 3rem; color: rgba(255,255,255,0.8); text-shadow: 0 0 10px black;">►</div>
-                  </div>
-                 <h3 style="font-size: 1.1rem;">Healthcare Data Revolution</h3>
-                 <p style="font-size: 0.9em; color: var(--gray-text);">Sarah Williams, MediCare CTO</p>
-             </div>
-         </div>
-     </div>
- </section> -->
+    <div id="testimonial-filters"></div>
+    <div id="testimonial-active-summary" class="active-filters" aria-live="polite"></div>
+        
+        <div class="testimonials-grid" id="testimonials-grid-container">
+            <div class="testimonial-loading grid-loading">
+                <div class="loading-spinner"></div>
+                <p>Loading all testimonials...</p>
+            </div>
+        </div>
+    </div>
+</section>
 
-<!-- CTA Section -->
-<section id="cta" class="cta-section">
+<!-- Call to Action -->
+<section class="cta-section cta-alt full-bleed">
     <div class="container">
         <div class="cta-content">
-            <h2>Ready to Join Our Satisfied Clients?</h2>
-            <p>Contact us today to discuss how our automation solutions can transform your business operations.</p>
-            <a href="/contact" class="cta-button primary-btn glow-button">Get Started</a>
+            <h2 class="cta-title">Ready to Join Our Satisfied Clients?</h2>
+            <p class="cta-description">Contact us today to discuss how our automation solutions can transform your business operations and deliver measurable results.</p>
+            <div class="cta-actions">
+                <a href="/contact" class="btn btn-primary">Start Your Project</a>
+                <a href="/services" class="btn btn-secondary">Explore Our Services</a>
+            </div>
         </div>
     </div>
 </section>

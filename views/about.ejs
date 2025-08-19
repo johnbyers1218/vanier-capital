@@ -7,56 +7,77 @@
     path: '/about'
 }) %>
 
-<!-- Page Header -->
-<section class="page-header">
-    <div class="container">
-        <h1>About Us</h1>
-        <div class="breadcrumbs">
-            <a href="/">Home</a>
-            <span class="separator">/</span>
-            <span class="current">About Us</span>
-        </div>
-    </div>
-</section>
+<!-- Page Header removed per request; 'Our Story' serves as the page title. -->
 
 <!-- Our Story Section -->
-<section class="section our-story-section"> <!-- Consider removing class if .section styling sufficient -->
+<section class="section our-story-section">
     <div class="container">
         <div class="section-header" style="margin-bottom: 2rem;">
-            <h2 class="section-title">Our Story</h2>
-            <!-- <div class="our-story-divider"></div> Combined with section title ::after -->
-            <h3 style="font-size: 1.5rem; color: var(--light-text); font-weight: 400; margin-top: 2rem;">From vision to reality: The journey of FND Automations</h3>
+            <h2 class="section-title">The Expertise Behind Your Automation</h2>
+            <p class="section-description">Built on experience, driven by results.</p>
+            <p class="section-description">A mission to modernize business.</p>
         </div>
 
-        <div style="max-width: 850px; margin: 0 auto 3rem auto; text-align: left;">
-            <p>
-                FND Automations was founded with a clear mission: to help businesses leverage the power of automation to increase efficiency, reduce costs, and drive growth. What started as a small team of passionate automation experts has grown into a leading consulting firm serving clients across multiple industries.
-            </p>
-            <p>
-                Our journey began when our founders recognized a critical gap in the market – businesses needed custom automation solutions that addressed their specific challenges, not one-size-fits-all approaches. This insight has guided our development and remains at the core of our philosophy today.
-            </p>
+    <!-- Narrative layout (single column) -->
+    <div class="our-story-grid single">
+            <div class="our-story-copy">
+                <p>
+                    FND Automations was founded with a clear mission: to help businesses leverage the power of automation to increase efficiency, reduce costs, and drive growth. What started as a small team of passionate automation experts has grown into a trusted partner for organizations across multiple industries.
+                </p>
+                <p>
+                    We recognized early that businesses needed custom solutions tailored to their workflows — not one-size-fits-all tools. Today, we design pragmatic end‑to‑end systems that combine AI agents, workflow automation, and robust web applications to deliver tangible results.
+                </p>
+            </div>
         </div>
 
-        <!-- Quick Facts -->
-        <div class="grid-container grid-3-col quick-facts-container" style="gap: 1.5rem;"> <!-- Use grid -->
-            <div class="quick-fact content-card"> <!-- Reuse card styling -->
-                <div class="quick-fact-number" style="font-size: 2.5rem; font-weight: 700; color: var(--primary-color); margin-bottom: 0.5rem;">10+</div>
-                <div class="quick-fact-text" style="font-size: 1.1rem; color: var(--light-text);">Clients Served</div>
+        <!-- Mission / Vision cards -->
+        <div class="mv-grid">
+            <div class="mv-card">
+                <div class="mv-header">
+                    <span class="mv-icon" aria-hidden="true"><i class="fas fa-cogs"></i></span>
+                    <h3 class="mv-title">Our Mission</h3>
+                </div>
+                <p class="mv-text">Empower teams with reliable, well‑designed automation that eliminates busywork and unlocks higher‑value work.</p>
             </div>
-            <div class="quick-fact content-card">
-                <div class="quick-fact-number" style="font-size: 2.5rem; font-weight: 700; color: var(--primary-color); margin-bottom: 0.5rem;">15+</div>
-                <div class="quick-fact-text" style="font-size: 1.1rem; color: var(--light-text);">Projects Completed</div>
-            </div>
-            <div class="quick-fact content-card">
-                <div class="quick-fact-number" style="font-size: 2.5rem; font-weight: 700; color: var(--primary-color); margin-bottom: 0.5rem;">1+</div> <!-- Update as needed -->
-                <div class="quick-fact-text" style="font-size: 1.1rem; color: var(--light-text);">Year of Experience</div>
+            <div class="mv-card">
+                <div class="mv-header">
+                    <span class="mv-icon" aria-hidden="true"><i class="fas fa-chart-line"></i></span>
+                    <h3 class="mv-title">Our Vision</h3>
+                </div>
+                <p class="mv-text">A world where AI‑assisted operations are accessible to every business, driving smarter decisions and sustainable growth.</p>
             </div>
         </div>
+
+        <!-- At a Glance / Quick Facts -->
+        <div class="quick-facts-container">
+            <div class="stat-item">
+                <div class="stat-number" data-count="<%= aboutStats ? (aboutStats.valuedPartners || 0) : 0 %>" data-suffix="+">0</div>
+                <div class="stat-label">Valued Partners</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="<%= aboutStats ? (aboutStats.projectsCompleted || 0) : 0 %>" data-suffix="+">0</div>
+                <div class="stat-label">Projects Completed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="<%= aboutStats ? (aboutStats.yearsCombinedExpertise || 0) : 0 %>" data-suffix="+">0</div>
+                <div class="stat-label">Years Combined Expertise</div>
+            </div>
+        </div>
+
+        <% if (visibleClients && visibleClients.length) { %>
+        <div class="client-logos" style="margin-top: 1.5rem; display: grid; grid-template-columns: repeat( auto-fit, minmax(120px, 1fr) ); gap: 1rem; align-items: center;">
+            <% visibleClients.forEach(cl => { %>
+                <div class="client-logo" style="background: #fff; border-radius: 6px; padding: 8px; display:flex; align-items:center; justify-content:center; height: 72px;">
+                    <img src="<%= cl.logoUrl %>" alt="<%= cl.name %> logo" style="max-height: 56px; max-width: 100%; object-fit: contain;" onerror="this.onerror=null;this.src='/images/FND_LOGO_SVG_BLACK.svg';">
+                </div>
+            <% }) %>
+        </div>
+        <% } %>
     </div>
 </section>
 
 <!-- Team Section -->
-<section id="team" class="section team-section section-darker">
+<section id="team" class="section team-section">
     <div class="container">
         <div class="section-header">
             <h2 class="section-title">Meet Our Team</h2>
@@ -64,11 +85,14 @@
         </div>
 
         <!-- Team Grid -->
-        <div class="team-grid" style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem;">
+    <div class="team-grid">
             <!-- Team Member Card 1: Logan -->
-            <div class="team-member">
-                 <div class="member-image">
-                     <img src="/images/Logan.png" alt="Portrait of Logan Mayfield">
+                <div class="team-member">
+                      <div class="member-image">
+                            <picture>
+                                <source srcset="/images/Logan.webp" type="image/webp">
+                                <img src="/images/Logan.png" alt="Portrait of Logan Mayfield" width="600" height="800" loading="lazy">
+                            </picture>
                      <!-- Overlay structure preserved -->
                      <div class="member-details-overlay initial-overlay">
                          <h3>Logan Mayfield</h3>
@@ -90,7 +114,10 @@
              <!-- Team Member Card 2: Matthew -->
              <div class="team-member">
                  <div class="member-image">
-                     <img src="/images/Moe.png" alt="Portrait of Matthew Moellering">
+                     <picture>
+                        <source srcset="/images/Moe.webp" type="image/webp">
+                        <img src="/images/Moe.png" alt="Portrait of Matthew Moellering" width="600" height="800" loading="lazy">
+                     </picture>
                       <!-- Overlay structure preserved -->
                      <div class="member-details-overlay initial-overlay">
                          <h3>Matthew Moellering</h3>
@@ -110,9 +137,12 @@
              </div>
 
              <!-- Team Member Card 3: Haiden -->
-              <div class="team-member">
-                 <div class="member-image">
-                     <img src="/images/Haidan.png" alt="Portrait of Haiden Mayfield">
+                  <div class="team-member">
+                      <div class="member-image">
+                            <picture>
+                                <source srcset="/images/Haidan.webp" type="image/webp">
+                                <img src="/images/Haidan.png" alt="Portrait of Haiden Mayfield" width="600" height="800" loading="lazy">
+                            </picture>
                      <!-- Overlay structure preserved -->
                      <div class="member-details-overlay initial-overlay">
                          <h3>Haidan Mayfield</h3>
@@ -122,11 +152,7 @@
                          <h3>Haidan Mayfield</h3>
                                                   <p class="member-role">Chief Marketing Officer</p>
                          <p class="member-bio">Haiden is the voice of FND Automations, translating complex AI and web development capabilities into compelling narratives. He ensures our innovative solutions, including voice agents and custom automations, resonate with businesses seeking to elevate their operations and customer engagement.</p>
-                          <div class="member-social">
-                             <!-- <a href="https://www.linkedin.com/in/haiden-mayfield/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a> -->
-                             <!-- <a href="https://twitter.com/HaidenMayfield" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-twitter"></i></a> -->
-                             <!-- <a href="mailto:haiden.mayfield@fndautomations.com" aria-label="Email"><i class="fas fa-envelope"></i></a> -->
-                         </div>
+                                 <!-- No social links currently provided -->
                      </div>
                  </div>
              </div>
@@ -134,7 +160,10 @@
             <!-- Team Member Card 4: John -->
              <div class="team-member">
                  <div class="member-image">
-                     <img src="/images/John.png" alt="Portrait of John Byers">
+                     <picture>
+                        <source srcset="/images/John.webp" type="image/webp">
+                        <img src="/images/John.png" alt="Portrait of John Byers" width="600" height="800" loading="lazy">
+                     </picture>
                      <!-- Overlay structure preserved -->
                      <div class="member-details-overlay initial-overlay">
                          <h3>John Byers</h3>
@@ -158,7 +187,7 @@
 </section>
 
 <!-- CTA Section -->
-<section id="cta" class="cta-section">
+<section id="cta" class="cta-section cta-alt full-bleed">
      <div class="container">
          <div class="cta-content">
              <h2>Ready to Transform Your Business?</h2>

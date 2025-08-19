@@ -1,5 +1,5 @@
 <!-- views/projects.ejs -->
-<%# Projects Portfolio Page Listing for FND Automations %>
+<%# Projects Portfolio Page - Professional Design %>
 
 <%- include('partials/header', {
     pageTitle: 'Our Projects - Automation Case Studies',
@@ -7,63 +7,88 @@
     path: '/projects'
 }) %>
 
-<section class="page-header">
-    <div class="container">
-        <h1>Our Projects</h1>
-        <div class="breadcrumbs">
-            <a href="/">Home</a> <span class="separator">/</span> <span class="current">Projects</span>
-        </div>
-    </div>
-</section>
-
- <!-- Featured Project Section (Keep dynamic loading as is from apps.js) -->
- <section id="featured-project" class="section">
-    <div class="container">
-       <div class="section-header"><h2 class="section-title">Featured Project</h2></div>
-       <div id="featured-project-container">
-            <p style="text-align: center; padding: 1rem; color: var(--gray-text);">Loading featured project...</p>
-       </div>
-    </div>
-</section>
-
-<section id="projects-grid-section" class="section section-darker">
+<!-- Page Intro (compact) -->
+<section class="section">
     <div class="container">
         <div class="section-header">
-            <h2 class="section-title">Project Portfolio</h2>
-            <p class="section-description">Explore our diverse range of automation solutions.</p>
+            <h2 class="section-title">Complete Portfolio</h2>
+            <p class="section-subtitle">Browse our comprehensive collection of automation solutions across various industries</p>
         </div>
+    </div>
+    
+</section>
 
-        <div class="projects-filter" style="display: flex; justify-content: center; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 3rem;">
-            <button class="filter-btn cta-button secondary-btn active" data-filter="all">All</button>
-            <button class="filter-btn cta-button secondary-btn" data-filter="real-estate">Real Estate</button>
-            <button class="filter-btn cta-button secondary-btn" data-filter="finance">Finance</button>
-            <button class="filter-btn cta-button secondary-btn" data-filter="legal">Legal</button>
-            <button class="filter-btn cta-button secondary-btn" data-filter="e-commerce">E-commerce</button>
-            <button class="filter-btn cta-button secondary-btn" data-filter="advertising">Advertising</button>
-            <!-- Add more categories as needed -->
+<!-- Featured Project Section (single hero card) -->
+<section id="featured-project" class="section section-muted featured-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Featured Project</h2>
+            <p class="section-subtitle">Highlighting our most impactful automation implementation</p>
         </div>
-        <style>
-            .projects-filter .filter-btn { padding: 8px 18px; font-size: 0.9rem; border-width: 1px; text-transform: capitalize; }
-            .projects-filter .filter-btn.active { background-color: var(--primary-color); border-color: var(--primary-color); color: var(--darker-bg); font-weight: 600;}
-        </style>
-
-        <div id="projects-grid-container" class="grid-container grid-3-col">
-             <div class="content-card is-loading" style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem;">
-                 <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-color);"></i>
-                 <p style="margin-top: 1rem; color: var(--gray-text);">Loading Projects...</p>
-             </div>
+    <div id="featured-project-container">
+            <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Loading featured project...</p>
+            </div>
         </div>
     </div>
 </section>
 
-<section id="cta" class="cta-section">
-     <div class="container">
-         <div class="cta-content">
-             <h2>Have a Similar Challenge?</h2>
-             <p>Let's discuss a custom automation solution for your business needs.</p>
-             <a href="/contact" class="cta-button primary-btn glow-button">Request a Consultation</a>
-         </div>
-     </div>
+<!-- Projects Grid Section -->
+<section id="projects-grid-section" class="section projects-section">
+    <div class="container">
+        
+
+                <!-- Filter Navigation (dual groups) -->
+                <nav class="filter-navigation" role="navigation" aria-label="Project filters">
+                    <div class="project-filter-card">
+                        <div class="filter-group-block">
+                            <div class="filter-title">Filter by Industry</div>
+                            <div class="filter-controls" style="display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; margin:.25rem 0 .5rem 0;">
+                                <label for="industryFilterSearch" class="sr-only">Filter industries</label>
+                                <input id="industryFilterSearch" type="search" placeholder="Find an industry…" autocomplete="off" style="min-width:220px; border:1px solid var(--color-border-subtle); border-radius:.5rem; padding:.35rem .6rem; background:#fff;">
+                                <button id="industryToggle" class="link-button" type="button" aria-expanded="false" aria-controls="industry-filters">Show more…</button>
+                            </div>
+                            <div class="filter-group collapsible" id="industry-filters" data-collapsed="true" style="max-height: 84px; overflow:hidden; transition:max-height .25s ease;"></div>
+                            <div class="filter-divider" aria-hidden="true"></div>
+                        </div>
+                        <div class="filter-group-block">
+                            <div class="filter-title">Filter by Service Type</div>
+                            <div class="filter-controls" style="display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; margin:.25rem 0 .5rem 0;">
+                                <label for="serviceFilterSearch" class="sr-only">Filter services</label>
+                                <input id="serviceFilterSearch" type="search" placeholder="Find a service…" autocomplete="off" style="min-width:220px; border:1px solid var(--color-border-subtle); border-radius:.5rem; padding:.35rem .6rem; background:#fff;">
+                                <button id="serviceToggle" class="link-button" type="button" aria-expanded="false" aria-controls="service-filters">Show more…</button>
+                            </div>
+                            <div class="filter-group collapsible" id="service-filters" data-collapsed="true" style="max-height: 84px; overflow:hidden; transition:max-height .25s ease;"></div>
+                        </div>
+                    </div>
+                </nav>
+
+    <!-- Projects Grid -->
+    <div id="projects-grid-container" class="projects-grid">
+            <div class="loading-state grid-loading">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Loading project portfolio...</p>
+            </div>
+        </div>
+
+    <!-- Pagination -->
+    <div id="projects-pagination" class="pagination"></div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="cta-section cta-alt full-bleed">
+    <div class="container">
+        <div class="cta-content">
+            <h2 class="cta-title">Ready to Transform Your Business?</h2>
+            <p class="cta-description">Let's discuss how automation can streamline your operations and drive growth. Schedule a consultation to explore possibilities tailored to your unique needs.</p>
+            <div class="cta-actions center">
+                <a href="/contact" class="btn btn-primary">Start Your Project</a>
+                <a href="/services" class="btn btn-secondary">Learn About Our Services</a>
+            </div>
+        </div>
+    </div>
 </section>
 
 <%- include('partials/footer') %>

@@ -1,7 +1,7 @@
 // utils/helpers.js
 // Import necessary modules (ensure these are at the top if adding to helpers.js)
-import AdminLog from '../models/AdminLog.js';
-import { logger } from '../config/logger.js';
+const AdminLog = require('../models/AdminLog.js');
+const { logger } = require('../config/logger.js');
 
 /**
  * SECURE HTML escaping utility.
@@ -13,20 +13,44 @@ import { logger } from '../config/logger.js';
  * @param {string | number | any} unsafe The potentially unsafe input. Handles non-strings gracefully.
  * @returns {string} The HTML-escaped string.
  */
-export function escapeHtml(unsafe) {
-    // 1. Ensure input is a string. If null/undefined, becomes empty string.
-    const str = String(unsafe || '');
-
-    // 2. Perform replacements in the correct order. '&' MUST be first.
-    //    Use alternating quotes for the replacement string literals
-    //    to avoid syntax errors when the entity itself contains a quote.
+function escapeHtml(unsafe) {
+    if (unsafe === null || unsafe === undefined) return '';
+    const str = String(unsafe);
+    // Ampersand must be escaped first to avoid double-escaping
     return str
-         .replace(/&/g, "&")      // Replace & with &
-         .replace(/</g, "<")       // Replace < with <
-         .replace(/>/g, ">")       // Replace > with >
-         .replace(/"/g, '"')    // Replace " with " (using single quotes for the JS string)
-         .replace(/'/g, "'");   // Replace ' with ' (using double quotes for the JS string)
-                                     // (' is generally preferred over ' for broader compatibility)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+/**
+ * Decodes a subset of common HTML entities back to their characters.
+ * This helps when content has been double-encoded (e.g., '&amp;amp;' -> '&amp;' -> '&').
+ * Safe to use on text (not HTML markup), and should still be rendered with escaping in templates.
+ */
+function decodeHtmlEntities(input) {
+    if (input === null || input === undefined) return '';
+    let str = String(input);
+    // Named entities
+    str = str
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#0*39;|&apos;/g, "'");
+    // Numeric decimal entities (e.g., &#38;)
+    str = str.replace(/&#(\d+);/g, (_, code) => {
+        const n = parseInt(code, 10);
+        return Number.isFinite(n) ? String.fromCharCode(n) : _;
+    });
+    // Numeric hex entities (e.g., &#x26;)
+    str = str.replace(/&#x([\da-fA-F]+);/g, (_, code) => {
+        const n = parseInt(code, 16);
+        return Number.isFinite(n) ? String.fromCharCode(n) : _;
+    });
+    return str;
 }
 
 /**
@@ -39,7 +63,7 @@ export function escapeHtml(unsafe) {
  * @param {string} [details=''] - Optional details about the action (e.g., item title/ID).
  * @param {string} [ipAddress=''] - The IP address from the request.
  */
-export async function logAdminAction(userId, username, action, details = '', ipAddress = '') {
+async function logAdminAction(userId, username, action, details = '', ipAddress = '') {
     if (!userId || !username || !action) {
         logger.error('Attempted to log admin action with missing required fields.', { userId, username, action });
         return; // Don't proceed if essential info missing
@@ -64,4 +88,8 @@ export async function logAdminAction(userId, username, action, details = '', ipA
     }
 }
 
-// Export other helper functions if this is helpers.js
+module.exports = {
+    escapeHtml,
+    decodeHtmlEntities,
+    logAdminAction
+};

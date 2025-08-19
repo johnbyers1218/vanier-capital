@@ -1,9 +1,9 @@
 // utils/email.js (ESM Version)
 
 // Import necessary modules using ESM syntax
-import nodemailer from "nodemailer";
-import { google } from "googleapis"; // googleapis typically exports 'google' as a named export
-import { logger } from "../config/logger.js"; // Import named export, add .js extension
+const nodemailer = require("nodemailer");
+const { google } = require("googleapis"); // googleapis typically exports 'google' as a named export
+const { logger } = require("../config/logger.js"); // Import named export, add .js extension
 
 // Destructure google.auth for easier access if preferred
 const { OAuth2 } = google.auth;
@@ -14,7 +14,7 @@ const { OAuth2 } = google.auth;
  * Throws an error if configuration is missing or authentication fails.
  * @returns {Promise<nodemailer.Transporter>} A Promise resolving to the configured transporter.
  */
-export const createTransporter = async () => {
+const createTransporter = async () => {
   logger.debug("Attempting to create Nodemailer OAuth2 transporter...");
 
   // 1. Check for required environment variables
@@ -91,5 +91,4 @@ export const createTransporter = async () => {
   }
 };
 
-// If this was the only function, could use: export default createTransporter;
-// But using named export allows adding other email-related utils later easily.
+module.exports = { createTransporter };

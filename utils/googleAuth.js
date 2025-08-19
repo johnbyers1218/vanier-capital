@@ -12,7 +12,7 @@
  * THIS FUNCTION IS CURRENTLY NOT USED AS DIRECT CALENDAR INTEGRATION IS DISABLED.
  * @returns {Promise<object>} A Promise resolving to the authorized JWT client instance.
  */
-export const getGoogleAuth = async () => {
+const getGoogleAuth = async () => {
     // logger.debug('Attempting Google API authentication (Currently Disabled for Calendar)...');
     logger.warn('[googleAuth.js] getGoogleAuth called, but Calendar integration is currently disabled. No action will be taken for Calendar API.');
     // Return a placeholder or throw an error if it were to be used unexpectedly.
@@ -50,7 +50,7 @@ export const getGoogleAuth = async () => {
         throw new Error('Server configuration error: Incomplete Google API credentials.');
     }
 
-    const scopes = ['https://www.googleapis.com/auth/calendar.events'];
+    const scopes = ['https://www.googleapis.comcalendar.events'];
 
     const jwtClientOptions = {
         email: key.client_email,
@@ -86,3 +86,4 @@ export const getGoogleAuth = async () => {
     }
     */
 };
+module.exports = { getGoogleAuth };

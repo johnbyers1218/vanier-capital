@@ -1,13 +1,14 @@
 <!-- views/partials/pagination.ejs -->
 <%# Reusable pagination controls %>
-<%# Expects: currentPage, hasNextPage, hasPreviousPage, nextPage, previousPage, lastPage, baseUrl, tagQuery (optional) %>
+<%# Expects: currentPage, hasNextPage, hasPreviousPage, nextPage, previousPage, lastPage, baseUrl, categoryQuery (optional), tagQuery (optional legacy) %>
+<% const _q = (typeof categoryQuery !== 'undefined' && categoryQuery) ? { key: 'category', val: categoryQuery } : ((typeof tagQuery !== 'undefined' && tagQuery) ? { key: 'tag', val: tagQuery } : null); %>
 
 <% if (lastPage > 1) { %> <%# Only show pagination if there's more than one page %>
     <nav class="pagination" aria-label="Page navigation">
 
         <!-- Previous Page Link -->
         <% if (hasPreviousPage) { %>
-             <% const prevUrl = `${baseUrl}?page=${previousPage}` + (tagQuery ? `&tag=${encodeURIComponent(tagQuery)}` : ''); %>
+             <% const prevUrl = `${baseUrl}?page=${previousPage}` + (_q ? `&${_q.key}=${encodeURIComponent(_q.val)}` : '') + '#article-grid'; %>
              <a href="<%= prevUrl %>" class="page-link prev" aria-label="Previous Page">← Previous</a>
         <% } else { %>
             <span class="page-link disabled prev" aria-disabled="true">← Previous</span>
@@ -26,7 +27,7 @@
 
         <%# Link to First Page (if not shown in main range) %>
         <% if (startPage > 1) { %>
-             <% const firstUrl = `${baseUrl}?page=1` + (tagQuery ? `&tag=${encodeURIComponent(tagQuery)}` : ''); %>
+             <% const firstUrl = `${baseUrl}?page=1` + (_q ? `&${_q.key}=${encodeURIComponent(_q.val)}` : '') + '#article-grid'; %>
              <a href="<%= firstUrl %>" class="page-link" aria-label="Page 1">1</a>
              <% if (startPage > 2) { %> <span class="page-link disabled">...</span> <% } %>
         <% } %>
@@ -36,7 +37,7 @@
             <% if (i === currentPage) { %>
                  <span class="page-link active" aria-current="page"><%= i %></span>
             <% } else { %>
-                 <% const pageUrl = `${baseUrl}?page=${i}` + (tagQuery ? `&tag=${encodeURIComponent(tagQuery)}` : ''); %>
+                 <% const pageUrl = `${baseUrl}?page=${i}` + (_q ? `&${_q.key}=${encodeURIComponent(_q.val)}` : '') + '#article-grid'; %>
                  <a href="<%= pageUrl %>" class="page-link" aria-label="Page <%= i %>"><%= i %></a>
             <% } %>
         <% } %>
@@ -44,13 +45,13 @@
          <%# Link to Last Page (if not shown in main range) %>
         <% if (endPage < lastPage) { %>
              <% if (endPage < lastPage - 1) { %> <span class="page-link disabled">...</span> <% } %>
-              <% const lastUrl = `${baseUrl}?page=${lastPage}` + (tagQuery ? `&tag=${encodeURIComponent(tagQuery)}` : ''); %>
+              <% const lastUrl = `${baseUrl}?page=${lastPage}` + (_q ? `&${_q.key}=${encodeURIComponent(_q.val)}` : '') + '#article-grid'; %>
               <a href="<%= lastUrl %>" class="page-link" aria-label="Page <%= lastPage %>"><%= lastPage %></a>
         <% } %>
 
         <!-- Next Page Link -->
         <% if (hasNextPage) { %>
-             <% const nextUrl = `${baseUrl}?page=${nextPage}` + (tagQuery ? `&tag=${encodeURIComponent(tagQuery)}` : ''); %>
+             <% const nextUrl = `${baseUrl}?page=${nextPage}` + (_q ? `&${_q.key}=${encodeURIComponent(_q.val)}` : '') + '#article-grid'; %>
              <a href="<%= nextUrl %>" class="page-link next" aria-label="Next Page">Next →</a>
         <% } else { %>
             <span class="page-link disabled next" aria-disabled="true">Next →</span>

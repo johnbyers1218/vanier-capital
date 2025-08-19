@@ -1,6 +1,6 @@
 // models/Testimonial.js (ESM Version)
 
-import mongoose from 'mongoose'; // Use ESM import
+const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema; // Alias for mongoose.Schema
 
@@ -51,8 +51,9 @@ const TestimonialSchema = new Schema(
             default: true, // Defaults to visible unless explicitly hidden
             required: true // Ensure this field is always present for filtering
         },
-        // Optional: Add fields like project associated, author image URL, etc.
-        project: { type: Schema.Types.ObjectId, ref: 'Project' },
+    // Optional: Link to a related project and client (either or both)
+    project: { type: Schema.Types.ObjectId, ref: 'Project' },
+    client: { type: Schema.Types.ObjectId, ref: 'Client' },
         // authorImage: { type: String, trim: true, match: [/^https?:\/\/.+\..+/, 'Invalid URL.'] }
     },
     {
@@ -65,10 +66,11 @@ const TestimonialSchema = new Schema(
 // Index for filtering by visibility and sorting (common query for public API)
 TestimonialSchema.index({ isVisible: 1, createdAt: -1 });
 TestimonialSchema.index({ isVisible: 1, isFeatured: -1, createdAt: -1 }); // For featured + visible
+// Helpful for filtering testimonials by client
+TestimonialSchema.index({ client: 1, createdAt: -1 });
 
 // --- Model Export ---
 // Handles potential model recompilation in development environments
 const Testimonial = mongoose.models.Testimonial || mongoose.model('Testimonial', TestimonialSchema);
 
-// Use ESM default export
-export default Testimonial;
+module.exports = Testimonial;

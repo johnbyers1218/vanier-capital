@@ -1,9 +1,9 @@
 // utils/adminUploads.js
 
-import { v2 as cloudinary } from 'cloudinary';
-import multer from 'multer';
-import { logger } from '../config/logger.js';
-import { logAdminAction } from './helpers.js'; // Assuming this is where your logAdminAction is
+const { v2: cloudinary } = require('cloudinary');
+const multer = require('multer');
+const { logger } = require('../config/logger.js');
+const { logAdminAction } = require('./helpers.js'); // Assuming this is where your logAdminAction is
 
 
 
@@ -89,5 +89,4 @@ const handleMulterErrorForCoverImage = (error, req, res, next) => {
     next(); // Should not be reached if error is handled
 };
 
-
-export { coverImageUpload, handleCoverImageUpload, handleMulterErrorForCoverImage };
+module.exports = { coverImageUpload, handleCoverImageUpload, handleMulterErrorForCoverImage };

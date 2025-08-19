@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom CSS Variables for compatibility with existing code */
+:root {
+  --primary-color: theme('colors.primary.500');
+  --secondary-color: theme('colors.secondary.500');
+  --dark-bg: theme('colors.dark.800');
+  --darker-bg: theme('colors.dark.900');
+  --light-text: theme('colors.gray.light');
+  --gray-text: theme('colors.gray.text');
+  --muted-text: theme('colors.gray.muted');
+}
+
+/* Custom component classes */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center px-8 py-3 rounded-xl font-semibold text-base transition-all duration-300 ease-in-out min-w-[180px] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-900;
+  }
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-primary-500 to-secondary-500 text-white shadow-lg hover:shadow-glow hover:-translate-y-1 focus:ring-primary-500;
+  }
+
+  .btn-secondary {
+    @apply bg-white/5 text-light border border-white/15 backdrop-blur-sm hover:bg-white/10 hover:border-primary-500/30 hover:-translate-y-1 focus:ring-white/50;
+  }
+
+  .card {
+    @apply bg-gradient-to-br from-dark-800/80 to-dark-700/60 border border-white/8 rounded-2xl backdrop-blur-md transition-all duration-400 ease-out;
+  }
+
+  .card-hover {
+    @apply hover:-translate-y-2 hover:border-primary-500/30 hover:shadow-xl hover:shadow-black/30;
+  }
+
+  .section-padding {
+    @apply py-24;
+  }
+
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .heading-gradient {
+    @apply bg-gradient-to-r from-primary-400 to-secondary-400 bg-clip-text text-transparent;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-light to-gray-text bg-clip-text text-transparent;
+  }
+}
+
+/* Custom utilities */
+@layer utilities {
+  .glass-effect {
+    @apply bg-white/5 backdrop-blur-md border border-white/10;
+  }
+  
+  .glass-hover {
+    @apply hover:bg-white/10 hover:border-primary-500/20;
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes glow {
+    from {
+      box-shadow: 0 0 20px rgba(0, 168, 232, 0.3);
+    }
+    to {
+      box-shadow: 0 0 40px rgba(0, 168, 232, 0.6);
+    }
+  }
+}

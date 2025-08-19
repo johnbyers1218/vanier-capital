@@ -1,7 +1,7 @@
 // models/Contacts.js (ESM Version - UPDATED with optional scheduling fields)
 
-import mongoose from 'mongoose';
-import validator from 'validator';
+const mongoose = require('mongoose');
+const validator = require('validator');
 
 const Schema = mongoose.Schema;
 
@@ -68,6 +68,6 @@ const ContactSchema = new Schema(
 ContactSchema.index({ createdAt: -1 });
 ContactSchema.index({ email: 1 });
 
-const Contact = mongoose.models.Contact || mongoose.model('Contact', ContactSchema);
+const Contact = mongoose.models.Contacts || mongoose.model('Contacts', ContactSchema);
 
-export default Contact;
+module.exports = Contact;

@@ -1,87 +1,119 @@
 // app.js (ESM Version - Merged with Robust Startup/Shutdown for Heroku & CSP Fix)
-import path from 'path';
-import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
-import fs from 'fs';
-import https from 'https';
-import express from 'express';
-import mongoose from 'mongoose';
-
-// --- Security & Middleware (from your original full app.js) ---
-import helmet from 'helmet';
-import cors from 'cors';
-import rateLimit from 'express-rate-limit';
-import cookieParser from 'cookie-parser';
-import session from 'express-session';
-import flash from 'connect-flash';
-import MongoStore from 'connect-mongo';
-import csrf from 'csurf';
-// import morgan from 'morgan'; // Morgan is used within httpLoggerMiddleware
-
-// --- Utilities & Config ---
-import { logger, httpLoggerMiddleware } from './config/logger.js';
-import { escapeHtml } from './utils/helpers.js';
-
-// --- Routers ---
-import publicRoutes from './routes/publicRoutes.js';
-import apiPublicRoutes from './routes/apiPublic.js';
-import apiContactRoutes from './routes/apiContact.js';
-import adminAuthRoutes from './routes/admin/adminAuth.js';
-import adminDashboardRoutes from './routes/admin/adminDashboard.js';
-import adminProjectRoutes from './routes/admin/adminProjects.js';
-import adminTestimonialRoutes from './routes/admin/adminTestimonials.js';
-import adminBlogRoutes from './routes/admin/adminBlog.js';
-
-// --- Custom Middleware ---
-import isAdmin from './middleware/isAdmin.js';
+const path = require('path');
+const dotenv = require('dotenv');
+const fs = require('fs');
+// ...existing code...
+const https = require('https');
+const express = require('express');
+const mongoose = require('mongoose');
+const helmet = require('helmet');
+const cors = require('cors');
+const rateLimit = require('express-rate-limit');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const flash = require('connect-flash');
+const MongoStore = require('connect-mongo');
+const csrf = require('csurf');
+// const morgan = require('morgan');
+const { logger, httpLoggerMiddleware } = require('./config/logger.js');
+const { escapeHtml } = require('./utils/helpers.js');
+const publicRoutes = require('./routes/publicRoutes.js');
+const apiPublicRoutes = require('./routes/apiPublic.js');
+const apiContactRoutes = require('./routes/apiContact.js');
+const apiInquiriesRoutes = require('./routes/apiInquiries.js');
+const adminDashboardRoutes = require('./routes/admin/adminDashboard.js');
+const adminProjectRoutes = require('./routes/admin/adminProjects.js');
+const adminClientRoutes = require('./routes/admin/adminClients.js');
+const adminTestimonialRoutes = require('./routes/admin/adminTestimonials.js');
+const adminBlogRoutes = require('./routes/admin/adminBlog.js');
+const adminNewslettersRoutes = require('./routes/admin/adminNewsletters.js');
+const adminSubscriberRoutes = require('./routes/admin/adminSubscribers.js');
+const adminSettingsRoutes = require('./routes/admin/adminSettings.js');
+const adminCategoriesRoutes = require('./routes/admin/adminCategories.js');
+const adminIndustriesRoutes = require('./routes/admin/adminIndustries.js');
+const adminServicesRoutes = require('./routes/admin/adminServices.js');
+const adminSearchRoutes = require('./routes/admin/adminSearch.js');
+const adminInquiriesRoutes = require('./routes/admin/adminInquiries.js');
+const { startNewsletterScheduler } = require('./services/newsletterScheduler.js');
+const authRoutes = require('./routes/auth.js');
+const adminAuthRoutes = require('./routes/admin/adminAuth.js');
+const isAdmin = require('./middleware/isAdmin.js');
+const requireAdminClerk = require('./middleware/requireAdminClerk.js');
+const { ClerkExpressWithAuth } = require('@clerk/clerk-sdk-node');
 
 // --- Global Error Handlers (Early for critical errors) ---
 process.on('unhandledRejection', (reason, promise) => {
-  // Use console.error for pre-logger critical failures
-  console.error('<<<<< UNHANDLED REJECTION AT PROMISE >>>>>');
-  console.error('Reason:', reason);
-  // If logger is available:
+  logger.error('<<<<< UNHANDLED REJECTION AT PROMISE >>>>>');
+  logger.error('Reason:', reason);
   logger.error('CRITICAL: Unhandled Rejection at Promise', { reason: reason instanceof Error ? reason.message : reason, stack: reason instanceof Error ? reason.stack : undefined });
-  // Consider a more graceful shutdown or alert here in production
-  process.exit(1); // Exiting on unhandled rejection can be debated
+  process.exit(1);
 });
-
 process.on('uncaughtException', (err, origin) => {
-  console.error('<<<<< UNCAUGHT EXCEPTION >>>>>');
-  console.error('Error:', err);
-  console.error('Origin:', origin);
-  // If logger is available:
+  logger.error('<<<<< UNCAUGHT EXCEPTION >>>>>');
+  logger.error('Error:', err);
+  logger.error('Origin:', origin);
   logger.error('CRITICAL: Uncaught Exception', { error: err.message, stack: err.stack, origin });
-  process.exit(1); // Standard practice to exit on uncaught exceptions
+  process.exit(1);
 });
-
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// __dirname and __filename are available in CommonJS
 
 // --- Dotenv Configuration ---
 if (process.env.NODE_ENV === 'development') {
-    const devEnvPath = path.resolve(__dirname, '.env.development');
-    const result = dotenv.config({ path: devEnvPath, override: true });
-    if (result.error) {
-        // Use console.warn here as logger might not be fully ready if dotenv itself fails critically for logger config
-        console.warn(`[ENV] Warning: Could not load .env.development from ${devEnvPath}. Error: ${result.error.message}`);
-    } else if (logger) { // Check if logger is imported and available
-        logger.info(`[ENV] Loaded .env.development from ${devEnvPath}`);
-    } else {
-        console.log(`[ENV] Loaded .env.development from ${devEnvPath} (logger not yet available).`);
-    }
+  const devEnvPath = path.resolve(__dirname, '.env.development');
+  // Load base .env first, then override with .env.development so missing keys in the latter are filled by the former.
+  const base = dotenv.config();
+  if (!base.error) {
+    (logger || console).info('[ENV] Loaded base .env file.');
+  }
+  const result = dotenv.config({ path: devEnvPath, override: true });
+  if (result.error) {
+  logger.warn(`[ENV] Warning: Could not load .env.development from ${devEnvPath}. Error: ${result.error.message}`);
+  } else if (logger) {
+    logger.info(`[ENV] Loaded .env.development from ${devEnvPath}`);
+  } else {
+  logger.info(`[ENV] Loaded .env.development from ${devEnvPath} (logger not yet available).`);
+  }
 } else if (process.env.NODE_ENV === 'production') {
     if (logger) logger.info('[ENV] Production environment. Relying on Heroku Config Vars.');
-    else console.log('[ENV] Production environment. Relying on Heroku Config Vars (logger not yet available).');
+  else logger.info('[ENV] Production environment. Relying on Heroku Config Vars (logger not yet available).');
 } else {
     dotenv.config(); // Default .env load
     if (logger) logger.info('[ENV] NODE_ENV not set to "development" or "production". Attempted to load default .env file.');
-    else console.log('[ENV] NODE_ENV not set. Attempted to load default .env (logger not yet available).');
+  else logger.info('[ENV] NODE_ENV not set. Attempted to load default .env (logger not yet available).');
 }
+
+// Log presence of key SendGrid env vars (booleans only, no secrets)
+try {
+  const present = {
+    SENDGRID_API_KEY: !!process.env.SENDGRID_API_KEY,
+    SENDGRID_FROM_EMAIL: !!process.env.SENDGRID_FROM_EMAIL,
+    SENDGRID_FROM_NAME: !!process.env.SENDGRID_FROM_NAME,
+    CONTACT_TEAM_EMAIL: !!process.env.CONTACT_TEAM_EMAIL,
+  };
+  (logger || console).info(`[ENV] SendGrid presence: API_KEY=${present.SENDGRID_API_KEY}, FROM_EMAIL=${present.SENDGRID_FROM_EMAIL}, FROM_NAME=${present.SENDGRID_FROM_NAME}, CONTACT_TEAM_EMAIL=${present.CONTACT_TEAM_EMAIL}`);
+} catch {}
 
 // --- Initialize Express App ---
 const app = express();
+
+// Enable gzip compression for all responses (after app is defined)
+const compression = require('compression');
+app.use(compression({
+  filter: (req, res) => {
+    if (req.headers['x-no-compression']) return false;
+    return compression.filter(req, res);
+  }
+}));
+
+
+// Serve authoring guide (raw markdown)
+app.get('/AUTHORING_GUIDE.md', (req, res) => {
+  res.sendFile(path.join(__dirname, 'AUTHORING_GUIDE.md'));
+});
+
+// Mount dynamic sitemap route for SEO
+const sitemapRouter = require('./routes/sitemap.js');
+app.use('/sitemap.xml', sitemapRouter);
 
 
 app.set('trust proxy', 1);
@@ -98,26 +130,63 @@ app.locals.formatDate = (date) => { // Simplified
     } catch (e) { return 'Invalid Date'; }
 };
 app.locals.NODE_ENV = process.env.NODE_ENV;
+// Basic cache-busting token for assets (updates per process start)
+
+// Asset version for cache-busting
+app.locals.assetVersion = Date.now().toString(36);
+
+// CDN URL helper: use CDN in production, local in dev/test
+const CDN_URL = process.env.CDN_URL || '';
+app.locals.cdnUrl = function(assetPath) {
+  // assetPath should start with '/'
+  if (CDN_URL && process.env.NODE_ENV === 'production') {
+    return CDN_URL.replace(/\/$/, '') + assetPath;
+  }
+  return assetPath;
+};
+
 
 // --- Database Connection ---
-const MONGODB_URI = process.env.MONGODB_URI;
-if (!MONGODB_URI) {
-    (logger || console).error('FATAL ERROR: MONGODB_URI environment variable is not set. Application cannot start.');
-    process.exit(1);
+// In test or smoke environments, skip real DB connection to enable fast/unit tests or smoke start without services.
+// However, allow opting-in during tests when using an in-memory MongoDB (mongodb-memory-server)
+const isTestEnv = process.env.NODE_ENV === 'test';
+const isSmokeEnv = process.env.SMOKE === '1';
+const allowDbInTest = process.env.USE_IN_MEMORY_DB === '1';
+
+async function connectToDatabase() {
+  if ((!isTestEnv || allowDbInTest) && !isSmokeEnv) {
+    const MONGODB_URI = process.env.MONGODB_URI;
+    if (!MONGODB_URI) {
+        (logger || console).error('FATAL ERROR: MONGODB_URI environment variable is not set. Application cannot start.');
+        process.exit(1);
+    }
+    try {
+        await mongoose.connect(MONGODB_URI);
+        logger.info('MongoDB Connected successfully.');
+    } catch (err) {
+        logger.error('MongoDB initial connection error. Application will exit.', { message: err.message, stack: err.stack });
+        process.exit(1);
+    }
+    mongoose.connection.on('error', err => logger.error('MongoDB runtime connection error:', { message: err.message }));
+  } else {
+    logger.info('[TEST/SMOKE MODE] Skipping MongoDB connection.');
+  }
 }
-try {
-    await mongoose.connect(MONGODB_URI);
-    logger.info('MongoDB Connected successfully.');
-} catch (err) {
-    logger.error('MongoDB initial connection error. Application will exit.', { message: err.message, stack: err.stack });
-    process.exit(1);
+
+
+// Start background schedulers after DB init (skip in test/smoke to avoid open handles during Jest runs)
+if (!isTestEnv && !isSmokeEnv) {
+  try { startNewsletterScheduler(); }
+  catch (e) { logger.warn('[INIT] Newsletter scheduler failed to start.', { message: e.message }); }
+} else {
+  logger.info('[TEST/SMOKE MODE] Skipping background schedulers.');
 }
-mongoose.connection.on('error', err => logger.error('MongoDB runtime connection error:', { message: err.message }));
 
 // --- View Engine Setup ---
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-logger.debug('[INIT] View engine setup complete.');
+app.locals.basedir = __dirname;
+logger.debug(`[INIT] View engine setup complete. Views path set to: ${path.join(__dirname, 'views')}`);
 
 // --- Core Middleware Pipeline ---
 logger.debug('[INIT] Applying httpLoggerMiddleware...');
@@ -127,20 +196,24 @@ logger.debug('[INIT] Applied httpLoggerMiddleware.');
 logger.debug('[INIT] Applying helmet...');
 const cspDirectives = {
     defaultSrc: ["'self'"],
-    scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud", "https://www.googletagmanager.com", "https://calendar.google.com", "https://apis.google.com","https://www.gstatic.com"],
-    styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud", "https://calendar.google.com","https://apis.google.com"],
+  scriptSrc: ["'self'", "'unsafe-inline'","https://*.clerk.accounts.dev", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud", "https://www.googletagmanager.com", "https://calendar.google.com", "https://apis.google.com","https://www.gstatic.com", "https://unpkg.com", "https://cdn.jsdelivr.net"],
+  styleSrc: ["'self'", "'unsafe-inline'", "https://*.clerk.accounts.dev", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud", "https://calendar.google.com","https://apis.google.com", "https://unpkg.com"],
     fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
-    imgSrc: ["'self'", "data:", "blob:", "https://res.cloudinary.com", "https:", "https://apis.google.com"],
-    connectSrc: [
-        "'self'",
-        "https://*.tiny.cloud",
-        "https://www.googleapis.com",
-        "https://www.google-analytics.com", // <-- ADDED FOR GA DATA SENDING
-        "https://*.googletagmanager.com",    // <-- ADDED FOR GA SCRIPT ORIGIN (good practice)
-        "https://calendar.google.com",
-        "https://apis.google.com"
-    ],
-    frameSrc: ["'self'", "https://*.tiny.cloud", "https://calendar.google.com","https://accounts.google.com"],
+    imgSrc: ["'self'", "data:", "blob:", "https://res.cloudinary.com", "https:", "https://apis.google.com", "https://*.clerk.accounts.dev","https://img.clerk.com"],
+  connectSrc: [
+    "'self'",
+    "https://*.tiny.cloud",
+    "https://www.googleapis.com",
+    "https://www.google-analytics.com", // <-- ADDED FOR GA DATA SENDING
+    "https://*.googletagmanager.com",    // <-- ADDED FOR GA SCRIPT ORIGIN (good practice)
+    "https://calendar.google.com",
+    "https://apis.google.com",
+    // Clerk API and instance domains
+    "https://api.clerk.com",
+    "https://*.clerk.accounts.dev"
+  ],
+    frameSrc: ["'self'", "https://*.tiny.cloud", "https://calendar.google.com","https://accounts.google.com", "https://*.clerk.accounts.dev"],
+    scriptSrcAttr: ["'unsafe-inline'"],
     workerSrc: ["'self'", "blob:"],
     objectSrc: ["'none'"],
 };
@@ -235,6 +308,14 @@ app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 logger.debug('[INIT] Applied body parsers.');
 
+// --- Liveness/Readiness Probe ---
+// Returns 200 only when MongoDB is connected to avoid race conditions in E2E
+app.get('/healthz', (req, res) => {
+  const dbReady = mongoose.connection.readyState === 1; // connected
+  if (dbReady) return res.status(200).json({ status: 'ok', db: 'connected' });
+  return res.status(503).json({ status: 'starting', db: 'connecting' });
+});
+
 logger.debug('[INIT] Applying cookieParser...');
 if (!process.env.COOKIE_SECRET && process.env.NODE_ENV === 'production') {
     logger.error('FATAL: COOKIE_SECRET is not set in production. Required for signed cookies.');
@@ -257,15 +338,32 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 logger.debug('[INIT] Applying session middleware...');
+// Provide a default secret in test so the app can initialize without env.
 if (!process.env.SESSION_SECRET) {
+  if (isTestEnv) {
+    process.env.SESSION_SECRET = 'test-session-secret';
+    logger.warn('[TEST MODE] SESSION_SECRET not set; using a test-only default.');
+  } else {
     logger.error('FATAL: SESSION_SECRET not set. Application cannot start.');
     process.exit(1);
+  }
 }
+
+// Provide a default JWT secret in tests so legacy admin auth works deterministically
+if (!process.env.JWT_SECRET && isTestEnv) {
+  process.env.JWT_SECRET = 'test-jwt-secret';
+  logger.warn('[TEST MODE] JWT_SECRET not set; using a test-only default.');
+}
+
+const sessionStore = (isTestEnv || isSmokeEnv)
+  ? new session.MemoryStore()
+  : MongoStore.create({ mongoUrl: process.env.MONGODB_URI, collectionName: 'sessions', ttl: 14 * 24 * 60 * 60 });
+
 app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false, saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: MONGODB_URI, collectionName: 'sessions', ttl: 14 * 24 * 60 * 60 }),
-    cookie: { secure: process.env.NODE_ENV === 'production', httpOnly: true, maxAge: 1000 * 60 * 60 * 2, sameSite: 'lax' }
+  secret: process.env.SESSION_SECRET,
+  resave: false, saveUninitialized: false,
+  store: sessionStore,
+  cookie: { secure: process.env.NODE_ENV === 'production', httpOnly: true, maxAge: 1000 * 60 * 60 * 2, sameSite: 'lax' }
 }));
 logger.debug('[INIT] Applied session middleware.');
 
@@ -274,7 +372,10 @@ app.use(flash());
 logger.debug('[INIT] Applied flash middleware.');
 
 logger.debug('[INIT] Setting up CSRF protection (to be applied by routes)...');
-const csrfProtection = csrf({ cookie: false });
+// In test, bypass CSRF but still provide a csrfToken() shim so routes rendering forms don't break
+const csrfProtection = process.env.NODE_ENV === 'test'
+  ? ((req, res, next) => { req.csrfToken = () => 'test-csrf-token'; next(); })
+  : csrf({ cookie: false });
 logger.debug('[INIT] CSRF protection setup complete.');
 
 logger.debug('[INIT] Applying custom locals middleware...');
@@ -283,6 +384,8 @@ app.use((req, res, next) => {
     res.locals.errorMessage = req.flash('error');
     res.locals.adminUser = req.adminUser || null;
     res.locals.isAuthenticated = !!req.adminUser;
+  // Expose the current request path to templates for active nav states
+  res.locals.path = req.path;
     if (typeof req.csrfToken === 'function') { // Only set if csrfProtection middleware has run for the route
         res.locals.csrfToken = req.csrfToken();
     } else {
@@ -292,9 +395,19 @@ app.use((req, res, next) => {
 });
 logger.debug('[INIT] Applied custom locals middleware.');
 
-logger.debug('[INIT] Applying static file serving...');
-app.use(express.static(path.join(__dirname, 'public')));
-logger.debug('[INIT] Applied static file serving.');
+// --- Optional Clerk Auth Wiring ---
+// Enable by setting USE_CLERK=1; keeps legacy auth by default
+// Force legacy auth in test to keep integration tests deterministic
+const useClerk = process.env.USE_CLERK === '1' && !isTestEnv;
+if (useClerk) {
+  logger.info('[AUTH] USE_CLERK=1 detected. Applying Clerk withAuth middleware.');
+  app.use(ClerkExpressWithAuth());
+} else {
+  logger.info('[AUTH] Using legacy session-based admin auth (isAdmin middleware).');
+}
+
+// NOTE: Deliberately mount static files AFTER public routes so that dynamic routes like /sitemap.xml aren't overridden by a static file
+logger.debug('[INIT] Deferring static file serving until after routers...');
 
 logger.debug('[INIT] Applying API rate limiter...');
 const apiLimiter = rateLimit({
@@ -305,17 +418,55 @@ const apiLimiter = rateLimit({
 app.use('/api', apiLimiter);
 logger.debug('[INIT] Applied API rate limiter.');
 
+// (Removed temporary EJS debug routes)
+
 // --- Mount Routers ---
 logger.debug('[INIT] Mounting routers...');
+const adminGuard = useClerk ? requireAdminClerk : isAdmin;
 app.use('/', publicRoutes);
 app.use('/api', apiPublicRoutes);
 app.use('/api', apiContactRoutes);
-app.use('/admin', adminAuthRoutes(csrfProtection));
-app.use('/admin/dashboard', isAdmin, adminDashboardRoutes(csrfProtection));
-app.use('/admin/projects', isAdmin, adminProjectRoutes(csrfProtection));
-app.use('/admin/testimonials', isAdmin, adminTestimonialRoutes(csrfProtection));
-app.use('/admin/blog', isAdmin, adminBlogRoutes(csrfProtection));
+app.use('/api', apiInquiriesRoutes);
+app.use('/admin/dashboard', adminGuard, adminDashboardRoutes(csrfProtection));
+app.use('/admin/projects', adminGuard, adminProjectRoutes(csrfProtection));
+app.use('/admin/clients', adminGuard, adminClientRoutes(csrfProtection));
+app.use('/admin/testimonials', adminGuard, adminTestimonialRoutes(csrfProtection));
+app.use('/admin/blog', adminGuard, adminBlogRoutes(csrfProtection));
+app.use('/admin/categories', adminGuard, adminCategoriesRoutes(csrfProtection));
+app.use('/admin/industries', adminGuard, adminIndustriesRoutes(csrfProtection));
+app.use('/admin/services', adminGuard, adminServicesRoutes(csrfProtection));
+app.use('/admin/inquiries', adminGuard, adminInquiriesRoutes(csrfProtection));
+app.use('/admin/newsletters', adminGuard, adminNewslettersRoutes(csrfProtection));
+app.use('/admin/subscribers', adminGuard, adminSubscriberRoutes(csrfProtection));
+app.use('/admin/settings', adminGuard, adminSettingsRoutes(csrfProtection));
+app.use('/admin/search', adminGuard, adminSearchRoutes(csrfProtection));
+app.use('/auth', authRoutes(csrfProtection));
 logger.debug('[INIT] Routers mounted.');
+
+logger.debug('[INIT] Applying static file serving...');
+// Serve static files (including favicon) after routes so /sitemap.xml dynamic route wins over any static file
+app.use(express.static(path.join(__dirname, 'public'), {
+  setHeaders: (res, filePath) => {
+    // Cache all except HTML for 30 days
+    if (/\.html$/i.test(filePath)) {
+      res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+    } else {
+      res.setHeader('Cache-Control', 'public, max-age=2592000, immutable'); // 30 days
+    }
+  }
+}));
+logger.debug('[INIT] Applied static file serving.');
+
+// --- Redirect legacy admin login to Clerk sign-in when Clerk is enabled ---
+if (useClerk) {
+  app.get('/admin/login', (req, res) => {
+  const redirectTo = encodeURIComponent('/admin/dashboard');
+  res.redirect(302, `/auth/sign-in?redirectTo=${redirectTo}`);
+  });
+} else {
+  // Mount legacy admin auth endpoints when Clerk is disabled (default in tests)
+  app.use('/admin', adminAuthRoutes(csrfProtection));
+}
 
 // --- Error Handling Middleware ---
 logger.debug('[INIT] Setting up error handlers...');
@@ -324,9 +475,16 @@ app.use((req, res, next) => { // 404 Handler
   res.status(404).render('404', { pageTitle: 'Page Not Found (404)', path: req.originalUrl });
 });
 app.use((err, req, res, next) => { // Global Error Handler
-  // ... (your full global error handler logic as provided before) ...
-  logger.error('Unhandled Application Error:', { /* ... */ });
-  if (err.code === 'EBADCSRFTOKEN') { /* ... */ }
+  // Enhanced logging for debugging during tests and development
+  try {
+    logger.error('Unhandled Application Error:', {
+      message: err?.message,
+      stack: err?.stack,
+      route: req?.originalUrl,
+      method: req?.method
+    });
+  } catch {}
+  if (err.code === 'EBADCSRFTOKEN') { /* keep existing CSRF handling */ }
   const statusCode = err.status || 500;
   const isProduction = process.env.NODE_ENV === 'production';
   const responseMessage = (isProduction && statusCode >=500) ? 'Internal Server Error' : err.message;
@@ -350,7 +508,19 @@ let serverInstance;
 
 logger.info(`[INIT] Preparing to start server in ${process.env.NODE_ENV} mode.`);
 
-if (process.env.NODE_ENV === 'development') {
+// Allow opting-in to start server in test (for E2E) via ALLOW_SERVER_IN_TEST=1
+const allowServerInTest = process.env.ALLOW_SERVER_IN_TEST === '1';
+
+// Do not start a listening server in test environment unless explicitly allowed
+if (process.env.NODE_ENV === 'test' && !allowServerInTest) {
+  logger.info('[TEST MODE] Skipping HTTP/HTTPS server startup.');
+} else if (process.env.NODE_ENV === 'test' && allowServerInTest) {
+  // Simplified HTTP-only server for E2E in test env
+  serverInstance = app.listen(PORT, () => {
+    logger.info(`HTTP Test Server started: http://localhost:${PORT}`);
+  });
+  serverInstance.on('error', (httpErr) => logger.error(`[SERVER START] HTTP Test Server listen error: ${httpErr.message}.`, httpErr));
+} else if (process.env.NODE_ENV === 'development') {
     logger.info('[SERVER START] Development mode. Attempting HTTPS and HTTP.');
     try {
         const keyPath = path.join(__dirname, 'key.pem');
@@ -458,4 +628,7 @@ const gracefulShutdown = async (signal) => { // Made the handler async
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
-export default app;
+module.exports = {
+  app,
+  connectToDatabase
+};

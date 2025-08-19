@@ -1,0 +1,156 @@
+<%# views/admin/clients/index.ejs %>
+<%# Admin page to list and manage clients %>
+
+<%- include('../partials/header', { pageTitle: 'Manage Clients' }) %>
+
+<div class="space-y-6">
+  <div class="flex items-start justify-between">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-100">Manage Clients</h2>
+      <p class="text-gray-400 mt-1">Add, edit, and manage client information for your showcase.</p>
+      <div class="mt-3 flex flex-wrap items-center gap-3">
+        <%- include('../partials/pillToggle', {
+          basePath: '/admin/clients',
+          paramName: 'status',
+          items: [
+            { label: 'All', value: '' },
+            { label: 'Public', value: 'public' },
+            { label: 'Hidden', value: 'hidden' }
+          ],
+          currentValue: (status||''),
+          preserve: { size: (size||'') }
+        }) %>
+        <%- include('../partials/pillToggle', {
+          basePath: '/admin/clients',
+          paramName: 'size',
+          items: [
+            { label: 'All Sizes', value: '' },
+            { label: 'By Valuation', value: 'valuation' },
+            { label: 'By Revenue', value: 'revenue' }
+          ],
+          currentValue: (size||''),
+          preserve: { status: (status||'') }
+        }) %>
+      </div>
+    </div>
+    <div>
+      <a href="/admin/clients/new" class="inline-flex items-center gap-2 bg-primary text-white font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
+        <i class="fas fa-plus"></i> Add New Client
+      </a>
+    </div>
+  </div>
+
+  <% if (typeof messages !== 'undefined' && messages && messages.success) { %>
+    <div class="bg-green-900/30 border-l-4 border-success text-green-200 p-4 rounded-md flex items-center gap-2" role="alert">
+      <i class="fas fa-check-circle"></i>
+      <span><%= messages.success %></span>
+    </div>
+  <% } %>
+  <% if (typeof messages !== 'undefined' && messages && messages.error) { %>
+    <div class="bg-red-900/30 border-l-4 border-danger text-red-200 p-4 rounded-md flex items-center gap-2" role="alert">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span><%= messages.error %></span>
+    </div>
+  <% } %>
+
+  <div>
+    <% if (clients && clients.length > 0) { %>
+      <div class="overflow-x-auto bg-gray-800 rounded-lg shadow-md border border-gray-700">
+        <table class="min-w-full divide-y divide-gray-700">
+          <thead class="bg-gray-800/60">
+            <tr>
+              <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Logo</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Client Name</th>
+              <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Company Valuation</th>
+              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Public</th>
+              <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Annual Revenue</th>
+              <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Website</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Created</th>
+              <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-gray-800 divide-y divide-gray-700">
+            <% clients.forEach(client => { %>
+              <tr class="hover:bg-gray-800/70">
+                <td class="px-4 py-3">
+                  <img src="<%= client.logoUrl %>" alt="<%= client.name %> Logo" class="h-10 w-10 object-contain rounded bg-gray-900 p-1 border border-gray-700">
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
+                  <%= client.name %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-mono font-medium text-gray-100">
+                  <% if (client.companyValuation > 0) { %>
+                    $<%= (client.companyValuation / 1000000).toFixed(1) %>M
+                  <% } else { %>
+                    <span class="text-gray-500 italic">Not set</span>
+                  <% } %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold <%= client.isPubliclyVisible ? 'bg-green-900/40 text-green-300' : 'bg-yellow-900/40 text-yellow-300' %>"><%= client.isPubliclyVisible ? 'Yes' : 'Hidden' %></span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-mono font-medium text-gray-100">
+                  <% if (client.annualRevenue > 0) { %>
+                    $<%= (client.annualRevenue / 1000000).toFixed(1) %>M
+                  <% } else { %>
+                    <span class="text-gray-500 italic">Not set</span>
+                  <% } %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                  <% if (client.websiteUrl) { %>
+                    <a href="<%= client.websiteUrl %>" target="_blank" rel="noopener" class="text-primary hover:text-primary-hover"><i class="fas fa-external-link-alt"></i></a>
+                  <% } else { %>
+                    <span class="text-gray-600">—</span>
+                  <% } %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                  <%= new Date(client.createdAt).toLocaleDateString() %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                  <div class="inline-flex items-center gap-2">
+                    <a href="/admin/clients/edit/<%= client._id %>" class="inline-flex items-center gap-1 bg-gray-700 text-gray-100 font-semibold py-1.5 px-3 rounded-lg border border-gray-600 shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors" title="Edit Client">
+                      <i class="fas fa-edit"></i>
+                      <span>Edit</span>
+                    </a>
+                    <form method="POST" action="/admin/clients/delete/<%= client._id %>" class="delete-form inline-block">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                      <button type="submit" class="inline-flex items-center gap-1 bg-danger text-white font-semibold py-1.5 px-3 rounded-lg shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-danger transition-colors delete-btn" title="Delete Client">
+</div>
+<script>
+// Remove inline delete confirmation, use delegated event listener
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.delete-form .delete-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      if (!confirm('Are you sure you want to delete this client? This action cannot be undone.')) {
+        e.preventDefault();
+      }
+    });
+  });
+});
+</script>
+                        <i class="fas fa-trash"></i>
+                        <span>Delete</span>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div class="bg-gray-800 rounded-lg shadow-md border border-gray-700 p-8 text-center">
+        <div class="mx-auto mb-3 h-12 w-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300">
+          <i class="fas fa-building"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-100">No Clients Yet</h3>
+        <p class="text-gray-400 mt-1">Start building your client showcase by adding your first client.</p>
+        <a href="/admin/clients/new" class="mt-4 inline-flex items-center gap-2 bg-primary text-white font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
+          <i class="fas fa-plus"></i> Add First Client
+        </a>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

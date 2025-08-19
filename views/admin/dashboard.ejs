@@ -1,184 +1,471 @@
 <%# views/admin/dashboard.ejs %>
 <%# Admin Dashboard - Main landing page after login %>
 
-<%- include('partials/header', { pageTitle: 'Admin Dashboard' }) %> <%# Includes admin header/nav %>
+<%- include('partials/header', { pageTitle }) %> <%# Includes admin header/nav %>
 
-<div class="admin-dashboard-content">
+<div class="space-y-8">
 
-    <%# Welcome message using res.locals.adminUser %>
-    <% if (isAuthenticated && adminUser) { %>
-        <h2 style="font-weight: 300; margin-bottom: 2rem;">Welcome back, <strong style="font-weight: 600;"><%= adminUser.username %></strong>!</h2>
-    <% } else { %>
-         <!-- Fallback/Error state if user somehow isn't set -->
-         <h2 style="font-weight: 300; margin-bottom: 2rem;">Admin Dashboard</h2>
-         <div class="flash-message error"><i></i> <span>Error: User data not found. Please try logging in again.</span></div>
-    <% } %>
+        <%# Welcome message using res.locals.adminUser %>
+        <% if (isAuthenticated && adminUser) { %>
+            <h2 class="text-xl font-light">Welcome back, <strong class="font-semibold"><%= adminUser.fullName || adminUser.username %></strong>!</h2>
+        <% } else { %>
+            <h2 class="text-xl font-light">Admin Dashboard</h2>
+            <div class="flex items-center gap-2 rounded-md border border-red-700/50 bg-red-900/20 text-red-200 px-3 py-2 text-sm mt-4">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>Error: User data not found. Please try logging in again.</span>
+            </div>
+        <% } %>
 
-    <p style="color: var(--gray-text); margin-bottom: 3rem; font-size: 1.1em;">
-        Manage your website content and view recent activity from the sidebar navigation.
-    </p>
+    <p class="text-gray-300 mb-6 text-base">
+            Manage your website content and view recent activity from the sidebar navigation.
+        </p>
 
-    <!-- Quick Action Links Section -->
-    <div class="dashboard-section">
-        <h3 class="dashboard-section-title">Quick Actions</h3>
-        <div class="quick-actions-grid">
-            <a href="/admin/blog/new" class="quick-action-card">
-                <i class="fas fa-plus-circle fa-fw"></i>
-                <span>New Blog Post</span>
-            </a>
-            <a href="/admin/projects/new" class="quick-action-card">
-                <i class="fas fa-plus-circle fa-fw"></i>
-                <span>New Project</span>
-            </a>
-            <a href="/admin/testimonials/new" class="quick-action-card">
-                <i class="fas fa-plus-circle fa-fw"></i>
-                <span>New Testimonial</span>
-            </a>
-             <a href="/admin/blog?status=draft" class="quick-action-card"> <%# Example link %>
-                 <i class="fas fa-pencil-alt fa-fw"></i>
-                 <span>View Drafts</span>
-             </a>
-        </div>
-    </div>
+    <!-- Quick Action Links Section (smaller buttons; removed Quick Start card) -->
+    <section id="widget-quick-actions" class="rounded-lg border border-gray-700 bg-gray-800 p-6 shadow-md">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-gray-100">Quick Actions</h2>
+                <button id="dashCustomizeBtn" type="button" class="text-sm text-gray-300 hover:text-white">Customize</button>
+            </div>
+            <div id="dashCustomizePanel" class="hidden mb-4 border border-gray-700 rounded p-3 bg-gray-900/50">
+                <div class="text-xs text-gray-400 mb-2">Show/Hide widgets</div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 text-sm" id="dashCustomizeList">
+                    <!-- checkboxes injected by script -->
+                </div>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                <a id="widget-quick-newpost" href="/admin/blog/new" class="inline-flex items-center justify-center gap-2 bg-primary text-white font-medium py-2 px-3 rounded-md shadow-sm hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition text-sm">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>New Blog Post</span>
+                </a>
+                <a id="widget-quick-newproject" href="/admin/projects/new" class="inline-flex items-center justify-center gap-2 bg-primary text-white font-medium py-2 px-3 rounded-md shadow-sm hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition text-sm">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>New Project</span>
+                </a>
+                <a id="widget-quick-newtestimonial" href="/admin/testimonials/new" class="inline-flex items-center justify-center gap-2 bg-primary text-white font-medium py-2 px-3 rounded-md shadow-sm hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition text-sm">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>New Testimonial</span>
+                </a>
+                <% const hasDrafts = typeof draftPostCount === 'number' && draftPostCount > 0; %>
+                <a id="widget-quick-viewdrafts" href="<%= hasDrafts ? '/admin/blog?status=draft' : 'javascript:void(0)' %>" class="inline-flex items-center justify-center gap-2 font-medium py-2 px-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition text-sm <%= hasDrafts ? 'bg-secondary text-white hover:bg-gray-600 focus:ring-primary' : 'bg-gray-700 text-gray-400 cursor-not-allowed opacity-70' %>" aria-disabled="<%= hasDrafts ? 'false' : 'true' %>">
+                    <i class="fas fa-pencil-alt"></i>
+                    <span>View Drafts</span>
+                </a>
+            </div>
+        </section>
 
     <!-- Content Overview / Stats Section -->
-    <div class="dashboard-section">
-        <h3 class="dashboard-section-title">Content Overview</h3>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h4>Total Projects</h4>
-                <!-- Display count, default to '--' if null/undefined/error -->
-                <span class="stat-number"><%= (typeof projectCount === 'number') ? projectCount : '--' %></span>
+                <section id="widget-stats" class="rounded-lg border border-gray-700 bg-gray-800 p-6 shadow-md">
+            <h2 class="text-xl font-semibold text-gray-100 mb-4">Content Overview</h2>
+                        <div id="stats" class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                                <a href="/admin/projects" class="rounded-md border border-gray-700 bg-gray-800/50 p-4 text-center hover:bg-gray-700/40 transition">
+                    <h4 class="text-gray-300 text-sm uppercase tracking-wide mb-2">Total Projects</h4>
+                                        <span class="block text-3xl font-semibold text-primary" data-stat="projectCount"><%= (typeof projectCount === 'number') ? projectCount : '--' %></span>
+                                </a>
+                                <a href="/admin/blog?status=published" class="rounded-md border border-gray-700 bg-gray-800/50 p-4 text-center hover:bg-gray-700/40 transition">
+                    <h4 class="text-gray-300 text-sm uppercase tracking-wide mb-2">Published Posts</h4>
+                                        <span class="block text-3xl font-semibold text-primary" data-stat="blogPostCount"><%= (typeof blogPostCount === 'number') ? blogPostCount : '--' %></span>
+                                </a>
+                                <div class="rounded-md border border-gray-700 bg-gray-800/50 p-4 text-center">
+                    <h4 class="text-gray-300 text-sm uppercase tracking-wide mb-2">Visible Testimonials</h4>
+                                        <span class="block text-3xl font-semibold text-primary" data-stat="testimonialCount"><%= (typeof testimonialCount === 'number') ? testimonialCount : '--' %></span>
+                </div>
+                                <a href="/admin/blog?status=draft" class="rounded-md border border-gray-700 bg-gray-800/50 p-4 text-center hover:bg-gray-700/40 transition">
+                    <h4 class="text-gray-300 text-sm uppercase tracking-wide mb-2">Draft Posts</h4>
+                                        <span class="block text-3xl font-semibold text-primary" data-stat="draftPostCount"><%= (typeof draftPostCount === 'number') ? draftPostCount : '--' %></span>
+                                </a>
+                <a href="/admin/subscribers" class="rounded-md border border-gray-700 bg-gray-800/50 p-4 text-center hover:bg-gray-700/40 transition">
+                    <h4 class="text-gray-300 text-sm uppercase tracking-wide mb-2">Total Subscribers</h4>
+                                        <span class="block text-3xl font-semibold text-primary" data-stat="totalSubscribers"><%= (typeof totalSubscribers === 'number') ? totalSubscribers : '0' %></span>
+                                </a>
+                <a href="/admin/inquiries?status=New" class="rounded-md border border-gray-700 bg-gray-800/50 p-4 text-center hover:bg-gray-700/40 transition">
+            <h4 class="text-gray-300 text-sm uppercase tracking-wide mb-2">New Inquiries</h4>
+                    <span class="block text-3xl font-semibold text-primary" data-stat="newInquiries">--</span>
+                </a>
             </div>
-            <div class="stat-card">
-                 <h4>Published Posts</h4>
-                 <span class="stat-number"><%= (typeof blogPostCount === 'number') ? blogPostCount : '--' %></span>
-            </div>
-            <div class="stat-card">
-                 <h4>Visible Testimonials</h4>
-                 <span class="stat-number"><%= (typeof testimonialCount === 'number') ? testimonialCount : '--' %></span>
-            </div>
-             <div class="stat-card">
-                 <h4>Draft Posts</h4>
-                 <span class="stat-number"><%= (typeof draftPostCount === 'number') ? draftPostCount : '--' %></span>
-            </div>
-        </div>
-    </div>
+        </section>
 
-    <!-- ==================================== -->
-    <!-- NEW: Recent Admin Activity Section -->
-    <!-- ==================================== -->
-    <div class="dashboard-section">
-        <h3 class="dashboard-section-title">Recent Admin Activity</h3>
-        <div class="activity-log-container">
-            <%# Check if recentLogs array exists and has items %>
-            <% if (typeof recentLogs !== 'undefined' && recentLogs && recentLogs.length > 0) { %>
-                <ul class="admin-log-list">
-                    <% recentLogs.forEach(log => { %>
-                        <li class="admin-log-item">
-                            <!-- Log Details Column -->
-                            <div class="log-details">
-                                <span class="log-action">
-                                    <%# Format action type nicely %>
-                                    <%= log.action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) %>
-                                </span>
-                                <!-- Display admin user who performed the action -->
-                                <span class="log-user">
-                                    by <strong style="color: #fff;"><%= log.adminUser ? escapeHtml(log.adminUser.username) : 'System/Unknown' %></strong> <!-- Now works! -->
-                                </span>
-                                <%# Display optional details if they exist %>
-                                <% if (log.details) { %>
-                                    <span class="log-action-details">
-                                        : <%= escapeHtml(log.details.replace(`User '${log.adminUser ? log.adminUser.username : ''}'. `, '')) %> <%# Remove repetitive user part %>
-                                    </span>
+        <!-- Charts Row: compact cards -->
+        <section class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <!-- Subscriber Growth Chart (smaller) -->
+            <div id="widget-chart-subs" class="rounded-lg border border-gray-700 bg-gray-800 p-4 shadow-md">
+                <h2 class="text-lg font-semibold text-gray-100 mb-2">New Subscribers (30d)</h2>
+                <div id="subsSummary" class="text-xs text-gray-300 mb-2"></div>
+                <div class="h-40 flex items-center justify-center" id="subs-skeleton">
+                    <div class="w-full h-32 bg-gray-700/40 animate-pulse rounded"></div>
+                </div>
+                <canvas id="subsChart" class="hidden" height="120"></canvas>
+            </div>
+
+            <!-- Content Pipeline Chart (smaller donut) -->
+            <div id="widget-chart-pipeline" class="rounded-lg border border-gray-700 bg-gray-800 p-4 shadow-md">
+                <h2 class="text-lg font-semibold text-gray-100 mb-2">Content Pipeline</h2>
+                <div class="h-40 flex items-center justify-center" id="pipeline-skeleton">
+                    <div class="w-28 h-28 bg-gray-700/40 animate-pulse rounded-full"></div>
+                </div>
+                <div class="relative max-w-[220px] mx-auto">
+                    <div id="pipelineTotal" class="absolute inset-0 flex items-center justify-center text-2xl font-bold text-gray-100 pointer-events-none hidden">0</div>
+                    <canvas id="pipelineChart" class="hidden" height="120"></canvas>
+                </div>
+            </div>
+
+            <!-- Blog Views (30d) -->
+            <div id="widget-chart-views" class="rounded-lg border border-gray-700 bg-gray-800 p-4 shadow-md">
+                <h2 class="text-lg font-semibold text-gray-100 mb-2">Blog Views (30d)</h2>
+                <div class="h-40 flex items-center justify-center" id="views-skeleton">
+                    <div class="w-full h-32 bg-gray-700/40 animate-pulse rounded"></div>
+                </div>
+                <canvas id="viewsChart" class="hidden" height="120"></canvas>
+            </div>
+        </section>
+
+        <!-- Second charts row: Contact forms (30d) only when space allows -->
+        <section class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <div id="widget-chart-contacts" class="rounded-lg border border-gray-700 bg-gray-800 p-4 shadow-md xl:col-span-1">
+                <h2 class="text-lg font-semibold text-gray-100 mb-2">Contact Forms (30d)</h2>
+                <div class="h-40 flex items-center justify-center" id="contacts-skeleton">
+                    <div class="w-full h-32 bg-gray-700/40 animate-pulse rounded"></div>
+                </div>
+                <canvas id="contactsChart" class="hidden" height="120"></canvas>
+            </div>
+        </section>
+
+        <!-- Content Health + Team -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Content Health -->
+            <div id="widget-health" class="rounded-lg border border-gray-700 bg-gray-800 p-6 shadow-md">
+                <h2 class="text-xl font-semibold text-gray-100 mb-4">Content Health</h2>
+                <ul class="space-y-3">
+                    <li class="flex items-center justify-between">
+                        <span class="text-gray-200">Posts Missing Featured Image</span>
+                        <a href="/admin/blog?status=published" class="text-primary font-semibold hover:underline"><%= (contentHealth && typeof contentHealth.postsMissingFeatured === 'number') ? contentHealth.postsMissingFeatured : 0 %></a>
+                    </li>
+                    <li class="flex items-center justify-between">
+                        <span class="text-gray-200">Drafts Older Than 30 Days</span>
+                        <a href="/admin/blog?status=draft" class="text-primary font-semibold hover:underline"><%= (contentHealth && typeof contentHealth.staleDrafts === 'number') ? contentHealth.staleDrafts : 0 %></a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- User Roles -->
+            <div id="widget-team" class="rounded-lg border border-gray-700 bg-gray-800 p-6 shadow-md">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-100">Team</h2>
+                      <a href="/admin/settings/team" class="text-sm text-primary hover:underline">Manage Team</a>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <% (teamUsers || []).forEach(function(u){
+                        var avatarSrc = u.avatarUrl;
+                        if (avatarSrc && !/^https?:\/\//i.test(avatarSrc) && avatarSrc.charAt(0) !== '/') {
+                            avatarSrc = '/images/' + avatarSrc;
+                        }
+                    %>
+                        <div class="flex items-center gap-3 p-3 rounded-md border border-gray-700 bg-gray-800/40">
+                            <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-700 flex items-center justify-center text-gray-300">
+                                <% if (avatarSrc) { %>
+                                    <img src="<%= avatarSrc %>" alt="<%= u.fullName || u.username %>" class="w-full h-full object-cover" />
+                                <% } else { %>
+                                    <i class="fas fa-user"></i>
                                 <% } %>
                             </div>
-                            <!-- Timestamp & IP Column -->
-                            <div class="log-meta">
-                                 <% if (log.createdAt) { %>
-                                     <span class="log-timestamp" title="<%= log.createdAt.toISOString() %>">
-                                         <i class="far fa-clock fa-fw"></i>
-                                         <%# Format date nicely %>
-                                         <%= log.createdAt.toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short'}) %>
-                                     </span>
-                                 <% } %>
-                                 <% if (log.ipAddress) { %>
-                                     <span class="log-ip" title="IP Address">
-                                        <i class="fas fa-network-wired fa-fw"></i>
-                                        <%= escapeHtml(log.ipAddress) %> <%# Escape IP just in case %>
-                                     </span>
-                                 <% } %>
+                            <div class="min-w-0">
+                                <div class="font-medium truncate"><%= u.fullName || u.username %></div>
+                                <div class="text-xs text-gray-400 uppercase tracking-wide"><%= u.role %></div>
+                            </div>
+                        </div>
+                    <% }) %>
+                    <% if (!teamUsers || teamUsers.length === 0) { %>
+                        <p class="text-gray-400">No team members found.</p>
+                    <% } %>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Admin Activity -->
+        <section id="widget-activity" class="rounded-lg border border-gray-700 bg-gray-800 p-6 shadow-md">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-xl font-semibold text-gray-100">Recent Admin Activity</h2>
+                <div>
+                    <div class="inline-flex rounded-md bg-gray-800/60 border border-gray-700 p-1 text-sm" id="activityFilter">
+                        <button data-filter="all" class="px-3 py-1.5 rounded-md bg-gray-700 text-white">All Activity</button>
+                        <button data-filter="mine" class="px-3 py-1.5 rounded-md text-gray-300 hover:text-white">My Activity</button>
+                    </div>
+                </div>
+            </div>
+            <div class="border border-gray-700 rounded-md bg-gray-800/30 overflow-hidden">
+                <% if (typeof recentLogs !== 'undefined' && recentLogs && recentLogs.length > 0) { %>
+                    <ul class="divide-y divide-gray-800 max-h-[450px] overflow-y-auto" id="activityList">
+                        <% recentLogs.forEach(function(log){
+                            var actor = log.adminUser || {};
+                            var name = actor.fullName || actor.username || 'System';
+                            var avatar = actor.avatarUrl;
+                            // Extract a readable detail without username prefixes or query strings
+                            var detail = (log.details || '').replace(/User '\w+'.\s*/, '').replace(/\?.*$/, '');
+                            var ts = log.createdAt ? new Date(log.createdAt) : null;
+                            // Attempt to parse title/id from details to build an edit link where possible
+                            var editHref = null;
+                            if (/create_blog_post|update_blog_post|delete_blog_post/.test(log.action)) {
+                                var m = detail.match(/ID:\s*([0-9a-fA-F]{24})/);
+                                if (m) editHref = '/admin/blog/edit/' + m[1];
+                            }
+                            if (/create_project|update_project|delete_project/.test(log.action)) {
+                                var pm = detail.match(/ID:\s*([0-9a-fA-F]{24})/);
+                                if (pm) editHref = '/admin/projects/edit/' + pm[1];
+                            }
+                            // Try to find "Title: ..."
+                            var titleMatch = detail.match(/Title:\s*([^,]+)/);
+                            var title = titleMatch ? titleMatch[1].trim() : detail || log.action;
+                        %>
+                        <li class="flex items-start gap-4 px-4 py-3 text-sm" data-actor="<%= actor.username || '' %>">
+                            <div class="w-9 h-9 rounded-full overflow-hidden bg-gray-700 flex items-center justify-center shrink-0">
+                                <% if (avatar) { %>
+                                    <img src="<%= avatar %>" alt="<%= name %>" class="w-full h-full object-cover" />
+                                <% } else { %>
+                                    <i class="fas fa-user text-gray-300"></i>
+                                <% } %>
+                            </div>
+                            <div class="grow min-w-0">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="text-primary font-medium"><%= name %></span>
+                                    <span class="text-gray-400">•</span>
+                                    <span class="text-gray-200"><%= log.action.replace(/_/g,' ').replace(/\b\w/g, s=>s.toUpperCase()) %></span>
+                                </div>
+                                <div class="mt-1 truncate">
+                                    <% if (editHref) { %>
+                                        <a href="<%= editHref %>" class="font-semibold hover:underline"><%= title %></a>
+                                    <% } else { %>
+                                        <span class="font-semibold"><%= title %></span>
+                                    <% } %>
+                                </div>
+                                <% if (log.ipAddress || ts) { %>
+                                    <div class="mt-1 text-xs text-gray-400">
+                                        <% if (ts) { %>
+                                            <i class="far fa-clock"></i>
+                                            <time class="activity-time" datetime="<%= ts.toISOString() %>" title="<%= ts.toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'long'}) %>">...</time>
+                                        <% } %>
+                                        <% if (log.ipAddress) { %> <span class="ml-2"><i class="fas fa-network-wired"></i> <%= log.ipAddress %></span><% } %>
+                                    </div>
+                                <% } %>
                             </div>
                         </li>
-                    <% }) %>
-                </ul>
-                <%# Optional: Add a link to view all logs if you create a separate log page %>
-                <!-- <div style="text-align: right; margin-top: 1rem;"><a href="/admin/logs" class="card-link">View All Activity →</a></div> -->
-            <% } else { %>
-                <%# Message shown if no logs are found %>
-                <p style="color: var(--muted-text); text-align: center; padding: 1.5rem; background-color: rgba(0,0,0,0.1); border-radius: var(--border-radius);">No recent admin activity recorded.</p>
-            <% } %>
-        </div> <!-- /.activity-log-container -->
-    </div>
-    <!-- End Recent Admin Activity Section -->
+                        <% }) %>
+                    </ul>
+                <% } else { %>
+                    <p class="text-gray-400 text-center p-6">No recent admin activity recorded.</p>
+                <% } %>
+            </div>
+        </section>
 
-</div> <!-- /.admin-dashboard-content -->
+</div>
 
 <%- include('partials/footer') %> <%# Includes admin footer %>
 
-<!-- Add specific styles for dashboard components -->
-<style>
-    /* Keep styles from previous dashboard version */
-    .dashboard-section { margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-    .dashboard-section:last-child { border-bottom: none; margin-bottom: 0; }
-    .dashboard-section-title { color: var(--primary-color); font-size: 1.4rem; font-weight: 500; margin-bottom: 1.5rem; }
-    .quick-actions-grid, .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; }
-    .quick-action-card { display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: var(--card-bg); padding: 1.5rem 1rem; border-radius: var(--border-radius); text-decoration: none; color: var(--light-text); transition: all 0.3s ease; border: 1px solid var(--card-border); min-height: 120px; }
-    .quick-action-card:hover { transform: translateY(-5px); background-color: var(--card-hover-bg); border-color: var(--primary-color); box-shadow: 0 5px 15px rgba(0, 168, 232, 0.1); color: var(--primary-color); }
-    .quick-action-card i { font-size: 2rem; margin-bottom: 0.75rem; color: var(--primary-color); transition: color 0.3s ease; }
-    .quick-action-card:hover i { color: inherit; }
-    .quick-action-card span { font-weight: 500; text-align: center; font-size: 0.95rem; }
-    .stat-card { background-color: rgba(255, 255, 255, 0.03); padding: 1.5rem; border-radius: var(--border-radius); text-align: center; border: 1px solid rgba(255, 255, 255, 0.08); }
-    .stat-card h4 { color: var(--gray-text); font-size: 0.9rem; font-weight: 400; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
-    .stat-card .stat-number { font-size: 2.2rem; font-weight: 600; color: var(--primary-color); display: block; line-height: 1.2; }
+<!-- Page scripts: charts + activity filter + lazy stats refresh -->
+<script src="https://unpkg.com/chart.js@4.4.1/dist/chart.umd.js"></script>
+<script>
+    (function(){
+        const qs = (s, r=document) => r.querySelector(s);
+        const qsa = (s, r=document) => Array.from(r.querySelectorAll(s));
+        const statEls = {
+            projectCount: qs('[data-stat="projectCount"]'),
+            blogPostCount: qs('[data-stat="blogPostCount"]'),
+            draftPostCount: qs('[data-stat="draftPostCount"]'),
+            totalSubscribers: qs('[data-stat="totalSubscribers"]'),
+            testimonialCount: qs('[data-stat="testimonialCount"]')
+        };
+        // Refresh stats in background to avoid layout shift
+        fetch('/admin/dashboard/api/stats').then(r=>r.json()).then(data=>{
+            Object.keys(statEls).forEach(k=>{ if (statEls[k] && typeof data[k] !== 'undefined') statEls[k].textContent = data[k]; });
+            const newInquiriesEl = qs('[data-stat="newInquiries"]'); if (newInquiriesEl && typeof data.newInquiries !== 'undefined') newInquiriesEl.textContent = data.newInquiries;
+        }).catch(()=>{});
 
-    /* NEW: Styles for Admin Activity Log */
-    /*.activity-log-container { }/* Optional wrapper */ 
-    .admin-log-list {
-        list-style: none; padding: 0; margin: 0;
-        max-height: 450px; /* Limit height and make scrollable */
-        overflow-y: auto;
-        border: 1px solid var(--card-border);
-        border-radius: var(--border-radius);
-        background-color: rgba(0,0,0,0.15); /* Slightly different bg */
-    }
-    .admin-log-item {
-        padding: 12px 15px;
-        border-bottom: 1px solid var(--card-border);
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start; /* Align items top */
-        flex-wrap: wrap; /* Wrap on small screens */
-        gap: 10px; /* Gap between details and meta */
-        font-size: 0.9rem;
-    }
-    .admin-log-item:last-child { border-bottom: none; }
-    .log-details { flex-grow: 1; /* Allow details to take up space */ }
-    .log-action { color: var(--primary-color); font-weight: 500; }
-    .log-user { color: var(--light-text); margin: 0 5px; }
-    .log-action-details { color: var(--muted-text); font-size: 0.9em; display: block; margin-top: 3px; word-break: break-word;}
-    .log-meta { flex-shrink: 0; /* Prevent meta from shrinking */ text-align: right; }
-    .log-timestamp { color: var(--muted-text); font-size: 0.85em; white-space: nowrap; margin-right: 10px;}
-    .log-ip { color: var(--muted-text); font-size: 0.85em; white-space: nowrap; }
-    .log-meta i { margin-right: 4px; }
+        // Activity filter
+        const filterWrap = qs('#activityFilter');
+        const list = qs('#activityList');
+        if (filterWrap && list) {
+            filterWrap.addEventListener('click', (e)=>{
+                const btn = e.target.closest('button[data-filter]');
+                if (!btn) return;
+                qsa('button', filterWrap).forEach(b=>b.classList.remove('bg-gray-700','text-white'));
+                btn.classList.add('bg-gray-700','text-white');
+                const mode = btn.getAttribute('data-filter');
+            const me = `<%= adminUser ? (adminUser.username) : '' %>`;
+                qsa('li[data-actor]', list).forEach(li=>{
+                    const actor = li.getAttribute('data-actor');
+                    const show = (mode === 'all') || (actor === me);
+                    li.style.display = show ? '' : 'none';
+                });
+            });
+        }
 
-     @media (max-width: 768px) {
-        .admin-log-item { flex-direction: column; align-items: flex-start; gap: 5px;}
-        .log-meta { text-align: left; margin-top: 5px; }
-     }
-     @media (max-width: 576px) {
-         .quick-actions-grid, .stats-grid { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; }
-         .quick-action-card i { font-size: 1.5rem; } .quick-action-card span { font-size: 0.9rem; }
-         .stat-card .stat-number { font-size: 1.8rem; }
-     }
-</style>
+        // Charts
+    const subsCtx = qs('#subsChart');
+        const subsSkeleton = qs('#subs-skeleton');
+            fetch('/admin/dashboard/api/subscribers/last-30-days').then(r=>r.json()).then(({labels, data})=>{
+            if (subsCtx) {
+                subsCtx.classList.remove('hidden');
+                if (subsSkeleton) subsSkeleton.classList.add('hidden');
+                    const total = (data||[]).reduce((a,b)=>a+b,0);
+                    const summaryEl = qs('#subsSummary'); if (summaryEl) summaryEl.textContent = `Total New in 30 Days: ${total}`;
+                    new Chart(subsCtx, {
+                    type: 'line',
+                        data: { labels, datasets: [{ label: 'New', data, borderColor: '#00A8E8', backgroundColor: 'rgba(0,168,232,0.15)', fill: true, tension: 0.3, pointRadius: 0 }] },
+                        options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxTicksLimit: 6 } }, y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } } }
+                });
+            }
+        }).catch(()=>{});
+
+    const pipeCtx = qs('#pipelineChart');
+        const pipeSkeleton = qs('#pipeline-skeleton');
+            fetch('/admin/dashboard/api/posts/pipeline').then(r=>r.json()).then(({published, drafts})=>{
+            if (pipeCtx) {
+                    pipeCtx.classList.remove('hidden');
+                    if (pipeSkeleton) pipeSkeleton.classList.add('hidden');
+                    const total = (published||0)+(drafts||0);
+                    const totalEl = qs('#pipelineTotal'); if (totalEl) { totalEl.textContent = String(total); totalEl.classList.remove('hidden'); }
+                    const chart = new Chart(pipeCtx, {
+                    type: 'doughnut',
+                    data: { labels: ['Published','Drafts'], datasets: [{ data: [published, drafts], backgroundColor: ['#10B981','#F59E0B'] }] },
+                    options: { plugins: { legend: { position: 'bottom' } }, cutout: '60%' }
+                });
+                    // Make legend interactive: navigate on click
+                    // Using a simple delegated click on labels rendered in canvas legend isn't trivial; instead, add external legend
+                    const legendMap = [
+                        { label: 'Published', href: '/admin/blog?status=published' },
+                        { label: 'Drafts', href: '/admin/blog?status=draft' }
+                    ];
+                    // If Chart.js draws internal legend, we can't easily hook it; add small inline links under chart
+                    const wrapper = pipeCtx.parentElement;
+                    if (wrapper && !wrapper.querySelector('.pipeline-links')) {
+                        const div = document.createElement('div');
+                        div.className = 'pipeline-links mt-2 text-sm text-center';
+                        div.innerHTML = `<a class="text-emerald-400 hover:underline mx-2" href="${legendMap[0].href}">Published</a>
+                                                         <a class="text-amber-400 hover:underline mx-2" href="${legendMap[1].href}">Drafts</a>`;
+                        wrapper.appendChild(div);
+                    }
+            }
+        }).catch(()=>{});
+
+        // Blog Views (30d)
+        const viewsCtx = qs('#viewsChart');
+        const viewsSkeleton = qs('#views-skeleton');
+        fetch('/admin/dashboard/api/blog-views/last-30-days').then(r=>r.json()).then(({labels, data})=>{
+            if (viewsCtx) {
+                viewsCtx.classList.remove('hidden');
+                if (viewsSkeleton) viewsSkeleton.classList.add('hidden');
+                new Chart(viewsCtx, {
+                    type: 'bar',
+                    data: { labels, datasets: [{ label: 'Views', data, backgroundColor: '#60A5FA' }] },
+                    options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxTicksLimit: 6 } }, y: { beginAtZero: true, ticks: { precision: 0 } } } }
+                });
+            }
+        }).catch(()=>{});
+
+        // Contact forms (30d)
+        const contactsCtx = qs('#contactsChart');
+        const contactsSkeleton = qs('#contacts-skeleton');
+        fetch('/admin/dashboard/api/contacts/last-30-days').then(r=>r.json()).then(({labels, data})=>{
+            if (contactsCtx) {
+                contactsCtx.classList.remove('hidden');
+                if (contactsSkeleton) contactsSkeleton.classList.add('hidden');
+                new Chart(contactsCtx, {
+                    type: 'line',
+                    data: { labels, datasets: [{ label: 'Submissions', data, borderColor: '#34D399', backgroundColor: 'rgba(52,211,153,0.15)', tension: 0.3, fill: true, pointRadius: 0 }] },
+                    options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxTicksLimit: 6 } }, y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 } } } }
+                });
+            }
+        }).catch(()=>{});
+
+        // Relative timestamps for activity list
+        const rel = (date) => {
+            const d = (typeof date === 'string') ? new Date(date) : date;
+            const diff = Date.now() - d.getTime();
+            const sec = Math.floor(diff/1000);
+            if (sec < 60) return `${sec}s ago`;
+            const min = Math.floor(sec/60);
+            if (min < 60) return `${min}m ago`;
+            const hr = Math.floor(min/60);
+            if (hr < 24) return `${hr}h ago`;
+            const day = Math.floor(hr/24);
+            if (day < 7) return `${day}d ago`;
+            const wk = Math.floor(day/7);
+            if (wk < 5) return `${wk}w ago`;
+            const mo = Math.floor(day/30);
+            if (mo < 12) return `${mo}mo ago`;
+            const yr = Math.floor(day/365);
+            return `${yr}y ago`;
+        };
+        const updateTimes = () => {
+            qsa('time.activity-time').forEach(t => {
+                const dt = t.getAttribute('datetime');
+                if (dt) t.textContent = rel(dt);
+            });
+        };
+        updateTimes();
+        setInterval(updateTimes, 30000);
+
+        // Simple dashboard customization: show/hide widgets with persistence
+    const widgetIds = ['widget-quick-actions','widget-quick-newpost','widget-quick-newproject','widget-quick-newtestimonial','widget-quick-viewdrafts','widget-stats','widget-chart-subs','widget-chart-pipeline','widget-chart-views','widget-chart-contacts','widget-health','widget-team','widget-activity'];
+        const storageKey = 'adminDashWidgets:v1';
+        const loadPrefs = () => {
+            try { return JSON.parse(localStorage.getItem(storageKey)) || {}; } catch { return {}; }
+        };
+        const savePrefs = (prefs) => {
+            try { localStorage.setItem(storageKey, JSON.stringify(prefs)); } catch {}
+        };
+        const applyPrefs = (prefs) => {
+            widgetIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const visible = prefs[id] !== false; // default true
+                el.style.display = visible ? '' : 'none';
+            });
+        };
+        const prefs = loadPrefs();
+        applyPrefs(prefs);
+        const btn = qs('#dashCustomizeBtn');
+        const panel = qs('#dashCustomizePanel');
+        const listEl = qs('#dashCustomizeList');
+        if (btn && panel && listEl) {
+            btn.addEventListener('click', ()=> panel.classList.toggle('hidden'));
+            listEl.innerHTML = '';
+            widgetIds.forEach(id => {
+                const target = document.getElementById(id);
+                if (!target) return; // skip missing widget
+                const label = id.replace('widget-','').replace(/-/g,' ');
+                const wrap = document.createElement('label');
+                wrap.className = 'flex items-center gap-2 p-2 rounded hover:bg-gray-800/60 cursor-pointer';
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.className = 'accent-blue-600';
+                cb.checked = prefs[id] !== false;
+                cb.addEventListener('change', ()=>{
+                    prefs[id] = cb.checked;
+                    applyPrefs(prefs);
+                    savePrefs(prefs);
+                });
+                const span = document.createElement('span');
+                span.textContent = label;
+                wrap.appendChild(cb);
+                wrap.appendChild(span);
+                listEl.appendChild(wrap);
+            });
+        }
+    })();
+</script>
+<script async crossorigin src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js"></script>
+<script>
+    // Clerk signOut integration for admin nav
+    (function() {
+        var logout = document.getElementById('clerk-logout-link');
+        if (logout) {
+            logout.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (window.Clerk) {
+                    window.Clerk.signOut();
+                } else {
+                    window.location.href = '/auth/sign-in?redirectTo=' + encodeURIComponent('/admin/dashboard');
+                }
+            });
+        }
+    })();
+</script>

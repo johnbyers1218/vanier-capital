@@ -1,5 +1,4 @@
 <%# views/admin/partials/header.ejs %>
-<%# Header partial specifically for the Admin Panel layout %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,156 +16,46 @@
     <%# Set a dynamic page title, defaulting to "FND Admin" %>
     <title><%= typeof pageTitle !== 'undefined' ? pageTitle : 'FND Admin' %> | FND Automations</title>
 
-    <%# Link to the main stylesheet used across the site %>
-    <link rel="stylesheet" href="/css/style.css"> <%# Assumes it's in public/css/ %>
+    <%# Admin Tailwind compiled styles %>
 
     <%# Link to Font Awesome (used for icons in admin nav/UI) %>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    <%# Link to an optional, dedicated stylesheet for Admin Panel overrides/additions %>
-    <%# Create this file: public/css/admin-style.css if you need specific admin styles %>
-    <link rel="stylesheet" href="/css/admin-style.css">
+    <%# Admin-specific compiled styles %>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/admin-style.css?v=<%= typeof assetVersion !== 'undefined' ? assetVersion : '' %>">
 
     <%# Include basic admin layout styles directly here if not using admin-style.css %>
     <%# (Styles from previous examples for .admin-body, .admin-page-wrapper, etc.) %>
     <%# It's generally better to put these in admin-style.css %>
-    <style>
-        /* Base Admin Layout Styles (Move to admin-style.css ideally) */
-        body.admin-body {
-            background-color: #18181b; /* Slightly different dark shade maybe */
-            color: var(--light-text);
-            font-family: 'Montserrat', sans-serif; /* Ensure font consistency */
-            margin: 0; /* Reset body margin */
-        }
-        .admin-page-wrapper {
-            display: flex;
-            min-height: 100vh;
-        }
-        /* Sidebar defined in nav.ejs */
-        .admin-main-content {
-            margin-left: 220px; /* Match sidebar width */
-            flex-grow: 1;
-            padding: 2rem 2.5rem;
-            width: calc(100% - 220px); /* Ensure it takes remaining width */
-        }
-        .admin-header { /* Top bar within the main content area */
-            background-color: var(--card-bg);
-            padding: 1rem 2.5rem;
-            margin-bottom: 2rem;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            /* Adjust margins to align with padding */
-            margin-left: -2.5rem;
-            margin-right: -2.5rem;
-            margin-top: -2rem;
-             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .admin-header h1 { /* Page title in the header bar */
-            color: var(--light-text);
-            font-size: 1.6rem; /* Slightly smaller than public H1 maybe */
-            margin-bottom: 0;
-            font-weight: 500;
-        }
-        .admin-header .user-info span { /* Style for "Welcome, username!" */
-             color: var(--gray-text);
-             font-size: 0.95em;
-        }
-         .admin-header .user-info strong {
-             color: var(--light-text);
-             font-weight: 500;
-         }
-
-        /* Flash Message Base Styles (can be in admin-style.css) */
-        .flash-message {
-            padding: 15px;
-            margin: -0.5rem 0 1.5rem 0; /* Position nicely below header */
-            border-radius: 4px;
-            border: 1px solid transparent;
-            font-size: 0.95em;
-            display: flex; /* Align icon and text */
-            align-items: center;
-            gap: 10px;
-        }
-        .flash-message.success {
-            background-color: rgba(40, 167, 69, 0.15);
-            border-color: rgba(40, 167, 69, 0.4);
-            color: #a3d9b1; /* Lighter green text */
-        }
-        .flash-message.error {
-            background-color: rgba(220, 53, 69, 0.15);
-            border-color: rgba(220, 53, 69, 0.4);
-            color: #f8d7da; /* Lighter red text */
-        }
-         .flash-message i { /* Add icons to flash messages */
-             font-size: 1.2em;
-         }
-         .flash-message.success i::before { content: "\f058"; font-family: "Font Awesome 6 Free"; font-weight: 900; } /* fas fa-check-circle */
-         .flash-message.error i::before { content: "\f06a"; font-family: "Font Awesome 6 Free"; font-weight: 900; } /* fas fa-exclamation-circle */
-
-        /* Responsive Admin Adjustments (can be in admin-style.css) */
-        @media (max-width: 768px) {
-             /* Sidebar stacks on top - handled by nav.ejs if position becomes static */
-            .admin-main-content {
-                margin-left: 0;
-                padding: 1.5rem;
-                width: 100%;
-            }
-            .admin-header {
-                margin-left: -1.5rem;
-                margin-right: -1.5rem;
-                margin-top: -1.5rem;
-                padding: 1rem 1.5rem;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-             .admin-header h1 {
-                 font-size: 1.4rem;
-             }
-        }
-    </style>
+        <style>
+            :root { color-scheme: dark; }
+        </style>
 </head>
-<body class="admin-body"> <%# Add class to body for specific admin styling %>
-    <div class="admin-page-wrapper">
+<body class="bg-gray-900 text-gray-100 font-sans">
+    <div class="admin-layout min-h-screen flex">
+        <%- include('sidebar') %>
+        <main class="flex-1 overflow-y-auto bg-gray-800 text-gray-100 min-h-screen p-8">
+            <header class="flex items-center justify-between gap-4 bg-gray-800 rounded-lg px-5 py-4 border border-gray-700 shadow-sm mb-6">
+                <h1 class="text-2xl md:text-3xl font-bold text-white truncate"><%= typeof pageTitle !== 'undefined' ? pageTitle : 'FND Admin' %></h1>
+                <form action="/admin/search" method="get" class="hidden sm:flex items-center gap-2 flex-1 max-w-xl ml-4 relative">
+                    <label for="adminGlobalSearch" class="sr-only">Search</label>
+                    <input id="adminGlobalSearch" name="q" type="search" placeholder="Search projects, posts, clients..." class="w-full px-3 py-2 rounded-md bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary" autocomplete="off" />
+                    <button type="submit" class="px-3 py-2 rounded-md bg-primary text-white hover:bg-primary-hover"><i class="fas fa-search"></i></button>
+                    <div id="adminSearchDropdown" class="absolute top-full left-0 mt-1 w-full bg-gray-800 border border-gray-700 rounded shadow-lg hidden z-40">
+                        <ul class="max-h-72 overflow-auto divide-y divide-gray-700" role="listbox"></ul>
+                    </div>
+                </form>
+                <% if (typeof isAuthenticated !== 'undefined' && isAuthenticated && typeof adminUser !== 'undefined' && adminUser) { %>
+                    <span class="text-sm text-gray-300 whitespace-nowrap">Welcome, <strong class="text-gray-100 font-medium"><%= adminUser.fullName || adminUser.username %></strong></span>
+                <% } %>
+            </header>
 
-        <%- include('nav') %> <%# Include the sidebar navigation %>
+            <%# Toast container (messages will be rendered via JS for non-blocking UX) %>
+            <div id="toast-root" class="fixed top-4 right-4 z-50 space-y-2 pointer-events-none"></div>
 
-        <main class="admin-main-content">
-            <div class="logo">
-                    <%# OLD Text Logo: <a href="/index" title="FND Automations Home">FND Automations</a> %>
-                    <%# NEW Image Logo: %>
-                    <a href="/" title="FND Automations Home">
-                        <img src="/images/FND_LOGO_SVG_WHITE.svg" alt="FND Automations Logo" id="header-logo">
-                    </a>
-            </div>
-            <%# Top header bar within the main content area %>
-            <div class="admin-header">
-                 <h1><%= typeof pageTitle !== 'undefined' ? pageTitle : 'FND Admin' %></h1>
-                 <%# Display user info if available (set in res.locals middleware) %>
-                 <% if (typeof isAuthenticated !== 'undefined' && isAuthenticated && typeof adminUser !== 'undefined' && adminUser) { %>
-                    <span class="user-info">Welcome, <strong><%= adminUser.username %></strong>!</span>
-                 <% } %>
-            </div>
+            <div class="max-w-7xl mx-auto space-y-6">
 
-             <%# Flash Messages Display Area (Placed consistently below header) %>
-             <% if (typeof successMessage !== 'undefined' && successMessage && successMessage.length > 0) { %>
-                 <% successMessage.forEach(msg => { %>
-                     <div class="flash-message success">
-                         <i></i> <%# Icon added via CSS ::before %>
-                         <span><%= msg %></span>
-                     </div>
-                 <% }) %>
-             <% } %>
-             <% if (typeof errorMessage !== 'undefined' && errorMessage && errorMessage.length > 0) { %>
-                  <% errorMessage.forEach(msg => { %>
-                     <div class="flash-message error">
-                         <i></i> <%# Icon added via CSS ::before %>
-                         <span><%= msg %></span>
-                     </div>
-                 <% }) %>
-              <% } %>
-            <%# End Flash Messages Display %>
-
-            <%# Start of page-specific content (comes after this include in other files) %>
+    <%# Start of page-specific content (comes after this include in other files) %>

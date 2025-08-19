@@ -1,0 +1,70 @@
+@import "tailwindcss";
+@plugin '@tailwindcss/forms';
+@source "../../views";
+@source "../../views/admin";
+@source not "../../public";
+
+/* Safelist critical utilities used broadly in admin */
+@source inline("{hover:,focus:,}bg-gray-800 bg-gray-800/50 bg-gray-800/60 text-gray-100 text-gray-300 text-gray-400 border-gray-700 divide-gray-700 divide-gray-800 bg-blue-600 text-blue-700 bg-white text-white bg-gray-700 hover:bg-gray-600 focus:ring-primary focus:ring-2 focus:ring-offset-2");
+
+/* Admin theme tweaks (v4 CSS-first config) */
+@theme {
+	--font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	/* Brand colors used in admin */
+	--color-primary: #2563eb; /* blue-600 */
+	--color-primary-hover: #1d4ed8; /* blue-700 */
+	--color-secondary: #475569; /* slate-600 */
+	/* Gray palette needed by templates */
+	--color-gray-50:  #f9fafb;
+	--color-gray-100: #f3f4f6;
+	--color-gray-200: #e5e7eb;
+	--color-gray-300: #d1d5db;
+	--color-gray-400: #9ca3af;
+	--color-gray-500: #6b7280;
+	--color-gray-600: #4b5563;
+	--color-gray-700: #374151;
+	--color-gray-800: #1f2937;
+	--color-gray-900: #111827;
+}
+
+@layer base {
+	html { font-family: var(--font-sans); }
+}
+
+/* Error summary and field validation styles */
+@layer components {
+	.error-summary { display: flex; gap: .75rem; align-items: flex-start; background: color-mix(in oklab, #ef4444 12%, transparent); border: 1px solid #ef4444; color: #fecaca; padding: .75rem .9rem; border-radius: .5rem; margin: 0 0 1rem 0; }
+	.error-summary-icon { color: #fca5a5; font-size: 1.25rem; line-height: 1; margin-top: .15rem; }
+	.error-summary-title { font-weight: 800; color: #fff; margin: 0 0 .25rem 0; }
+	.error-summary-list { margin: 0; padding-left: 1.1rem; color: #ffe4e6; }
+
+	.field-error { margin-top: .35rem; color: #fecaca; font-size: .875rem; }
+	.label-error { color: #fca5a5 !important; }
+	.input-error { border-color: #ef4444 !important; outline: none; box-shadow: 0 0 0 2px color-mix(in oklab, #ef4444 30%, transparent); }
+	.has-error .richtext-editor { border: 1px solid #ef4444; }
+
+	/* Admin form control defaults so minimal markup still looks themed */
+	.admin-form input[type="text"],
+	.admin-form input[type="email"],
+	.admin-form input[type="password"],
+	.admin-form input[type="number"],
+	.admin-form input[type="url"],
+	.admin-form input[type="search"],
+	.admin-form input[type="tel"],
+	.admin-form select,
+	.admin-form textarea {
+		@apply block w-full rounded-md border border-gray-700 bg-gray-800 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary;
+	}
+
+	/* File input - keep native but make it readable in dark theme */
+	.admin-form input[type="file"] {
+		@apply block w-full text-sm text-gray-300 file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-700 file:text-gray-100 hover:file:bg-gray-600;
+	}
+
+	/* Checkbox alignment helpers */
+	.admin-form .checkbox-inline { @apply flex items-center gap-2; }
+	.admin-form .checkbox-inline input[type="checkbox"] { @apply h-4 w-4 rounded border-gray-700 bg-gray-800 text-primary focus:ring-primary; }
+
+	/* Small helper text under fields */
+	.admin-form .help-text { @apply text-sm text-gray-400; }
+}

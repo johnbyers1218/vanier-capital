@@ -1,8 +1,8 @@
 // models/BlogPost.js (ESM Version)
 
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 // Optional: Import slugify if you plan to use it for auto-generation
-import slugify from 'slugify'; // Run: npm install slugify
+const slugify = require('slugify'); // Run: npm install slugify
 
 const Schema = mongoose.Schema;
 
@@ -30,7 +30,8 @@ const BlogPostSchema = new Schema({
     excerpt: {
         type: String,
         trim: true,
-        maxlength: [500, 'Excerpt cannot exceed 500 characters.']
+        required: [true, 'Excerpt is required.'],
+        maxlength: [250, 'Excerpt cannot exceed 250 characters.']
     },
     author: {
         type: Schema.Types.ObjectId,
@@ -55,15 +56,24 @@ const BlogPostSchema = new Schema({
         trim: true,
         match: [/^https?:\/\/.+\..+/, 'Please enter a valid image URL.']
     },
-    tags: [{
-        type: String,
-        trim: true,
-        lowercase: true
-    }],
+    categories: [{ type: Schema.Types.ObjectId, ref: 'Category', index: true }],
     metaDescription: { // Optional SEO field
         type: String,
         trim: true,
         maxlength: 160
+    },
+    // Featured flag for homepage/blog featured section
+    isFeatured: {
+        type: Boolean,
+        default: false,
+        index: true
+    },
+    // Basic view counter for trending logic
+    viewCount: {
+        type: Number,
+        default: 0,
+        min: 0,
+        index: true
     },
     // Add viewCount/likeCount here later if implementing
     // viewCount: { type: Number, default: 0 },
@@ -109,6 +119,8 @@ BlogPostSchema.pre('save', function(next) {
 // --- Indexes ---
 // Index for common query used in public blog list (isPublished + publishedDate)
 BlogPostSchema.index({ isPublished: 1, publishedDate: -1 });
+BlogPostSchema.index({ isFeatured: 1, publishedDate: -1 });
+BlogPostSchema.index({ viewCount: -1 });
 // NOTE: Removed BlogPostSchema.index({ slug: 1 }); because unique:true already creates it.
 
 // --- Model Export ---
@@ -116,4 +128,4 @@ BlogPostSchema.index({ isPublished: 1, publishedDate: -1 });
 const BlogPost = mongoose.models.BlogPost || mongoose.model('BlogPost', BlogPostSchema);
 
 // Use ESM default export
-export default BlogPost;
+module.exports = BlogPost;

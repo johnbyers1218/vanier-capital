@@ -9,20 +9,20 @@
 
 <%- include('partials/header', { pageTitle: displayTitle }) %> <%# Includes admin header/nav %>
 
-<div class="admin-error-container">
-    <div class="error-icon">
+<div class="max-w-2xl mx-auto my-8 p-8 bg-gray-800 border border-gray-700 rounded-lg text-center">
+    <div class="text-4xl mb-4">
         <% if (statusCode === 404) { %>
-            <i class="fas fa-search"></i> <!-- Not Found Icon -->
+            <i class="fas fa-search text-yellow-400"></i>
         <% } else if (statusCode === 403) { %>
-             <i class="fas fa-user-lock"></i> <!-- Forbidden Icon -->
+             <i class="fas fa-user-lock text-red-400"></i>
         <% } else if (statusCode >= 400 && statusCode < 500) { %>
-            <i class="fas fa-exclamation-triangle"></i> <!-- Generic Client Error Icon -->
+            <i class="fas fa-exclamation-triangle text-yellow-400"></i>
         <% } else { %>
-            <i class="fas fa-server"></i> <!-- Server Error Icon -->
+            <i class="fas fa-server text-gray-400"></i>
         <% } %>
     </div>
 
-    <h2 class="error-title">
+    <h2 class="text-xl font-semibold text-gray-100 mb-3">
         <% if (statusCode === 404) { %>
             Resource Not Found
         <% } else if (statusCode === 403) { %>
@@ -32,20 +32,18 @@
         <% } %>
     </h2>
 
-    <p class="error-message-text">
-        <%= displayMessage %> <%# Escaped output for safety %>
-    </p>
+    <p class="text-gray-300 mb-4"><%= displayMessage %></p>
 
     <%# Optionally display more details in development %>
     <% if (process.env.NODE_ENV !== 'production' && typeof error !== 'undefined' && error && error.stack) { %>
-        <pre class="error-stack-trace"><%= error.stack %></pre> <%# Display stack trace %>
+        <pre class="text-left text-sm bg-gray-900 border border-gray-700 rounded p-4 text-gray-300 max-h-64 overflow-y-auto whitespace-pre-wrap break-all mb-4"><%= error.stack %></pre>
     <% } %>
 
-    <div class="error-actions">
-        <a href="javascript:history.back()" class="cta-button secondary-btn">
-             <i class="fas fa-arrow-left"></i> Go Back
+    <div class="flex items-center justify-center gap-3 mt-4">
+        <a href="javascript:history.back()" class="inline-flex items-center gap-2 bg-gray-700 text-gray-100 font-semibold py-2 px-4 rounded-md border border-gray-600 shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            <i class="fas fa-arrow-left"></i> Go Back
         </a>
-        <a href="/admin/dashboard" class="cta-button primary-btn">
+        <a href="/admin/dashboard" class="inline-flex items-center gap-2 bg-primary text-white font-semibold py-2 px-4 rounded-md shadow-sm hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
             <i class="fas fa-tachometer-alt"></i> Go to Dashboard
         </a>
     </div>
@@ -62,18 +60,3 @@
 </div>
 
 <%- include('partials/footer') %> <%# Includes admin footer %>
-
-<!-- Add specific styles here or preferably in admin-style.css -->
-<style>
-    /* Keep the styles defined previously for .admin-error-container etc. */
-    .admin-error-container { max-width: 700px; margin: 3rem auto; padding: 2.5rem 3rem; background-color: var(--card-bg); border-radius: 8px; text-align: center; border: 1px solid rgba(220, 53, 69, 0.2); }
-    .error-icon { font-size: 3.5rem; margin-bottom: 1.5rem; }
-    .error-icon .fa-search { color: #ffc107; } .error-icon .fa-user-lock { color: #dc3545; } .error-icon .fa-exclamation-triangle { color: #ffc107; } .error-icon .fa-server { color: #6c757d; }
-    .error-title { font-size: 1.8rem; color: var(--light-text); margin-bottom: 1rem; font-weight: 500; }
-    .error-message-text { color: var(--gray-text); font-size: 1.1rem; line-height: 1.7; margin-bottom: 2rem; }
-    .error-stack-trace { background-color: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 4px; color: #ccc; font-size: 0.85em; text-align: left; max-height: 200px; overflow-y: auto; margin-bottom: 2rem; white-space: pre-wrap; word-break: break-all; }
-    .error-actions { display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; }
-    .error-actions .cta-button i { margin-right: 8px; }
-    .error-support-info { font-size: 0.9em; color: var(--gray-text); margin-top: 1rem; }
-     @media (max-width: 576px) { .admin-error-container { padding: 2rem 1.5rem; } .error-icon { font-size: 3rem; } .error-title { font-size: 1.5rem; } .error-message-text { font-size: 1rem; } .error-actions { flex-direction: column; } }
-</style>

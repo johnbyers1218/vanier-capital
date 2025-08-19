@@ -1,24 +1,27 @@
 // routes/admin/adminBlog.js (ESM Version - COMPLETE with authorDisplayName)
 
-import express from 'express';
-import { body, param, validationResult } from 'express-validator';
-import BlogPost from '../../models/BlogPost.js';
-import AdminUser from '../../models/AdminUser.js'; // IMPORTED AdminUser MODEL
-import { logger } from '../../config/logger.js';
-import { validateMongoId, checkMongoIdValidation } from '../../middleware/validateMongoId.js';
-import { logAdminAction } from '../../utils/helpers.js';
-import { coverImageUpload, handleCoverImageUpload, handleMulterErrorForCoverImage } from '../../utils/adminUploads.js';
+
+const express = require('express');
+const { body, param, validationResult } = require('express-validator');
+const BlogPost = require('../../models/BlogPost');
+const AdminUser = require('../../models/AdminUser');
+const { logger } = require('../../config/logger');
+const { validateMongoId, checkMongoIdValidation } = require('../../middleware/validateMongoId');
+const { logAdminAction } = require('../../utils/helpers');
+const { coverImageUpload, handleCoverImageUpload, handleMulterErrorForCoverImage } = require('../../utils/adminUploads');
+// Legacy tag taxonomy removed; categories are the single source of truth
+const Category = require('../../models/Category');
 
 // --- HTML Sanitizer Setup ---
-import createDOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom';
+const createDOMPurify = require('dompurify');
+const { JSDOM } = require('jsdom');
 const window = new JSDOM('').window;
 const DOMPurify = createDOMPurify(window);
 
 // --- Image Upload Dependencies & Setup ---
-import multer from 'multer';
-import { v2 as cloudinary } from 'cloudinary';
-import path from 'path';
+const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
+const path = require('path');
 
 
 
@@ -40,7 +43,7 @@ const upload = multer({
 });
 
 // --- Router Export ---
-export default (csrfProtection) => {
+module.exports = (csrfProtection) => {
     const router = express.Router();
 
         // --- Configure Cloudinary ---
@@ -75,8 +78,8 @@ export default (csrfProtection) => {
                 const existingPost = await BlogPost.findOne(query).lean();
                 if (existingPost) { throw new Error('Slug is already in use.'); } return true;
             }),
-        body('excerpt', 'Excerpt cannot exceed 500 characters.')
-            .optional({ checkFalsy: true }).trim().isLength({ max: 500 }).escape(),
+        body('excerpt', 'Excerpt is required and must be 1-250 characters.')
+            .trim().isLength({ min: 1, max: 250 }).escape(),
         body('content', 'Blog content must be at least 50 characters.')
             .trim().isLength({ min: 50 }), // Raw HTML, sanitize later
         body('authorDisplayName', 'Author Display Name cannot exceed 100 characters.')
@@ -86,9 +89,7 @@ export default (csrfProtection) => {
             .escape(),
         body('featuredImage', 'Featured Image must be a valid URL.')
             .optional({ checkFalsy: true }).trim().isURL(),
-        body('tags', 'Tags seem invalid.')
-            .optional({ checkFalsy: true }).trim().escape()
-            .customSanitizer(value => value ? value.split(',').map(tag => tag.trim().toLowerCase()).filter(tag => tag && tag.length <= 30) : []),
+    // No legacy tags; curated categories only
         body('isPublished', 'Published status must be a boolean.')
             .optional().isBoolean().toBoolean()
     ];
@@ -158,16 +159,30 @@ export default (csrfProtection) => {
     router.get('/', csrfProtection, async (req, res, next) => {
         logger.debug(`[Admin Blog] GET / - List request from user: ${req.adminUser.username}, IP: ${req.ip}`);
         try {
-            const posts = await BlogPost.find()
-                                       .populate('author', 'username fullName') // Populate actual author for internal reference
-                                       .sort({ createdAt: -1 })
+            const allowedSortFields = new Set(['createdAt', 'publishedDate', 'viewCount']);
+            const sort = allowedSortFields.has(req.query.sort) ? req.query.sort : 'createdAt';
+            const order = (req.query.order === 'asc' || req.query.order === 'desc') ? req.query.order : 'desc';
+            const status = req.query.status === 'draft' ? 'draft' : (req.query.status === 'published' ? 'published' : 'all');
+
+            const filter = {};
+            if (status === 'draft') filter.isPublished = false;
+            if (status === 'published') filter.isPublished = true;
+
+            const sortObj = { [sort]: order === 'asc' ? 1 : -1 };
+
+            const posts = await BlogPost.find(filter)
+                                       .populate('author', 'username fullName')
+                                       .sort(sortObj)
                                        .lean();
-            logger.debug(`[Admin Blog] Found ${posts.length} posts to list.`);
+            logger.debug(`[Admin Blog] Found ${posts.length} posts to list. sort=${sort} order=${order} status=${status}`);
             res.render('admin/blog/index', {
-                posts: posts, // Template will use authorDisplayName from post object, or fallback
+                posts,
                 pageTitle: 'Manage Blog Posts',
                 path: '/admin/blog',
-                csrfToken: req.csrfToken()
+                csrfToken: req.csrfToken(),
+                sort,
+                order,
+                status
             });
         } catch (err) {
             logger.error('[Admin Blog] Error fetching post list:', { error: err.message, stack: err.stack });
@@ -176,10 +191,11 @@ export default (csrfProtection) => {
     });
 
     // GET /admin/blog/new - Display Add Form
-    router.get('/new', csrfProtection, (req, res) => {
+    router.get('/new', csrfProtection, async (req, res) => {
         logger.debug(`[Admin Blog] GET /new - Form request from user: ${req.adminUser.username}, IP: ${req.ip}`);
         // Pre-fill authorDisplayName with the current admin's full name (or username as fallback)
         const defaultAuthorName = req.adminUser.fullName || req.adminUser.username;
+    const categories = await Category.find({ isActive: true }).sort({ name: 1 }).lean();
         res.render('admin/blog/edit', {
             post: { authorDisplayName: defaultAuthorName }, // Initialize post object for the form
             editing: false,
@@ -188,34 +204,37 @@ export default (csrfProtection) => {
             csrfToken: req.csrfToken(),
             errorMessages: [],
             tinymceApiKey: process.env.TINYMCE_API_KEY || 'no-api-key',
-            currentAdminFullName: defaultAuthorName // For placeholder text in the form
+            currentAdminFullName: defaultAuthorName, // For placeholder text in the form
+            categories
         });
     });
 
     // POST /admin/blog - Create Post
     router.post('/', csrfProtection, blogPostValidationRules, async (req, res, next) => {
         logger.debug(`[Admin Blog] POST / - Create request by ${req.adminUser.username}, IP: ${req.ip}`);
-        const errors = validationResult(req);
+    const errors = validationResult(req);
 
         // Data for re-rendering form in case of error
-        const postDataForRender = {
+    const postDataForRender = {
              title: req.body.title, slug: req.body.slug, excerpt: req.body.excerpt,
              content: req.body.content, featuredImage: req.body.featuredImage,
              authorDisplayName: req.body.authorDisplayName, // Keep submitted value
-             tags: Array.isArray(req.body.tags) ? req.body.tags.join(', ') : (req.body.tags || ''),
-             isPublished: !!req.body.isPublished
+         isPublished: !!req.body.isPublished,
+         categories: Array.isArray(req.body.categories) ? req.body.categories : (req.body.categories ? [req.body.categories] : [])
         };
         const currentAdminNameForForm = req.adminUser.fullName || req.adminUser.username;
 
 
         if (!errors.isEmpty()) {
             logger.warn(`[Admin Blog] Validation errors creating post by ${req.adminUser.username}:`, { errors: errors.array() });
+            const categories = await Category.find({ isActive: true }).sort({ name: 1 }).lean();
             return res.status(422).render('admin/blog/edit', {
                 post: postDataForRender,
                 editing: false, pageTitle: 'Add New Blog Post (Errors)', path: '/admin/blog',
                 csrfToken: req.csrfToken(), errorMessages: errors.array(),
                 tinymceApiKey: process.env.TINYMCE_API_KEY || 'no-api-key',
-                currentAdminFullName: currentAdminNameForForm
+                currentAdminFullName: currentAdminNameForForm,
+                categories
             });
         }
 
@@ -240,6 +259,9 @@ export default (csrfProtection) => {
                 finalAuthorDisplayName = req.adminUser.fullName || req.adminUser.username;
             }
 
+            const categoryIds = Array.isArray(req.body.categories)
+                ? req.body.categories
+                : (req.body.categories ? [req.body.categories] : []);
             const newPost = new BlogPost({
                 title: req.body.title,
                 slug: finalSlug,
@@ -248,7 +270,7 @@ export default (csrfProtection) => {
                 author: req.adminUser.userId, // Actual creator (AdminUser ObjectId)
                 authorDisplayName: finalAuthorDisplayName, // Name to be displayed publicly
                 featuredImage: req.body.featuredImage || null,
-                tags: req.body.tags || [],
+                categories: categoryIds,
                 isPublished: !!req.body.isPublished,
                 publishedDate: (!!req.body.isPublished ? new Date() : null)
             });
@@ -271,12 +293,14 @@ export default (csrfProtection) => {
                  const duplicateField = err.keyPattern.slug ? 'Slug' : 'Title';
                  errorMessagesList.push({ msg: `This ${duplicateField} is already in use. Please choose a different one.` });
             }
+            const categories = await Category.find({ isActive: true }).sort({ name: 1 }).lean();
             return res.status(err.code === 11000 ? 409 : 500).render('admin/blog/edit', {
                 post: postDataForRender,
                 editing: false, pageTitle: 'Add New Blog Post (Error)', path: '/admin/blog',
                 csrfToken: req.csrfToken(), errorMessages: errorMessagesList,
                 tinymceApiKey: process.env.TINYMCE_API_KEY || 'no-api-key',
-                currentAdminFullName: currentAdminNameForForm
+                currentAdminFullName: currentAdminNameForForm,
+                categories
             });
         }
     });
@@ -300,10 +324,10 @@ export default (csrfProtection) => {
             // Prepare data for the form. If authorDisplayName is empty, use the actual author's name for the form field.
             const postDataForForm = {
                 ...post,
-                tags: Array.isArray(post.tags) ? post.tags.join(', ') : '',
                 authorDisplayName: post.authorDisplayName || authorForPlaceholder
             };
 
+            const categories = await Category.find({ isActive: true }).sort({ name: 1 }).lean();
             res.render('admin/blog/edit', {
                 post: postDataForForm,
                 editing: true,
@@ -312,7 +336,8 @@ export default (csrfProtection) => {
                 csrfToken: req.csrfToken(),
                 errorMessages: [],
                 tinymceApiKey: process.env.TINYMCE_API_KEY || 'no-api-key',
-                currentAdminFullName: authorForPlaceholder // Used for the placeholder text
+                currentAdminFullName: authorForPlaceholder, // Used for the placeholder text
+                categories
             });
         } catch (err) {
             logger.error(`[Admin Blog] Error fetching post ${postId} for edit:`, { error: err.message, stack: err.stack });
@@ -331,8 +356,9 @@ export default (csrfProtection) => {
             _id: postId, title: req.body.title, slug: req.body.slug, excerpt: req.body.excerpt,
             content: req.body.content, featuredImage: req.body.featuredImage,
             authorDisplayName: req.body.authorDisplayName, // Keep submitted value
-            tags: Array.isArray(req.body.tags) ? req.body.tags.join(', ') : (req.body.tags || ''),
-            isPublished: !!req.body.isPublished
+            isPublished: !!req.body.isPublished,
+            isFeatured: !!req.body.isFeatured,
+            categories: Array.isArray(req.body.categories) ? req.body.categories : (req.body.categories ? [req.body.categories] : [])
         };
 
         if (!errors.isEmpty()) {
@@ -341,11 +367,13 @@ export default (csrfProtection) => {
             const originalPost = await BlogPost.findById(postId).populate('author', 'fullName username').select('author').lean();
             const authorForPlaceholder = originalPost && originalPost.author ? (originalPost.author.fullName || originalPost.author.username) : '';
 
+            const categories = await Category.find({ isActive: true }).sort({ name: 1 }).lean();
             return res.status(422).render('admin/blog/edit', {
                 post: postDataForRender, editing: true, pageTitle: 'Edit Blog Post (Errors)', path: '/admin/blog',
                 csrfToken: req.csrfToken(), errorMessages: errors.array(),
                 tinymceApiKey: process.env.TINYMCE_API_KEY || 'no-api-key',
-                currentAdminFullName: authorForPlaceholder
+                currentAdminFullName: authorForPlaceholder,
+                categories
             });
         }
 
@@ -364,11 +392,18 @@ export default (csrfProtection) => {
             if (!finalSlug) throw new Error("A valid slug is required for the update.");
 
             // Prepare the final update data object for BlogPost model
-            const updateData = {
+                    const updateData = {
                  title: req.body.title, slug: finalSlug, excerpt: req.body.excerpt,
-                 content: cleanHtmlContent, featuredImage: req.body.featuredImage || null,
-                 tags: req.body.tags || [], isPublished: !!req.body.isPublished
+                      content: cleanHtmlContent, featuredImage: req.body.featuredImage || null,
+                  isPublished: !!req.body.isPublished,
+              isFeatured: !!req.body.isFeatured
             };
+
+                        // categories
+                        const categoryIds = Array.isArray(req.body.categories)
+                                ? req.body.categories
+                                : (req.body.categories ? [req.body.categories] : []);
+                        updateData.categories = categoryIds;
 
             // Determine the authorDisplayName for the update
             let finalAuthorDisplayName = req.body.authorDisplayName?.trim();
@@ -423,12 +458,14 @@ export default (csrfProtection) => {
             const originalPostForError = await BlogPost.findById(postId).populate('author', 'fullName username').select('author').lean();
             const authorForPlaceholderOnError = originalPostForError && originalPostForError.author ? (originalPostForError.author.fullName || originalPostForError.author.username) : '';
 
+            const categories = await Category.find({ isActive: true }).sort({ name: 1 }).lean();
             return res.status(err.code === 11000 ? 409 : 500).render('admin/blog/edit', {
                 post: postDataForRender, // Send submitted data back
                 editing: true, pageTitle: 'Edit Blog Post (Error)', path: '/admin/blog',
                 csrfToken: req.csrfToken(), errorMessages: errorMessagesList,
                 tinymceApiKey: process.env.TINYMCE_API_KEY || 'no-api-key',
-                currentAdminFullName: authorForPlaceholderOnError
+                currentAdminFullName: authorForPlaceholderOnError,
+                categories
             });
         }
     });

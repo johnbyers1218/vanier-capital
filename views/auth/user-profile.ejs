@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= pageTitle %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>body { font-family: system-ui, sans-serif; background: #f8fafc; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; }</style>
+</head>
+<body>
+  <div id="clerk-user-profile"></div>
+  <script>
+    window.ClerkConfig = { publishableKey: "<%= clerkPublishableKey %>" };
+  </script>
+  <script async crossorigin src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js" onload="window.Clerk.load().then(() => Clerk.mountUserProfile('#clerk-user-profile'))"></script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><%= pageTitle %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/images/FND_LOGO_SVG_STRIPPED.svg" type="image/svg+xml">
+    <style>body { font-family: system-ui, sans-serif; background: #f8fafc; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; }</style>
+    
+        <script
+            src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js"
+            data-clerk-publishable-key="<%- clerkPublishableKey %>"
+            async
+            crossorigin="anonymous"
+        ></script>
+</head>
+<body>
+    <div id="sign-in"></div>
+
+    <script>
+        window.addEventListener("load", async function () {
+            const publishableKey = "<%- clerkPublishableKey %>";
+            const params = new URLSearchParams(window.location.search);
+            const afterUrl = params.get('redirectTo') || '/admin/dashboard';
+            
+            if (!publishableKey) {
+                console.error("Clerk Publishable Key is missing!");
+                return;
+            }
+
+            const Clerk = window.Clerk;
+            try {
+                // Ensure Clerk receives the publishable key (also available via data attribute above)
+                await Clerk.load({ publishableKey });
+
+                // If already signed in, skip rendering and go straight to the target
+                if (Clerk.user) {
+                    window.location.replace(afterUrl);
+                    return;
+                }
+
+                                const signInDiv = document.getElementById("sign-in");
+                                Clerk.mountSignIn(signInDiv, {
+                                    redirectUrl: afterUrl,
+                                    afterSignInUrl: afterUrl,
+                                    afterSignUpUrl: afterUrl
+                                });
+
+            } catch (err) {
+                console.error("Clerk failed to load:", err);
+            }
+        });
+    </script>
+</body>
+</html>

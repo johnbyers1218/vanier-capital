@@ -24,6 +24,14 @@
                 </a>
             </li>
 
+            <!-- Clients Link -->
+            <li style="margin-bottom: 0.5rem;">
+                 <% const isClientsActive = (typeof path !== 'undefined' && path.startsWith('/admin/clients')); %>
+                <a href="/admin/clients" class="nav-link <%= isClientsActive ? 'active' : '' %>">
+                    <i class="fas fa-building"></i> Clients
+                </a>
+            </li>
+
             <!-- Testimonials Link -->
             <li style="margin-bottom: 0.5rem;">
                  <% const isTestimonialsActive = (typeof path !== 'undefined' && path.startsWith('/admin/testimonials')); %>
@@ -52,8 +60,8 @@
 
             <!-- Logout and View Site Links -->
             <li style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
-                 <a href="/admin/logout" class="nav-link logout">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                      <a href="#" class="nav-link logout" id="clerk-logout-link">
+                          <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
             </li>
              <li style="margin-top: 1rem;">
@@ -73,7 +81,9 @@
         .admin-nav .nav-link i { margin-right: 12px; width: 18px; text-align: center; }
         .admin-nav .nav-link:hover { background-color: rgba(255, 255, 255, 0.05); color: var(--primary-color); }
         .admin-nav .nav-link.active { color: var(--primary-color); font-weight: 600; border-left-color: var(--primary-color); background-color: rgba(0, 168, 232, 0.08); }
-        .admin-nav .nav-link.logout:hover, .admin-nav .nav-link.view-site:hover { background-color: rgba(255, 255, 255, 0.05); color: #eee; }
+                .admin-nav .nav-link.logout:hover, .admin-nav .nav-link.view-site:hover { background-color: rgba(255, 255, 255, 0.05); color: #eee; }
+
+<!-- Clerk signOut JS is now included in the main admin layout or dashboard page -->
         .admin-nav .nav-link.view-site { color: var(--gray-text); }
     </style>
 </aside>

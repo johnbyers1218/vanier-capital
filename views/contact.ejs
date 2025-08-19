@@ -1,401 +1,230 @@
-<!-- views/contact.ejs (UPDATED for combined form structure) -->
-<%- include('partials/header', { /* ... */ }) %>
+<!-- views/contact.ejs (Two-Paths Redesign) -->
+<%- include('partials/header', {
+    pageTitle: 'Contact Us - FND Automations',
+    pageDescription: 'Ready to talk or just have a question? Choose how you want to connect with FND Automations—schedule a live consultation or send us a message.'
+}) %>
 
-<section class="page-header">
+<!-- Hero -->
+<section class="section contact-hero">
     <div class="container">
-        <h1>Contact Us</h1>
-        <div class="breadcrumbs">
-            <a href="/">Home</a> <span class="separator">/</span> <span
-                class="current">Contact</span>
+        <div class="section-header">
+            <h1 class="section-title">Ready to Transform Your Business?</h1>
+            <p class="section-description">Whether you're ready to book a strategic consultation or just have a question, we're here to help. Choose the best way to connect with our team below.</p>
+        </div>
+    </div>
+    </section>
+
+    <!-- Map moved to homepage for Credibility Sandwich -->
+
+<!-- Choose Your Path -->
+<section class="section contact-paths">
+    <div class="container">
+        <div class="choose-paths-grid">
+            <!-- High-Intent: Schedule Meeting -->
+            <div class="path-card primary">
+                <div class="path-card-body">
+                    <h2 class="path-title">Schedule a Live Consultation</h2>
+                      <p class="path-text">Book a complimentary strategy session (up to 60 minutes) directly on our calendar. We'll dive into your specific challenges and explore how AI and automation can drive tangible results for your business.</p>
+                    <div class="team-avatars" aria-label="You may meet with these team members">
+                        <% if (typeof teamUsers !== 'undefined' && teamUsers && teamUsers.length) { %>
+                            <% teamUsers.forEach(function(u){
+                                var name = (u.fullName || u.username || '').trim();
+                                var initials = name ? name.split(/\s+/).map(p=>p[0]).slice(0,2).join('').toUpperCase() : 'U';
+                            %>
+                                <div class="avatar" title="<%= name %>">
+                                    <% var avatarSrc = u.avatarUrl; if (avatarSrc && !/^https?:\/\//i.test(avatarSrc) && avatarSrc.charAt(0) !== '/') { avatarSrc = '/images/' + avatarSrc; } %>
+                                    <% if (avatarSrc) { %>
+                                        <img src="<%= avatarSrc %>" alt="<%= name %>" loading="lazy"/>
+                                    <% } else { %>
+                                        <div class="avatar-fallback" aria-hidden="true"><%= initials %></div>
+                                    <% } %>
+                                </div>
+                            <% }) %>
+                        <% } else { %>
+                            <!-- Fallback static faces if no team data available -->
+                            <img src="/images/Logan.png" alt="Logan" loading="lazy"/>
+                            <img src="/images/John.png" alt="John" loading="lazy"/>
+                            <img src="/images/Haidan.png" alt="Haidan" loading="lazy"/>
+                            <img src="/images/Moe.png" alt="Moe" loading="lazy"/>
+                        <% } %>
+                    </div>
+                                <div class="expectations">
+                                    <h3 class="expect-title">In this complimentary session, we will:</h3>
+                                    <ul class="expect-list">
+                                        <li><i class="fas fa-check"></i> Analyze your current operational challenges.</li>
+                                        <li><i class="fas fa-check"></i> Identify key opportunities for automation and AI.</li>
+                                        <li><i class="fas fa-check"></i> Outline a potential roadmap for implementation.</li>
+                                        <li><i class="fas fa-check"></i> Provide an initial estimate of potential ROI.</li>
+                                    </ul>
+                                </div>
+                                <div class="path-actions">
+                                    <a href="https://calendar.google.com/calendar/appointments/schedules/AcZssZ335AVuGBH_NJglKI3iiThB8cP6sHwnzkeg6aJjyEGEKEVJkIQuUCWFOaL1UpBPp_YbVAfTY4dI?gv=true" class="cta-button primary-btn" target="_blank" rel="noopener">Find a Time</a>
+                                </div>
+                </div>
+            </div>
+
+            <!-- General Inquiry: Message Form -->
+            <div class="path-card secondary">
+                <div class="path-card-body">
+                    <h2 class="path-title">Send Us a Message</h2>
+                    <p class="path-text">Have a general question, a project inquiry, or a media request? Fill out the form, and a member of our team will get back to you within one business day.</p>
+                    <div id="contact-form-message" style="margin-bottom: 1rem;"></div>
+                    <form id="contact-form">
+                        <input type="hidden" id="requestedMeeting" name="requestedMeeting" value="false" />
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="name">Your Name <span style="color:#dc3545">*</span></label>
+                                <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email Address <span style="color:#dc3545">*</span></label>
+                                <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone Number (Optional)</label>
+                                <input type="tel" id="phone" name="phone" placeholder="Enter your phone number">
+                            </div>
+                            <div class="form-group">
+                                <label for="subject">Subject <span style="color:#dc3545">*</span></label>
+                                <select id="subject" name="subject" required>
+                                    <option value disabled selected>-- Select a Subject --</option>
+                                    <option value="General Inquiry">General Inquiry</option>
+                                    <option value="Service Information">Service Information</option>
+                                    <option value="Request Quote/Consultation">Request Quote/Consultation</option>
+                                    <option value="Partnership Inquiry">Partnership Inquiry</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group form-group-full">
+                                <label for="message">Your Message <span style="color:#dc3545">*</span></label>
+                                <textarea id="message" name="message" placeholder="Tell us about your project or question..." rows="6" required></textarea>
+                            </div>
+                                            <div class="policy-agreement form-group-full">
+                                                <input type="checkbox" id="privacy" name="privacy" required>
+                                                <label for="privacy">I agree to the <a href="/privacy-policy" target="_blank">Privacy Policy</a> and <a href="/terms-of-service" target="_blank">Terms of Service</a> <span style="color:#dc3545">*</span></label>
+                                            </div>
+                        </div>
+                        <div class="submit-btn-container">
+                            <button type="submit" class="submit-btn cta-button primary-btn"><i class="fas fa-paper-plane"></i> Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 
-<section id="contact-section" class="section contact-section">
+<!-- Contact Information Panel -->
+<section class="section contact-info-panel">
     <div class="container">
-        <div class="contact-intro section-header" style="margin-bottom: 3rem;">
-            <h2 class="section-title">Get In Touch</h2>
-            <p class="section-description">Have questions or want to discuss
-                your automation needs?</p>
-        </div>
-        <div class="form-header">
-                <h3>Schedule a free consultation call</h3>
-        </div>
-        <div class="form-header submit-btn-container"><!-- Google Calendar Appointment Scheduling begin -->
-                <link
-                    href="https://calendar.google.com/calendar/scheduling-button-script.css"
-                    rel="stylesheet">
-                <script
-                    src="https://calendar.google.com/calendar/scheduling-button-script.js"
-                    async></script>
-                <script>
-                    (function() {
-                    var target = document.currentScript;
-                    window.addEventListener('load', function() {
-                        calendar.schedulingButton.load({
-                        url: 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ335AVuGBH_NJglKI3iiThB8cP6sHwnzkeg6aJjyEGEKEVJkIQuUCWFOaL1UpBPp_YbVAfTY4dI?gv=true',
-                        color: '#00a8e8',
-                        label: "Schedule Now",
-                        target,
-                        });
-                    });
-                    })();
-                </script>
-                <!-- end Google Calendar Appointment Scheduling -->
-            </div>
-        <div class="contact-form-container">
-            <div class="form-header">
-                <h3>Send Us a Message</h3>
-            </div>
-
-            <div id="contact-form-message" style="margin-bottom: 1.5rem;"></div>
-
-            <form id="contact-form">
-
-                <div class="form-group">
-                    <label for="name">Your Name <span
-                            style="color: #dc3545;">*</span></label>
-                    <input type="text" id="name" name="name"
-                        placeholder="Enter your full name" required>
+        <div class="info-card">
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-icon" aria-hidden="true"><i class="fas fa-phone"></i></div>
+                    <div class="info-text">
+                        <h3 class="info-title">Phone</h3>
+                        <div class="info-content">
+                            <div class="info-line">Main: <a href="tel:+12094020089">(209) 402-0089</a></div>
+                            <div class="info-line">Support: <a href="tel:+14436436044">(443) 643-6044</a></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="email">Email Address <span
-                            style="color: #dc3545;">*</span></label>
-                    <input type="email" id="email" name="email"
-                        placeholder="Enter your email address" required>
+                <div class="info-item">
+                    <div class="info-icon" aria-hidden="true"><i class="fas fa-envelope"></i></div>
+                    <div class="info-text">
+                        <h3 class="info-title">Email</h3>
+                        <div class="info-content">
+                            <div class="info-line"><a href="mailto:logan.mayfield@fndautomations.com">logan.mayfield@fndautomations.com</a></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="phone">Phone Number (Optional)</label>
-                    <input type="tel" id="phone" name="phone"
-                        placeholder="Enter your phone number">
+                <div class="info-item">
+                    <div class="info-icon" aria-hidden="true"><i class="fas fa-clock"></i></div>
+                    <div class="info-text">
+                        <h3 class="info-title">Hours</h3>
+                        <div class="info-content">
+                            <div class="info-line">Sunday - Saturday</div>
+                            <div class="info-line">9AM - 6PM EST</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="subject">Subject <span
-                            style="color: #dc3545;">*</span></label>
-                    <select id="subject" name="subject" required>
-                        <option value disabled selected>-- Select a Subject
-                            --</option>
-                        <option value="General Inquiry">General Inquiry</option>
-                        <option value="Service Information">Service
-                            Information</option>
-                        <option value="Request Quote/Consultation">Request
-                            Quote/Consultation</option>
-                        <option value="Partnership Inquiry">Partnership
-                            Inquiry</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                <div class="form-group form-group-full">
-                    <label for="message">Your Message <span
-                            style="color: #dc3545;">*</span></label>
-                    <textarea id="message" name="message"
-                        placeholder="Tell us about your project or question..."
-                        rows="6" required></textarea>
-                </div>
-
-                <div class="form-group form-checkbox form-group-full"
-                    style="margin-top: 1.5rem;">
-                    <input type="checkbox" id="privacy" name="privacy" required>
-                    <label for="privacy">I agree to the <a
-                            href="/privacy-policy" target="_blank">Privacy
-                            Policy</a> and <a href="/terms-of-service"
-                            target="_blank">Terms of Service</a> <span
-                            style="color: #dc3545;">*</span></label>
-                </div>
-
-                <div class="submit-btn-container form-group-full">
-                    <button type="submit"
-                        class="submit-btn cta-button primary-btn">
-                        <i class="fas fa-paper-plane"></i> Send Message
-                    </button>
-                </div>
-            </form>
-
-           
-
-        </div>
- 
-        <!-- Contact Information Section -->
-        <div class="contact-info-container">
-            <!-- <div class="contact-info-item">
-                <h3><i class="fas fa-map-marker-alt fa-fw"></i> Location</h3>
-                <p>123 Automation Avenue</p>
-                <p>Tech District, CA 94103</p>
-            </div> -->
-            <div class="contact-info-item">
-                <h3><i class="fas fa-phone fa-fw"></i> Phone</h3>
-                <p>Main: <a href="tel:+11234567890">(209) 402-0089</a></p>
-                <p>Support: <a href="tel:+11234567891">(443) 643-6044</a></p>
-                <!-- Update numbers -->
-            </div>
-            <div class="contact-info-item">
-                <h3><i class="fas fa-envelope fa-fw"></i> Email</h3>
-                <p><a
-                        href="mailto:info@fndautomations.com">logan.mayfield@fndautomations.com</a></p>
-                <!-- <p><a href="mailto:support@fndautomations.com">support@fndautomations.com</a></p> Update emails -->
-            </div>
-            <div class="contact-info-item">
-                <h3><i class="fas fa-clock fa-fw"></i> Hours</h3>
-                <p>Sunday - Saturday</p> <!-- Add timezone -->
-                <p>9AM - 6PM EST</p>
             </div>
         </div>
+    </div>
+</section>
 
-        <!-- Social Media Section -->
-        <div class="social-section"
-            style="margin-bottom: 3rem; text-align: center;">
-            <h3><i class="fas fa-share-alt"></i> Connect With Us</h3>
-            <div class="social-icons" style="justify-content: center;">
-                <!-- <a href="https://www.facebook.com/yourprofile" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a> -->
-                <!-- <a href="https://twitter.com/yourprofile" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-twitter"></i></a> -->
-                <a href="https://www.instagram.com/fndautomations/"
-                    target="_blank" rel="noopener noreferrer"
-                    aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                <!-- <a href="https://www.linkedin.com/in/yourprofile" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a> -->
-                <a href="https://www.tiktok.com/@fnd.automations?lang=en"
-                    target="_blank" rel="noopener noreferrer"
-                    aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-            </div>
+<!-- FAQ -->
+<section class="section faq-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title faq-title">Frequently Asked Questions</h2>
+            <p class="section-description">Find answers to common questions about AI automation and working with FND Automations.</p>
         </div>
-
-        <!-- Optional: Map Section -->
-        <!--
-        <div class="map-container">
-            <h2>Find Us</h2>
-            <div class="google-map">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d..." allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-            </div>
-            <a href="https://maps.google.com/?q=..." class="cta-button secondary-btn get-directions" target="_blank">Get Directions</a>
-        </div>
-        -->
-
-        <!-- views/contact.ejs -->
-
-        <%# ... Include header and other contact sections above ... %>
-
-        <!-- ======================================== -->
-        <!-- FAQ Section                            -->
-        <!-- ======================================== -->
-        <section class="section faq-section"> <%# Added section-darker %>
-            <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title faq-title">Frequently Asked
-                        Questions</h2>
-                    <div class="faq-underline"
-                        style="height: 3px; width: 70px; background-color: var(--primary-color); margin: -5px auto 40px auto;"></div>
-                    <p class="section-description">Find answers to common
-                        questions about AI automation and working with FND
-                        Automations.</p>
+        <div class="faq-list">
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-1">What exactly is AI Automation for a business like mine?</button>
+                <div class="faq-answer" id="faq-answer-1">
+                    <p>AI Automation uses Artificial Intelligence software to handle tasks usually done by people. For your business, this could mean automating repetitive data entry, answering common customer questions instantly with chatbots, processing invoices automatically, personalizing marketing messages, or analyzing sales data to find trends – freeing up your team for more strategic work.</p>
                 </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-2">How much does implementing AI automation typically cost?</button>
+                <div class="faq-answer" id="faq-answer-2">
+                    <p>Costs vary widely based on complexity. Simple automations using tools like Make/n8n might start with setup fees in the low thousands or small retainers. Implementing specific AI tools (like advanced chatbots or document processing) often involves monthly subscriptions ($50-$500+) plus integration costs. Custom AI development is more significant. We focus on delivering clear ROI, often seen within 3-9 months.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-3">Will AI replace my employees?</button>
+                <div class="faq-answer" id="faq-answer-3">
+                    <p>Our goal is typically augmentation, not replacement. AI excels at handling repetitive, data-intensive tasks, freeing up your employees to focus on higher-value activities requiring creativity, critical thinking, complex problem-solving, and human interaction. It often makes existing roles more efficient and strategic, rather than eliminating them.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-4">How long does it take to implement an automation solution?</button>
+                <div class="faq-answer" id="faq-answer-4">
+                    <p>Timelines depend on the project scope. Simple process automations (like connecting two apps) can sometimes be done in 1-3 weeks. More complex integrations or AI implementations might take 1-4 months, including discovery, setup, testing, and training. We provide a detailed timeline estimate after our initial consultation.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-5">What results can I realistically expect from automation?</button>
+                <div class="faq-answer" id="faq-answer-5">
+                    <p>Results depend on the process automated. Common outcomes include significant time savings on manual tasks (often 50-90% reduction for specific tasks), reduced error rates, faster response times (e.g., for customer service or lead follow-up), improved data accuracy, better resource allocation, and data-driven insights for decision-making, ultimately leading to cost savings or revenue growth.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-6">What technologies do you primarily use (e.g., Make, n8n, OpenAI)?</button>
+                <div class="faq-answer" id="faq-answer-6">
+                    <p>We leverage a range of powerful tools based on client needs. Our core stack often includes leading integration platforms like Make.com and n8n, flexible databases like Airtable, and advanced AI models via APIs from OpenAI (GPT series), Anthropic (Claude), and Google AI. We also integrate with various CRMs, marketing platforms, and other business software.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-7">How do we get started working with FND Automations?</button>
+                <div class="faq-answer" id="faq-answer-7">
+                    <p>The first step is an initial consultation (usually free). We'll discuss your business challenges, goals, and current processes. Based on this, we can identify potential high-impact automation opportunities and suggest next steps, which might involve a deeper discovery phase or a proposal for a specific project.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-8">Do you offer ongoing support and maintenance?</button>
+                <div class="faq-answer" id="faq-answer-8">
+                    <p>Yes, absolutely. Automation isn't always set it and forget it. We offer various support and maintenance packages to ensure your automations continue running smoothly, adapt to software updates from connected apps, and remain optimized as your business evolves.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-9">What kind of access or information do you need from us?</button>
+                <div class="faq-answer" id="faq-answer-9">
+                    <p>This depends on the project. Typically, we'll need insights into your current workflow, access to relevant software platforms (via secure API keys or dedicated logins), and potentially sample data for testing. We prioritize security and data privacy, using secure methods for credential handling and adhering to strict confidentiality.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-answer-10">Can you automate highly specific or unique processes for my industry?</button>
+                <div class="faq-answer" id="faq-answer-10">
+                    <p>Yes, that's one of our core strengths. While we use standard tools, we specialize in designing custom automation workflows and integrations tailored to your specific business logic and industry requirements. We don't believe in one-size-fits-all solutions.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-                <div class="faq-list" style="max-width: 850px; margin: 0 auto;">
-                    <%# Wrapper for items %>
-
-                    <!-- FAQ Item 1 -->
-                    <div class="faq-item">
-                        <h3 class="faq-question" tabindex="0"
-                            aria-expanded="false" aria-controls="faq-answer-1">
-                            What exactly is AI Automation for a business like
-                            mine?
-                        </h3>
-                        <div class="faq-answer" id="faq-answer-1" hidden>
-                            <p>AI Automation uses Artificial Intelligence
-                                software to handle tasks usually done by people.
-                                For your business, this could mean automating
-                                repetitive data entry, answering common customer
-                                questions instantly with chatbots, processing
-                                invoices automatically, personalizing marketing
-                                messages, or analyzing sales data to find trends
-                                – freeing up your team for more strategic
-                                work.</p>
-                        </div>
-                    </div>
-
-                    <!-- FAQ Item 2 -->
-                    <div class="faq-item">
-                        <h3 class="faq-question" tabindex="0"
-                            aria-expanded="false" aria-controls="faq-answer-2">
-                            How much does implementing AI automation typically
-                            cost?
-                        </h3>
-                        <div class="faq-answer" id="faq-answer-2" hidden>
-                            <p>Costs vary widely based on complexity. Simple
-                                automations using tools like Make/n8n might
-                                start with setup fees in the low thousands or
-                                small retainers. Implementing specific AI tools
-                                (like advanced chatbots or document processing)
-                                often involves monthly subscriptions ($50-$500+)
-                                plus integration costs. Custom AI development is
-                                more significant. We focus on delivering clear
-                                ROI, often seen within 3-9 months.</p>
-                        </div>
-                    </div>
-
-                    <!-- FAQ Item 3 -->
-                    <div class="faq-item">
-                        <h3 class="faq-question" tabindex="0"
-                            aria-expanded="false" aria-controls="faq-answer-3">
-                            Will AI replace my employees?
-                        </h3>
-                        <div class="faq-answer" id="faq-answer-3" hidden>
-                            <p>Our goal is typically *augmentation*, not
-                                replacement. AI excels at handling repetitive,
-                                data-intensive tasks, freeing up your employees
-                                to focus on higher-value activities requiring
-                                creativity, critical thinking, complex
-                                problem-solving, and human interaction. It often
-                                makes existing roles more efficient and
-                                strategic, rather than eliminating them.</p>
-                        </div>
-                    </div>
-
-                    <!-- FAQ Item 4 -->
-                    <div class="faq-item">
-                        <h3 class="faq-question" tabindex="0"
-                            aria-expanded="false" aria-controls="faq-answer-4">
-                            How long does it take to implement an automation
-                            solution?
-                        </h3>
-                        <div class="faq-answer" id="faq-answer-4" hidden>
-                            <p>Timelines depend on the project scope. Simple
-                                process automations (like connecting two apps)
-                                can sometimes be done in 1-3 weeks. More complex
-                                integrations or AI implementations might take
-                                1-4 months, including discovery, setup, testing,
-                                and training. We provide a detailed timeline
-                                estimate after our initial consultation.</p>
-                        </div>
-                    </div>
-
-                    <!-- FAQ Item 5 -->
-                    <div class="faq-item">
-                        <h3 class="faq-question" tabindex="0"
-                            aria-expanded="false" aria-controls="faq-answer-5">
-                            What results can I realistically expect from
-                            automation?
-                        </h3>
-                        <div class="faq-answer" id="faq-answer-5" hidden>
-                            <p>Results depend on the process automated. Common
-                                outcomes include significant time savings on
-                                manual tasks (often 50-90% reduction for
-                                specific tasks), reduced error rates, faster
-                                response times (e.g., for customer service or
-                                lead follow-up), improved data accuracy, better
-                                resource allocation, and data-driven insights
-                                for decision-making, ultimately leading to cost
-                                savings or revenue growth.</p>
-                        </div>
-                    </div>
-
-                    <!-- FAQ Item 6 -->
-                    <div class="faq-item">
-                        <h3 class="faq-question" tabindex="0"
-                            aria-expanded="false" aria-controls="faq-answer-6">
-                            What technologies do you primarily use (e.g., Make,
-                            n8n, OpenAI)?
-                        </h3>
-                        <div class="faq-answer" id="faq-answer-6" hidden>
-                            <p>We leverage a range of powerful tools based on
-                                client needs. Our core stack often includes
-                                leading integration platforms like Make.com and
-                                n8n, flexible databases like Airtable, and
-                                advanced AI models via APIs from OpenAI (GPT
-                                series), Anthropic (Claude), and Google AI. We
-                                also integrate with various CRMs, marketing
-                                platforms, and other business software.</p>
-                        </div>
-                    </div>
-
-                    <!-- FAQ Item 7 -->
-                    <div class="faq-item">
-                        <h3 class="faq-question" tabindex="0"
-                            aria-expanded="false" aria-controls="faq-answer-7">
-                            How do we get started working with FND Automations?
-                        </h3>
-                        <div class="faq-answer" id="faq-answer-7" hidden>
-                            <p>The first step is an initial consultation
-                                (usually free). We'll discuss your business
-                                challenges, goals, and current processes. Based
-                                on this, we can identify potential high-impact
-                                automation opportunities and suggest next steps,
-                                which might involve a deeper discovery phase or
-                                a proposal for a specific project.</p>
-                        </div>
-                    </div>
-
-                    <!-- FAQ Item 8 -->
-                    <div class="faq-item">
-                        <h3 class="faq-question" tabindex="0"
-                            aria-expanded="false" aria-controls="faq-answer-8">
-                            Do you offer ongoing support and maintenance?
-                        </h3>
-                        <div class="faq-answer" id="faq-answer-8" hidden>
-                            <p>Yes, absolutely. Automation isn't always
-                                "set it and forget it." We offer various support
-                                and maintenance packages to ensure your
-                                automations continue running smoothly, adapt to
-                                software updates from connected apps, and remain
-                                optimized as your business evolves.</p>
-                        </div>
-                    </div>
-
-                    <!-- FAQ Item 9 -->
-                    <div class="faq-item">
-                        <h3 class="faq-question" tabindex="0"
-                            aria-expanded="false" aria-controls="faq-answer-9">
-                            What kind of access or information do you need from
-                            us?
-                        </h3>
-                        <div class="faq-answer" id="faq-answer-9" hidden>
-                            <p>This depends on the project. Typically, we'll
-                                need insights into your current workflow, access
-                                to relevant software platforms (via secure API
-                                keys or dedicated logins), and potentially
-                                sample data for testing. We prioritize security
-                                and data privacy, using secure methods for
-                                credential handling and adhering to strict
-                                confidentiality.</p>
-                        </div>
-                    </div>
-
-                    <!-- FAQ Item 10 -->
-                    <div class="faq-item">
-                        <h3 class="faq-question" tabindex="0"
-                            aria-expanded="false" aria-controls="faq-answer-10">
-                            Can you automate highly specific or unique processes
-                            for my industry?
-                        </h3>
-                        <div class="faq-answer" id="faq-answer-10" hidden>
-                            <p>Yes, that's one of our core strengths. While we
-                                use standard tools, we specialize in designing
-                                *custom* automation workflows and integrations
-                                tailored to your specific business logic and
-                                industry requirements. We don't believe in
-                                one-size-fits-all solutions.</p>
-                        </div>
-                    </div>
-
-                    <!-- Add more relevant FAQs -->
-
-                </div> <!-- /.faq-list -->
-            </div> <!-- /.container -->
-        </section> <!-- /.faq-section -->
-
-        <%# ... Include footer partial ... %>
-
-    </div> <!-- /.container -->
-</section> <!-- /#contact-section -->
+<!-- (map moved above) -->
 
 <%- include('partials/footer') %>
-
-<!-- Add JS for Contact form submission, Schedule form display/submit, FAQ accordion -->
-<!-- This logic should ideally be in apps.js -->
-<script>
-    // Placeholder: Ensure apps.js handles:
-    // 1. Contact form submission via fetch to /api/contact
-    // 2. Showing #schedule-section on successful contact submit
-    // 3. Populating hidden fields in #schedule-form
-    // 4. Handling schedule form submission via fetch to /api/schedule-meeting
-    // 5. FAQ Accordion toggle functionality
-    // 6. Populating timezone dropdown dynamically
-</script>

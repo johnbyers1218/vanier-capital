@@ -6,25 +6,40 @@
 <div class="admin-form-container">
     <h2><%= editing ? 'Edit Project' : 'Add New Project' %></h2>
 
+    <div class="info-panel" style="margin: 12px 0 20px 0; padding: 12px 14px; border: 1px solid #374151; border-radius: 8px; background: #111827; color: #d1d5db;">
+        <strong style="color:#93c5fd;">Tip:</strong> Blog Categories organize blog posts. Projects use curated Industries and Service Types instead. Pick one or more Industries the project belongs to, and Service Types delivered. There's no legacy "project category" anymore.
+    </div>
+
+    <% const __errorMap = (typeof errorMap !== 'undefined' && errorMap) ? errorMap : {}; %>
+
     <% if (typeof errorMessages !== 'undefined' && errorMessages && errorMessages.length > 0) { %>
-        <div class="validation-errors">
-            <p><strong>Please correct the following errors:</strong></p>
-            <ul><% errorMessages.forEach(err => { %><li><%= err.msg %> <%= err.param ? '('+err.param+')' : '' %></li><% }) %></ul>
+        <div class="error-summary" role="alert" aria-live="assertive">
+            <div class="error-summary-icon" aria-hidden="true"><i class="fas fa-exclamation-triangle"></i></div>
+            <div>
+                <p class="error-summary-title">Please correct the following errors:</p>
+                <ul class="error-summary-list">
+                    <% errorMessages.forEach(err => { %>
+                        <li><strong><%= err.param %>:</strong> <%= err.msg %></li>
+                    <% }) %>
+                </ul>
+            </div>
         </div>
     <% } %>
 
     <form action="<%= editing ? '/admin/projects/edit/' + project._id : '/admin/projects' %>" method="POST" class="admin-form" id="projectForm">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-        <div class="form-group">
-            <label for="title">Project Title <span style="color: #dc3545;">*</span></label>
-            <input type="text" id="title" name="title" value="<%= project && project.title ? project.title : '' %>" required maxlength="150">
+        <div class="form-group <%= __errorMap.title ? 'has-error' : '' %>">
+            <label for="title" class="<%= __errorMap.title ? 'label-error' : '' %>">Project Title <span style="color: #dc3545;">*</span></label>
+            <input type="text" id="title" name="title" value="<%= project && project.title ? project.title : '' %>" required maxlength="150" class="<%= __errorMap.title ? 'input-error' : '' %>">
+            <% if (__errorMap.title) { %><div class="field-error"><%= __errorMap.title[0] %></div><% } %>
         </div>
 
-        <div class="form-group">
+    <div class="form-group <%= __errorMap.slug ? 'has-error' : '' %>">
             <label for="slug">URL Slug</label>
-            <input type="text" id="slug" name="slug" value="<%= project && project.slug ? project.slug : '' %>" maxlength="200" pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$" placeholder="auto-generated-if-blank-from-title">
+            <input type="text" id="slug" name="slug" value="<%= project && project.slug ? project.slug : '' %>" maxlength="200" pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$" placeholder="auto-generated-if-blank-from-title" class="<%= __errorMap.slug ? 'input-error' : '' %>">
             <small>URL-friendly ID. Leave blank to auto-generate from title. Unique, lowercase, numbers, hyphens only.</small>
+            <% if (__errorMap.slug) { %><div class="field-error"><%= __errorMap.slug[0] %></div><% } %>
         </div>
 
         <%# ****** COVER IMAGE UPLOAD SECTION FOR PROJECTS ****** %>
@@ -41,57 +56,150 @@
             <div id="projectCoverImageUploadStatus" style="font-size: 0.85em; margin-top: 5px;"></div>
         </div>
 
-        <div class="form-group">
+    <div class="form-group <%= __errorMap.image ? 'has-error' : '' %>">
             <label for="image">Main Project Image URL (Thumbnail)</label>
-            <input type="url" id="image" name="image" value="<%= project && project.image ? project.image : '' %>" placeholder="Auto-populated by upload or enter URL manually">
+            <input type="url" id="image" name="image" value="<%= project && project.image ? project.image : '' %>" placeholder="Auto-populated by upload or enter URL manually" class="<%= __errorMap.image ? 'input-error' : '' %>">
             <small>Main image shown in listings. Can be auto-filled by "Upload Cover Image" above.</small>
+            <% if (__errorMap.image) { %><div class="field-error"><%= __errorMap.image[0] %></div><% } %>
         </div>
         <%# ****** END COVER IMAGE SECTION ****** %>
 
-        <div class="form-group">
+    <div class="form-group <%= __errorMap.description ? 'has-error' : '' %>">
             <label for="project-description-editor">Full Description / Case Study <span style="color: #dc3545;">*</span></label>
-            <textarea id="project-description-editor" name="description" class="richtext-editor" style="visibility: hidden; min-height: 400px;" required minlength="50"><%= project && project.description ? project.description : '' %></textarea>
-            <small>Detailed project information. Use the editor for formatting.</small>
+            <textarea id="project-description-editor" name="description" class="richtext-editor <%= __errorMap.description ? 'input-error' : '' %>" style="visibility: hidden; min-height: 400px;" required minlength="50"><%= project && project.description ? project.description : '' %></textarea>
+            <small>Detailed project information. Use the editor for formatting. <a href="https://github.com/johnbyers1218/fnd-automations-webapp/blob/main/AUTHORING_GUIDE.md" target="_blank" rel="noopener noreferrer">Authoring Guide</a></small>
+            <% if (__errorMap.description) { %><div class="field-error"><%= __errorMap.description[0] %></div><% } %>
+        </div>
+
+        <div class="form-group <%= __errorMap.excerpt ? 'has-error' : '' %>">
+            <label for="projectExcerpt">Excerpt / Summary <span style="color:#dc3545">*</span></label>
+            <textarea id="projectExcerpt" name="excerpt" rows="3" maxlength="250" required oninput="document.getElementById('projectExcerptCounter').textContent = this.value.length + '/250'"><%= project && project.excerpt ? project.excerpt : '' %></textarea>
+            <div class="muted" style="display:flex;justify-content:space-between;">
+                <small>Appears on cards and previews (max 250 chars).</small>
+                <small id="projectExcerptCounter"><%= project && project.excerpt ? project.excerpt.length : 0 %>/250</small>
+            </div>
+            <% if (__errorMap.excerpt) { %><div class="field-error"><%= __errorMap.excerpt[0] %></div><% } %>
         </div>
 
         <div class="form-group">
-            <label for="category">Category <span style="color: #dc3545;">*</span></label>
-            <input type="text" id="category" name="category" value="<%= project && project.category ? project.category : '' %>" required maxlength="50" placeholder="e.g., manufacturing, real-estate">
-            <small>Used for filtering (e.g., real-estate, finance). Will be lowercased.</small>
+            <label for="technologiesUsed">Technologies Used (comma-separated)</label>
+            <input type="text" id="technologiesUsed" name="technologiesUsed" value="<%= project && project.technologiesUsed ? project.technologiesUsed : '' %>" placeholder="e.g., node.js, express, mongodb">
+            <small>Enter a comma-separated list. Example: node.js, express, mongodb</small>
         </div>
 
         <div class="form-group">
+            <label for="projectDate">Completion Date</label>
+            <input type="text" id="projectDate" name="projectDate" placeholder="Select a date" value="<%= project && project.projectDate ? new Date(project.projectDate).toISOString().split('T')[0] : '' %>">
+        </div>
+
+        <div class="form-group">
+            <label for="industries">Industries (curated)</label>
+            <select id="industries" name="industries" multiple class="form-control">
+                <% if (typeof industries !== 'undefined' && industries && industries.length) { %>
+                    <% industries.forEach(function(ind) { %>
+                        <option value="<%= ind._id %>" <%= (project && Array.isArray(project.industries) && project.industries.includes(String(ind._id))) ? 'selected' : '' %>><%= ind.name %></option>
+                    <% }) %>
+                <% } %>
+            </select>
+            <small>Select one or more industries for this project.</small>
+        </div>
+        <div class="form-group">
+            <label for="serviceTypes">Service Types (curated)</label>
+            <select id="serviceTypes" name="serviceTypes" multiple class="form-control">
+                <% if (typeof services !== 'undefined' && services && services.length) { %>
+                    <% services.forEach(function(svc) { %>
+                        <option value="<%= svc._id %>" <%= (project && Array.isArray(project.serviceTypes) && project.serviceTypes.includes(String(svc._id))) ? 'selected' : '' %>><%= svc.name %></option>
+                    <% }) %>
+                <% } %>
+            </select>
+            <small>Select one or more service types delivered.</small>
+        </div>
+        
+
+    <div class="form-group <%= (__errorMap.image || __errorMap.link) ? 'has-error' : '' %>">
             <label for="link">External Project Link (Optional)</label>
-            <input type="url" id="link" name="link" value="<%= project && project.link ? project.link : '' %>" placeholder="https://live-project-example.com">
+            <input type="url" id="link" name="link" value="<%= project && project.link ? project.link : '' %>" placeholder="https://live-project-example.com" class="<%= __errorMap.link ? 'input-error' : '' %>">
             <small>Link to a live version or client site if applicable.</small>
+            <% if (__errorMap.link) { %><div class="field-error"><%= __errorMap.link[0] %></div><% } %>
         </div>
 
-        <div class="form-group">
-            <label for="clientName">Client Name (Optional)</label>
-            <input type="text" id="clientName" name="clientName" value="<%= project && project.clientName ? project.clientName : '' %>" maxlength="100">
+        <!-- Client Selection (Optional Association) -->
+    <div class="form-group <%= __errorMap.client ? 'has-error' : '' %>">
+            <label for="client">Client <span style="color:#6b7280; font-weight: normal;">(optional)</span></label>
+            <select id="client" name="client" class="form-control <%= __errorMap.client ? 'input-error' : '' %>">
+                <option value="">No client / Confidential</option>
+                <% if (clients && clients.length > 0) { %>
+                    <% clients.forEach(client => { %>
+                        <option value="<%= client._id %>" 
+                            <%= (project && project.client && (project.client._id || project.client) == client._id) ? 'selected' : '' %>>
+                            <%= client.name %>
+                        </option>
+                    <% }); %>
+                <% } %>
+            </select>
+            <small>You can leave this blank for anonymous or internal projects. If needed, <a href="/admin/clients/new" target="_blank">add a new client</a>.</small>
+            <% if (__errorMap.client) { %><div class="field-error"><%= __errorMap.client[0] %></div><% } %>
         </div>
 
+        <!-- Success Snippet -->
         <div class="form-group">
-            <label for="technologiesUsed">Technologies Used (Optional)</label>
-            <input type="text" id="technologiesUsed" name="technologiesUsed" value="<%= project && project.technologiesUsed ? (Array.isArray(project.technologiesUsed) ? project.technologiesUsed.join(', ') : project.technologiesUsed) : '' %>" placeholder="e.g., Make.com, OpenAI GPT-4, Airtable">
-            <small>Comma-separated list of key technologies.</small>
+            <label for="successSnippet">Success Snippet</label>
+            <textarea id="successSnippet" name="successSnippet" class="form-control" rows="3" placeholder="Brief description of project success or impact..."><%= project.successSnippet || '' %></textarea>
+            <small>Optional: A brief description of the project's success or impact (max 500 characters).</small>
         </div>
 
+        <!-- Services -->
         <div class="form-group">
-            <label for="projectDate">Project Completion Date (Optional)</label>
-            <input type="date" id="projectDate" name="projectDate" value="<%= project && project.projectDate ? new Date(project.projectDate).toISOString().split('T')[0] : '' %>">
+            <label for="services">Services (comma-separated)</label>
+            <input type="text" id="services" name="services" value="<%= project && project.services ? project.services : '' %>" placeholder="e.g., workflow automation, rpa, data integration">
+            <small>Shown in the Project Snapshot. Example: workflow automation, rpa, data integration</small>
         </div>
 
+        <!-- Key Results -->
         <div class="form-group">
-            <input type="checkbox" id="isFeatured" name="isFeatured" value="true" <%= (project && project.isFeatured) ? 'checked' : '' %>>
-            <label for="isFeatured" class="checkbox-label">Feature this project?</label>
-            <small style="display: block;">Check to mark as featured (e.g., on homepage).</small>
+            <label>Key Results</label>
+            <div id="keyResultsContainer">
+                <% if (project && project.keyResults && project.keyResults.length) { %>
+                    <% project.keyResults.forEach(function(kr, idx) { %>
+                        <div class="kr-row" style="display:flex; gap:8px; margin-bottom:8px; align-items:center;">
+                            <input type="text" name="keyResultsValues" value="<%= kr.value %>" placeholder="Value (e.g., 3x)" style="flex:0 0 140px;">
+                            <input type="text" name="keyResultsLabels" value="<%= kr.label %>" placeholder="Label (e.g., Productivity)" style="flex:1;">
+                            <button type="button" class="delete-btn" onclick="this.parentElement.remove()">Remove</button>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="kr-row" style="display:flex; gap:8px; margin-bottom:8px; align-items:center;">
+                        <input type="text" name="keyResultsValues" placeholder="Value (e.g., 3x)" style="flex:0 0 140px;">
+                        <input type="text" name="keyResultsLabels" placeholder="Label (e.g., Productivity)" style="flex:1;">
+                        <button type="button" class="delete-btn" onclick="this.parentElement.remove()">Remove</button>
+                    </div>
+                <% } %>
+            </div>
+            <button type="button" class="cta-button secondary-btn" id="addKeyResultBtn" style="margin-top:6px;">Add Result</button>
+            <small>Displayed as "Measurable Impact" on the public page.</small>
         </div>
 
-        <div class="form-group">
-            <input type="checkbox" id="isPubliclyVisible" name="isPubliclyVisible" value="true" <%= (typeof project !== 'undefined' && project.isPubliclyVisible !== undefined) ? (project.isPubliclyVisible ? 'checked' : '') : 'checked' %>>
-            <label for="isPubliclyVisible" class="checkbox-label">Make publicly visible?</label>
-            <small style="display: block;">Uncheck to hide from public site without deleting. Checked by default for new projects.</small>
+        <!-- Toggles -->
+    <div class="form-group <%= __errorMap.isFeatured ? 'has-error' : '' %>">
+            <div class="checkbox-inline">
+                <input type="checkbox" id="isFeatured" name="isFeatured" <%= project.isFeatured ? 'checked' : '' %> class="<%= __errorMap.isFeatured ? 'input-error' : '' %>">
+                <label for="isFeatured" class="<%= __errorMap.isFeatured ? 'label-error' : '' %>">Feature this Project</label>
+            </div>
+            <% if (__errorMap.isFeatured) { %><div class="field-error"><%= __errorMap.isFeatured[0] %></div><% } %>
+        </div>
+        <div class="form-group <%= __errorMap.isPubliclyVisible ? 'has-error' : '' %>">
+            <div class="checkbox-inline">
+                <input type="checkbox" id="isPubliclyVisible" name="isPubliclyVisible" <%= project.isPubliclyVisible ? 'checked' : '' %> class="<%= __errorMap.isPubliclyVisible ? 'input-error' : '' %>">
+                <label for="isPubliclyVisible" class="<%= __errorMap.isPubliclyVisible ? 'label-error' : '' %>">Make Publicly Visible</label>
+            </div>
+            <% if (__errorMap.isPubliclyVisible) { %><div class="field-error"><%= __errorMap.isPubliclyVisible[0] %></div><% } %>
+        </div>
+        <div class="form-group <%= __errorMap.isFeaturedOnHomepage ? 'has-error' : '' %>">
+            <div class="checkbox-inline">
+                <input type="checkbox" id="isFeaturedOnHomepage" name="isFeaturedOnHomepage" <%= project.isFeaturedOnHomepage ? 'checked' : '' %> class="<%= __errorMap.isFeaturedOnHomepage ? 'input-error' : '' %>">
+                <label for="isFeaturedOnHomepage" class="<%= __errorMap.isFeaturedOnHomepage ? 'label-error' : '' %>">Feature on Homepage</label>
+            </div>
+            <% if (__errorMap.isFeaturedOnHomepage) { %><div class="field-error"><%= __errorMap.isFeaturedOnHomepage[0] %></div><% } %>
         </div>
 
         <div class="form-actions">
@@ -110,6 +218,12 @@
 
 <%# TinyMCE Initialization Script %>
 <script src="https://cdn.tiny.cloud/1/<%= typeof tinymceApiKey !== 'undefined' ? tinymceApiKey : 'no-api-key' %>/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<!-- Choices.js for enhanced multi-selects -->
+<link rel="stylesheet" href="/vendor/choices/choices.min.css" />
+<script src="/vendor/choices/choices.min.js"></script>
+<!-- Flatpickr for a consistent calendar UI (progressive enhancement) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const checkTinyMCE = setInterval(() => {
@@ -124,9 +238,16 @@
             selector: 'textarea#project-description-editor', // Target the project description editor
             promotion: false,
             plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount codesample',
-            toolbar: 'undo redo | blocks | bold italic underline strikethrough | link image media table | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | code codesample | preview fullscreen | help',
-            content_style: 'body { font-family:Montserrat,Arial,sans-serif; font-size:16px; line-height: 1.7; color: #ccc; background-color: #2d2d2d; } a { color: #00a8e8; } code { background-color: rgba(255,255,255,0.1); padding: 0.1em 0.3em; border-radius: 3px; } pre code { background-color: transparent; padding: 0;}',
-            height: 400, // Adjusted height if different from blog
+            toolbar: 'undo redo | blocks | bold italic underline strikethrough | link image media table | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | styles | code codesample | preview fullscreen | help',
+            content_style: 'body { font-family:Montserrat,Arial,sans-serif; font-size:16px; line-height: 1.7; color: #ccc; background-color: #2d2d2d; } a { color: #00a8e8; } code { background-color: rgba(255,255,255,0.1); padding: 0.1em 0.3em; border-radius: 3px; } pre code { background-color: transparent; padding: 0;} .callout,.info,.warning,.tip{padding:1rem 1.125rem;border-radius:.5rem;margin:1rem 0;border:1px solid transparent}.callout{background:rgba(0,168,232,.08);border-color:rgba(0,168,232,.35)}.info{background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.35)}.warning{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.4)}.tip{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.4)} .callout-title{font-weight:700;margin-bottom:.25rem}',
+            style_formats: [
+                { title: 'Callout', block: 'div', classes: 'callout', wrapper: true },
+                { title: 'Info', block: 'div', classes: 'info', wrapper: true },
+                { title: 'Warning', block: 'div', classes: 'warning', wrapper: true },
+                { title: 'Tip', block: 'div', classes: 'tip', wrapper: true },
+                { title: 'Callout Title', inline: 'strong', classes: 'callout-title' }
+            ],
+            height: 600, // Taller editor for better editing comfort
             menubar: false,
             statusbar: true,
             skin: (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'oxide-dark' : 'oxide', // Auto dark/light mode
@@ -185,6 +306,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const uploadStatusDiv = document.getElementById('projectCoverImageUploadStatus');
     const removeCoverImageBtn = document.getElementById('removeProjectCoverImageBtn'); // Button for an initially loaded image
     const form = document.getElementById('projectForm'); // Ensure the form has this ID
+    const addKeyResultBtn = document.getElementById('addKeyResultBtn');
+    const keyResultsContainer = document.getElementById('keyResultsContainer');
 
     // Helper function to re-attach event listener to a dynamically created remove button
     function attachRemoveListener(buttonId) {
@@ -265,8 +388,79 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!previewContainer) console.warn("Preview container 'projectCoverImagePreviewContainer' not found.");
         if (!uploadStatusDiv) console.warn("Upload status div 'projectCoverImageUploadStatus' not found.");
     }
+
+    // Add Key Result row
+    if (addKeyResultBtn && keyResultsContainer) {
+        addKeyResultBtn.addEventListener('click', () => {
+            const row = document.createElement('div');
+            row.className = 'kr-row';
+            row.style.cssText = 'display:flex; gap:8px; margin-bottom:8px; align-items:center;';
+            row.innerHTML = `
+                <input type="text" name="keyResultsValues" placeholder="Value (e.g., 120%)" style="flex:0 0 140px;">
+                <input type="text" name="keyResultsLabels" placeholder="Label (e.g., Efficiency Increase)" style="flex:1;">
+                <button type="button" class="delete-btn">Remove</button>
+            `;
+            keyResultsContainer.appendChild(row);
+        });
+        }
+
+    // Remove inline row removal, use delegated event listener
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('delete-btn')) {
+            const row = e.target.closest('.kr-row');
+            if (row) row.remove();
+        }
+    });
 });
 </script>
 <%# ****** END JAVASCRIPT FOR PROJECT COVER IMAGE UPLOAD ****** %>
+
+    <script>
+    // Enhance multi-selects and date input after DOM load
+    document.addEventListener('DOMContentLoaded', () => {
+        // Choices.js for Industries and Service Types
+        const industriesSelect = document.getElementById('industries');
+        const serviceTypesSelect = document.getElementById('serviceTypes');
+        if (window.Choices) {
+            try {
+                if (industriesSelect) {
+                    new Choices(industriesSelect, {
+                        removeItemButton: true,
+                        shouldSort: false,
+                        itemSelectText: ''
+                    });
+                }
+                if (serviceTypesSelect) {
+                    new Choices(serviceTypesSelect, {
+                        removeItemButton: true,
+                        shouldSort: false,
+                        itemSelectText: ''
+                    });
+                }
+            } catch (e) {
+                console.warn('Choices.js init failed:', e);
+            }
+        }
+
+        // Flatpickr for Completion Date (keeps underlying value as YYYY-MM-DD)
+        const dateInput = document.getElementById('projectDate');
+        if (dateInput && window.flatpickr) {
+            try {
+                    const fp = flatpickr(dateInput, {
+                        dateFormat: 'Y-m-d', // submitted value
+                        altInput: true,      // pretty display
+                        altFormat: 'M j, Y',
+                        allowInput: true,
+                        clickOpens: true,
+                        disableMobile: true // ensure Flatpickr shows instead of native pickers
+                    });
+                    // Open on focus to hint users there's a calendar
+                    dateInput.addEventListener('focus', () => { try { fp.open(); } catch(_){} });
+            } catch (e) {
+                console.warn('Flatpickr init failed:', e);
+            }
+        }
+    });
+    </script>
 
 <%- include('../partials/footer') %>

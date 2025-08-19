@@ -1,8 +1,8 @@
 // models/AdminUser.js (ESM Version)
 
-import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs'; // Use ESM import for bcryptjs
-import { logger } from '../config/logger.js'; // Adjust path, add .js extension
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs'); // Use CommonJS require for bcryptjs
+const { logger } = require('../config/logger.js'); // Adjust path, add .js extension
 
 const Schema = mongoose.Schema;
 
@@ -54,7 +54,13 @@ const AdminUserSchema = new Schema(
         },
         lockUntil: {
             type: Date // Timestamp indicating when the account lock expires
-        }
+    },
+    // Optional public profile fields for author bios
+    title: { type: String, trim: true, maxlength: 120 },
+    bio: { type: String, trim: true, maxlength: 1000 },
+    avatarUrl: { type: String, trim: true },
+    linkedinUrl: { type: String, trim: true },
+    twitterUrl: { type: String, trim: true }
         // Optional: Add fields like 'fullName', 'isActive' flag, etc. if needed
         // fullName: { type: String, trim: true },
         // isActive: { type: Boolean, default: true }
@@ -126,4 +132,4 @@ AdminUserSchema.methods.isLocked = function() {
 const AdminUser = mongoose.models.AdminUser || mongoose.model('AdminUser', AdminUserSchema);
 
 // Use ESM default export
-export default AdminUser;
+module.exports = AdminUser;

@@ -1,15 +1,13 @@
 // config/logger.js (ESM Version)
 
 // Import necessary modules using ESM syntax
-import winston from 'winston';
-import path from 'path'; // Node.js core module
-import { fileURLToPath } from 'url'; // For replicating __dirname
-import morgan from 'morgan'; // For HTTP request logging
+const winston = require('winston');
+const path = require('path');
+const morgan = require('morgan');
 
 // --- ESM __dirname and __filename equivalent ---
 // Needed for constructing file paths if using file transport
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// __dirname is available in CommonJS
 
 // --- Winston Configuration ---
 
@@ -132,4 +130,4 @@ const httpLoggerMiddleware = morgan(
 
 // --- Exports ---
 // Use named exports for ESM
-export { logger, httpLoggerMiddleware };
+module.exports = { logger, httpLoggerMiddleware };

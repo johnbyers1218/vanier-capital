@@ -7,108 +7,166 @@
     path: '/services' /* Pass path for active nav highlighting */
 }) %>
 
-<!-- Page Header -->
-<section class="page-header">
+<!-- Structured Data: Service (generic umbrella) -->
+<script type="application/ld+json">
+<%- JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": "AI and Process Automation Services",
+    "provider": {
+        "@type": "Organization",
+        "name": "FND Automations",
+        "url": "https://www.fndautomations.com/",
+        "logo": "https://www.fndautomations.com/images/FND_LOGO_SVG_BLACK.svg"
+    },
+    "areaServed": "Global",
+    "serviceType": [
+        "Process Automation",
+        "AI Integration",
+        "Custom Software",
+        "Data Analytics",
+        "Security Automation",
+        "Automation Consulting"
+    ]
+}, null, 2) %>
+</script>
+
+<!-- Page Header / Services Hero -->
+<section id="services-hero" class="section services-hero-section">
     <div class="container">
-        <h1>Our Services</h1>
-        <div class="breadcrumbs">
-            <a href="/">Home</a> <span class="separator">/</span> <span class="current">Services</span>
+        <div class="services-hero">
+            <!-- Left: Headline + Copy -->
+            <div class="services-hero-copy">
+                <p class="eyebrow">Our Services</p>
+                <h1 class="hero-title-text">Empowering Your Business</h1>
+                <p class="hero-sub-text">We craft automation and AI solutions that streamline operations, reduce manual work, and unlock measurable growth—tailored precisely to your goals and stack.</p>
+                <div class="hero-actions">
+                    <a href="#services-grid-details" class="cta-button primary-btn glow-button">Explore Core Services</a>
+                    <a href="/contact" class="cta-button secondary-btn">Talk to an Expert</a>
+                </div>
+            </div>
+            <!-- Right: Abstract Visual (decorative) -->
+            <div class="automation-visual" aria-hidden="true">
+                <svg class="automation-visual-svg" viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg" role="img">
+                    <defs>
+                        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#00a8e8" stop-opacity="0.95"/>
+                            <stop offset="100%" stop-color="#0077b6" stop-opacity="0.85"/>
+                        </linearGradient>
+                        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                            <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+                            <feMerge>
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <g fill="none" stroke="url(#grad)" stroke-width="1.5" opacity="0.9">
+                        <path d="M30,300 C120,200 180,260 260,200 S400,120 450,160" stroke-dasharray="4 6"/>
+                        <path d="M20,220 C110,140 180,160 260,120 S390,70 470,110" stroke-dasharray="3 7" opacity="0.6"/>
+                        <path d="M10,150 C120,110 180,100 250,80 S380,50 470,60" stroke-dasharray="2 6" opacity="0.45"/>
+                    </g>
+                    <g fill="#00a8e8" filter="url(#glow)">
+                        <circle cx="90" cy="240" r="5"/>
+                        <circle cx="170" cy="210" r="4"/>
+                        <circle cx="240" cy="170" r="6"/>
+                        <circle cx="320" cy="140" r="4"/>
+                        <circle cx="400" cy="130" r="5"/>
+                    </g>
+                </svg>
+            </div>
         </div>
     </div>
-</section>
-
-<!-- Services Intro Section -->
-<section id="services-intro" class="section services-intro-section">
-    <div class="container section-header">
-        <h2 class="section-title">Empowering Your Business</h2>
-        <p class="section-description">We offer a tailored suite of automation and AI services designed to tackle your specific challenges, streamline operations, increase efficiency, and unlock new growth opportunities.</p>
-    </div>
+    <!-- Subtle contrasting band to introduce next section -->
+    <div class="section-separator" aria-hidden="true"></div>
+    
 </section>
 
 <!-- Services Grid Section - Detailed Offerings -->
-<section id="services-grid-details" class="section section-darker">
+<section id="services-grid-details" class="section">
     <div class="container">
-         <div class="section-header" style="margin-bottom: 3rem;">
+         <div class="section-header" style="margin-bottom: 1.75rem;">
              <h2 class="section-title">Core Automation & AI Services</h2>
+             <p class="section-description">Our core capabilities are the foundation for faster delivery, lower risk, and scalable results.</p>
          </div>
-        <div class="grid-container grid-3-col">
+        <div class="grid-container grid-3-col services-grid">
 
             <!-- Service Card 1: Process Automation -->
-            <div id="process-automation" class="content-card service-card">
-                <div class="card-icon"><i class="fas fa-cogs fa-fw"></i></div> <!-- Changed Icon -->
-                <h3>Process Automation</h3>
-                <p>Eliminate bottlenecks and manual work. We analyze your workflows and implement robust automations using platforms like Make.com and n8n to connect apps, move data, and significantly boost team productivity.</p>
-                <ul style="text-align: left; font-size: 0.9rem; margin-top: auto; padding-top: 1rem;">
-                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Workflow Optimization</li>
-                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Repetitive Task Handling</li>
-                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Error Rate Reduction</li>
+            <div id="process-automation" class="content-card service-card core-service">
+                <div class="card-icon icon-wrap"><i class="fas fa-cogs fa-fw"></i></div>
+                <h3 class="service-title">Process Automation</h3>
+                <p class="service-summary">Eliminate bottlenecks and manual work with intelligent workflows. We connect platforms like Make.com and n8n to orchestrate processes and boost productivity.</p>
+                <ul class="service-list">
+                    <li><i class="fas fa-check-circle"></i> Workflow Optimization</li>
+                    <li><i class="fas fa-check-circle"></i> Repetitive Task Handling</li>
+                    <li><i class="fas fa-check-circle"></i> Error Rate Reduction</li>
                 </ul>
-                <!-- <a href="/contact?subject=Process%20Automation%20Inquiry" class="card-link" style="margin-top: 1rem;">Learn More →</a> -->
+                <a href="/contact?subject=Process%20Automation%20Inquiry" class="card-link learn-more">Learn More →</a>
             </div>
 
             <!-- Service Card 2: AI Integration & Solutions -->
-             <div id="ai-integration" class="content-card service-card">
-                 <div class="card-icon"><i class="fas fa-brain fa-fw"></i></div>
-                 <h3>AI Integration & Solutions</h3>
-                 <p>Leverage the power of Artificial Intelligence. We integrate cutting-edge models (like GPT, Claude) for intelligent document processing (invoice/data extraction), AI-powered customer service chatbots, content generation, and advanced data analysis.</p>
-                  <ul style="text-align: left; font-size: 0.9rem; margin-top: auto; padding-top: 1rem;">
-                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Intelligent Document Processing</li>
-                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Custom AI Chatbots</li>
-                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Data-driven Insights</li>
+             <div id="ai-integration" class="content-card service-card core-service">
+                 <div class="card-icon icon-wrap"><i class="fas fa-brain fa-fw"></i></div>
+                 <h3 class="service-title">AI Integration Solutions</h3>
+                 <p class="service-summary">Leverage GPT, Claude, and vector search for intelligent document processing, customer support, and decision support.</p>
+                 <ul class="service-list">
+                    <li><i class="fas fa-check-circle"></i> Intelligent Document Processing</li>
+                    <li><i class="fas fa-check-circle"></i> Custom AI Chatbots</li>
+                    <li><i class="fas fa-check-circle"></i> Data‑driven Insights</li>
                 </ul>
-                 <!-- <a href="/contact?subject=AI%20Integration%20Inquiry" class="card-link" style="margin-top: 1rem;">Learn More →</a> -->
+                 <a href="/contact?subject=AI%20Integration%20Inquiry" class="card-link learn-more">Learn More →</a>
              </div>
 
             <!-- Service Card 3: Custom Software & Integration -->
-             <div id="custom-solutions" class="content-card service-card">
-                 <div class="card-icon"><i class="fas fa-laptop-code fa-fw"></i></div>
-                 <h3>Custom Software & Systems</h3>
-                 <p>When off-the-shelf tools aren't enough, we build bespoke software applications and complex integrations. We connect your essential systems (CRMs, ERPs, databases like Airtable, external APIs) to create seamless workflows.</p>
-                 <ul style="text-align: left; font-size: 0.9rem; margin-top: auto; padding-top: 1rem;">
-                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Tailored Application Development</li>
-                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> API Integration & Development</li>
-                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Database Design (Airtable, etc.)</li>
+             <div id="custom-solutions" class="content-card service-card core-service">
+                 <div class="card-icon icon-wrap"><i class="fas fa-laptop-code fa-fw"></i></div>
+                 <h3 class="service-title">Custom Software</h3>
+                 <p class="service-summary">Bespoke applications and robust integrations that connect CRMs, ERPs, and data platforms into seamless workflows.</p>
+                 <ul class="service-list">
+                    <li><i class="fas fa-check-circle"></i> Tailored Application Development</li>
+                    <li><i class="fas fa-check-circle"></i> API Integration & Development</li>
+                    <li><i class="fas fa-check-circle"></i> Database Design (Airtable, etc.)</li>
                 </ul>
-                  <!-- <a href="/contact?subject=Custom%20Solution%20Inquiry" class="card-link" style="margin-top: 1rem;">Learn More →</a> -->
+                <a href="/contact?subject=Custom%20Solution%20Inquiry" class="card-link learn-more">Learn More →</a>
              </div>
 
             <!-- Service Card 4: Data Analytics & Reporting -->
             <div class="content-card service-card">
-                <div class="card-icon"><i class="fas fa-chart-pie fa-fw"></i></div>
-                <h3>Data Analytics & Reporting</h3>
-                <p>Turn your raw data into a strategic asset. We design and implement automated reporting dashboards, perform data analysis, and help you extract actionable insights for better, faster decision-making.</p>
-                 <ul style="text-align: left; font-size: 0.9rem; margin-top: auto; padding-top: 1rem;">
-                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Automated Dashboards</li>
-                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Performance Tracking (KPIs)</li>
-                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Trend Analysis & Forecasting</li>
+                <div class="card-icon icon-wrap alt"><i class="fas fa-chart-pie fa-fw"></i></div>
+                <h3 class="service-title">Data Analytics Solutions</h3>
+                <p class="service-summary">Turn raw data into clear dashboards and decision-ready insights with automated reporting.</p>
+                 <ul class="service-list">
+                    <li><i class="fas fa-check-circle"></i> Automated Dashboards</li>
+                    <li><i class="fas fa-check-circle"></i> Performance Tracking (KPIs)</li>
+                    <li><i class="fas fa-check-circle"></i> Trend Analysis & Forecasting</li>
                 </ul>
-                 <!-- <a href="/contact?subject=Data%20Analytics%20Inquiry" class="card-link" style="margin-top: 1rem;">Learn More →</a> -->
+                <a href="/contact?subject=Data%20Analytics%20Inquiry" class="card-link learn-more">Learn More →</a>
             </div>
 
             <!-- Service Card 5: Cybersecurity Automation (Optional - Keep if offered) -->
             <div class="content-card service-card">
-                <div class="card-icon"><i class="fas fa-shield-alt fa-fw"></i></div>
-                <h3>Security & Compliance Automation</h3>
-                <p>Enhance your security posture by automating critical tasks like vulnerability scanning coordination, compliance reporting generation, user access reviews, and security alert triage.</p>
-                <ul style="text-align: left; font-size: 0.9rem; margin-top: auto; padding-top: 1rem;">
-                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Compliance Automation</li>
-                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Security Workflow Orchestration</li>
-                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Automated Alerting</li>
+                <div class="card-icon icon-wrap alt"><i class="fas fa-shield-alt fa-fw"></i></div>
+                <h3 class="service-title">Security Automation</h3>
+                <p class="service-summary">Automate compliance checks, access reviews, and alert routing to elevate your security posture.</p>
+                <ul class="service-list">
+                    <li><i class="fas fa-check-circle"></i> Compliance Automation</li>
+                    <li><i class="fas fa-check-circle"></i> Security Workflow Orchestration</li>
+                    <li><i class="fas fa-check-circle"></i> Automated Alerting</li>
                 </ul>
-                 <!-- <a href="/contact?subject=Security%20Automation%20Inquiry" class="card-link" style="margin-top: 1rem;">Learn More →</a> -->
+                <a href="/contact?subject=Security%20Automation%20Inquiry" class="card-link learn-more">Learn More →</a>
             </div>
 
             <!-- Service Card 6: Automation Consulting -->
              <div class="content-card service-card">
-                 <div class="card-icon"><i class="fas fa-comments fa-fw"></i></div>
-                 <h3>Automation Consulting & Strategy</h3>
-                 <p>Unsure where to begin or how to maximize ROI? Our consulting services help you identify high-impact automation opportunities, assess technical feasibility, select the optimal tools, and develop a strategic implementation plan.</p>
-                  <ul style="text-align: left; font-size: 0.9rem; margin-top: auto; padding-top: 1rem;">
-                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Opportunity Assessment</li>
-                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Technology Stack Evaluation</li>
-                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Phased Rollout Planning</li>
+                 <div class="card-icon icon-wrap alt"><i class="fas fa-comments fa-fw"></i></div>
+                 <h3 class="service-title">Automation Consulting</h3>
+                 <p class="service-summary">Pinpoint high‑ROI opportunities and plan phased rollouts with clear milestones and success metrics.</p>
+                 <ul class="service-list">
+                    <li><i class="fas fa-check-circle"></i> Opportunity Assessment</li>
+                    <li><i class="fas fa-check-circle"></i> Technology Stack Evaluation</li>
+                    <li><i class="fas fa-check-circle"></i> Phased Rollout Planning</li>
                 </ul>
-                  <!-- <a href="/contact?subject=Automation%20Consulting%20Inquiry" class="card-link" style="margin-top: 1rem;">Learn More →</a> -->
+                <a href="/contact?subject=Automation%20Consulting%20Inquiry" class="card-link learn-more">Learn More →</a>
              </div>
 
         </div> <!-- /.grid-container -->
@@ -122,82 +180,115 @@
             <h2 class="section-title">Our Collaborative Approach</h2>
             <p class="section-description">We follow a transparent, structured process focused on partnership and delivering measurable value.</p>
         </div>
-        <!-- Using grid for better responsiveness -->
-        <div class="process-steps-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-top: 3rem; position: relative;">
-            <!-- Optional Connector Line (CSS pseudo-element on grid container could do this) -->
-             <div class="process-step" style="text-align: center; position: relative;">
-                 <div class="step-number" style="width: 60px; height: 60px; background-color: var(--darker-bg); color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 700; margin: 0 auto 1rem; border: 3px solid var(--primary-color); box-shadow: 0 0 15px rgba(0, 168, 232, 0.2);">1</div>
-                 <h3 style="font-size: 1.2rem;">Discovery</h3>
-                 <p style="font-size: 0.9rem;">Deep dive into your goals, challenges, and current processes via collaborative workshops.</p>
-             </div>
-             <div class="process-step" style="text-align: center; position: relative;">
-                <div class="step-number" style="width: 60px; height: 60px; background-color: var(--darker-bg); color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 700; margin: 0 auto 1rem; border: 3px solid var(--primary-color); box-shadow: 0 0 15px rgba(0, 168, 232, 0.2);">2</div>
-                <h3 style="font-size: 1.2rem;">Strategy & Design</h3>
-                 <p style="font-size: 0.9rem;">Identify key automation opportunities, select tools, and design the optimal solution architecture.</p>
-             </div>
-            <div class="process-step" style="text-align: center; position: relative;">
-                <div class="step-number" style="width: 60px; height: 60px; background-color: var(--darker-bg); color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 700; margin: 0 auto 1rem; border: 3px solid var(--primary-color); box-shadow: 0 0 15px rgba(0, 168, 232, 0.2);">3</div>
-                 <h3 style="font-size: 1.2rem;">Implementation</h3>
-                 <p style="font-size: 0.9rem;">Agile development and configuration of the automation solution with regular check-ins.</p>
-             </div>
-             <div class="process-step" style="text-align: center; position: relative;">
-                <div class="step-number" style="width: 60px; height: 60px; background-color: var(--darker-bg); color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 700; margin: 0 auto 1rem; border: 3px solid var(--primary-color); box-shadow: 0 0 15px rgba(0, 168, 232, 0.2);">4</div>
-                <h3 style="font-size: 1.2rem;">Testing & Launch</h3>
-                 <p style="font-size: 0.9rem;">Rigorous testing, quality assurance, user acceptance, and smooth deployment.</p>
-             </div>
-            <div class="process-step" style="text-align: center; position: relative;">
-                <div class="step-number" style="width: 60px; height: 60px; background-color: var(--darker-bg); color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 700; margin: 0 auto 1rem; border: 3px solid var(--primary-color); box-shadow: 0 0 15px rgba(0, 168, 232, 0.2);">5</div>
-                 <h3 style="font-size: 1.2rem;">Support & Evolution</h3>
-                 <p style="font-size: 0.9rem;">Comprehensive training, ongoing support packages, and continuous improvement planning.</p>
-             </div>
-        </div>
+          <!-- Connected steps with subtle line and animated micro-interactions -->
+          <div class="process-steps-grid connected">
+                 <div class="process-step">
+                      <div class="step-number">1</div>
+                      <h3>Discovery</h3>
+                      <p>Deep dive into your goals, challenges, and current processes via collaborative workshops.</p>
+                 </div>
+                 <div class="process-step">
+                     <div class="step-number">2</div>
+                     <h3>Strategy & Design</h3>
+                     <p>Identify key automation opportunities, select tools, and design the optimal solution architecture.</p>
+                 </div>
+                <div class="process-step">
+                     <div class="step-number">3</div>
+                     <h3>Implementation</h3>
+                     <p>Agile development and configuration of the solution with regular check‑ins.</p>
+                 </div>
+                 <div class="process-step">
+                     <div class="step-number">4</div>
+                     <h3>Testing & Launch</h3>
+                     <p>Rigorous testing, UAT, and a smooth deployment plan.</p>
+                 </div>
+                <div class="process-step">
+                     <div class="step-number">5</div>
+                     <h3>Support & Evolution</h3>
+                     <p>Training, ongoing support, and continuous improvement roadmaps.</p>
+                 </div>
+          </div>
     </div>
 </section>
 
 <!-- Industries Served Section (Could be simplified or removed if redundant) -->
 <!-- Kept for now -->
-<section id="industries-served" class="section section-darker">
+<section id="industries-served" class="section">
     <div class="container">
         <div class="section-header">
             <h2 class="section-title">Industries We Empower</h2>
              <p class="section-description">While adaptable to any sector, we bring deep experience to these industries:</p>
         </div>
-        <div class="industries-grid grid-container" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1.5rem;">
-            <div class="industry-item content-card" style="padding: 1.5rem;">
-                <div class="card-icon" style="font-size: 2.5rem; margin-bottom: 1rem;"><i class="fas fa-industry fa-fw"></i></div>
-                <h4 style="font-size: 1rem; color: var(--light-text);">Manufacturing</h4>
-            </div>
-             <div class="industry-item content-card" style="padding: 1.5rem;">
-                <div class="card-icon" style="font-size: 2.5rem; margin-bottom: 1rem;"><i class="fas fa-cash-register fa-fw"></i></div>
-                <h4 style="font-size: 1rem; color: var(--light-text);">Retail & E-commerce</h4>
-            </div>
-            <div class="industry-item content-card" style="padding: 1.5rem;">
-                <div class="card-icon" style="font-size: 2.5rem; margin-bottom: 1rem;"><i class="fas fa-heartbeat fa-fw"></i></div>
-                <h4 style="font-size: 1rem; color: var(--light-text);">Healthcare</h4>
-            </div>
-             <div class="industry-item content-card" style="padding: 1.5rem;">
-                <div class="card-icon" style="font-size: 2.5rem; margin-bottom: 1rem;"><i class="fas fa-university fa-fw"></i></div>
-                <h4 style="font-size: 1rem; color: var(--light-text);">Finance</h4>
-            </div>
-             <div class="industry-item content-card" style="padding: 1.5rem;">
-                 <div class="card-icon" style="font-size: 2.5rem; margin-bottom: 1rem;"><i class="fas fa-users fa-fw"></i></div>
-                 <h4 style="font-size: 1rem; color: var(--light-text);">Professional Services</h4>
-             </div>
-            <div class="industry-item content-card" style="padding: 1.5rem;">
-                <div class="card-icon" style="font-size: 2.5rem; margin-bottom: 1rem;"><i class="fas fa-truck fa-fw"></i></div>
-                <h4 style="font-size: 1rem; color: var(--light-text);">Logistics</h4>
-            </div>
+        <div class="industries-grid grid-container industries-grid-services">
+            <a class="industry-item content-card" href="/projects?industry=Manufacturing" aria-label="Manufacturing case studies">
+                <div class="card-icon xl"><i class="fas fa-industry fa-fw"></i></div>
+                <h4>Manufacturing</h4>
+            </a>
+            <a class="industry-item content-card" href="/projects?industry=Retail%20%26%20E-commerce" aria-label="Retail and E-commerce case studies">
+                <div class="card-icon xl"><i class="fas fa-cash-register fa-fw"></i></div>
+                <h4>Retail & E-commerce</h4>
+            </a>
+            <a class="industry-item content-card" href="/projects?industry=Healthcare" aria-label="Healthcare case studies">
+                <div class="card-icon xl"><i class="fas fa-heartbeat fa-fw"></i></div>
+                <h4>Healthcare</h4>
+            </a>
+            <a class="industry-item content-card" href="/projects?industry=Finance" aria-label="Finance case studies">
+                <div class="card-icon xl"><i class="fas fa-university fa-fw"></i></div>
+                <h4>Finance</h4>
+            </a>
+            <a class="industry-item content-card" href="/projects?industry=Professional%20Services" aria-label="Professional Services case studies">
+                 <div class="card-icon xl"><i class="fas fa-users fa-fw"></i></div>
+                 <h4>Professional Services</h4>
+            </a>
+            <a class="industry-item content-card" href="/projects?industry=Logistics" aria-label="Logistics case studies">
+                <div class="card-icon xl"><i class="fas fa-truck fa-fw"></i></div>
+                <h4>Logistics</h4>
+            </a>
         </div>
     </div>
 </section>
 
 <!-- Final CTA Section -->
-<section id="cta" class="cta-section">
+<section id="cta" class="cta-section cta-strong full-bleed">
      <div class="container">
-         <div class="cta-content">
-             <h2>Ready to Start Automating?</h2>
-             <p>Take the first step towards enhanced efficiency and growth. Contact us for a personalized consultation.</p>
-             <a href="/contact" class="cta-button primary-btn glow-button">Schedule Your Free Consultation</a>
+         <div class="cta-strong-grid">
+            <div class="cta-strong-copy">
+                <h2 class="cta-strong-title">Let's Design Your Automation Roadmap</h2>
+                <p class="cta-strong-description">See how intelligent automation can streamline your operations and compound results month after month.</p>
+                <div class="cta-actions">
+                    <a href="/contact" class="cta-button primary-btn glow-button">Schedule Your Free Consultation</a>
+                    <a href="/projects" class="cta-button secondary-btn">View Case Studies</a>
+                </div>
+            </div>
+            <div class="cta-social-proof">
+                <div class="quote-mark" aria-hidden="true">“</div>
+                <blockquote class="testimonial-quote">
+                    <p><%= servicesTestimonial && servicesTestimonial.quote ? servicesTestimonial.quote : 'FND Automations delivered results beyond our expectations. The impact was immediate and measurable.' %></p>
+                </blockquote>
+                <div class="testimonial-signature">
+                    <% if (servicesTestimonial && servicesTestimonial.clientLogoUrl) { %>
+                        <img class="client-logo" src="<%= servicesTestimonial.clientLogoUrl %>" alt="<%= servicesTestimonial.clientName || servicesTestimonial.company || 'Client' %> logo" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.querySelector('.client-badge').style.display='inline'" />
+                    <% } else { %>
+                        <!-- No logo available, hide img and show fallback badge via inline style below -->
+                        <img class="client-logo" src="" alt="" style="display:none" />
+                    <% } %>
+                    <div class="sig-meta">
+                        <% const __badgeLabel = (servicesTestimonial && (servicesTestimonial.clientName || servicesTestimonial.company)) ? (servicesTestimonial.clientName || servicesTestimonial.company) : 'Client'; %>
+                        <% const __showBadge = !(servicesTestimonial && servicesTestimonial.clientLogoUrl); %>
+                        <% if (__showBadge) { %>
+                            <div class="client-badge" aria-label="<%= __badgeLabel %>">
+                                <%= __badgeLabel %>
+                            </div>
+                        <% } %>
+                        <div class="author-meta">
+                            <%= servicesTestimonial && servicesTestimonial.author ? servicesTestimonial.author : 'Client Leader' %>
+                            <% if (servicesTestimonial && (servicesTestimonial.position || servicesTestimonial.company)) { %>
+                                — <%= [servicesTestimonial.position, servicesTestimonial.company].filter(Boolean).join(', ') %>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
          </div>
      </div>
 </section>

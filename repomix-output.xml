@@ -1,0 +1,3557 @@
+This file is a merged representation of a subset of the codebase, containing specifically included files, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of a subset of the repository's contents that is considered the most important context.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Only files matching these patterns are included: views/404.ejs, views/about.ejs, views/blog-index.ejs, views/blog-post.ejs, views/contact.ejs, views/index.ejs, views/privacy-policy.ejs, views/project-single.ejs, views/projects.ejs, views/public-error.ejs, views/services.ejs, views/terms-of-service.ejs, views/testimonials.ejs, views/partials/pagination.ejs, views/partials/header.ejs, views/partials/footer.ejs, public/js/apps.js
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+public/js/apps.js
+views/404.ejs
+views/about.ejs
+views/blog-index.ejs
+views/blog-post.ejs
+views/contact.ejs
+views/index.ejs
+views/partials/footer.ejs
+views/partials/header.ejs
+views/partials/pagination.ejs
+views/privacy-policy.ejs
+views/project-single.ejs
+views/projects.ejs
+views/public-error.ejs
+views/services.ejs
+views/terms-of-service.ejs
+views/testimonials.ejs
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="views/404.ejs">
+<!-- views/404.ejs -->
+<%# Custom 404 Page Not Found %>
+
+<%- include('partials/header', {
+    pageTitle: 'Page Not Found (404)',
+    pageDescription: 'The page you were looking for could not be found on FND Automations.',
+    path: '/404' <!-- Special path for potential styling/logic -->
+}) %>
+
+<!-- Main Content Section for Error -->
+<section class="section error-section" style="padding: 4rem 0;"> <!-- Add padding -->
+    <div class="container error-content-wrapper">
+        <div class="error-container">
+            <div class="error-code">404</div>
+            <h2 class="error-message">Oops! Page Not Found</h2>
+            <p class="error-description">
+                Sorry, the page you are looking for might have been removed, had its name changed,
+                or is temporarily unavailable. Please check the URL or use the navigation below.
+            </p>
+
+            <!-- Button back to homepage -->
+            <a href="/" class="cta-button primary-btn glow-button">
+                <i class="fas fa-home"></i> Return to Homepage
+            </a>
+
+            <!-- Quick navigation links -->
+            <div class="navigation-links">
+                <a href="/services">Our Services</a>
+                <a href="/projects">View Projects</a>
+                <a href="/blog">Read Blog</a>
+                <a href="/contact">Contact Us</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<%- include('partials/footer') %>
+
+<!-- Ensure error page styles from style.css are sufficient -->
+</file>
+
+<file path="views/blog-index.ejs">
+<!-- views/blog-index.ejs -->
+<%# Public Blog Listing Page %>
+
+<%- include('partials/header', {
+    pageTitle: 'Blog - FND Automations',
+    pageDescription: 'Read the latest insights on AI, automation, business efficiency, and technology trends from FND Automations.',
+    path: '/blog'
+}) %>
+
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <h1>Blog</h1>
+    </div>
+</section>
+
+<!-- Blog Introduction Section -->
+<section class="blog-intro-section">
+    <div class="container">
+        <div class="blog-intro-content">
+            <p class="blog-intro-text">
+                Discover cutting-edge insights and proven strategies from our team of automation experts. 
+                Explore how AI and intelligent automation are transforming businesses across industries, 
+                and learn actionable approaches to drive efficiency, growth, and competitive advantage in your organization.
+            </p>
+            <div class="blog-intro-stats">
+                <div class="intro-stat">
+                    <span class="stat-number">50+</span>
+                    <span class="stat-label">Expert Articles</span>
+                </div>
+                <div class="intro-stat">
+                    <span class="stat-number">1000+</span>
+                    <span class="stat-label">Business Leaders Informed</span>
+                </div>
+                <div class="intro-stat">
+                    <span class="stat-number">5</span>
+                    <span class="stat-label">Years of Industry Expertise</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Blog Content Section -->
+<section class="section blog-posts-section">
+    <div class="container">
+
+        <!-- Filter Navigation -->
+        <nav class="filter-navigation blog-filter-navigation" role="navigation" aria-label="Blog categories">
+            <div class="filter-group">
+                <button class="filter-btn active" data-filter="all" aria-pressed="true">
+                    <span class="filter-label">All Posts</span>
+                    <span class="filter-count" data-count="all">—</span>
+                </button>
+                <button class="filter-btn" data-filter="automation" aria-pressed="false">
+                    <span class="filter-label">Automation</span>
+                    <span class="filter-count" data-count="automation">—</span>
+                </button>
+                <button class="filter-btn" data-filter="ai" aria-pressed="false">
+                    <span class="filter-label">AI & Machine Learning</span>
+                    <span class="filter-count" data-count="ai">—</span>
+                </button>
+                <button class="filter-btn" data-filter="business" aria-pressed="false">
+                    <span class="filter-label">Business Strategy</span>
+                    <span class="filter-count" data-count="business">—</span>
+                </button>
+                <button class="filter-btn" data-filter="technology" aria-pressed="false">
+                    <span class="filter-label">Technology</span>
+                    <span class="filter-count" data-count="technology">—</span>
+                </button>
+                <button class="filter-btn" data-filter="case-studies" aria-pressed="false">
+                    <span class="filter-label">Case Studies</span>
+                    <span class="filter-count" data-count="case-studies">—</span>
+                </button>
+            </div>
+        </nav>
+
+        <% if (posts && posts.length > 0) { %>
+            <!-- Blog Post Grid -->
+            <div class="grid-container grid-3-col blog-list"> <%# Use 3 columns for blog list %>
+                <% posts.forEach(post => { %>
+                    <article class="content-card blog-post-summary" data-tags="<%= post.tags ? post.tags.join(',') : '' %>">
+                        <%# Featured Image Link %>
+                        <% if (post.featuredImage) { %>
+                          <a href="/blog/<%= post.slug %>" class="blog-post-image-link" aria-hidden="true" tabindex="-1">
+                              <img src="<%= post.featuredImage %>" alt="" class="blog-post-summary-image">
+                          </a>
+                        <% } else { %>
+                           <div class="blog-post-placeholder-image">
+                               <i class="fas fa-file-alt"></i>
+                           </div>
+                        <% } %>
+
+                        <div class="blog-post-summary-content">
+                             <%# Post Title (Link) %>
+                             <h3><a href="/blog/<%= post.slug %>" class="blog-post-summary-title"><%= post.title %></a></h3>
+
+                             <%# Date and Read button in same row %>
+                             <div class="blog-post-footer">
+                                <div class="blog-post-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <%= post.publishedDate ? post.publishedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Date N/A' %>
+                                </div>
+                                <a href="/blog/<%= post.slug %>" class="blog-post-read-btn">Read Article</a>
+                             </div>
+                        </div>
+                    </article>
+                <% }) %>
+            </div> <!-- /.blog-list -->
+
+            <!-- Pagination Controls -->
+            <%- include('partials/pagination', { currentPage, hasNextPage, hasPreviousPage, nextPage, previousPage, lastPage, baseUrl: '/blog', tagQuery: (typeof tagQuery !== 'undefined' ? tagQuery : null) }) %>
+
+        <% } else { %>
+            <%# Message if no posts found (e.g., for a specific tag or empty blog) %>
+            <div class="no-posts-message">
+                <h3>No posts found</h3>
+                <p>Check back soon for the latest insights on automation and technology!</p>
+                <a href="/blog" class="cta-button secondary-btn">View All Posts</a>
+            </div>
+        <% } %>
+    </div> <!-- /.container -->
+</section> <!-- /.blog-posts-section -->
+
+<%- include('partials/footer') %>
+</file>
+
+<file path="views/blog-post.ejs">
+<%# views/blog-post.ejs %>
+<%# Template for displaying a single public blog post - UPDATED with conditional prev/next links %>
+
+<%# Use the PUBLIC header partial %>
+<%- include('partials/header', { pageTitle: pageTitle }) %>
+
+<main>
+    <%# Standard Page Header Section - Provides context %>
+    <section class="page-header" style="padding-bottom: 1.5rem; margin-bottom: 0;">
+        <div class="container">
+             <%# Use a less prominent title here if the main title is in the article %>
+             <%# <h1>Blog Post</h1> %>
+             <%# Adjust breadcrumb margin if needed %>
+             <div class="breadcrumbs" style="margin-top: 1rem;">
+                 <a href="/">Home</a>
+                 <span class="separator">/</span>
+                 <a href="/blog">Blog</a>
+                 <span class="separator">/</span>
+                 <%# Display truncated title or a generic "Post" if title is too long %>
+                 <span class="current"><%= post.title.length > 50 ? post.title.substring(0, 50) + '...' : post.title %></span>
+            </div>
+        </div>
+    </section>
+
+    <%# Main Content Section for the Blog Post %>
+    <section class="content-section">
+        <div class="container">
+            <%# Reuse the styling from the static blog post example for consistency %>
+            <article class="blog-post-full">
+                <header class="blog-post-header">
+                    <%# Main Post Title %>
+                    <h1><%= post.title %></h1>
+                    <%# Post Metadata %>
+                    <span class="blog-post-meta">
+                        <% if (post.publishedDate) { %>
+                            <span>
+                                <i class="fas fa-calendar-alt"></i>
+                                <%= post.publishedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %>
+                            </span>
+                        <% } %>
+                        <% if (post.authorDisplayName || (post.author && (post.author.fullName || post.author.username))) { %>
+                            <span>
+                                <i class="fas fa-user"></i> By <%= post.authorDisplayName || post.author.fullName || post.author.username %>
+                            </span>
+                        <% } %>
+                         <%# Display tags if they exist %>
+                         <% if (post.tags && post.tags.length > 0) { %>
+                             <span class="blog-tags">
+                                 <i class="fas fa-tags"></i>
+                                 <% post.tags.forEach((tag, index) => { %>
+                                     <a href="/blog/tag/<%= tag %>" class="tag-link"><%= tag %></a><%= index < post.tags.length - 1 ? ', ' : '' %>
+                                 <% }) %>
+                             </span>
+                         <% } %>
+                    </span>
+                </header>
+
+                <%# Featured Image (Optional) %>
+                <% if (post.featuredImage) { %>
+                    <figure class="featured-image">
+                        <img src="<%= post.featuredImage %>" alt="<%= post.title %> - Featured Image">
+                         <%# Optional: Add figcaption if relevant %>
+                         <%# <figcaption>Optional caption for the image</figcaption> %>
+                    </figure>
+                <% } %>
+
+                <%# Main Blog Post Content - Render sanitized HTML %>
+                <%# IMPORTANT: Use unescaped output for SANITIZED HTML %>
+                <div class="blog-post-content">
+                    <%- post.content %>
+                </div>
+
+                <%# Optional: Add related posts, comments section, or social sharing buttons here %>
+                <hr style="border: none; border-top: 1px solid rgba(255, 255, 255, 0.1); margin: 3rem 0;">
+                 <div class="post-navigation" style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem;"> <%# Added wrap & gap %>
+
+                     <%# Conditionally render Previous Post link %>
+                     <% if (prevPostSlug) { %>
+                         <a href="/blog/<%= prevPostSlug %>" class="cta-button secondary-btn">← Previous Post</a>
+                     <% } else { %>
+                         <%# Optional: Add an empty span or div as a placeholder if you want to maintain alignment %>
+                         <span style="visibility: hidden;" class="cta-button secondary-btn">← Previous Post</span>
+                     <% } %>
+
+                     <%# Always show link back to blog list %>
+                     <a href="/blog" class="cta-button secondary-btn" style="margin-left: auto; margin-right: auto;">Back to Blog List</a>
+
+                     <%# Conditionally render Next Post link %>
+                     <% if (nextPostSlug) { %>
+                         <a href="/blog/<%= nextPostSlug %>" class="cta-button secondary-btn">Next Post →</a>
+                     <% } else { %>
+                          <%# Optional: Placeholder for alignment %>
+                         <span style="visibility: hidden;" class="cta-button secondary-btn">Next Post →</span>
+                     <% } %>
+
+                 </div>
+
+            </article>
+        </div>
+    </section>
+</main>
+
+<%# Use the PUBLIC footer partial %>
+<%- include('partials/footer') %>
+
+<%# Add specific CSS overrides here if needed, or ensure styles in style.css cover .blog-post-full %>
+<style>
+    /* Ensure styles from starting-ai-automation-agency-considerations.html are applied or moved to style.css */
+    /* Example: Make sure links within the post content are styled correctly */
+    .blog-post-content a {
+        color: var(--primary-color);
+        text-decoration: none;
+        border-bottom: 1px dashed var(--primary-color);
+        transition: color 0.3s, border-bottom-color 0.3s;
+    }
+    .blog-post-content a:hover {
+        color: var(--secondary-color);
+        border-bottom-color: var(--secondary-color);
+    }
+     .blog-tags .tag-link {
+         display: inline-block;
+         background-color: rgba(0, 168, 232, 0.1);
+         padding: 2px 8px;
+         border-radius: 3px;
+         font-size: 0.85em;
+         color: var(--primary-color);
+         text-decoration: none;
+         border: none;
+         margin-left: 5px;
+         transition: background-color 0.3s;
+     }
+    .blog-tags .tag-link:hover {
+        background-color: rgba(0, 168, 232, 0.3);
+        color: #fff;
+    }
+     .blog-post-meta > span { /* Add spacing between meta items */
+         margin-right: 15px;
+     }
+    .blog-post-meta > span:last-child {
+        margin-right: 0;
+    }
+</style>
+</file>
+
+<file path="views/partials/header.ejs">
+<!-- views/partials/header.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof pageTitle !== 'undefined' ? pageTitle : 'FND Automations' %> | FND Automations</title>
+    <meta name="description" content="<%= typeof pageDescription !== 'undefined' ? pageDescription : 'FND Automations empowers businesses...' %>">
+    <meta name="author" content="FND Automations">
+
+     <!-- ========== FAVICON LINKS START ========== -->
+    <link rel="icon" href="/images/FND_LOGO_SVG_STRIPPED.svg" sizes="any"> <!-- ICO format, any size -->
+    <!-- You might also have a manifest.json for PWAs which can define icons -->
+    <!-- <link rel="manifest" href="/manifest.json"> -->
+    <!-- ========== FAVICON LINKS END ========== -->
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Favicon Links -->
+</head>
+<body>
+    <div class="page-wrapper">
+        <header>
+            <nav class="container">
+                <div class="logo">
+                    <%# OLD Text Logo: <a href="/index" title="FND Automations Home">FND Automations</a> %>
+                    <%# NEW Image Logo: %>
+                    <a href="/" title="FND Automations Home">
+                        <img src="/images/FND_LOGO_SVG_WHITE.svg" alt="FND Automations Logo" id="header-logo">
+                    </a>
+                </div>
+                <ul class="nav-links" id="nav-links-list"> <!-- Added ID -->
+                     <% const currentPath = typeof path !== 'undefined' ? path : ''; %>
+                     <li><a href="/" class="<%= currentPath === '/' ? 'active' : '' %>">Home</a></li>
+                     <li><a href="/services" class="<%= currentPath === '/services' ? 'active' : '' %>">Services</a></li>
+                     <li><a href="/projects" class="<%= currentPath === '/projects' ? 'active' : '' %>">Projects</a></li>
+                     <li><a href="/testimonials" class="<%= currentPath === '/testimonials' ? 'active' : '' %>">Testimonials</a></li>
+                     <li><a href="/about" class="<%= currentPath === '/about' ? 'active' : '' %>">About Us</a></li>
+                     <li><a href="/blog" class="<%= currentPath.startsWith('/blog') ? 'active' : '' %>">Blog</a></li>
+                     <li><a href="/contact" class="<%= currentPath === '/contact' ? 'active' : '' %>">Contact</a></li>
+                 </ul>
+                 <button class="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-links-list">
+                     <span></span><span></span><span></span>
+                 </button>
+            </nav>
+        </header>
+         <main> <!-- Opening main tag -->
+</file>
+
+<file path="views/partials/pagination.ejs">
+<!-- views/partials/pagination.ejs -->
+<%# Reusable pagination controls %>
+<%# Expects: currentPage, hasNextPage, hasPreviousPage, nextPage, previousPage, lastPage, baseUrl, tagQuery (optional) %>
+
+<% if (lastPage > 1) { %> <%# Only show pagination if there's more than one page %>
+    <nav class="pagination" aria-label="Page navigation">
+
+        <!-- Previous Page Link -->
+        <% if (hasPreviousPage) { %>
+             <% const prevUrl = `${baseUrl}?page=${previousPage}` + (tagQuery ? `&tag=${encodeURIComponent(tagQuery)}` : ''); %>
+             <a href="<%= prevUrl %>" class="page-link prev" aria-label="Previous Page">← Previous</a>
+        <% } else { %>
+            <span class="page-link disabled prev" aria-disabled="true">← Previous</span>
+        <% } %>
+
+        <!-- Page Number Links (Example: Simple, could be extended with ellipsis ...) -->
+        <%
+            const maxPagesToShow = 5; // Max number links shown around current page
+            let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+            let endPage = Math.min(lastPage, startPage + maxPagesToShow - 1);
+            // Adjust startPage if endPage reaches the limit first
+            if (endPage === lastPage && (endPage - startPage + 1) < maxPagesToShow) {
+                 startPage = Math.max(1, endPage - maxPagesToShow + 1);
+            }
+        %>
+
+        <%# Link to First Page (if not shown in main range) %>
+        <% if (startPage > 1) { %>
+             <% const firstUrl = `${baseUrl}?page=1` + (tagQuery ? `&tag=${encodeURIComponent(tagQuery)}` : ''); %>
+             <a href="<%= firstUrl %>" class="page-link" aria-label="Page 1">1</a>
+             <% if (startPage > 2) { %> <span class="page-link disabled">...</span> <% } %>
+        <% } %>
+
+        <%# Main Page Number Range %>
+        <% for (let i = startPage; i <= endPage; i++) { %>
+            <% if (i === currentPage) { %>
+                 <span class="page-link active" aria-current="page"><%= i %></span>
+            <% } else { %>
+                 <% const pageUrl = `${baseUrl}?page=${i}` + (tagQuery ? `&tag=${encodeURIComponent(tagQuery)}` : ''); %>
+                 <a href="<%= pageUrl %>" class="page-link" aria-label="Page <%= i %>"><%= i %></a>
+            <% } %>
+        <% } %>
+
+         <%# Link to Last Page (if not shown in main range) %>
+        <% if (endPage < lastPage) { %>
+             <% if (endPage < lastPage - 1) { %> <span class="page-link disabled">...</span> <% } %>
+              <% const lastUrl = `${baseUrl}?page=${lastPage}` + (tagQuery ? `&tag=${encodeURIComponent(tagQuery)}` : ''); %>
+              <a href="<%= lastUrl %>" class="page-link" aria-label="Page <%= lastPage %>"><%= lastPage %></a>
+        <% } %>
+
+        <!-- Next Page Link -->
+        <% if (hasNextPage) { %>
+             <% const nextUrl = `${baseUrl}?page=${nextPage}` + (tagQuery ? `&tag=${encodeURIComponent(tagQuery)}` : ''); %>
+             <a href="<%= nextUrl %>" class="page-link next" aria-label="Next Page">Next →</a>
+        <% } else { %>
+            <span class="page-link disabled next" aria-disabled="true">Next →</span>
+        <% } %>
+
+    </nav>
+<% } %>
+</file>
+
+<file path="views/privacy-policy.ejs">
+<%# views/privacy-policy.ejs %>
+<%- include('partials/header', {
+    pageTitle: 'Privacy Policy - FND Automations',
+    pageDescription: 'Read the FND Automations Privacy Policy to understand how we collect, use, and protect your personal information.',
+    path: '/privacy-policy'
+}) %>
+
+<section class="page-header">
+    <div class="container">
+        <h1>Privacy Policy</h1>
+        <div class="breadcrumbs">
+            <a href="/">Home</a> <span class="separator">/</span> <span class="current">Privacy Policy</span>
+        </div>
+    </div>
+</section>
+
+<section class="section legal-content">
+    <div class="container blog-post-content"> <%# Reuse blog content styling for readability %>
+        <p><strong>Last Updated: May 15, 2025</strong></p>
+
+        <p>FND Automations ("us", "we", or "our") operates the fndautomations.com website (hereinafter referred to as the "Service"). This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service and the choices you have associated with that data.</p>
+        <p>We use your data to provide and improve the Service. By using the Service, you agree to the collection and use of information in accordance with this policy. Unless otherwise defined in this Privacy Policy, the terms used in this Privacy Policy have the same meanings as in our Terms and Service.</p>
+
+        <h2>Information Collection and Use</h2>
+        <p>We collect several different types of information for various purposes to provide and improve our Service to you.</p>
+
+        <h3>Types of Data Collected</h3>
+        <h4>Personal Data</h4>
+        <p>While using our Service, we may ask you to provide us with certain personally identifiable information that can be used to contact or identify you ("Personal Data"). Personally identifiable information may include, but is not limited to:</p>
+        <ul>
+            <li>Email address</li>
+            <li>First name and last name</li>
+            <li>Phone number</li>
+            <li>Company Name</li>
+            <li>Website usage data (via cookies)</li>
+        </ul>
+
+        <h4>Usage Data</h4>
+        <p>We may also collect information on how the Service is accessed and used ("Usage Data"). This Usage Data may include information such as your computer's Internet Protocol address (e.g. IP address), browser type, browser version, the pages of our Service that you visit, the time and date of your visit, the time spent on those pages, unique device identifiers and other diagnostic data.</p>
+
+        <h4>Tracking & Cookies Data</h4>
+        <p>We use cookies and similar tracking technologies to track the activity on our Service and we hold certain information. Cookies are files with a small amount of data which may include an anonymous unique identifier. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, you may not be able to use some portions of our Service.</p>
+        <p>Examples of Cookies we use:</p>
+        <ul>
+            <li><strong>Session Cookies:</strong> We use Session Cookies to operate our Service.</li>
+            <li><strong>Preference Cookies:</strong> We use Preference Cookies to remember your preferences and various settings.</li>
+            <li><strong>Security Cookies:</strong> We use Security Cookies for security purposes.</li>
+        </ul>
+
+        <h2>Use of Data</h2>
+        <p>FND Automations uses the collected data for various purposes:</p>
+        <ul>
+            <li>To provide and maintain our Service</li>
+            <li>To notify you about changes to our Service</li>
+            <li>To allow you to participate in interactive features of our Service when you choose to do so</li>
+            <li>To provide customer support</li>
+            <li>To gather analysis or valuable information so that we can improve our Service</li>
+            <li>To monitor the usage of our Service</li>
+            <li>To detect, prevent and address technical issues</li>
+            <li>To respond to your inquiries, quote requests, or meeting requests submitted through our forms</li>
+        </ul>
+
+        <h2>Transfer of Data</h2>
+        <p>Your information, including Personal Data, may be transferred to — and maintained on — computers located outside of your state, province, country or other governmental jurisdiction where the data protection laws may differ from those from your jurisdiction.</p>
+        <p>If you are located outside United States and choose to provide information to us, please note that we transfer the data, including Personal Data, to United States and process it there.</p>
+        <p>Your consent to this Privacy Policy followed by your submission of such information represents your agreement to that transfer.</p>
+        <p>FND Automations will take all the steps reasonably necessary to ensure that your data is treated securely and in accordance with this Privacy Policy and no transfer of your Personal Data will take place to an organisation or a country unless there are adequate controls in place including the security of your data and other personal information.</p>
+
+        <h2>Disclosure of Data</h2>
+        <h3>Legal Requirements</h3>
+        <p>FND Automations may disclose your Personal Data in the good faith belief that such action is necessary to:</p>
+        <ul>
+            <li>To comply with a legal obligation</li>
+            <li>To protect and defend the rights or property of FND Automations</li>
+            <li>To prevent or investigate possible wrongdoing in connection with the Service</li>
+            <li>To protect the personal safety of users of the Service or the public</li>
+            <li>To protect against legal liability</li>
+        </ul>
+
+        <h2>Security of Data</h2>
+        <p>The security of your data is important to us but remember that no method of transmission over the Internet or method of electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your Personal Data, we cannot guarantee its absolute security.</p>
+
+        <h2>Service Providers</h2>
+        <p>We may employ third party companies and individuals to facilitate our Service ("Service Providers"), to provide the Service on our behalf, to perform Service-related services or to assist us in analyzing how our Service is used. These third parties have access to your Personal Data only to perform these tasks on our behalf and are obligated not to disclose or use it for any other purpose (e.g., Heroku for hosting, MongoDB Atlas for database, Google Analytics if used).</p>
+
+        <h2>Links to Other Sites</h2>
+        <p>Our Service may contain links to other sites that are not operated by us. If you click a third party link, you will be directed to that third party's site. We strongly advise you to review the Privacy Policy of every site you visit. We have no control over and assume no responsibility for the content, privacy policies or practices of any third party sites or services.</p>
+
+        <h2>Children's Privacy</h2>
+        <p>Our Service does not address anyone under the age of 18 ("Children"). We do not knowingly collect personally identifiable information from anyone under the age of 18. If you are a parent or guardian and you are aware that your Child has provided us with Personal Data, please contact us. If we become aware that we have collected Personal Data from children without verification of parental consent, we take steps to remove that information from our servers.</p>
+
+        <h2>Changes to This Privacy Policy</h2>
+        <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page. We will let you know via email and/or a prominent notice on our Service, prior to the change becoming effective and update the "effective date" at the top of this Privacy Policy. You are advised to review this Privacy Policy periodically for any changes. Changes to this Privacy Policy are effective when they are posted on this page.</p>
+
+        <h2>Contact Us</h2>
+        <p>If you have any questions about this Privacy Policy, please contact us:</p>
+        <ul>
+            <li>By email: logan.mayfield@fndautomations.com</li>
+            <li>By visiting this page on our website: <a href="/contact">fndautomations.com/contact</a></li>
+        </ul>
+    </div>
+</section>
+
+<%- include('partials/footer') %>
+</file>
+
+<file path="views/project-single.ejs">
+<%# views/project-single.ejs %>
+<%# Template for displaying a single public project %>
+
+<%- include('partials/header', { pageTitle: pageTitle, pageDescription: pageDescription }) %>
+
+<main>
+    <section class="page-header" style="padding-bottom: 1.5rem; margin-bottom: 0;">
+        <div class="container">
+            <div class="breadcrumbs" style="margin-top: 1rem;">
+                 <a href="/">Home</a>
+                 <span class="separator">/</span>
+                 <a href="/projects">Projects</a>
+                 <span class="separator">/</span>
+                 <span class="current"><%= project.title.length > 50 ? project.title.substring(0, 50) + '...' : project.title %></span>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section project-details-section">
+        <div class="container">
+            <article class="project-full-content">
+                <header class="project-header" style="margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--card-border);">
+                    <h1><%= project.title %></h1>
+                    <div class="project-meta" style="font-size: 0.9rem; color: var(--gray-text); margin-top: 0.5rem;">
+                        <% if (project.category) { %>
+                            <span><i class="fas fa-folder-open"></i> Category: <a href="/projects?category=<%= project.category %>" style="color: var(--primary-color);"><%= project.category %></a></span>
+                        <% } %>
+                        <% if (project.projectDate) { %>
+                            <span style="margin-left: 15px;"><i class="fas fa-calendar-alt"></i> Completed: <%= new Date(project.projectDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) %></span>
+                        <% } %>
+                        <% if (project.clientName) { %>
+                            <span style="margin-left: 15px;"><i class="fas fa-user-tie"></i> Client: <%= project.clientName %></span>
+                        <% } %>
+                    </div>
+                </header>
+
+                <% if (project.image) { %>
+                    <figure class="featured-project-image" style="margin-bottom: 2.5rem; text-align: center;">
+                        <img src="<%= project.image %>" alt="<%= project.title %> - Main Image" style="max-width: 100%; height: auto; max-height: 500px; border-radius: var(--border-radius); box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                    </figure>
+                <% } %>
+
+                <div class="project-description-content blog-post-content"> <%# Reuse blog post content styling for rich text %>
+                    <%- project.description %> <%# Output raw HTML from TinyMCE %>
+                </div>
+
+                <% if (project.technologiesUsed && project.technologiesUsed.length > 0) { %>
+                    <div class="project-technologies" style="margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--card-border);">
+                        <h3 style="font-size: 1.3rem; color: var(--light-text); margin-bottom: 1rem;">Technologies Used:</h3>
+                        <ul style="list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                            <% project.technologiesUsed.forEach(tech => { %>
+                                <li style="background-color: rgba(0,168,232,0.1); color: var(--primary-color); padding: 5px 10px; border-radius: 3px; font-size: 0.9em;"><%= tech %></li>
+                            <% }) %>
+                        </ul>
+                    </div>
+                <% } %>
+
+                <% if (project.link) { %>
+                    <div class="project-external-link" style="margin-top: 2.5rem; text-align: center;">
+                        <a href="<%= project.link %>" class="cta-button primary-btn" target="_blank" rel="noopener noreferrer">
+                            <i class="fas fa-external-link-alt"></i> View Live Project / Learn More
+                        </a>
+                    </div>
+                <% } %>
+
+                <hr style="border: none; border-top: 1px solid var(--card-border); margin: 3rem 0;">
+                <div class="post-navigation" style="display: flex; justify-content: center;">
+                     <a href="/projects" class="cta-button secondary-btn">← Back to All Projects</a>
+                     <%# TODO: Add Prev/Next Project links here similar to blog posts if desired %>
+                </div>
+
+            </article>
+        </div>
+    </section>
+</main>
+
+<%- include('partials/footer') %>
+</file>
+
+<file path="views/projects.ejs">
+<!-- views/projects.ejs -->
+<%# Projects Portfolio Page - Professional Design %>
+
+<%- include('partials/header', {
+    pageTitle: 'Our Projects - Automation Case Studies',
+    pageDescription: 'Explore case studies and examples of successful AI and process automation projects by FND Automations.',
+    path: '/projects'
+}) %>
+
+<!-- Hero Section -->
+<section class="page-header">
+    <div class="container">
+        <h1>Our Projects</h1>
+    </div>
+</section>
+
+<!-- Featured Project Section -->
+<section id="featured-project" class="section featured-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Featured Project</h2>
+            <p class="section-subtitle">Highlighting our most impactful automation implementation</p>
+        </div>
+        <div id="featured-project-container">
+            <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Loading featured project...</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Projects Grid Section -->
+<section id="projects-grid-section" class="section projects-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Complete Portfolio</h2>
+            <p class="section-subtitle">Browse our comprehensive collection of automation solutions across various industries</p>
+        </div>
+
+        <!-- Filter Navigation -->
+        <nav class="filter-navigation" role="navigation" aria-label="Project categories">
+            <div class="filter-group">
+                <button class="filter-btn active" data-filter="all" aria-pressed="true">
+                    <span class="filter-label">All Projects</span>
+                    <span class="filter-count" data-count="all">—</span>
+                </button>
+                <button class="filter-btn" data-filter="real-estate" aria-pressed="false">
+                    <span class="filter-label">Real Estate</span>
+                    <span class="filter-count" data-count="real-estate">—</span>
+                </button>
+                <button class="filter-btn" data-filter="finance" aria-pressed="false">
+                    <span class="filter-label">Financial Services</span>
+                    <span class="filter-count" data-count="finance">—</span>
+                </button>
+                <button class="filter-btn" data-filter="legal" aria-pressed="false">
+                    <span class="filter-label">Legal Technology</span>
+                    <span class="filter-count" data-count="legal">—</span>
+                </button>
+                <button class="filter-btn" data-filter="e-commerce" aria-pressed="false">
+                    <span class="filter-label">E-Commerce</span>
+                    <span class="filter-count" data-count="e-commerce">—</span>
+                </button>
+                <button class="filter-btn" data-filter="advertising" aria-pressed="false">
+                    <span class="filter-label">Digital Marketing</span>
+                    <span class="filter-count" data-count="advertising">—</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Projects Grid -->
+        <div id="projects-grid-container" class="projects-grid">
+            <div class="loading-state grid-loading">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Loading project portfolio...</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2 class="cta-title">Ready to Transform Your Business?</h2>
+            <p class="cta-description">Let's discuss how automation can streamline your operations and drive growth. Schedule a consultation to explore possibilities tailored to your unique needs.</p>
+            <div class="cta-actions">
+                <a href="/contact" class="btn btn-primary">Start Your Project</a>
+                <a href="/services" class="btn btn-secondary">Learn About Our Services</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<%- include('partials/footer') %>
+</file>
+
+<file path="views/public-error.ejs">
+<!-- views/public-error.ejs -->
+<!-- Simplified version for debugging EJS compilation errors -->
+
+<%
+    // Basic variable setting - simplified defaults
+    const errStatusCode = typeof status !== 'undefined' ? status : 500;
+    const displayTitle = typeof pageTitle !== 'undefined' ? pageTitle : 'Error';
+    const displayMessage = typeof message !== 'undefined' ? message : 'An error occurred.';
+    // Note: Complex title/message logic based on status code removed for now
+%>
+
+<%- include('partials/header', { pageTitle: `Error ${errStatusCode}`, path: '/error' }) %>
+
+<!-- Simplified Error Content -->
+<section class="section error-section" style="padding: 4rem 0;">
+    <div class="container error-content-wrapper">
+        <div class="error-container">
+            <!-- Minimal Icon Logic -->
+            <div class="error-icon">
+                 <i class="fas fa-exclamation-triangle"></i> <!-- Default Error Icon -->
+            </div>
+
+            <!-- Basic Title and Message Output -->
+            <h2 class="error-message"><%= displayTitle %> (<%= errStatusCode %>)</h2>
+            <p class="error-description">
+                <%= displayMessage %>
+            </p>
+
+            <!-- Stack Trace (Development Only - Simplified Check) -->
+            <% if (process.env.NODE_ENV !== 'production' && typeof error !== 'undefined' && error && error.stack) { %>
+                <pre class="error-stack-trace" style="max-height: 150px;"><%= error.stack %></pre>
+            <% } %>
+
+            <!-- Actions -->
+            <div class="error-actions">
+                 <a href="javascript:history.back()" class="cta-button secondary-btn">
+                     <i class="fas fa-arrow-left"></i> Go Back
+                 </a>
+                <a href="/" class="cta-button primary-btn">
+                    <i class="fas fa-home"></i> Return to Homepage
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<%- include('partials/footer') %>
+
+<!-- Styles should be in style.css -->
+</file>
+
+<file path="views/services.ejs">
+<!-- views/services.ejs -->
+<%# Services Page for FND Automations %>
+
+<%- include('partials/header', {
+    pageTitle: 'Our Services - AI & Automation Solutions',
+    pageDescription: 'Explore the comprehensive suite of AI and process automation services offered by FND Automations, including custom solutions, integration, and data analytics.',
+    path: '/services' /* Pass path for active nav highlighting */
+}) %>
+
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <h1>Our Services</h1>
+    </div>
+</section>
+
+<!-- Services Intro Section -->
+<section id="services-intro" class="section services-intro-section">
+    <div class="container section-header">
+        <h2 class="section-title">Empowering Your Business</h2>
+        <p class="section-description">We offer a tailored suite of automation and AI services designed to tackle your specific challenges, streamline operations, increase efficiency, and unlock new growth opportunities.</p>
+    </div>
+</section>
+
+<!-- Services Grid Section - Detailed Offerings -->
+<section id="services-grid-details" class="section section-darker">
+    <div class="container">
+         <div class="section-header" style="margin-bottom: 3rem;">
+             <h2 class="section-title">Core Automation & AI Services</h2>
+         </div>
+        <div class="grid-container grid-3-col">
+
+            <!-- Service Card 1: Process Automation -->
+            <div id="process-automation" class="content-card service-card">
+                <div class="card-icon"><i class="fas fa-cogs fa-fw"></i></div> <!-- Changed Icon -->
+                <h3>Process Automation</h3>
+                <p>Eliminate bottlenecks and manual work with intelligent workflow automation. We connect platforms like Make.com and n8n to streamline your processes and boost productivity.</p>
+                <ul style="text-align: left; font-size: 0.9rem; margin-top: auto; padding-top: 1rem;">
+                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Workflow Optimization</li>
+                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Repetitive Task Handling</li>
+                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Error Rate Reduction</li>
+                </ul>
+                <!-- <a href="/contact?subject=Process%20Automation%20Inquiry" class="card-link" style="margin-top: 1rem;">Learn More →</a> -->
+            </div>
+
+            <!-- Service Card 2: AI Integration & Solutions -->
+             <div id="ai-integration" class="content-card service-card">
+                 <div class="card-icon"><i class="fas fa-brain fa-fw"></i></div>
+                 <h3>AI Integration Solutions</h3>
+                 <p>Leverage cutting-edge AI models like GPT and Claude for intelligent document processing, customer service chatbots, and advanced data analysis solutions.</p>
+                  <ul style="text-align: left; font-size: 0.9rem; margin-top: auto; padding-top: 1rem;">
+                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Intelligent Document Processing</li>
+                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Custom AI Chatbots</li>
+                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Data-driven Insights</li>
+                </ul>
+                 <!-- <a href="/contact?subject=AI%20Integration%20Inquiry" class="card-link" style="margin-top: 1rem;">Learn More →</a> -->
+             </div>
+
+            <!-- Service Card 3: Custom Software & Integration -->
+             <div id="custom-solutions" class="content-card service-card">
+                 <div class="card-icon"><i class="fas fa-laptop-code fa-fw"></i></div>
+                 <h3>Custom Software</h3>
+                 <p>Build bespoke software applications and complex integrations that connect your essential systems like CRMs, ERPs, and databases to create seamless workflows.</p>
+                 <ul style="text-align: left; font-size: 0.9rem; margin-top: auto; padding-top: 1rem;">
+                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Tailored Application Development</li>
+                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> API Integration & Development</li>
+                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Database Design (Airtable, etc.)</li>
+                </ul>
+                  <!-- <a href="/contact?subject=Custom%20Solution%20Inquiry" class="card-link" style="margin-top: 1rem;">Learn More →</a> -->
+             </div>
+
+            <!-- Service Card 4: Data Analytics & Reporting -->
+            <div class="content-card service-card">
+                <div class="card-icon"><i class="fas fa-chart-pie fa-fw"></i></div>
+                <h3>Data Analytics Solutions</h3>
+                <p>Transform raw data into strategic insights with automated reporting dashboards and comprehensive analysis tools for better decision-making processes.</p>
+                 <ul style="text-align: left; font-size: 0.9rem; margin-top: auto; padding-top: 1rem;">
+                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Automated Dashboards</li>
+                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Performance Tracking (KPIs)</li>
+                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Trend Analysis & Forecasting</li>
+                </ul>
+                 <!-- <a href="/contact?subject=Data%20Analytics%20Inquiry" class="card-link" style="margin-top: 1rem;">Learn More →</a> -->
+            </div>
+
+            <!-- Service Card 5: Cybersecurity Automation (Optional - Keep if offered) -->
+            <div class="content-card service-card">
+                <div class="card-icon"><i class="fas fa-shield-alt fa-fw"></i></div>
+                <h3>Security Automation</h3>
+                <p>Enhance security posture through automated vulnerability scanning, compliance reporting, user access reviews, and intelligent security alert management.</p>
+                <ul style="text-align: left; font-size: 0.9rem; margin-top: auto; padding-top: 1rem;">
+                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Compliance Automation</li>
+                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Security Workflow Orchestration</li>
+                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Automated Alerting</li>
+                </ul>
+                 <!-- <a href="/contact?subject=Security%20Automation%20Inquiry" class="card-link" style="margin-top: 1rem;">Learn More →</a> -->
+            </div>
+
+            <!-- Service Card 6: Automation Consulting -->
+             <div class="content-card service-card">
+                 <div class="card-icon"><i class="fas fa-comments fa-fw"></i></div>
+                 <h3>Automation Consulting</h3>
+                 <p>Identify high-impact automation opportunities and develop strategic implementation plans to maximize ROI through expert technical feasibility assessments.</p>
+                  <ul style="text-align: left; font-size: 0.9rem; margin-top: auto; padding-top: 1rem;">
+                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Opportunity Assessment</li>
+                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Technology Stack Evaluation</li>
+                    <li><i class="fas fa-check-circle" style="color:var(--primary-color); margin-right: 5px;"></i> Phased Rollout Planning</li>
+                </ul>
+                  <!-- <a href="/contact?subject=Automation%20Consulting%20Inquiry" class="card-link" style="margin-top: 1rem;">Learn More →</a> -->
+             </div>
+
+        </div> <!-- /.grid-container -->
+    </div> <!-- /.container -->
+</section>
+
+<!-- Service Process Section -->
+<section id="service-process" class="section service-process-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Our Collaborative Approach</h2>
+            <p class="section-description">We follow a transparent, structured process focused on partnership and delivering measurable value.</p>
+        </div>
+        <!-- Using grid for better responsiveness -->
+        <div class="process-steps-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-top: 3rem; position: relative;">
+            <!-- Optional Connector Line (CSS pseudo-element on grid container could do this) -->
+             <div class="process-step" style="text-align: center; position: relative;">
+                 <div class="step-number" style="width: 60px; height: 60px; background-color: var(--darker-bg); color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 700; margin: 0 auto 1rem; border: 3px solid var(--primary-color); box-shadow: 0 0 15px rgba(0, 168, 232, 0.2);">1</div>
+                 <h3 style="font-size: 1.2rem;">Discovery</h3>
+                 <p style="font-size: 0.9rem;">Deep dive into your goals, challenges, and current processes via collaborative workshops.</p>
+             </div>
+             <div class="process-step" style="text-align: center; position: relative;">
+                <div class="step-number" style="width: 60px; height: 60px; background-color: var(--darker-bg); color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 700; margin: 0 auto 1rem; border: 3px solid var(--primary-color); box-shadow: 0 0 15px rgba(0, 168, 232, 0.2);">2</div>
+                <h3 style="font-size: 1.2rem;">Strategy & Design</h3>
+                 <p style="font-size: 0.9rem;">Identify key automation opportunities, select tools, and design the optimal solution architecture.</p>
+             </div>
+            <div class="process-step" style="text-align: center; position: relative;">
+                <div class="step-number" style="width: 60px; height: 60px; background-color: var(--darker-bg); color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 700; margin: 0 auto 1rem; border: 3px solid var(--primary-color); box-shadow: 0 0 15px rgba(0, 168, 232, 0.2);">3</div>
+                 <h3 style="font-size: 1.2rem;">Implementation</h3>
+                 <p style="font-size: 0.9rem;">Agile development and configuration of the automation solution with regular check-ins.</p>
+             </div>
+             <div class="process-step" style="text-align: center; position: relative;">
+                <div class="step-number" style="width: 60px; height: 60px; background-color: var(--darker-bg); color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 700; margin: 0 auto 1rem; border: 3px solid var(--primary-color); box-shadow: 0 0 15px rgba(0, 168, 232, 0.2);">4</div>
+                <h3 style="font-size: 1.2rem;">Testing & Launch</h3>
+                 <p style="font-size: 0.9rem;">Rigorous testing, quality assurance, user acceptance, and smooth deployment.</p>
+             </div>
+            <div class="process-step" style="text-align: center; position: relative;">
+                <div class="step-number" style="width: 60px; height: 60px; background-color: var(--darker-bg); color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 700; margin: 0 auto 1rem; border: 3px solid var(--primary-color); box-shadow: 0 0 15px rgba(0, 168, 232, 0.2);">5</div>
+                 <h3 style="font-size: 1.2rem;">Support & Evolution</h3>
+                 <p style="font-size: 0.9rem;">Comprehensive training, ongoing support packages, and continuous improvement planning.</p>
+             </div>
+        </div>
+    </div>
+</section>
+
+<!-- Industries Served Section (Could be simplified or removed if redundant) -->
+<!-- Kept for now -->
+<section id="industries-served" class="section section-darker">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Industries We Empower</h2>
+             <p class="section-description">While adaptable to any sector, we bring deep experience to these industries:</p>
+        </div>
+        <div class="industries-grid grid-container" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1.5rem;">
+            <div class="industry-item content-card" style="padding: 1.5rem;">
+                <div class="card-icon" style="font-size: 2.5rem; margin-bottom: 1rem;"><i class="fas fa-industry fa-fw"></i></div>
+                <h4 style="font-size: 1rem; color: var(--light-text);">Manufacturing</h4>
+            </div>
+             <div class="industry-item content-card" style="padding: 1.5rem;">
+                <div class="card-icon" style="font-size: 2.5rem; margin-bottom: 1rem;"><i class="fas fa-cash-register fa-fw"></i></div>
+                <h4 style="font-size: 1rem; color: var(--light-text);">Retail & E-commerce</h4>
+            </div>
+            <div class="industry-item content-card" style="padding: 1.5rem;">
+                <div class="card-icon" style="font-size: 2.5rem; margin-bottom: 1rem;"><i class="fas fa-heartbeat fa-fw"></i></div>
+                <h4 style="font-size: 1rem; color: var(--light-text);">Healthcare</h4>
+            </div>
+             <div class="industry-item content-card" style="padding: 1.5rem;">
+                <div class="card-icon" style="font-size: 2.5rem; margin-bottom: 1rem;"><i class="fas fa-university fa-fw"></i></div>
+                <h4 style="font-size: 1rem; color: var(--light-text);">Finance</h4>
+            </div>
+             <div class="industry-item content-card" style="padding: 1.5rem;">
+                 <div class="card-icon" style="font-size: 2.5rem; margin-bottom: 1rem;"><i class="fas fa-users fa-fw"></i></div>
+                 <h4 style="font-size: 1rem; color: var(--light-text);">Professional Services</h4>
+             </div>
+            <div class="industry-item content-card" style="padding: 1.5rem;">
+                <div class="card-icon" style="font-size: 2.5rem; margin-bottom: 1rem;"><i class="fas fa-truck fa-fw"></i></div>
+                <h4 style="font-size: 1rem; color: var(--light-text);">Logistics</h4>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Final CTA Section -->
+<section id="cta" class="cta-section">
+     <div class="container">
+         <div class="cta-content">
+             <h2>Ready to Start Automating?</h2>
+             <p>Take the first step towards enhanced efficiency and growth. Contact us for a personalized consultation.</p>
+             <a href="/contact" class="cta-button primary-btn glow-button">Schedule Your Free Consultation</a>
+         </div>
+     </div>
+</section>
+
+<%- include('partials/footer') %>
+</file>
+
+<file path="views/terms-of-service.ejs">
+<%# views/terms-of-service.ejs %>
+<%- include('partials/header', {
+    pageTitle: 'Terms of Service - FND Automations',
+    pageDescription: 'Read the FND Automations Terms of Service governing the use of our website and services.',
+    path: '/terms-of-service'
+}) %>
+
+<section class="page-header">
+    <div class="container">
+        <h1>Terms of Service</h1>
+        <div class="breadcrumbs">
+            <a href="/">Home</a> <span class="separator">/</span> <span class="current">Terms of Service</span>
+        </div>
+    </div>
+</section>
+
+<section class="section legal-content">
+    <div class="container blog-post-content"> <%# Reuse blog content styling %>
+        <p><strong>Last Updated: May 15, 2025</strong></p>
+
+        <p>Please read these Terms of Service ("Terms", "Terms of Service") carefully before using the fndautomations.com website (the "Service") operated by FND Automations ("us", "we", or "our").</p>
+        <p>Your access to and use of the Service is conditioned upon your acceptance of and compliance with these Terms. These Terms apply to all visitors, users and others who wish to access or use the Service. By accessing or using the Service you agree to be bound by these Terms. If you disagree with any part of the terms then you do not have permission to access the Service.</p>
+
+        <h2>1. Intellectual Property</h2>
+        <p>The Service and its original content (excluding content provided by users or linked third-party sites), features and functionality are and will remain the exclusive property of FND Automations and its licensors. The Service is protected by copyright, trademark, and other laws of both the United States and foreign countries. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of FND Automations.</p>
+
+        <h2>2. Use of Our Service</h2>
+        <p>You may use our Service only for lawful purposes and in accordance with these Terms. You agree not to use the Service:</p>
+        <ul>
+            <li>In any way that violates any applicable national or international law or regulation.</li>
+            <li>For the purpose of exploiting, harming, or attempting to exploit or harm minors in any way by exposing them to inappropriate content or otherwise.</li>
+            <li>To transmit, or procure the sending of, any advertising or promotional material, including any "junk mail", "chain letter", "spam", or any other similar solicitation.</li>
+            <li>To impersonate or attempt to impersonate FND Automations, an FND Automations employee, another user, or any other person or entity.</li>
+            <li>In any way that infringes upon the rights of others, or in any way is illegal, threatening, fraudulent, or harmful, or in connection with any unlawful, illegal, fraudulent, or harmful purpose or activity.</li>
+            <li>To engage in any other conduct that restricts or inhibits anyone's use or enjoyment of the Service, or which, as determined by us, may harm or offend FND Automations or users of the Service or expose them to liability.</li>
+        </ul>
+        <p>Additionally, you agree not to:</p>
+        <ul>
+            <li>Use the Service in any manner that could disable, overburden, damage, or impair the Service or interfere with any other party's use of the Service.</li>
+            <li>Use any robot, spider, or other automatic device, process, or means to access the Service for any purpose, including monitoring or copying any of the material on the Service.</li>
+            <li>Introduce any viruses, trojan horses, worms, logic bombs, or other material which is malicious or technologically harmful.</li>
+            <li>Attempt to gain unauthorized access to, interfere with, damage, or disrupt any parts of the Service, the server on which the Service is stored, or any server, computer, or database connected to the Service.</li>
+        </ul>
+
+        <h2>3. Links to Other Web Sites</h2>
+        <p>Our Service may contain links to third-party web sites or services that are not owned or controlled by FND Automations. FND Automations has no control over, and assumes no responsibility for the content, privacy policies, or practices of any third-party web sites or services. We do not warrant the offerings of any of these entities/individuals or their websites.</p>
+        <p>You acknowledge and agree that FND Automations shall not be responsible or liable, directly or indirectly, for any damage or loss caused or alleged to be caused by or in connection with use of or reliance on any such content, goods or services available on or through any such third party web sites or services. We strongly advise you to read the terms and conditions and privacy policies of any third-party web sites or services that you visit.</p>
+
+        <h2>4. Disclaimer of Warranties; Limitation of Liability</h2>
+        <p>The Service is provided on an "AS IS" and "AS AVAILABLE" basis. FND Automations makes no representations or warranties of any kind, express or implied, as to the operation of their services, or the information, content or materials included therein. You expressly agree that your use of these services, their content, and any services or items obtained from us is at your sole risk.</p>
+        <p>Neither FND Automations nor any person associated with FND Automations makes any warranty or representation with respect to the completeness, security, reliability, quality, accuracy, or availability of the services. Without limiting the foregoing, neither FND Automations nor anyone associated with FND Automations represents or warrants that the services, their content, or any services or items obtained through the services will be accurate, reliable, error-free, or uninterrupted, that defects will be corrected, that the services or the server that makes it available are free of viruses or other harmful components or that the services or any services or items obtained through the services will otherwise meet your needs or expectations.</p>
+        <p>FND Automations hereby disclaims all warranties of any kind, whether express or implied, statutory, or otherwise, including but not limited to any warranties of merchantability, non-infringement, and fitness for particular purpose.</p>
+        <p>In no event will FND Automations, its affiliates, or their licensors, service providers, employees, agents, officers, or directors be liable for damages of any kind, under any legal theory, arising out of or in connection with your use, or inability to use, the Service, any websites linked to it, any content on the Service or such other websites, including any direct, indirect, special, incidental, consequential, or punitive damages, including but not limited to, personal injury, pain and suffering, emotional distress, loss of revenue, loss of profits, loss of business or anticipated savings, loss of use, loss of goodwill, loss of data, and whether caused by tort (including negligence), breach of contract, or otherwise, even if foreseeable.</p>
+
+        <h2>5. Indemnification</h2>
+        <p>You agree to defend, indemnify and hold harmless FND Automations and its licensee and licensors, and their employees, contractors, agents, officers and directors, from and against any and all claims, damages, obligations, losses, liabilities, costs or debt, and expenses (including but not limited to attorney's fees), resulting from or arising out of a) your use and access of the Service, or b) a breach of these Terms.</p>
+
+        <h2>6. Governing Law</h2>
+        <p>These Terms shall be governed and construed in accordance with the laws of the State of Georgia, United States, without regard to its conflict of law provisions.</p>
+        <p>Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights. If any provision of these Terms is held to be invalid or unenforceable by a court, the remaining provisions of these Terms will remain in effect. These Terms constitute the entire agreement between us regarding our Service, and supersede and replace any prior agreements we might have had between us regarding the Service.</p>
+
+        <h2>7. Changes to Service and Terms</h2>
+        <p>We reserve the right to withdraw or amend our Service, and any service or material we provide via the Service, in our sole discretion without notice. We will not be liable if for any reason all or any part of the Service is unavailable at any time or for any period.</p>
+        <p>We may revise and update these Terms of Service from time to time in our sole discretion. All changes are effective immediately when we post them. Your continued use of the Service following the posting of revised Terms of Service means that you accept and agree to the changes. You are expected to check this page frequently so you are aware of any changes, as they are binding on you.</p>
+
+        <h2>8. Contact Us</h2>
+        <p>If you have any questions about these Terms, please contact us:</p>
+        <ul>
+            <li>By email: logan.mayfield@fndautomations.com</li>
+            <li>By visiting this page on our website: <a href="/contact">fndautomations.com/contact</a></li>
+        </ul>
+    </div>
+</section>
+
+<%- include('partials/footer') %>
+</file>
+
+<file path="views/testimonials.ejs">
+<!-- views/testimonials.ejs -->
+<%# Modern Testimonials Page with Carousel Design %>
+
+<%- include('partials/header', {
+    pageTitle: 'Client Testimonials - FND Automations',
+    pageDescription: 'Read what our clients say about FND Automations\' impact on their business through successful AI and process automation solutions.',
+    path: '/testimonials'
+}) %>
+
+<!-- Hero Section -->
+<section class="page-header">
+    <div class="container">
+        <h1>Client Testimonials</h1>
+    </div>
+</section>
+
+<!-- Featured Testimonial Carousel -->
+<section class="testimonial-carousel-section">
+    <div class="container">
+        <div class="testimonial-carousel-container">
+            <div class="carousel-header">
+                <h2 class="section-title">Client Success Stories</h2>
+                <div class="carousel-controls">
+                    <button class="carousel-btn prev-btn" aria-label="Previous testimonial">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <button class="carousel-btn next-btn" aria-label="Next testimonial">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="testimonial-carousel" id="testimonials-carousel">
+                <div class="carousel-track" id="carousel-track">
+                    <!-- Loading state -->
+                    <div class="testimonial-loading">
+                        <div class="loading-spinner"></div>
+                        <p>Loading testimonials...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="carousel-dots" id="carousel-dots">
+                <!-- Dots will be generated dynamically -->
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="testimonial-stats-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number" data-count="150">0</div>
+                <div class="stat-label">Happy Clients</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="98">0</div>
+                <div class="stat-label">Success Rate %</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="500">0</div>
+                <div class="stat-label">Projects Completed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="24">0</div>
+                <div class="stat-label">Industries Served</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- All Testimonials Grid -->
+<section class="all-testimonials-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">All Client Feedback</h2>
+            <p class="section-subtitle">Explore our complete collection of client testimonials and success stories</p>
+        </div>
+        
+        <div class="testimonials-grid" id="testimonials-grid-container">
+            <div class="testimonial-loading grid-loading">
+                <div class="loading-spinner"></div>
+                <p>Loading all testimonials...</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2 class="cta-title">Ready to Join Our Satisfied Clients?</h2>
+            <p class="cta-description">Contact us today to discuss how our automation solutions can transform your business operations and deliver measurable results.</p>
+            <div class="cta-actions">
+                <a href="/contact" class="btn btn-primary">Start Your Project</a>
+                <a href="/services" class="btn btn-secondary">Explore Our Services</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<%- include('partials/footer') %>
+</file>
+
+<file path="views/about.ejs">
+<!-- views/about.ejs -->
+<%# About Us Page for FND Automations %>
+
+<%- include('partials/header', {
+    pageTitle: 'About FND Automations',
+    pageDescription: 'Learn about the mission, vision, team, and expertise behind FND Automations, your partner in business automation and AI solutions.',
+    path: '/about'
+}) %>
+
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <h1>About Us</h1>
+    </div>
+</section>
+
+<!-- Our Story Section -->
+<section class="section our-story-section"> <!-- Consider removing class if .section styling sufficient -->
+    <div class="container">
+        <div class="section-header" style="margin-bottom: 2rem;">
+            <h2 class="section-title">Our Story</h2>
+            <!-- <div class="our-story-divider"></div> Combined with section title ::after -->
+            <h3 style="font-size: 1.5rem; color: var(--light-text); font-weight: 400; margin-top: 2rem;">From vision to reality: The journey of FND Automations</h3>
+        </div>
+
+        <div style="max-width: 850px; margin: 0 auto 3rem auto; text-align: left;">
+            <p>
+                FND Automations was founded with a clear mission: to help businesses leverage the power of automation to increase efficiency, reduce costs, and drive growth. What started as a small team of passionate automation experts has grown into a leading consulting firm serving clients across multiple industries.
+            </p>
+            <p>
+                Our journey began when our founders recognized a critical gap in the market – businesses needed custom automation solutions that addressed their specific challenges, not one-size-fits-all approaches. This insight has guided our development and remains at the core of our philosophy today.
+            </p>
+        </div>
+
+        <!-- Quick Facts -->
+        <div class="grid-container grid-3-col quick-facts-container" style="gap: 2rem;"> <!-- Use grid -->
+            <div class="quick-fact stat-item"> <!-- Use testimonial stat styling -->
+                <div class="stat-number">10+</div>
+                <div class="stat-label">Clients Served</div>
+            </div>
+            <div class="quick-fact stat-item">
+                <div class="stat-number">15+</div>
+                <div class="stat-label">Projects Completed</div>
+            </div>
+            <div class="quick-fact stat-item">
+                <div class="stat-number">1+</div> <!-- Update as needed -->
+                <div class="stat-label">Year of Experience</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section id="team" class="section team-section section-darker">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Meet Our Team</h2>
+            <p class="section-description">Our team of experts brings together diverse skills and experiences to deliver exceptional results for our clients.</p>
+        </div>
+
+        <!-- Team Grid -->
+        <div class="team-grid" style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem;">
+            <!-- Team Member Card 1: Logan -->
+            <div class="team-member">
+                 <div class="member-image">
+                     <img src="/images/Logan.png" alt="Portrait of Logan Mayfield">
+                     <!-- Overlay structure preserved -->
+                     <div class="member-details-overlay initial-overlay">
+                         <h3>Logan Mayfield</h3>
+                         <p class="member-role">Chief Executive Officer</p>
+                     </div>
+                     <div class="member-details-overlay hover-overlay">
+                         <h3>Logan Mayfield</h3>
+                         <p class="member-role">Chief Executive Officer</p>
+                                         <p class="member-bio">Leveraging his Engineering Management background, Logan spearheads FND Automations' vision to deliver transformative AI and web automation solutions. He excels at identifying strategic opportunities where tools like Make, n8n, and custom AI agents can optimize client workflows and drive tangible business growth.</p>
+                         <div class="member-social">
+                             <a href="https://www.linkedin.com/in/logan-mayfield-a8345121b/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                             <!-- <a href="https://twitter.com/LoganMayfield" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-twitter"></i></a> -->
+                             <a href="mailto:logan.mayfield@fndautomations.com" aria-label="Email"><i class="fas fa-envelope"></i></a>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+
+             <!-- Team Member Card 2: Matthew -->
+             <div class="team-member">
+                 <div class="member-image">
+                     <img src="/images/Moe.png" alt="Portrait of Matthew Moellering">
+                      <!-- Overlay structure preserved -->
+                     <div class="member-details-overlay initial-overlay">
+                         <h3>Matthew Moellering</h3>
+                         <p class="member-role">Chief Financial Officer</p>
+                     </div>
+                     <div class="member-details-overlay hover-overlay">
+                        <h3>Matthew Moellering</h3>
+                                                 <p class="member-role">Chief Financial Officer</p>
+                        <p class="member-bio">With a strong foundation in Finance, Matthew masterminds FND Automations' financial strategy and operational efficiency. He ensures that our automation projects, from Airtable-driven data systems to complex AI integrations, deliver measurable ROI and sustainable value for our clients.</p>
+                         <div class="member-social">
+                             <a href="https://www.linkedin.com/in/matthew-moellering-jr/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                             <!-- <a href="https://twitter.com/MatthewMoellering" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                             <a href="mailto:matthew.moellering@fndautomations.com" aria-label="Email"><i class="fas fa-envelope"></i></a> -->
+                         </div>
+                     </div>
+                 </div>
+             </div>
+
+             <!-- Team Member Card 3: Haiden -->
+              <div class="team-member">
+                 <div class="member-image">
+                     <img src="/images/Haidan.png" alt="Portrait of Haiden Mayfield">
+                     <!-- Overlay structure preserved -->
+                     <div class="member-details-overlay initial-overlay">
+                         <h3>Haidan Mayfield</h3>
+                         <p class="member-role">Chief Marketing Officer</p>
+                     </div>
+                     <div class="member-details-overlay hover-overlay">
+                         <h3>Haidan Mayfield</h3>
+                                                  <p class="member-role">Chief Marketing Officer</p>
+                         <p class="member-bio">Haiden is the voice of FND Automations, translating complex AI and web development capabilities into compelling narratives. He ensures our innovative solutions, including voice agents and custom automations, resonate with businesses seeking to elevate their operations and customer engagement.</p>
+                          <div class="member-social">
+                             <!-- <a href="https://www.linkedin.com/in/haiden-mayfield/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a> -->
+                             <!-- <a href="https://twitter.com/HaidenMayfield" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-twitter"></i></a> -->
+                             <!-- <a href="mailto:haiden.mayfield@fndautomations.com" aria-label="Email"><i class="fas fa-envelope"></i></a> -->
+                         </div>
+                     </div>
+                 </div>
+             </div>
+
+            <!-- Team Member Card 4: John -->
+             <div class="team-member">
+                 <div class="member-image">
+                     <img src="/images/John.png" alt="Portrait of John Byers">
+                     <!-- Overlay structure preserved -->
+                     <div class="member-details-overlay initial-overlay">
+                         <h3>John Byers</h3>
+                         <p class="member-role">Chief Technology Officer</p>
+                     </div>
+                     <div class="member-details-overlay hover-overlay">
+                         <h3>John Byers</h3>
+                                                  <p class="member-role">Chief Technology Officer</p>
+                         <p class="member-bio">As CTO and an engineering Master's candidate at MIT, John architects the cutting-edge technical solutions at FND Automations. He leads the development of bespoke AI agents, sophisticated Make/n8n workflows, intelligent web applications, and robust Airtable systems, ensuring technical excellence and innovation.</p>
+                          <div class="member-social">
+                             <a href="https://www.linkedin.com/in/john-byers-6935072a3/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                             <!-- <a href="https://twitter.com/HaidenMayfield" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-twitter"></i></a> Assuming same twitter handle was typo -->
+                             <a href="mailto:johnbyers1218@gmail.com" aria-label="Email"><i class="fas fa-envelope"></i></a>
+                             <a href="https://github.com/johnbyers1218" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+        </div> <!-- /.team-grid -->
+    </div> <!-- /.container -->
+</section>
+
+<!-- CTA Section -->
+<section id="cta" class="cta-section">
+     <div class="container">
+         <div class="cta-content">
+             <h2>Ready to Transform Your Business?</h2>
+             <p>Contact us today to discuss how our automation solutions can help you achieve your goals.</p>
+             <a href="/contact" class="cta-button primary-btn glow-button">Get Started</a>
+         </div>
+     </div>
+</section>
+
+<%- include('partials/footer') %>
+</file>
+
+<file path="views/index.ejs">
+<!-- views/index.ejs -->
+<%# Homepage for FND Automations %>
+
+<%- include('partials/header', {
+    pageTitle: 'FND Automations - AI & Process Automation Solutions',
+    pageDescription: 'FND Automations provides innovative AI and process automation services to boost efficiency, reduce costs, and drive business growth. Contact us for custom solutions.',
+    path: '/'
+}) %>
+
+<!-- Hero Section -->
+<section id="hero" class="hero-section">
+    <!-- Video Background -->
+    <video class="hero-video-background" autoplay loop muted playsinline poster="image/HeroImage.png">
+        <!-- MP4 source (Primary and Only Video Choice) -->
+        <source src="/images/HeroVideo.mp4" type="video/mp4">
+
+        <!-- Fallback for browsers that don't support the <video> tag AT ALL,
+             or if they can't play MP4 -->
+        <img src="image/HeroImage.png" alt="Hero Background Image" class="hero-fallback-image">
+        Your browser does not support the video tag. <!-- This text is also a fallback -->
+    </video>
+
+    <!-- Your existing script -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const heroVideo = document.querySelector('.hero-video-background');
+        let isVideoPlaying = false; // Flag to track if we've intentionally started it
+
+        if (heroVideo) {
+            // Check if the video element has actually loaded a video source
+            // and isn't just showing the fallback image.
+            // If heroVideo.currentSrc is empty, it means no video source was loaded.
+            if (heroVideo.currentSrc) {
+                heroVideo.addEventListener('ended', function() {
+                    console.log("Video ended, explicitly replaying.");
+                    this.currentTime = 0;
+                    this.play().catch(error => {
+                        console.warn("Error replaying video on 'ended' event:", error);
+                    });
+                }, false);
+
+                // Try to play initially
+                const playPromise = heroVideo.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        isVideoPlaying = true; // Successfully started playing
+                        console.log("Video playback started successfully.");
+                    }).catch(error => {
+                        console.warn("Initial video autoplay was prevented or failed:", error);
+                        // If autoplay fails, the poster image (or img fallback) should be visible.
+                    });
+                }
+            } else {
+                console.log("No video source loaded, fallback image should be showing.");
+            }
+        }
+    });
+    </script>
+
+    <!-- Overlay: This will sit on top of the video to darken it for text readability -->
+    <div class="hero-overlay"></div>
+
+    <!-- Content: This will sit on top of the overlay -->
+    <div class="hero-content">
+        <h1 class="hero-title glowing-text">FND AUTOMATIONS</h1>
+        <p class="hero-subtitle">Empowering businesses through innovative automation solutions</p>
+        <div class="hero-buttons">
+            <a href="/services" class="cta-button primary-btn">Our Services</a>
+            <a href="/contact" class="cta-button secondary-btn">Get Started</a>
+        </div>
+    </div>
+</section>
+
+<!-- Client Showcase & Social Proof Section -->
+<section id="client-showcase" class="section section-darker">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Powering Industry Leaders</h2>
+            <p class="section-description">We partner with businesses of significant scale, driving enterprise-level growth and efficiency. The numbers below reflect the caliber of companies that trust our expertise.</p>
+        </div>
+
+        <!-- Aggregate Stats -->
+        <% if (aggregateStats && (aggregateStats.totalValuation > 0 || aggregateStats.totalRevenue > 0)) { %>
+        <div class="aggregate-stats-container">
+            <div class="stat-item">
+                <span class="stat-value">$<%= (aggregateStats.totalValuation / 1000000).toFixed(1) %>M+</span>
+                <span class="stat-label">Combined Partner Valuation</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">$<%= (aggregateStats.totalRevenue / 1000000).toFixed(1) %>M+</span>
+                <span class="stat-label">Combined Partner Revenue</span>
+            </div>
+            <% if (featuredProjects && featuredProjects.length > 0) { %>
+            <div class="stat-item">
+                <span class="stat-value"><%= featuredProjects.length %>+</span>
+                <span class="stat-label">Enterprise Case Studies</span>
+            </div>
+            <% } %>
+        </div>
+        <% } %>
+
+        <!-- Client Carousel -->
+        <% if (featuredProjects && featuredProjects.length > 0) { %>
+        <div class="client-carousel">
+            <% featuredProjects.forEach(project => { %>
+                <div class="client-card">
+                    <div class="client-card-header">
+                        <img src="<%= project.clientLogoUrl %>" alt="<%= project.clientName || 'Client' %> Logo" class="client-logo">
+                        <h3 class="client-name"><%= project.clientName || 'Confidential Client' %></h3>
+                    </div>
+                    <div class="client-card-body">
+                        <p class="success-snippet">"<%= project.successSnippet %>"</p>
+                    </div>
+                    <div class="client-card-footer">
+                        <a href="/projects/<%= project.slug %>" class="card-link">View Case Study →</a>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+        <% } %>
+    </div>
+</section>
+
+<!-- Services Preview Section -->
+<section id="services-preview" class="section section-darker">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">What We Offer</h2>
+            <p class="section-description">A glimpse into our comprehensive automation solutions designed for your business needs.</p>
+        </div>
+        <div class="grid-container grid-3-col">
+            <div class="content-card service-card">
+                <div class="card-icon"><i class="fas fa-robot fa-fw"></i></div>
+                <h3>Process Automation</h3>
+                <p>Automate repetitive tasks and workflows using tools like n8n and Make to increase productivity and reduce errors.</p>
+                <a href="/services#process-automation" class="card-link">Learn More →</a>
+            </div>
+            <div class="content-card service-card">
+                <div class="card-icon"><i class="fas fa-brain fa-fw"></i></div>
+                <h3>AI Integration</h3>
+                <p>Leverage AI models (OpenAI, Claude) for tasks like data analysis, content generation, and intelligent decision-making.</p>
+                 <a href="/services#ai-integration" class="card-link">Learn More →</a>
+            </div>
+            <div class="content-card service-card">
+                <div class="card-icon"><i class="fas fa-database fa-fw"></i></div>
+                <h3>Custom Solutions</h3>
+                <p>Tailored software and integrations connecting tools like Airtable, CRMs, and APIs for your specific workflows.</p>
+                 <a href="/services#custom-solutions" class="card-link">Learn More →</a>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 3rem;">
+            <a href="/services" class="cta-button secondary-btn">View All Services</a>
+        </div>
+    </div>
+</section>
+
+ <!-- Dynamic Projects Preview -->
+ <section id="projects-preview" class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Recent Projects</h2>
+            <p class="section-description">See how we've helped businesses like yours achieve tangible results.</p>
+        </div>
+         <!-- Container where JS will inject project cards -->
+        <div id="projects-preview-grid" class="grid-container grid-3-col">
+             <!-- Example placeholder structure for JS target -->
+             <div class="content-card project-card is-loading" style="justify-content: center; align-items: center;">
+                <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-color);"></i>
+                <p style="margin-top: 1rem; color: var(--gray-text);">Loading Projects...</p>
+            </div>
+             <div class="content-card project-card is-loading" style="justify-content: center; align-items: center; display: none; /* Hide extra placeholders on larger screens */"></div>
+             <div class="content-card project-card is-loading" style="justify-content: center; align-items: center; display: none;"></div>
+        </div>
+         <div style="text-align: center; margin-top: 3rem;">
+            <a href="/projects" class="cta-button secondary-btn">View All Projects</a>
+        </div>
+    </div>
+ </section>
+
+<!-- Client Showcase & Social Proof Section -->
+<% if (featuredProjects && featuredProjects.length > 0) { %>
+<section id="client-showcase" class="section section-darker">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Client Success Showcase</h2>
+            <p class="section-description">We deliver measurable results. Here’s a look at the value we’ve created for our partners.</p>
+        </div>
+
+        <!-- Aggregate Stats -->
+        <div class="aggregate-stats-container">
+            <div class="stat-item">
+                <span class="stat-value">$<%= (aggregateStats.totalValuation / 1000000).toFixed(1) %>M+</span>
+                <span class="stat-label">Total Partner Valuation</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">$<%= (aggregateStats.totalRevenue / 1000000).toFixed(1) %>M+</span>
+                <span class="stat-label">Combined Annual Revenue</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value"><%= featuredProjects.length %>+</span>
+                <span class="stat-label">Featured Success Stories</span>
+            </div>
+        </div>
+
+        <!-- Client Carousel -->
+        <div class="client-carousel">
+            <% featuredProjects.forEach(project => { %>
+                <div class="client-card">
+                    <div class="client-card-header">
+                        <img src="<%= project.clientLogoUrl %>" alt="<%= project.clientName || 'Client' %> Logo" class="client-logo">
+                        <h3 class="client-name"><%= project.clientName || 'Confidential Client' %></h3>
+                    </div>
+                    <div class="client-card-body">
+                        <p class="success-snippet">"<%= project.successSnippet %>"</p>
+                    </div>
+                    <div class="client-card-footer">
+                        <a href="/projects/<%= project.slug %>" class="card-link">View Case Study →</a>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+</section>
+<% } %>
+
+<!-- Call to Action Section -->
+<section id="cta" class="cta-section">
+     <div class="container">
+         <div class="cta-content">
+             <h2>Ready to Transform Your Business?</h2>
+             <p>Contact us today for a free consultation and discover how automation can drive your success.</p>
+             <a href="/contact" class="cta-button primary-btn glow-button">Get Started Now</a>
+         </div>
+     </div>
+</section>
+
+<%- include('partials/footer') %>
+</file>
+
+<file path="views/partials/footer.ejs">
+<!-- views/partials/footer.ejs -->
+
+</main> <!-- Closing main tag opened in header.ejs -->
+
+<!-- ======================================== -->
+<!-- Site Footer                          -->
+<!-- ======================================== -->
+<footer>
+    <!-- Container for consistent padding and max-width -->
+    <div class="container">
+        <div class="footer-content"> <!-- Grid layout for footer sections -->
+
+            <!-- Footer Section 1: Logo & Brand -->
+            <div class="footer-section footer-logo">
+                <div class="logo">
+                    <%# OLD Text Logo: <a href="/index" title="FND Automations Home">FND Automations</a> %>
+                    <%# NEW Image Logo: %>
+                    <a href="/" title="FND Automations Home">
+                        <img src="/images/FND_LOGO_SVG_WHITE.svg" alt="FND Automations Logo" id="header-logo">
+                    </a>
+                </div>
+                <p style="color: var(--gray-text); font-size: 0.9rem; line-height: 1.6;">
+                    Empowering businesses through innovative AI and process automation solutions designed for efficiency and growth.
+                </p>
+                 <!-- Optional: Add mission snippet or tagline -->
+            </div>
+
+            <!-- Footer Section 2: Quick Links (Split into two columns) -->
+            <div class="footer-section footer-links">
+                <h3>Quick Links</h3>
+                <div class="footer-links-grid">
+                    <ul class="links-column">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/services">Services</a></li>
+                        <li><a href="/projects">Projects</a></li>
+                        <li><a href="/testimonials">Testimonials</a></li>
+                        <li><a href="/about">About Us</a></li>
+                    </ul>
+                    <ul class="links-column">
+                        <li><a href="/blog">Blog</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                        <li><a href="/privacy-policy">Privacy Policy</a></li>
+                        <li><a href="/terms-of-service">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Footer Section 3: Contact Info & Social -->
+            <div class="footer-section footer-contact">
+                <h3>Get In Touch</h3>
+                <p>
+                    <i class="fas fa-envelope fa-fw" style="color: var(--primary-color); margin-right: 8px;"></i>
+                    <a href="mailto:logan.mayfield@fndautomations.com" style="color: inherit; text-decoration: none;">logan.mayfield@fndautomations.com</a>
+                </p>
+                <p>
+                     <i class="fas fa-phone fa-fw" style="color: var(--primary-color); margin-right: 8px;"></i>
+                     <a href="tel:+11234567890" style="color: inherit; text-decoration: none;">(209) 402-0089</a> <%# Update phone # %>
+                 </p>
+                                <!-- Social Media Icons -->
+                <div class="social-icons" style="margin-top: 1.5rem;"> <!-- Added margin-top -->
+                     <!-- <a href="https://www.facebook.com/yourprofile" target="_blank" rel="noopener noreferrer" aria-label="FND Automations on Facebook" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                     <a href="https://twitter.com/yourprofile" target="_blank" rel="noopener noreferrer" aria-label="FND Automations on Twitter" title="Twitter"><i class="fab fa-twitter"></i></a> -->
+                     <a href="https://www.instagram.com/fndautomations" target="_blank" rel="noopener noreferrer" aria-label="FND Automations on Instagram" title="Instagram"><i class="fab fa-instagram"></i></a>
+                     <!-- <a href="https://www.linkedin.com/in/yourprofile" target="_blank" rel="noopener noreferrer" aria-label="FND Automations on LinkedIn" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a> -->
+                     <a href="https://www.tiktok.com/@fnd.automations?lang=en" target="_blank" rel="noopener noreferrer" aria-label="FND Automations on TikTok" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                     <!-- Add other relevant social media links (GitHub?) -->
+                </div>
+            </div>
+
+        </div> <!-- /.footer-content -->
+     </div> <!-- /.container -->
+
+     <!-- Footer Bottom Bar -->
+     <div class="footer-bottom">
+         <!-- Copyright text with dynamic year -->
+         <p>© <span id="current-year">2025</span> FND Automations. All rights reserved.</p>
+     </div>
+ </footer>
+ <!-- End Site Footer -->
+
+</div> <!-- /.page-wrapper -->
+
+<!-- ======================================== -->
+<!-- JavaScript Files                       -->
+<!-- ======================================== -->
+
+<!-- Main application script (should contain most JS logic) -->
+<script src="/js/apps.js"></script>
+
+<!-- Inline script for essential immediate execution (like dynamic year) -->
+<script>
+ // Set Dynamic Copyright Year
+ const yearSpan = document.getElementById('current-year');
+ if(yearSpan) { yearSpan.textContent = new Date().getFullYear(); }
+
+ // Basic Hamburger Menu Toggle Logic (RECOMMENDATION: Move to apps.js)
+ // This ensures basic nav works even if apps.js has an error or is deferred
+ const hamburger = document.querySelector('.hamburger');
+ const navLinks = document.querySelector('.nav-links');
+ const bodyForNav = document.body;
+
+ if(hamburger && navLinks) {
+     if (!navLinks.id) { navLinks.id = 'nav-links-list'; } // Ensure ID for aria
+     hamburger.setAttribute('aria-controls', navLinks.id);
+     hamburger.setAttribute('aria-expanded', 'false');
+
+     hamburger.addEventListener('click', () => {
+         const isActive = navLinks.classList.toggle('active');
+         hamburger.setAttribute('aria-expanded', isActive);
+         bodyForNav.classList.toggle('nav-active', isActive);
+     });
+ } else {
+      console.warn('Hamburger menu elements (.hamburger, .nav-links) not found for inline script.');
+ }
+</script>
+
+<!-- Optional: Analytics Script (Conditional for Production) -->
+<% if (process.env.NODE_ENV === 'production' && process.env.GA_MEASUREMENT_ID) { %> <!-- Check for ID -->
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=<%= process.env.GA_MEASUREMENT_ID %>"></script>
+<script>
+ window.dataLayer = window.dataLayer || [];
+ function gtag(){dataLayer.push(arguments);}
+ gtag('js', new Date());
+ gtag('config', '<%= process.env.GA_MEASUREMENT_ID %>'); // Use env variable
+</script>
+<% } else if (process.env.NODE_ENV === 'production' && !process.env.GA_MEASUREMENT_ID) { %>
+<!-- Warning if in production but ID is missing -->
+<script>console.warn('Google Analytics Measurement ID (GA_MEASUREMENT_ID) is not configured for production.');</script>
+<% } %>
+
+</body>
+</html>
+</file>
+
+<file path="public/js/apps.js">
+/**
+ * FND Automations - Frontend JavaScript (apps.js)
+ *
+ * Responsibilities:
+ * - Initialize UI components on DOM load.
+ * - Handle mobile navigation toggle.
+ * - Highlight active navigation link based on URL.
+ * - Fetch and display dynamic content (Projects, Testimonials) via API calls.
+ * - Handle Contact form submission (via API).
+ * - Trigger and handle Scheduling form submission (via API).
+ * - Implement FAQ accordion functionality.
+ * - Update dynamic elements like the copyright year.
+ * - Provide basic utility functions (e.g., escapeHtml).
+ */
+
+// --- Initialization ---
+document.addEventListener('DOMContentLoaded', () => {
+
+
+    // Initialize core UI components
+    initMobileNav();
+    setActiveNavLink();
+    initFAQAccordion();
+    updateCopyrightYear();
+
+    // Initialize dynamic content loading based on page elements
+    if (document.getElementById('projects-grid-container')) {
+        loadProjects(); // Load all projects on the /projects page
+        initProjectFilters(); // Activate filter buttons if present
+    }
+    if (document.querySelector('.blog-filter-navigation')) {
+        initBlogFilters(); // Activate blog filter buttons if present
+    }
+    if (document.getElementById('testimonials-grid-container')) {
+        loadTestimonials(); // Load testimonials on the /testimonials page
+    }
+    if (document.getElementById('projects-preview-grid')) {
+        loadProjectPreview(); // Load preview on the homepage /
+    }
+
+    // Initialize form handlers if forms exist
+    if (document.getElementById('contact-form')) {
+        initContactAndScheduleForm();
+    }
+    // Schedule form is initialized dynamically after contact form success
+
+  
+});
+
+
+/**
+ * CORRECT and SECURE HTML escaping utility.
+ * Converts special HTML characters to their entity equivalents.
+ * Handles quote characters correctly within replacement strings.
+ * @param {string | number | any} unsafe The input string (or other type).
+ * @returns {string} The escaped string.
+ */
+function escapeHtml(unsafe) {
+    // Ensure input is treated as a string, handle null/undefined
+    const str = String(unsafe || '');
+
+    // Perform replacements in the correct order
+    return str
+         .replace(/&/g, "&")      // Replace & first
+         .replace(/</g, "<")       // Then <
+         .replace(/>/g, ">")       // Then >
+         // Use single quotes to delimit the string containing "
+         .replace(/"/g, '"')
+         // Use double quotes to delimit the string containing '
+         .replace(/'/g, "'");
+ }
+ 
+
+/**
+ * Reusable fetch function with basic error handling.
+ * @param {string} url API endpoint URL.
+ * @param {object} options Fetch options (method, headers, body).
+ * @returns {Promise<object>} Promise resolving to the parsed JSON data.
+ */
+async function fetchData(url, options = {}) {
+    try {
+        const response = await fetch(url, options);
+        const responseData = await response.json(); // Always try to parse JSON
+
+        if (!response.ok) {
+            // Throw an error using message from API response if available
+            throw new Error(responseData.message || `HTTP error! status: ${response.status}`);
+        }
+        if (!responseData.success) {
+            // Throw an error if API indicates failure, include validation errors if present
+            const errorMsg = responseData.message || 'API request failed.';
+            const validationErrors = responseData.errors ? ` Details: ${responseData.errors.map(e => e.msg).join(', ')}` : '';
+            throw new Error(errorMsg + validationErrors);
+        }
+        return responseData; // Return the full success response object (contains data property)
+
+    } catch (error) {
+        console.error(`Fetch error for ${url}:`, error);
+        // Re-throw the processed error message or a generic one
+        throw new Error(error.message || `Failed to fetch data from ${url}. Network error.`);
+    }
+}
+
+/**
+ * Updates the text content of an element safely.
+ * @param {string} selector CSS selector for the target element.
+ * @param {string} text Text content to set.
+ */
+function updateTextContent(selector, text) {
+    const element = document.querySelector(selector);
+    if (element) {
+        element.textContent = text;
+    } else {
+         console.warn(`Element not found for selector: ${selector}`);
+    }
+}
+
+
+
+// --- Navigation ---
+
+function initMobileNav() {
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+    const body = document.body;
+
+    if (!hamburger || !navLinks) return; // Exit if elements not found
+
+    if (!navLinks.id) navLinks.id = 'nav-links-list';
+    hamburger.setAttribute('aria-controls', navLinks.id);
+    hamburger.setAttribute('aria-expanded', 'false'); // Initial state
+
+    hamburger.addEventListener('click', () => {
+        const isActive = navLinks.classList.toggle('active');
+        hamburger.setAttribute('aria-expanded', isActive);
+        body.classList.toggle('nav-active', isActive);
+    });
+
+    // Close menu when clicking a link inside it
+    navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            if (navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                hamburger.setAttribute('aria-expanded', 'false');
+                body.classList.remove('nav-active');
+            }
+            // Allow default link behavior to proceed
+        });
+    });
+}
+
+function setActiveNavLink() {
+    const navLinks = document.querySelectorAll('.nav-links a');
+    // Get the path relative to the root (e.g., "/", "/about", "/blog")
+    const currentPath = window.location.pathname;
+
+    navLinks.forEach(link => {
+        link.classList.remove('active'); // Reset all first
+        let linkPath = link.getAttribute('href');
+
+        // Handle potential leading/trailing slashes for comparison
+        if (linkPath !== '/' && linkPath.endsWith('/')) {
+            linkPath = linkPath.slice(0, -1);
+        }
+        const normalizedCurrentPath = currentPath.endsWith('/') && currentPath !== '/' ? currentPath.slice(0, -1) : currentPath;
+
+        // Check for exact match or if current path starts with link path (for sections like blog)
+        if (linkPath === normalizedCurrentPath || (linkPath !== '/' && normalizedCurrentPath.startsWith(linkPath) && (normalizedCurrentPath[linkPath.length] === '/' || normalizedCurrentPath.length === linkPath.length ))) {
+            link.classList.add('active');
+        }
+    });
+}
+
+// --- Dynamic Content Rendering ---
+
+/** Renders loading indicator into a grid container */
+function renderLoadingIndicator(container) {
+    container.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem;">
+            <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-color);"></i>
+            <p style="margin-top: 1rem; color: var(--gray-text);">Loading Content...</p>
+        </div>`;
+}
+
+/** Renders error message into a grid container */
+function renderErrorMessage(container, message = 'Could not load content.') {
+     container.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: #dc3545; padding: 2rem; background-color: rgba(220, 53, 69, 0.1); border-radius: var(--border-radius);">${escapeHtml(message)}</p>`;
+}
+
+/** Renders "no data" message into a grid container */
+function renderNoDataMessage(container, type = 'items') {
+     container.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: var(--gray-text); padding: 2rem;">No ${escapeHtml(type)} found.</p>`;
+}
+
+/**
+ * Generates a plain text excerpt from HTML content.
+ * @param {string} htmlContent The HTML string.
+ *   @param {number} maxLength The maximum length of the excerpt.
+ * @returns {string} A plain text excerpt.
+ */
+function generateExcerptFromHtml(htmlContent, maxLength = 150) {
+    if (!htmlContent) return '';
+    // Strip HTML tags
+    const textContent = htmlContent.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    if (textContent.length <= maxLength) {
+        return textContent;
+    }
+    // Truncate and add ellipsis
+    return textContent.substring(0, maxLength).trimEnd() + '...';
+}
+
+
+/** Creates HTML for a single Project card (for listing pages) */
+function createProjectCardHtml(project, isPreview = false) {
+    // Generate an excerpt from the potentially rich HTML description
+    const excerpt = generateExcerptFromHtml(project.description, isPreview ? 80 : 120);
+
+    const imageHtml = project.image
+        ? `<img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}" loading="lazy" class="project-image">`
+        : `<div class="project-image-placeholder">
+             <i class="fas fa-project-diagram"></i>
+           </div>`;
+
+    // Link to the single project page using its slug
+    const projectDetailUrl = `/projects/${escapeHtml(project.slug || 'no-slug-found')}`;
+
+    return `
+        <article class="project-card" data-category="${escapeHtml(project.category || 'uncategorized')}">
+            ${imageHtml}
+            <div class="project-content">
+                <h3 class="project-title">
+                    <a href="${projectDetailUrl}">${escapeHtml(project.title)}</a>
+                </h3>
+                <p class="project-description">${escapeHtml(excerpt)}</p>
+                <div class="project-meta">
+                    <a href="${projectDetailUrl}" class="project-link">View Case Study</a>
+                </div>
+            </div>
+        </article>
+    `;
+}
+
+// --- Loaders --- (loadProjects will use the updated createProjectCardHtml)
+async function loadProjects() {
+    const container = document.getElementById('projects-grid-container');
+    if (!container) {
+        console.warn('projects container not found on this page.');
+        return;
+    }
+    
+    renderLoadingIndicator(container);
+    
+    try {
+        const data = await fetchData('/api/projects');
+        if (data.projects && data.projects.length > 0) {
+            container.innerHTML = ''; // Clear loading
+            data.projects.forEach(project => {
+                container.insertAdjacentHTML('beforeend', createProjectCardHtml(project));
+            });
+            
+            // Update filter counts after projects are loaded
+            setTimeout(() => {
+                updateFilterCounts();
+            }, 100);
+        } else {
+            renderNoDataMessage(container, 'projects');
+        }
+    } catch (error) {
+        renderErrorMessage(container, `Could not load projects. ${error.message}`);
+    }
+}
+
+// createFeaturedProjectHtml needs to be updated to use an excerpt too if its description is HTML
+function createFeaturedProjectHtml(project) {
+    const imageHtml = project.image
+        ? `<div class="featured-project-image" style="min-height: 350px;">
+               <img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+           </div>`
+        : `<div class="featured-project-image" style="min-height: 350px; background-color: #222; display: flex; align-items: center; justify-content: center; color: var(--gray-text);"> <i class="fas fa-project-diagram fa-4x"></i></div>`;
+
+    // Link to the single project page for the "View Details" button
+    const projectDetailUrl = `/projects/${escapeHtml(project.slug)}`;
+    const linkHtml = `<a href="${projectDetailUrl}" class="cta-button primary-btn" style="margin-top: auto; align-self: flex-start;">View Case Study</a>`;
+
+    // Generate an excerpt for the featured project's description
+    const excerpt = generateExcerptFromHtml(project.description, 200); // Longer excerpt for featured
+
+    return `
+        <div class="featured-project-content" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0; align-items: stretch; background-color: var(--card-bg); border-radius: var(--border-radius); overflow:hidden; border: 1px solid var(--card-border); box-shadow: 0 5px 15px rgba(0,0,0,0.15);">
+            ${imageHtml}
+            <div class="featured-project-details" style="padding: 2rem 2.5rem; display: flex; flex-direction: column;">
+                <h3><a href="${projectDetailUrl}" style="color: inherit; text-decoration: none;">${escapeHtml(project.title)}</a></h3>
+                <p class="project-category" style="color: var(--primary-color); font-weight: 600; margin-bottom: 1rem; display: inline-block;">${escapeHtml(project.category)}</p>
+                <p style="flex-grow: 1; margin-bottom: 1.5rem;">${escapeHtml(excerpt)}</p>
+                ${linkHtml}
+            </div>
+        </div>
+    `;
+}
+
+
+// Ensure your DOMContentLoaded listener calls loadProjects, loadFeaturedProject correctly.
+document.addEventListener('DOMContentLoaded', () => {
+  
+    initMobileNav();
+    setActiveNavLink();
+    initFAQAccordion();
+    updateCopyrightYear();
+
+    if (document.getElementById('projects-grid-container')) {
+        loadProjects();
+        initProjectFilters();
+    }
+    if (document.getElementById('testimonials-grid-container')) {
+        loadTestimonials();
+    }
+    if (document.getElementById('projects-preview-grid')) { // Homepage project preview
+        // Ensure loadProjectPreview uses createProjectCardHtml which now links to slug
+        loadProjectPreview(); // This function likely needs to use createProjectCardHtml with isPreview=true
+    }
+    if (document.getElementById('featured-project-container')) { // For /projects page featured
+        loadFeaturedProject();
+    }
+    if (document.getElementById('featured-testimonial-container')) {
+        loadFeaturedTestimonial();
+    }
+
+    if (document.getElementById('contact-form'))initContactAndScheduleForm();
+    // Schedule form is initialized dynamically
+   
+});
+
+
+// loadProjectPreview needs to correctly use createProjectCardHtml for the homepage preview
+async function loadProjectPreview() {
+    const container = document.getElementById('projects-preview-grid');
+    if (!container) return;
+    renderLoadingIndicator(container);
+    try {
+        const data = await fetchData('/api/projects?featured=true&limit=3'); // Fetch featured, or just latest
+        container.innerHTML = '';
+        if (data.projects && data.projects.length > 0) {
+            // Show only a few, e.g., 3. Ensure `isPubliclyVisible` is checked by API or here.
+            const projectsToShow = data.projects.filter(p => p.isPubliclyVisible).slice(0, 3);
+            projectsToShow.forEach(project => {
+                // Pass true for isPreview to get shorter excerpt if desired
+                container.insertAdjacentHTML('beforeend', createProjectCardHtml(project, true));
+            });
+          
+        } else {
+            renderNoDataMessage(container, 'projects');
+        }
+    } catch (error) {
+        renderErrorMessage(container, `Could not load projects preview. ${error.message}`);
+    }
+}
+
+/** Creates HTML for a single Testimonial card */
+function createTestimonialCardHtml(testimonial) {
+    const ratingStars = testimonial.rating ?
+        '<span class="star">★</span>'.repeat(testimonial.rating) +
+        '<span class="star" style="color: #555;">★</span>'.repeat(5 - testimonial.rating)
+        : '';
+    const ratingHtml = testimonial.rating ? `<div class="rating">${ratingStars}</div>` : '';
+
+    const authorTitle = `${escapeHtml(testimonial.position || '')}${testimonial.position && testimonial.company ? ', ' : ''}${escapeHtml(testimonial.company || '')}`;
+
+    return `
+        <div class="testimonial-card">
+            <div class="testimonial-quote">
+                <p>${escapeHtml(testimonial.content)}</p>
+            </div>
+            <div class="testimonial-author-info">
+                <div>
+                    <h3>${escapeHtml(testimonial.author)}</h3>
+                    ${authorTitle ? `<p>${authorTitle}</p>` : ''}
+                    ${ratingHtml}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/** Creates HTML for testimonial carousel slide */
+function createTestimonialSlideHtml(testimonial) {
+    const ratingStars = testimonial.rating ?
+        '<span class="star">★</span>'.repeat(testimonial.rating) +
+        '<span class="star" style="color: #555;">★</span>'.repeat(5 - testimonial.rating)
+        : '';
+    const ratingHtml = testimonial.rating ? `<div class="rating">${ratingStars}</div>` : '';
+
+    const authorTitle = `${escapeHtml(testimonial.position || '')}${testimonial.position && testimonial.company ? ', ' : ''}${escapeHtml(testimonial.company || '')}`;
+
+    return `
+        <div class="testimonial-slide">
+            <div class="quote-content">
+                <p class="quote-text">${escapeHtml(testimonial.content)}</p>
+            </div>
+            <div class="author-info">
+                <div>
+                    <div class="author-name">${escapeHtml(testimonial.author)}</div>
+                    ${authorTitle ? `<div class="author-title">${authorTitle}</div>` : ''}
+                    ${ratingHtml}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// --- Loaders ---
+
+async function loadGenericContent(apiPath, containerId, cardRenderer, typeName) {
+    const container = document.getElementById(containerId);
+    if (!container) {
+        console.warn(`${typeName} container #${containerId} not found on this page.`);
+        return;
+    }
+    renderLoadingIndicator(container);
+    try {
+        const data = await fetchData(apiPath);
+        if (data[typeName] && data[typeName].length > 0) {
+            container.innerHTML = ''; // Clear loading
+            data[typeName].forEach(item => {
+                container.insertAdjacentHTML('beforeend', cardRenderer(item));
+            });
+           
+        } else {
+            renderNoDataMessage(container, typeName);
+        }
+    } catch (error) {
+        renderErrorMessage(container, `Could not load ${typeName}. ${error.message}`);
+    }
+}
+
+function loadTestimonials() {
+    // Load carousel testimonials
+    loadTestimonialsCarousel();
+    
+    // Load grid testimonials
+    loadGenericContent('/api/testimonials', 'testimonials-grid-container', createTestimonialCardHtml, 'testimonials');
+}
+
+// --- Testimonials Carousel Functions ---
+
+async function loadTestimonialsCarousel() {
+    const carouselContainer = document.getElementById('carousel-track');
+    if (!carouselContainer) return;
+
+    try {
+        const data = await fetchData('/api/testimonials');
+        if (data.testimonials && data.testimonials.length > 0) {
+            carouselContainer.innerHTML = '';
+            
+            // Create slides
+            data.testimonials.forEach(testimonial => {
+                carouselContainer.insertAdjacentHTML('beforeend', createTestimonialSlideHtml(testimonial));
+            });
+            
+            // Initialize carousel
+            initTestimonialsCarousel(data.testimonials.length);
+            
+            // Initialize stats counter
+            initStatsCounter();
+        } else {
+            carouselContainer.innerHTML = '<div class="testimonial-loading"><p>No testimonials available.</p></div>';
+        }
+    } catch (error) {
+        console.error('Error loading testimonials carousel:', error);
+        carouselContainer.innerHTML = '<div class="testimonial-loading"><p>Error loading testimonials.</p></div>';
+    }
+}
+
+let currentSlide = 0;
+let totalSlides = 0;
+let isAnimating = false;
+
+function initTestimonialsCarousel(slideCount) {
+    totalSlides = slideCount;
+    currentSlide = 0;
+    
+    createCarouselDots();
+    updateCarousel();
+    
+    // Add event listeners
+    const prevBtn = document.querySelector('.prev-btn');
+    const nextBtn = document.querySelector('.next-btn');
+    
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => prevSlide());
+    }
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => nextSlide());
+    }
+    
+    // Auto-advance carousel every 8 seconds
+    setInterval(() => {
+        if (!isAnimating) {
+            nextSlide();
+        }
+    }, 8000);
+    
+    // Touch/swipe support
+    addTouchSupport();
+}
+
+function createCarouselDots() {
+    const dotsContainer = document.getElementById('carousel-dots');
+    if (!dotsContainer) return;
+    
+    dotsContainer.innerHTML = '';
+    
+    for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement('button');
+        dot.className = 'carousel-dot';
+        dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+        dot.addEventListener('click', () => goToSlide(i));
+        dotsContainer.appendChild(dot);
+    }
+}
+
+function updateCarousel() {
+    const track = document.getElementById('carousel-track');
+    const dots = document.querySelectorAll('.carousel-dot');
+    const prevBtn = document.querySelector('.prev-btn');
+    const nextBtn = document.querySelector('.next-btn');
+    
+    if (track) {
+        track.style.transform = `translateX(-${currentSlide * 100}%)`;
+    }
+    
+    // Update dots
+    dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentSlide);
+    });
+    
+    // Update button states
+    if (prevBtn) {
+        prevBtn.disabled = currentSlide === 0;
+    }
+    
+    if (nextBtn) {
+        nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+}
+
+function prevSlide() {
+    if (isAnimating || currentSlide === 0) return;
+    isAnimating = true;
+    currentSlide--;
+    updateCarousel();
+    setTimeout(() => {
+        isAnimating = false;
+    }, 500);
+}
+
+function nextSlide() {
+    if (isAnimating) return;
+    
+    isAnimating = true;
+    
+    if (currentSlide === totalSlides - 1) {
+        // Loop back to first slide
+        currentSlide = 0;
+    } else {
+        currentSlide++;
+    }
+    
+    updateCarousel();
+    setTimeout(() => {
+        isAnimating = false;
+    }, 500);
+}
+
+function goToSlide(slideIndex) {
+    if (isAnimating || slideIndex === currentSlide) return;
+    isAnimating = true;
+    currentSlide = slideIndex;
+    updateCarousel();
+    setTimeout(() => {
+        isAnimating = false;
+    }, 500);
+}
+
+function addTouchSupport() {
+    const carousel = document.querySelector('.testimonial-carousel');
+    if (!carousel) return;
+    
+    let startX = 0;
+    let currentX = 0;
+    let isDragging = false;
+    
+    carousel.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        isDragging = true;
+    });
+    
+    carousel.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        currentX = e.touches[0].clientX;
+    });
+    
+    carousel.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        
+        const diffX = startX - currentX;
+        const threshold = 50;
+        
+        if (Math.abs(diffX) > threshold) {
+            if (diffX > 0) {
+                nextSlide();
+            } else {
+                prevSlide();
+            }
+        }
+    });
+}
+
+// Stats Counter Animation
+function initStatsCounter() {
+    const statsNumbers = document.querySelectorAll('.stat-number');
+    const observerOptions = {
+        threshold: 0.5,
+        rootMargin: '0px 0px -100px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const target = entry.target;
+                const finalValue = parseInt(target.getAttribute('data-count'));
+                animateCounter(target, 0, finalValue, 2000);
+                observer.unobserve(target);
+            }
+        });
+    }, observerOptions);
+    
+    statsNumbers.forEach(stat => {
+        observer.observe(stat);
+    });
+}
+
+function animateCounter(element, start, end, duration) {
+    const increment = (end - start) / (duration / 16);
+    let current = start;
+    
+    const timer = setInterval(() => {
+        current += increment;
+        if (current >= end) {
+            current = end;
+            clearInterval(timer);
+        }
+        element.textContent = Math.floor(current);
+    }, 16);
+}
+
+async function loadProjectPreview() {
+    const container = document.getElementById('projects-preview-grid');
+    if (!container) return;
+    renderLoadingIndicator(container);
+    try {
+        const data = await fetchData('/api/projects');
+        container.innerHTML = ''; // Clear loading/placeholders
+        if (data.projects && data.projects.length > 0) {
+            const projectsToShow = data.projects.slice(0, 3); // Show max 3
+            projectsToShow.forEach(project => {
+                container.insertAdjacentHTML('beforeend', createProjectCardHtml(project, true));
+            });
+             // Add empty placeholders if needed for grid layout visually
+             while (container.children.length % 3 !== 0 && container.children.length < 3) {
+                 container.insertAdjacentHTML('beforeend', '<div style="visibility: hidden; height: 0;"></div>');
+             }
+             
+        } else {
+            renderNoDataMessage(container, 'projects');
+        }
+    } catch (error) {
+        renderErrorMessage(container, `Could not load projects preview. ${error.message}`);
+    }
+}
+
+
+// --- Project Filtering ---
+
+function initProjectFilters() {
+    const filterButtons = document.querySelectorAll('.filter-navigation .filter-btn');
+    const projectGrid = document.getElementById('projects-grid-container');
+    if (!filterButtons.length || !projectGrid) return;
+
+    // Update filter counts on load
+    updateFilterCounts();
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            const filterValue = button.getAttribute('data-filter');
+            
+            // Update active states
+            filterButtons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-pressed', 'false');
+            });
+            button.classList.add('active');
+            button.setAttribute('aria-pressed', 'true');
+
+            // Filter projects with smooth animation
+            filterProjects(filterValue);
+        });
+    });
+}
+
+function updateFilterCounts() {
+    const projectCards = document.querySelectorAll('.project-card');
+    const filterButtons = document.querySelectorAll('.filter-navigation .filter-btn');
+    
+    // Count projects by category
+    const categoryCounts = {};
+    let totalCount = 0;
+
+    projectCards.forEach(card => {
+        const category = card.dataset.category || 'uncategorized';
+        categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+        totalCount++;
+    });
+
+    // Update count displays
+    filterButtons.forEach(button => {
+        const filterValue = button.getAttribute('data-filter');
+        const countElement = button.querySelector('.filter-count');
+        
+        if (countElement) {
+            if (filterValue === 'all') {
+                countElement.textContent = totalCount;
+            } else {
+                const count = categoryCounts[filterValue] || 0;
+                countElement.textContent = count;
+            }
+        }
+    });
+}
+
+function filterProjects(filterValue) {
+    const projectCards = document.querySelectorAll('.project-card');
+    
+    projectCards.forEach((card, index) => {
+        const category = card.dataset.category;
+        const shouldShow = (filterValue === 'all' || category === filterValue);
+        
+        if (shouldShow) {
+            card.style.display = 'flex';
+            card.style.animation = `fadeInUp 0.6s ease forwards ${index * 0.1}s`;
+        } else {
+            card.style.animation = 'fadeOut 0.3s ease forwards';
+            setTimeout(() => {
+                if (!shouldShow) card.style.display = 'none';
+            }, 300);
+        }
+    });
+}
+
+// --- Blog Filtering ---
+
+function initBlogFilters() {
+    const filterButtons = document.querySelectorAll('.blog-filter-navigation .filter-btn');
+    const blogGrid = document.querySelector('.blog-list');
+    if (!filterButtons.length || !blogGrid) return;
+
+    // Update filter counts on load
+    updateBlogFilterCounts();
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            const filterValue = button.getAttribute('data-filter');
+            
+            // Update active states
+            filterButtons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-pressed', 'false');
+            });
+            button.classList.add('active');
+            button.setAttribute('aria-pressed', 'true');
+
+            // Filter blog posts with smooth animation
+            filterBlogPosts(filterValue);
+        });
+    });
+}
+
+function updateBlogFilterCounts() {
+    const blogCards = document.querySelectorAll('.blog-post-summary');
+    const filterButtons = document.querySelectorAll('.blog-filter-navigation .filter-btn');
+    
+    // Count posts by tag
+    const tagCounts = {};
+    let totalCount = 0;
+
+    blogCards.forEach(card => {
+        const tags = card.dataset.tags ? card.dataset.tags.split(',') : [];
+        tags.forEach(tag => {
+            if (tag.trim()) {
+                tagCounts[tag.trim()] = (tagCounts[tag.trim()] || 0) + 1;
+            }
+        });
+        totalCount++;
+    });
+
+    // Update count displays
+    filterButtons.forEach(button => {
+        const filterValue = button.getAttribute('data-filter');
+        const countElement = button.querySelector('.filter-count');
+        
+        if (countElement) {
+            if (filterValue === 'all') {
+                countElement.textContent = totalCount;
+            } else {
+                const count = tagCounts[filterValue] || 0;
+                countElement.textContent = count;
+            }
+        }
+    });
+}
+
+function filterBlogPosts(filterValue) {
+    const blogCards = document.querySelectorAll('.blog-post-summary');
+    
+    blogCards.forEach((card, index) => {
+        const tags = card.dataset.tags ? card.dataset.tags.split(',') : [];
+        const shouldShow = (filterValue === 'all' || tags.includes(filterValue));
+        
+        if (shouldShow) {
+            card.style.display = 'flex';
+            card.style.animation = `fadeInUp 0.6s ease forwards ${index * 0.1}s`;
+        } else {
+            card.style.animation = 'fadeOut 0.3s ease forwards';
+            setTimeout(() => {
+                if (!shouldShow) card.style.display = 'none';
+            }, 300);
+        }
+    });
+}
+
+
+// --- Form Handling ---
+function displayStatusMessage(containerId, message, isSuccess = true) {
+    const container = document.getElementById(containerId);
+    if (container) {
+        const messageType = isSuccess ? 'success' : 'error';
+        // Using a checkmark or exclamation icon via class, assuming CSS handles the icon
+        const iconHtml = isSuccess ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-circle"></i>';
+        container.innerHTML = `<div class="flash-message ${messageType}" style="display: flex; align-items: center; gap: 10px;">${iconHtml} <span>${escapeHtml(message)}</span></div>`;
+        // Auto-clear after a delay - REMOVE FOR DEBUGGING if it clears too fast
+        // setTimeout(() => { if(container) container.innerHTML = ''; }, 7000);
+    } else {
+         console.warn(`Message container #${containerId} not found.`);
+    }
+}
+
+
+
+function clearFieldErrors() {
+    document.querySelectorAll('.field-error-message').forEach(el => el.remove());
+    document.querySelectorAll('.form-group input.error, .form-group textarea.error, .form-group select.error')
+        .forEach(el => el.classList.remove('error'));
+}
+
+/**
+ * Displays individual field validation errors.
+ * @param {Array} errors - The array of error objects from the server.
+ */
+function displayFieldErrors(errors) {
+    clearFieldErrors(); // Clear previous field errors
+
+    if (errors && Array.isArray(errors)) {
+        errors.forEach(err => {
+            const fieldName = err.path; // 'path' usually holds the field name
+            const inputElement = document.querySelector(`[name="${fieldName}"]`);
+            if (inputElement) {
+                inputElement.classList.add('error'); // Add error class for styling input
+                const errorMsgElement = document.createElement('small');
+                errorMsgElement.className = 'field-error-message';
+                errorMsgElement.style.color = 'var(--danger-color)'; // Or use a CSS class
+                errorMsgElement.style.display = 'block';
+                errorMsgElement.style.marginTop = '4px';
+                errorMsgElement.textContent = err.msg;
+
+                // Insert after the input element, or after its parent .form-group if more appropriate
+                if (inputElement.parentNode && inputElement.parentNode.classList.contains('form-group')) {
+                    inputElement.parentNode.appendChild(errorMsgElement);
+                } else {
+                    inputElement.insertAdjacentElement('afterend', errorMsgElement);
+                }
+            } else {
+                console.warn(`Could not find input element for field: ${fieldName} to display error: ${err.msg}`);
+            }
+        });
+    }
+}
+
+
+function initContactAndScheduleForm() {
+    const mainForm = document.getElementById('contact-form');
+    const submitButton = mainForm?.querySelector('button[type="submit"]'); // Ensure your button has type="submit"
+    const messageContainer = document.getElementById('contact-form-message');
+  
+
+
+    if (!mainForm || !submitButton || !messageContainer ) {
+        console.warn('Main contact form or one of its critical elements/containers not found. Form not initialized.', {
+            mainFormExists: !!mainForm,
+            submitButtonExists: !!submitButton,
+            messageContainerExists: !!messageContainer,
+        });
+        return;
+    }
+
+    const originalButtonHtml = submitButton.innerHTML;
+
+
+    // Main form submission handler
+    mainForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        if (submitButton.disabled) {
+            console.log('Form already submitting, ignoring additional click.');
+            return;
+        }
+        console.log('Main form submitted. Preventing default.');
+
+        submitButton.disabled = true;
+        submitButton.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Sending...`;
+        displayStatusMessage('contact-form-message', ''); // Clear previous general messages
+        clearFieldErrors(); // Clear previous individual field errors
+
+        const formData = new FormData(mainForm);
+        const formObject = Object.fromEntries(formData.entries());
+
+        // Explicitly get checkbox values
+        const privacyCheckbox = document.getElementById('privacy');
+        formObject.privacy = privacyCheckbox ? (privacyCheckbox.checked ? 'on' : 'off') : 'off';
+        formObject.requestedMeeting = (hiddenRequestedMeetingInput.value === 'true');
+
+
+        console.log('Submitting combined form data:', formObject);
+        let dataFromApi; // To store API response for use in finally block
+
+        try {
+            dataFromApi = await fetchData('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formObject)
+            });
+
+            console.log('Combined form API response:', dataFromApi);
+
+            if (dataFromApi.success) {
+                displayStatusMessage('contact-form-message', dataFromApi.message, true);
+                mainForm.reset(); // Reset all fields in the form
+
+                // Success message stays visible for a while
+                setTimeout(() => {
+                    if (document.getElementById('contact-form-message') &&
+                        document.getElementById('contact-form-message').querySelector('.success')) { // Only clear if it's a success message
+                        // displayStatusMessage('contact-form-message', ''); // Optionally clear global success
+                    }
+                }, 7000); // Message visible for 7 seconds
+            } else {
+                // Display general error message at the top
+                displayStatusMessage('contact-form-message', dataFromApi.message || 'Please correct the errors below.', false);
+                // Display individual field errors
+                if (dataFromApi.errors) {
+                    displayFieldErrors(dataFromApi.errors);
+                }
+            }
+        } catch (error) {
+            console.error('Error submitting combined form:', error);
+            displayStatusMessage('contact-form-message', error.message || 'An unexpected error occurred. Please try again.', false);
+            // In case of a network error or fetchData throwing before 'dataFromApi' is set
+            dataFromApi = { success: false }; // Assume failure for the finally block
+        } finally {
+            // Reset button based on the outcome
+            const wasSuccessful = dataFromApi && dataFromApi.success;
+            if (!wasSuccessful) {
+                // If there was an error or API returned success: false, re-enable immediately
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonHtml;
+            } else {
+                // If successful, form is reset. Re-enable button after a short delay
+                // so user can submit again if they wish (e.g., for a different inquiry)
+                setTimeout(() => {
+                    if (submitButton && document.body.contains(submitButton)) { // Check if button still exists
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = originalButtonHtml;
+                    }
+                }, 1000); // Delay of 1 second
+            }
+        }
+    });
+    console.log('Combined contact and schedule form initialized.');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // ...
+    if (document.getElementById('contact-form')) {
+        initContactAndScheduleForm(); // Call the new combined function
+    }
+    // ...
+});
+
+
+
+
+
+
+
+/** Fetches and renders the single featured project */
+async function loadFeaturedProject() {
+    const container = document.getElementById('featured-project-container'); // Target new ID
+    if (!container) return;
+    container.innerHTML = '<p style="text-align: center; padding: 1rem; color: var(--gray-text);">Loading featured project...</p>'; // Simple loading state
+
+    try {
+        // Fetch only the featured project, limit 1
+        const data = await fetchData('/api/projects?featured=true&limit=1');
+
+        if (data.projects && data.projects.length > 0) {
+            const featuredProject = data.projects[0];
+            container.innerHTML = createFeaturedProjectHtml(featuredProject); // Use a dedicated rendering function
+        } else {
+            // Optional: Hide the section or show a 'no featured' message
+            container.innerHTML = ''; // Clear loading message
+            // container.style.display = 'none'; // Hide section if no featured item
+          
+        }
+    } catch (error) {
+         container.innerHTML = `<p style="text-align: center; color: var(--danger-color);">Error loading featured project.</p>`;
+    }
+}
+
+async function loadFeaturedTestimonial() {
+    const container = document.getElementById('featured-testimonial-container');
+    if (!container) {
+        console.warn('Featured testimonial container not found.');
+        return;
+    }
+    container.innerHTML = '<p style="text-align: center; padding: 1rem; color: var(--gray-text);">Loading featured testimonial...</p>';
+    try {
+        const data = await fetchData('/api/testimonials?featured=true&limit=1');
+      
+
+        if (data.success && data.testimonials && data.testimonials.length > 0) {
+            const featuredTestimonial = data.testimonials[0]; // Assuming the API returns it sorted
+            container.innerHTML = createFeaturedTestimonialHtml(featuredTestimonial);
+        } else {
+            console.warn('No featured testimonial found or API success was false.');
+            // Display a more user-friendly message or hide the section
+            container.innerHTML = '<p style="text-align: center; color: var(--gray-text); padding: 1rem;">No featured testimonial available at the moment.</p>';
+            // container.style.display = 'none'; // Or hide section
+        }
+    } catch (error) {
+         console.error('Error in loadFeaturedTestimonial:', error); // Log the actual error
+         container.innerHTML = `<p style="text-align: center; color: var(--danger-color);">Error loading featured testimonial. ${escapeHtml(error.message)}</p>`;
+    }
+}
+
+function createFeaturedTestimonialHtml(testimonial) {
+     // Ensure all fields used here (testimonial.content, testimonial.author, etc.) exist
+     if (!testimonial || !testimonial.content || !testimonial.author) {
+         console.error("Missing data for createFeaturedTestimonialHtml", testimonial);
+         return '<p style="text-align: center; color: var(--danger-color);">Error: Incomplete testimonial data.</p>';
+     }
+     const ratingStars = testimonial.rating ? '<span class="star">★</span>'.repeat(testimonial.rating) + '<span class="star" style="color: #555;">★</span>'.repeat(5 - testimonial.rating) : '';
+     const ratingHtml = testimonial.rating ? `<div class="rating">${ratingStars}</div>` : '';
+     const authorTitle = `${escapeHtml(testimonial.position || '')}${testimonial.position && testimonial.company ? ', ' : ''}${escapeHtml(testimonial.company || '')}`;
+
+     // Using placeholder image as per previous setup. Ensure this image exists.
+     const authorImage = testimonial.authorImage || '/images/placeholder-client.png';
+
+     return `
+         <div class="featured-testimonial" style="background-color: var(--card-hover-bg); padding: 2.5rem; border-radius: var(--border-radius); border: 1px solid var(--primary-color); max-width: 900px; margin: 0 auto;">
+              <div class="testimonial-quote">
+                  <span class="quote-mark">"</span>
+                  <p>${escapeHtml(testimonial.content)}</p>
+                  <span class="quote-mark closing">"</span>
+              </div>
+               <div class="testimonial-author-info">
+                  <img src="${escapeHtml(authorImage)}" alt="${escapeHtml(testimonial.author)}" class="author-image">
+                  <div>
+                      <h3>${escapeHtml(testimonial.author)}</h3>
+                      ${authorTitle ? `<p>${authorTitle}</p>` : ''}
+                      ${ratingHtml}
+                  </div>
+              </div>
+          </div>
+     `;
+}
+
+
+
+// public/js/apps.js
+
+// ... (other functions like escapeHtml, fetchData, etc. remain the same) ...
+
+/** Creates HTML for the featured project section */
+function createFeaturedProjectHtml(project) {
+    // Similar structure to the static version, using dynamic data
+    // Ensure escapeHtml is used for user-generated content
+    const imageHtml = project.image
+        ? `<div class="featured-project-image" style="min-height: 350px;">
+               <img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+           </div>`
+        : `<div class="featured-project-image" style="min-height: 350px; background-color: #222; display: flex; align-items: center; justify-content: center; color: var(--gray-text);"> <i class="fas fa-project-diagram fa-4x"></i></div>`;
+
+    // Determine the correct link: to the project itself if a link exists, otherwise to the main /projects page
+    const linkHtml = project.link
+        ? `<a href="${escapeHtml(project.link)}" class="cta-button primary-btn" target="_blank" rel="noopener noreferrer" style="margin-top: auto; align-self: flex-start;">View Details</a>`
+        : `<a href="/projects" class="cta-button primary-btn" style="margin-top: auto; align-self: flex-start;">More Projects</a>`;
+
+    // --- REMOVED highlightsHtml ---
+    // const highlightsHtml = `
+    //     <ul class="project-highlights" style="margin: 1rem 0 1.5rem 0; list-style: none; padding: 0; font-size: 0.9rem;">
+    //         <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;"><i class="fas fa-check-circle" style="color: var(--primary-color); position: absolute; left: 0; top: 5px;"></i>Key Feature 1</li>
+    //         <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;"><i class="fas fa-check-circle" style="color: var(--primary-color); position: absolute; left: 0; top: 5px;"></i>Significant Result</li>
+    //     </ul>`;
+
+    return `
+        <div class="featured-project-content" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0; align-items: stretch; background-color: var(--card-bg); border-radius: var(--border-radius); overflow:hidden; border: 1px solid var(--card-border); box-shadow: 0 5px 15px rgba(0,0,0,0.15);">
+            ${imageHtml}
+            <div class="featured-project-details" style="padding: 2rem 2.5rem; display: flex; flex-direction: column;">
+                <h3 style="color: var(--light-text);">${escapeHtml(project.title)}</h3>
+                <p class="project-category" style="color: var(--primary-color); font-weight: 600; margin-bottom: 1rem; display: inline-block;">${escapeHtml(project.category)}</p>
+                <p style="flex-grow: 1; margin-bottom: 1.5rem;">${escapeHtml(project.description)}</p> 
+                ${linkHtml}
+            </div>
+        </div>
+    `;
+}
+
+// ... (rest of your apps.js file, including loadFeaturedProject and DOMContentLoaded listener) ...
+
+// --- Modify DOMContentLoaded Listener ---
+document.addEventListener('DOMContentLoaded', () => {
+    // ... other initializations ...
+
+    // Initialize dynamic FEATURED content loading
+    if (document.getElementById('featured-project-container')) {
+        loadFeaturedProject();
+    }
+    if (document.getElementById('featured-testimonial-container')) {
+        loadFeaturedTestimonial();
+    }
+
+    // Initialize dynamic LIST content loading (prevent double loading if preview exists)
+    if (document.getElementById('projects-grid-container') && !document.getElementById('projects-preview-grid')) {
+        loadProjects();
+        initProjectFilters();
+    }
+    if (document.getElementById('testimonials-grid-container') && !document.getElementById('featured-testimonial-container')) {
+        // Only load full list if not already showing featured (or adjust logic as needed)
+        loadTestimonials();
+    }
+     // Preview loader (ensure it doesn't conflict if on same page as full list)
+     if (document.getElementById('projects-preview-grid')) {
+        loadProjectPreview();
+    }
+
+    // ... form handlers etc. ...
+});
+
+function initScheduleForm() {
+    const scheduleForm = document.getElementById('schedule-form');
+    // ... (other setup) ...
+
+    scheduleForm.addEventListener('submit', async (e) => {
+        // ... (prevent default, button disabling) ...
+        displayStatusMessage('schedule-message', '');
+        // ... (formData and validation) ...
+
+        try {
+            const data = await fetchData('/api/schedule-meeting', { /* ... */ });
+
+            // UPDATED Success handling for scheduling form
+            displayStatusMessage('schedule-message', data.message || 'Meeting request received! We will email you to confirm.', true);
+            scheduleForm.reset();
+            scheduleForm.style.display = 'none';
+
+            const scheduleContainer = document.getElementById('schedule-section');
+            if(scheduleContainer) {
+                 const thankYouMsgContainer = document.createElement('div');
+                 thankYouMsgContainer.setAttribute('id', 'schedule-thank-you');
+                 thankYouMsgContainer.style.textAlign = 'center'; // ... (other styling) ...
+                 const thankYouP = document.createElement('p');
+                 thankYouP.innerHTML = `${escapeHtml(data.message)}<br><br>Please keep an eye on your inbox.`; // Use API message
+                 thankYouP.style.color = 'var(--light-text)';
+                 thankYouMsgContainer.prepend(thankYouP);
+                 // Remove previous thank you message if exists to prevent duplicates
+                 const existingThankYou = document.getElementById('schedule-thank-you');
+                 if (existingThankYou) existingThankYou.remove();
+                 scheduleContainer.appendChild(thankYouMsgContainer);
+            }
+        } catch (error) { /* ... */ }
+        // ... (button re-enabling on error) ...
+    });
+
+}
+
+// --- FAQ Accordion ---
+
+// Global flag to prevent multiple FAQ initializations
+window.faqInitialized = window.faqInitialized || false;
+
+function initFAQAccordion() {
+    if (window.faqInitialized) {
+        console.log('FAQ Accordion: Already initialized, skipping...');
+        return;
+    }
+    
+    console.log('FAQ Accordion: Starting initialization...');
+    
+    // Clear any existing FAQ handlers
+    const existingFaqItems = document.querySelectorAll('.faq-item');
+    existingFaqItems.forEach(item => {
+        const question = item.querySelector('.faq-question');
+        if (question) {
+            // Remove all event listeners by replacing the element
+            const clone = question.cloneNode(true);
+            question.parentNode.replaceChild(clone, question);
+        }
+    });
+    
+    const faqItems = document.querySelectorAll('.faq-item');
+    console.log(`FAQ Accordion: Found ${faqItems.length} FAQ items`);
+    
+    if (!faqItems.length) {
+        console.warn('FAQ Accordion: No FAQ items found');
+        return;
+    }
+
+    faqItems.forEach((item, index) => {
+        const question = item.querySelector('.faq-question');
+        const answer = item.querySelector('.faq-answer');
+
+        if (!question || !answer) {
+            console.warn(`FAQ ${index + 1}: Missing question or answer element`);
+            return;
+        }
+
+        console.log(`FAQ ${index + 1}: Initializing...`);
+
+        // Set unique IDs for accessibility
+        const answerId = `faq-answer-${index + 1}`;
+        answer.id = answerId;
+        question.setAttribute('aria-controls', answerId);
+        question.setAttribute('aria-expanded', 'false');
+        question.setAttribute('tabindex', '0');
+        question.setAttribute('role', 'button');
+        
+        // Mark as initialized to prevent double initialization
+        question.dataset.faqInitialized = 'true';
+
+        // Initialize CSS
+        answer.style.overflow = 'hidden';
+        answer.style.transition = 'max-height 0.3s ease-out';
+        answer.style.maxHeight = '0px';
+
+        // Calculate and store the natural height immediately
+        answer.style.maxHeight = 'none';
+        const height = answer.scrollHeight;
+        answer.style.maxHeight = '0px';
+        answer.dataset.height = height + 'px';
+        console.log(`FAQ ${index + 1}: Calculated height: ${height}px`);
+
+        // Toggle function with state tracking
+        const toggleFAQ = (event) => {
+            console.log(`FAQ ${index + 1}: Click event received`);
+            
+            // Only handle specific events
+            if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') {
+                return;
+            }
+            
+            // Prevent all event propagation
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            event.stopPropagation();
+
+            const currentState = question.getAttribute('aria-expanded');
+            const isExpanded = currentState === 'true';
+            console.log(`FAQ ${index + 1}: Current state: ${currentState}, isExpanded: ${isExpanded}`);
+
+            // Close all other FAQs first
+            faqItems.forEach((otherItem, otherIndex) => {
+                if (otherItem !== item) {
+                    const otherQuestion = otherItem.querySelector('.faq-question');
+                    const otherAnswer = otherItem.querySelector('.faq-answer');
+                    if (otherQuestion && otherAnswer && otherQuestion.getAttribute('aria-expanded') === 'true') {
+                        otherQuestion.setAttribute('aria-expanded', 'false');
+                        otherAnswer.style.maxHeight = '0px';
+                        console.log(`FAQ ${otherIndex + 1}: Force closed`);
+                    }
+                }
+            });
+
+            // Toggle current FAQ
+            if (!isExpanded) {
+                // Open
+                question.setAttribute('aria-expanded', 'true');
+                const targetHeight = answer.dataset.height || '150px';
+                answer.style.maxHeight = targetHeight;
+                console.log(`FAQ ${index + 1}: Opened to ${targetHeight}`);
+            } else {
+                // Close
+                question.setAttribute('aria-expanded', 'false');
+                answer.style.maxHeight = '0px';
+                console.log(`FAQ ${index + 1}: Closed`);
+            }
+            
+            return false;
+        };
+
+        // Add single event listener with capture
+        question.addEventListener('click', toggleFAQ, true);
+        
+        console.log(`FAQ ${index + 1}: Successfully initialized`);
+    });
+
+    window.faqInitialized = true;
+    console.log('FAQ Accordion: Initialization complete');
+}
+
+// Ensure this function is called within the main DOMContentLoaded listener in apps.js
+// document.addEventListener('DOMContentLoaded', () => {
+//     initFAQAccordion();
+//     // ... other initializations ...
+// });
+
+
+// --- Other Initializations ---
+
+function updateCopyrightYear() {
+    const yearSpan = document.getElementById('current-year');
+    if (yearSpan) yearSpan.textContent = new Date().getFullYear();
+}
+
+function populateTimezoneDropdown(selectId) {
+    const selectElement = document.getElementById(selectId);
+    if (!selectElement || selectElement.dataset.populated === 'true') return;
+
+    try {
+        const timezones = Intl.supportedValuesOf('timeZone');
+        if (!timezones || timezones.length === 0) throw new Error("No timezones found via Intl API.");
+
+        // Sort timezones alphabetically
+        timezones.sort();
+
+        selectElement.innerHTML = '<option value="" disabled selected>-- Select Your Timezone --</option>'; // Reset/Add placeholder
+
+        timezones.forEach(tz => {
+            // Optional: Filter out less common/deprecated timezones if desired
+            // if (tz.startsWith('Etc/') || tz.startsWith('SystemV/') || tz.startsWith('US/')) continue;
+
+            const option = document.createElement('option');
+            option.value = tz;
+            option.textContent = tz.replace(/_/g, ' ');
+            selectElement.appendChild(option);
+        });
+
+        try { // Pre-select user's timezone
+            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            if (timezones.includes(userTimezone)) selectElement.value = userTimezone;
+        } catch (e) { console.warn("Could not pre-select user timezone."); }
+
+        selectElement.dataset.populated = 'true';
+
+    } catch (error) {
+        console.error("Error populating timezone dropdown:", error);
+        selectElement.innerHTML = '<option value="">Could not load timezones</option>';
+    }
+}
+</file>
+
+<file path="views/contact.ejs">
+<!-- views/contact.ejs (UPDATED for combined form structure) -->
+<%- include('partials/header', { /* ... */ }) %>
+
+<section class="page-header">
+    <div class="container">
+        <h1>Contact Us</h1>
+    </div>
+</section>
+
+<section id="contact-section" class="section contact-section">
+    <div class="container">
+        <div class="contact-intro section-header" style="margin-bottom: 3rem;">
+            <h2 class="section-title">Get In Touch</h2>
+            <p class="section-description">Have questions or want to discuss
+                your automation needs?</p>
+        </div>
+        <div class="form-header">
+                <h3>Schedule a free consultation call</h3>
+        </div>
+        <div class="form-header submit-btn-container"><!-- Google Calendar Appointment Scheduling begin -->
+                <link
+                    href="https://calendar.google.com/calendar/scheduling-button-script.css"
+                    rel="stylesheet">
+                <script
+                    src="https://calendar.google.com/calendar/scheduling-button-script.js"
+                    async></script>
+                <script>
+                    (function() {
+                    var target = document.currentScript;
+                    window.addEventListener('load', function() {
+                        calendar.schedulingButton.load({
+                        url: 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ335AVuGBH_NJglKI3iiThB8cP6sHwnzkeg6aJjyEGEKEVJkIQuUCWFOaL1UpBPp_YbVAfTY4dI?gv=true',
+                        color: '#00a8e8',
+                        label: "Schedule Now",
+                        target,
+                        });
+                    });
+                    })();
+                </script>
+                <!-- end Google Calendar Appointment Scheduling -->
+            </div>
+        <div class="contact-form-container">
+            <div class="form-header">
+                <h3>Send Us a Message</h3>
+            </div>
+
+            <div id="contact-form-message" style="margin-bottom: 1.5rem;"></div>
+
+            <form id="contact-form">
+
+                <div class="form-group">
+                    <label for="name">Your Name <span
+                            style="color: #dc3545;">*</span></label>
+                    <input type="text" id="name" name="name"
+                        placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address <span
+                            style="color: #dc3545;">*</span></label>
+                    <input type="email" id="email" name="email"
+                        placeholder="Enter your email address" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number (Optional)</label>
+                    <input type="tel" id="phone" name="phone"
+                        placeholder="Enter your phone number">
+                </div>
+                <div class="form-group">
+                    <label for="subject">Subject <span
+                            style="color: #dc3545;">*</span></label>
+                    <select id="subject" name="subject" required>
+                        <option value disabled selected>-- Select a Subject
+                            --</option>
+                        <option value="General Inquiry">General Inquiry</option>
+                        <option value="Service Information">Service
+                            Information</option>
+                        <option value="Request Quote/Consultation">Request
+                            Quote/Consultation</option>
+                        <option value="Partnership Inquiry">Partnership
+                            Inquiry</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group form-group-full">
+                    <label for="message">Your Message <span
+                            style="color: #dc3545;">*</span></label>
+                    <textarea id="message" name="message"
+                        placeholder="Tell us about your project or question..."
+                        rows="6" required></textarea>
+                </div>
+
+                <div class="form-group form-checkbox form-group-full"
+                    style="margin-top: 1.5rem;">
+                    <input type="checkbox" id="privacy" name="privacy" required>
+                    <label for="privacy">I agree to the <a
+                            href="/privacy-policy" target="_blank">Privacy
+                            Policy</a> and <a href="/terms-of-service"
+                            target="_blank">Terms of Service</a> <span
+                            style="color: #dc3545;">*</span></label>
+                </div>
+
+                <div class="submit-btn-container form-group-full">
+                    <button type="submit"
+                        class="submit-btn cta-button primary-btn">
+                        <i class="fas fa-paper-plane"></i> Send Message
+                    </button>
+                </div>
+            </form>
+
+           
+
+        </div>
+ 
+        <!-- Contact Information Section -->
+        <div class="contact-info-container">
+            <!-- <div class="contact-info-item">
+                <h3><i class="fas fa-map-marker-alt fa-fw"></i> Location</h3>
+                <p>123 Automation Avenue</p>
+                <p>Tech District, CA 94103</p>
+            </div> -->
+            <div class="contact-info-item">
+                <h3><i class="fas fa-phone fa-fw"></i> Phone</h3>
+                <p>Main: <a href="tel:+11234567890">(209) 402-0089</a></p>
+                <p>Support: <a href="tel:+11234567891">(443) 643-6044</a></p>
+                <!-- Update numbers -->
+            </div>
+            <div class="contact-info-item">
+                <h3><i class="fas fa-envelope fa-fw"></i> Email</h3>
+                <p><a
+                        href="mailto:info@fndautomations.com">logan.mayfield@fndautomations.com</a></p>
+                <!-- <p><a href="mailto:support@fndautomations.com">support@fndautomations.com</a></p> Update emails -->
+            </div>
+            <div class="contact-info-item">
+                <h3><i class="fas fa-clock fa-fw"></i> Hours</h3>
+                <p>Sunday - Saturday</p> <!-- Add timezone -->
+                <p>9AM - 6PM EST</p>
+            </div>
+        </div>
+
+        <!-- Social Media Section -->
+        <div class="social-section"
+            style="margin-bottom: 3rem; text-align: center;">
+            <h3><i class="fas fa-share-alt"></i> Connect With Us</h3>
+            <div class="social-icons" style="justify-content: center;">
+                <!-- <a href="https://www.facebook.com/yourprofile" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a> -->
+                <!-- <a href="https://twitter.com/yourprofile" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><i class="fab fa-twitter"></i></a> -->
+                <a href="https://www.instagram.com/fndautomations/"
+                    target="_blank" rel="noopener noreferrer"
+                    aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <!-- <a href="https://www.linkedin.com/in/yourprofile" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a> -->
+                <a href="https://www.tiktok.com/@fnd.automations?lang=en"
+                    target="_blank" rel="noopener noreferrer"
+                    aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+            </div>
+        </div>
+
+        <!-- Optional: Map Section -->
+        <!--
+        <div class="map-container">
+            <h2>Find Us</h2>
+            <div class="google-map">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d..." allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+            <a href="https://maps.google.com/?q=..." class="cta-button secondary-btn get-directions" target="_blank">Get Directions</a>
+        </div>
+        -->
+
+        <!-- views/contact.ejs -->
+
+        <%# ... Include header and other contact sections above ... %>
+
+        <!-- ======================================== -->
+        <!-- FAQ Section                            -->
+        <!-- ======================================== -->
+        <section class="section faq-section"> <%# Added section-darker %>
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title faq-title">Frequently Asked
+                        Questions</h2>
+                    <div class="faq-underline"
+                        style="height: 3px; width: 70px; background-color: var(--primary-color); margin: -5px auto 40px auto;"></div>
+                    <p class="section-description">Find answers to common
+                        questions about AI automation and working with FND
+                        Automations.</p>
+                </div>
+
+                <div class="faq-list" style="max-width: 850px; margin: 0 auto;">
+                    <%# Wrapper for items %>
+
+                    <!-- FAQ Item 1 -->
+                    <div class="faq-item">
+                        <button class="faq-question" 
+                            aria-expanded="false" aria-controls="faq-answer-1">
+                            What exactly is AI Automation for a business like
+                            mine?
+                        </button>
+                        <div class="faq-answer" id="faq-answer-1">
+                            <p>AI Automation uses Artificial Intelligence
+                                software to handle tasks usually done by people.
+                                For your business, this could mean automating
+                                repetitive data entry, answering common customer
+                                questions instantly with chatbots, processing
+                                invoices automatically, personalizing marketing
+                                messages, or analyzing sales data to find trends
+                                – freeing up your team for more strategic
+                                work.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 2 -->
+                    <div class="faq-item">
+                        <button class="faq-question" 
+                            aria-expanded="false" aria-controls="faq-answer-2">
+                            How much does implementing AI automation typically
+                            cost?
+                        </button>
+                        <div class="faq-answer" id="faq-answer-2">
+                            <p>Costs vary widely based on complexity. Simple
+                                automations using tools like Make/n8n might
+                                start with setup fees in the low thousands or
+                                small retainers. Implementing specific AI tools
+                                (like advanced chatbots or document processing)
+                                often involves monthly subscriptions ($50-$500+)
+                                plus integration costs. Custom AI development is
+                                more significant. We focus on delivering clear
+                                ROI, often seen within 3-9 months.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 3 -->
+                    <div class="faq-item">
+                        <button class="faq-question" 
+                            aria-expanded="false" aria-controls="faq-answer-3">
+                            Will AI replace my employees?
+                        </button>
+                        <div class="faq-answer" id="faq-answer-3">
+                            <p>Our goal is typically *augmentation*, not
+                                replacement. AI excels at handling repetitive,
+                                data-intensive tasks, freeing up your employees
+                                to focus on higher-value activities requiring
+                                creativity, critical thinking, complex
+                                problem-solving, and human interaction. It often
+                                makes existing roles more efficient and
+                                strategic, rather than eliminating them.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 4 -->
+                    <div class="faq-item">
+                        <button class="faq-question" 
+                            aria-expanded="false" aria-controls="faq-answer-4">
+                            How long does it take to implement an automation
+                            solution?
+                        </button>
+                        <div class="faq-answer" id="faq-answer-4">
+                            <p>Timelines depend on the project scope. Simple
+                                process automations (like connecting two apps)
+                                can sometimes be done in 1-3 weeks. More complex
+                                integrations or AI implementations might take
+                                1-4 months, including discovery, setup, testing,
+                                and training. We provide a detailed timeline
+                                estimate after our initial consultation.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 5 -->
+                    <div class="faq-item">
+                        <button class="faq-question" 
+                            aria-expanded="false" aria-controls="faq-answer-5">
+                            What results can I realistically expect from
+                            automation?
+                        </button>
+                        <div class="faq-answer" id="faq-answer-5">
+                            <p>Results depend on the process automated. Common
+                                outcomes include significant time savings on
+                                manual tasks (often 50-90% reduction for
+                                specific tasks), reduced error rates, faster
+                                response times (e.g., for customer service or
+                                lead follow-up), improved data accuracy, better
+                                resource allocation, and data-driven insights
+                                for decision-making, ultimately leading to cost
+                                savings or revenue growth.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 6 -->
+                    <div class="faq-item">
+                        <button class="faq-question" 
+                            aria-expanded="false" aria-controls="faq-answer-6">
+                            What technologies do you primarily use (e.g., Make,
+                            n8n, OpenAI)?
+                        </button>
+                        <div class="faq-answer" id="faq-answer-6">
+                            <p>We leverage a range of powerful tools based on
+                                client needs. Our core stack often includes
+                                leading integration platforms like Make.com and
+                                n8n, flexible databases like Airtable, and
+                                advanced AI models via APIs from OpenAI (GPT
+                                series), Anthropic (Claude), and Google AI. We
+                                also integrate with various CRMs, marketing
+                                platforms, and other business software.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 7 -->
+                    <div class="faq-item">
+                        <button class="faq-question" 
+                            aria-expanded="false" aria-controls="faq-answer-7">
+                            How do we get started working with FND Automations?
+                        </button>
+                        <div class="faq-answer" id="faq-answer-7">
+                            <p>The first step is an initial consultation
+                                (usually free). We'll discuss your business
+                                challenges, goals, and current processes. Based
+                                on this, we can identify potential high-impact
+                                automation opportunities and suggest next steps,
+                                which might involve a deeper discovery phase or
+                                a proposal for a specific project.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 8 -->
+                    <div class="faq-item">
+                        <button class="faq-question" 
+                            aria-expanded="false" aria-controls="faq-answer-8">
+                            Do you offer ongoing support and maintenance?
+                        </button>
+                        <div class="faq-answer" id="faq-answer-8">
+                            <p>Yes, absolutely. Automation isn't always
+                                "set it and forget it." We offer various support
+                                and maintenance packages to ensure your
+                                automations continue running smoothly, adapt to
+                                software updates from connected apps, and remain
+                                optimized as your business evolves.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 9 -->
+                    <div class="faq-item">
+                        <button class="faq-question" 
+                            aria-expanded="false" aria-controls="faq-answer-9">
+                            What kind of access or information do you need from
+                            us?
+                        </button>
+                        <div class="faq-answer" id="faq-answer-9">
+                            <p>This depends on the project. Typically, we'll
+                                need insights into your current workflow, access
+                                to relevant software platforms (via secure API
+                                keys or dedicated logins), and potentially
+                                sample data for testing. We prioritize security
+                                and data privacy, using secure methods for
+                                credential handling and adhering to strict
+                                confidentiality.</p>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 10 -->
+                    <div class="faq-item">
+                        <button class="faq-question" 
+                            aria-expanded="false" aria-controls="faq-answer-10">
+                            Can you automate highly specific or unique processes
+                            for my industry?
+                        </button>
+                        <div class="faq-answer" id="faq-answer-10">
+                            <p>Yes, that's one of our core strengths. While we
+                                use standard tools, we specialize in designing
+                                *custom* automation workflows and integrations
+                                tailored to your specific business logic and
+                                industry requirements. We don't believe in
+                                one-size-fits-all solutions.</p>
+                        </div>
+                    </div>
+
+                    <!-- Add more relevant FAQs -->
+
+                </div> <!-- /.faq-list -->
+            </div> <!-- /.container -->
+        </section> <!-- /.faq-section -->
+
+        <%# ... Include footer partial ... %>
+
+    </div> <!-- /.container -->
+</section> <!-- /#contact-section -->
+
+<%- include('partials/footer') %>
+
+<!-- Add JS for Contact form submission, Schedule form display/submit, FAQ accordion -->
+<!-- This logic should ideally be in apps.js -->
+<script>
+    // Placeholder: Ensure apps.js handles:
+    // 1. Contact form submission via fetch to /api/contact
+    // 2. Showing #schedule-section on successful contact submit
+    // 3. Populating hidden fields in #schedule-form
+    // 4. Handling schedule form submission via fetch to /api/schedule-meeting
+    // 5. FAQ Accordion toggle functionality
+    // 6. Populating timezone dropdown dynamically
+</script>
+</file>
+
+</files>

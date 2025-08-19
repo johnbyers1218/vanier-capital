@@ -20,12 +20,12 @@ if (process.env.NODE_ENV === 'development') {
     const envPath = path.resolve(__dirname, '.env.development');
     dotenv.config({ path: envPath });
     // logger.info(`[setupAdmin] Loaded .env.development for local setup.`);
-    console.log(`[setupAdmin] Loaded .env.development for local setup.`); // Use console if logger not ready
+    // logger.info(`[setupAdmin] Loaded .env.development for local setup.`); // Use logger only
 } else {
     // For Heroku, dotenv.config() might load a root .env if it exists, but Config Vars take precedence.
     dotenv.config(); // This is often a no-op on Heroku if no .env file is present.
     // logger.info(`[setupAdmin] Running in non-development mode (e.g., Heroku). Using Heroku Config Vars.`);
-    console.log(`[setupAdmin] Running in non-development mode. Using Heroku Config Vars or existing process.env.`);
+    // logger.info(`[setupAdmin] Running in non-development mode. Using Heroku Config Vars or existing process.env.`);
 }
 
 

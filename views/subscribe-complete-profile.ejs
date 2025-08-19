@@ -1,0 +1,95 @@
+<!-- views/subscribe-complete-profile.ejs -->
+<%- include('partials/header', {
+  pageTitle: 'Complete Your Profile',
+  pageDescription: 'Add your name (and optionally your role and company) to complete your subscription.',
+  path: '/subscribe/complete-profile'
+}) %>
+
+<section class="section">
+  <div class="container">
+    <div class="content-card" style="max-width: 720px; margin-inline: auto; background: #f9fafb; border: 1px solid var(--color-border-subtle); border-radius: .875rem; box-shadow: 0 6px 30px rgba(0,0,0,.06); padding: clamp(2rem, 4vw, 2.5rem);">
+      <h1 class="section-title" style="text-align:center; font-size: clamp(1.6rem, 3vw, 2rem); font-weight: 800; letter-spacing: -0.01em;">Complete Your Profile</h1>
+      <p class="section-description" style="text-align:center; max-width: 60ch; margin: .375rem auto 1rem;">One more step. Add your name so we can personalize your emails. Your role and company are optional.</p>
+
+      <form id="finalizeForm" class="signup-form" onsubmit="return false;" style="margin-top: .75rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: end;">
+        <input type="hidden" id="email" value="<%= email ? email : '' %>" />
+
+        <div>
+          <label for="firstName" style="display:block; font-weight: 600; margin-bottom: .4rem;">First Name <span style="font-weight:400; color: var(--color-text-muted);">(Optional)</span></label>
+          <input id="firstName" name="firstName" type="text" placeholder="Enter your first name (optional)" />
+        </div>
+        <div>
+          <label for="lastName" style="display:block; font-weight: 600; margin-bottom: .4rem;">Last Name <span style="font-weight:400; color: var(--color-text-muted);">(Optional)</span></label>
+          <input id="lastName" name="lastName" type="text" placeholder="Enter your last name (optional)" />
+        </div>
+
+        <div>
+          <label for="role" style="display:block; font-weight: 600; margin-bottom: .4rem;">Your Role <span style="font-weight:400; color: var(--color-text-muted);">(Optional)</span></label>
+          <select id="role" name="role">
+            <option value="">Select your role (optional)</option>
+            <option>Business Leader / C-Suite</option>
+            <option>Manager / Department Head</option>
+            <option>Developer / Engineer</option>
+            <option>Marketing / Sales Professional</option>
+            <option>Student / Researcher</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div>
+          <label for="companyName" style="display:block; font-weight: 600; margin-bottom: .4rem;">Company Name <span style="font-weight:400; color: var(--color-text-muted);">(Optional)</span></label>
+          <input id="companyName" name="companyName" type="text" placeholder="Enter your company (optional)" />
+        </div>
+
+        <div style="grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: .75rem; margin-top: .25rem;">
+          <button id="finalizeSubmit" type="submit" class="cta-button primary-btn glow-button">Finish Signup</button>
+        </div>
+
+        <p id="finalizeMessage" class="form-message" aria-live="polite" hidden style="grid-column: 1 / -1;"></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  const form = document.getElementById('finalizeForm');
+  if(!form) return;
+  const email = (document.getElementById('email')?.value || '').trim();
+  const first = document.getElementById('firstName');
+  const last = document.getElementById('lastName');
+  const role = document.getElementById('role');
+  const company = document.getElementById('companyName');
+  const msg = document.getElementById('finalizeMessage');
+  const btn = document.getElementById('finalizeSubmit');
+
+  function showMessage(text, type){
+    msg.textContent = text; msg.hidden = false; msg.classList.remove('error','success'); if(type) msg.classList.add(type);
+  }
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    if (!email) { window.location.href = '/'; return; }
+  // All fields optional: only send provided values
+    btn.disabled = true;
+    try {
+      const resp = await fetch('/api/subscribe/finalize', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, firstName: first.value.trim(), lastName: last.value.trim(), role: role.value || undefined, companyName: company.value.trim() || undefined })
+      });
+      const data = await resp.json().catch(()=>({success:false,message:'Unexpected response.'}));
+      if(resp.ok && data.success){
+        if (data.redirect) { window.location.href = data.redirect; return; }
+        window.location.href = '/newsletter/welcome' + (email ? ('?email=' + encodeURIComponent(email)) : '');
+      } else {
+        showMessage(data.message || 'Sorry, something went wrong.', 'error');
+      }
+    } catch(err){
+      showMessage('Network error. Please try again.', 'error');
+    } finally {
+      btn.disabled = false;
+    }
+  });
+})();
+</script>
+
+<%- include('partials/footer') %>

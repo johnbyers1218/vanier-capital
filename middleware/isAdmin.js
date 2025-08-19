@@ -1,8 +1,8 @@
 // middleware/isAdmin.js (ESM Version)
 
-import jwt from 'jsonwebtoken';
-import { logger } from '../config/logger.js'; // Use named import, add .js extension
-import AdminUser from '../models/AdminUser.js'; // Default import from model, add .js extension
+const jwt = require('jsonwebtoken');
+const { logger } = require('../config/logger.js'); // Use named import, add .js extension
+const AdminUser = require('../models/AdminUser.js'); // Default import from model, add .js extension
 
 /**
  * Express middleware to authenticate and authorize admin users via JWT cookie.
@@ -99,17 +99,16 @@ const isAdmin = async (req, res, next) => {
 
         // 5. Role-Based Access Control (RBAC) - Placeholder Example
         // Implement specific checks here or in dedicated RBAC middleware if needed
-        /*
-        const requiresAdminRole = req.originalUrl.startsWith('/admin/users'); // Example: User management requires 'admin'
-        if (requiresAdminRole && req.adminUser.role !== 'admin') {
-           logger.warn(`isAdmin: Forbidden access attempt by user ${req.adminUser.username} (role: ${req.adminUser.role}) to ${req.originalUrl}. IP: ${req.ip}`);
-           // Render a specific "Forbidden" page instead of just sending text
-           return res.status(403).render('admin/forbidden', {
-               pageTitle: 'Access Denied',
-               message: 'You do not have permission to access this section.'
-           });
+        // Minimal RBAC: Only allow admins to delete blog posts via admin UI
+        if (req.method === 'POST' && req.originalUrl.startsWith('/admin/blog/delete')) {
+            if (req.adminUser.role !== 'admin') {
+                logger.warn(`isAdmin RBAC: Forbidden delete attempt by ${req.adminUser.username} (role: ${req.adminUser.role}) to ${req.originalUrl}. IP: ${req.ip}`);
+                return res.status(403).render('admin/forbidden', {
+                    pageTitle: 'Access Denied',
+                    message: 'You do not have permission to perform this action.'
+                });
+            }
         }
-        */
 
         logger.debug(`isAdmin: User authenticated: ${req.adminUser.username}. Role: ${req.adminUser.role}. Proceeding to route: ${req.originalUrl}, IP: ${req.ip}`);
 
@@ -127,4 +126,4 @@ const isAdmin = async (req, res, next) => {
 };
 
 // Use ESM default export for the middleware function
-export default isAdmin;
+module.exports = isAdmin;

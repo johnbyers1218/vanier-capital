@@ -7,18 +7,19 @@
     path: '/'
 }) %>
 
-<!-- Hero Section -->
-<section id="hero" class="hero-section">
-    <!-- Video Background -->
-    <video class="hero-video-background" autoplay loop muted playsinline poster="image/HeroImage.png">
-        <!-- MP4 source (Primary and Only Video Choice) -->
-        <source src="/images/HeroVideo.mp4" type="video/mp4">
+<!-- Hero Section: full-bleed immersive -->
+<section id="hero" class="hero-section hero-fullbleed">
+    <div class="hero-viewport">
+        <!-- Video Background -->
+        <video class="hero-video-background" autoplay loop muted playsinline poster="/images/HeroImage.png">
+            <!-- MP4 source (Primary and Only Video Choice) -->
+            <source src="/images/HeroVideo.mp4" type="video/mp4">
 
-        <!-- Fallback for browsers that don't support the <video> tag AT ALL,
-             or if they can't play MP4 -->
-        <img src="image/HeroImage.png" alt="Hero Background Image" class="hero-fallback-image">
-        Your browser does not support the video tag. <!-- This text is also a fallback -->
-    </video>
+            <!-- Fallback for browsers that don't support the <video> tag AT ALL,
+                or if they can't play MP4 -->
+            <img src="/images/HeroImage.png" alt="Hero Background Image" class="hero-fallback-image">
+            Your browser does not support the video tag. <!-- This text is also a fallback -->
+        </video>
 
     <!-- Your existing script -->
     <script>
@@ -57,76 +58,229 @@
     });
     </script>
 
-    <!-- Overlay: This will sit on top of the video to darken it for text readability -->
-    <div class="hero-overlay"></div>
+        <!-- Overlay: This will sit on top of the video to darken it for text readability -->
+    <div class="hero-overlay hero-gradient"></div>
 
-    <!-- Content: This will sit on top of the overlay -->
-    <div class="hero-content">
-        <h1 class="hero-title glowing-text">FND AUTOMATIONS</h1>
-        <p class="hero-subtitle">Empowering businesses through innovative automation solutions</p>
-        <div class="hero-buttons">
-            <a href="/services" class="cta-button primary-btn">Our Services</a>
-            <a href="/contact" class="cta-button secondary-btn">Get Started</a>
+        <!-- Content: This will sit on top of the overlay -->
+        <div class="hero-content">
+            <div class="hero-text-block">
+            <h1 class="hero-title hero-title-strong glowing-text">Unlock Your Business Potential with Intelligent Automation</h1>
+            <p class="hero-subtitle hero-subtitle-lg hero-subtitle-strong">Cut costs, speed up operations, and scale with AI‑driven workflows tailored to your team.</p>
+            <div class="hero-buttons hero-buttons-spaced">
+                <a href="/contact" class="cta-button primary-btn">Schedule a Consultation</a>
+                <a href="/services" class="cta-button secondary-btn">Our Services</a>
+            </div>
+            </div>
+
+            <!-- Trusted By row inside hero -->
+            
+        </div>
+        <!-- Curved divider for smooth transition -->
+        <div class="hero-divider" aria-hidden="true">
+            <svg viewBox="0 0 1440 120" preserveAspectRatio="none" focusable="false" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0,80 C360,20 1080,20 1440,80 L1440,120 L0,120 Z" fill="#ffffff" />
+            </svg>
         </div>
     </div>
 </section>
 
-<!-- Intro Section -->
-<section id="intro" class="section">
+<!-- Trusted By (directly under hero on white background) -->
+<% if (heroTopClients && heroTopClients.length) { %>
+<section id="trusted-hero" class="trusted-hero">
     <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Welcome to FND Automations</h2>
-        <p class="section-description">We transform how businesses operate through custom automation solutions, combining technical expertise with industry knowledge to deliver results that matter.</p>
-      </div>
-      <!-- Optional: Add more descriptive text if needed -->
-      <!-- <div class="intro-text" style="max-width: 850px; text-align: center; margin-bottom: 3rem;"> ... </div> -->
+        <div class="trusted-label section-title">Trusted by leading businesses, including:</div>
+        <div class="trusted-logos">
+            <% heroTopClients.forEach(c => { %>
+                <div class="trusted-logo-item">
+                    <% if (c.websiteUrl) { %>
+                        <a href="<%= c.websiteUrl %>" target="_blank" rel="noopener" class="trusted-logo-link" aria-label="<%= c.name || 'Client' %>">
+                            <img class="trusted-logo-img" src="<%= c.logoUrl %>" alt="<%= c.name || 'Client' %> logo" onerror="this.onerror=null;this.src='/images/FND_LOGO_SVG_BLACK.svg';" />
+                                                </a>
+                                                <% if (c.name) { %>
+                                                    <div class="trusted-caption"><%= c.name %></div>
+                                                <% } %>
+                    <% } else { %>
+                        <div class="trusted-logo-link" aria-label="<%= c.name || 'Client' %>">
+                            <img class="trusted-logo-img" src="<%= c.logoUrl %>" alt="<%= c.name || 'Client' %> logo" onerror="this.onerror=null;this.src='/images/FND_LOGO_SVG_BLACK.svg';" />
+                                                </div>
+                                                <% if (c.name) { %>
+                                                    <div class="trusted-caption"><%= c.name %></div>
+                                                <% } %>
+                    <% } %>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+ </section>
+<% } %>
 
-      <!-- Features Grid -->
-      <div class="grid-container grid-3-col">
-          <div class="content-card feature-card">
-            <div class="card-icon"><i class="fas fa-rocket fa-fw"></i></div> <!-- Added fa-fw for fixed width -->
-            <h3>Efficiency</h3>
-            <p>Streamline operations, reduce manual tasks, and cut operational costs significantly.</p>
-          </div>
-          <div class="content-card feature-card">
-            <div class="card-icon"><i class="fas fa-cogs fa-fw"></i></div>
-            <h3>Innovation</h3>
-            <p>Implement cutting-edge AI and automation solutions tailored to modern business challenges.</p>
-          </div>
-          <div class="content-card feature-card">
-            <div class="card-icon"><i class="fas fa-chart-line fa-fw"></i></div>
-            <h3>Growth</h3>
-            <p>Scale your business effectively by leveraging smart automation for revenue generation.</p>
-          </div>
-      </div>
+<!-- Serving Clients Globally (Credibility Sandwich) -->
+<section class="section global-reach">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Serving Clients Globally</h2>
+            <p class="section-description">A snapshot of locations we’ve partnered with. Hover a dot to see the location.</p>
+        </div>
+        <div class="world-map-card">
+            <!-- Vector container removed (using static SVG only) -->
+            <div id="world-map" class="world-map-canvas" aria-label="Client locations map" style="display:none;height:0;"></div>
+            <div class="world-map-static-wrap" id="world-map-static-wrap">
+                <button class="world-map-static-btn" id="open-map-modal" aria-label="Explore our client locations">
+                    <img src="/images/world-map-robinson-ne.svg"
+                         alt="Global client locations"
+                         class="world-map-static"
+                         loading="lazy"
+                         data-projection="robinson"
+                         style="width: 100%; height: auto; object-fit: contain;"/>
+                </button>
+                <svg id="world-map-overlay" class="world-map-overlay" aria-hidden="true"></svg>
+            </div>
+        </div>
+
+        <!-- Near full-screen interactive map modal -->
+        <div id="map-modal" class="map-modal" aria-hidden="true" role="dialog" aria-labelledby="mapModalTitle" aria-modal="true" hidden>
+            <div class="map-backdrop" data-close></div>
+            <div class="map-card" role="document">
+                <div class="map-card-header">
+                    <h3 id="mapModalTitle">Explore our client locations</h3>
+                    <button class="map-close" id="close-map-modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="map-card-body">
+                    <div id="interactive-map" class="interactive-map" aria-label="Interactive world map"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Process Section -->
+<section id="our-process" class="section section-tight-top">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">How We Work</h2>
+            <p class="section-description">A proven delivery model that de‑risks implementation and accelerates ROI.</p>
+        </div>
+        <div class="process-steps">
+            <div class="process-step">
+                <div class="step-icon"><i class="fas fa-search"></i></div>
+                <h3>1. Discovery</h3>
+                <p>We map your workflows, data, and goals to identify the highest‑impact automation opportunities.</p>
+            </div>
+            <div class="process-step">
+                <div class="step-icon"><i class="fas fa-diagram-project"></i></div>
+                <h3>2. Strategy & Design</h3>
+                <p>Blueprints for a scalable system: architecture, integrations, and governance defined clearly.</p>
+            </div>
+            <div class="process-step">
+                <div class="step-icon"><i class="fas fa-rocket"></i></div>
+                <h3>3. Implementation</h3>
+                <p>Rapid, iterative delivery with tight feedback loops and clear progress milestones.</p>
+            </div>
+            <div class="process-step">
+                <div class="step-icon"><i class="fas fa-life-ring"></i></div>
+                <h3>4. Support & Evolution</h3>
+                <p>Runbook, training, and ongoing optimization to expand wins across the organization.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Testimonial Highlight -->
+<section id="featured-testimonial" class="section section-muted">
+    <div class="container">
+        <div class="section-header" style="text-align:center;">
+            <h2 class="section-title">What Our Clients Say</h2>
+            <p class="section-description">Real outcomes from teams we’ve partnered with.</p>
+        </div>
+        <div id="featured-testimonial-container" style="display:grid;justify-items:center;">
+            <!-- JS will inject the featured testimonial card here -->
+            <div class="content-card" style="text-align:center;">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p style="margin-top:.5rem;color:var(--color-text-muted)">Loading testimonial…</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+ 
+
+<!-- Removed lower Trusted By section to consolidate social proof into the hero -->
+
+<!-- Client Showcase & Social Proof Section -->
+<section id="client-showcase" class="section section-muted">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Powering Industry Leaders</h2>
+            <p class="section-description">We partner with businesses of significant scale, driving enterprise-level growth and efficiency. The numbers below reflect the caliber of companies that trust our expertise.</p>
+        </div>
+
+        <!-- Aggregate Stats -->
+        <div class="stats-grid" style="margin-top:0.5rem;">
+            <div class="stat-item">
+                <div class="stat-number" data-prefix="$" data-count="<%= aggregateStats ? Math.max(0, Math.round(aggregateStats.totalValuation / 1000000)) : 0 %>" data-suffix="M+">$0M+</div>
+                <div class="stat-label">Combined Partner Valuation</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-prefix="$" data-count="<%= aggregateStats ? Math.max(0, Math.round(aggregateStats.totalRevenue / 1000000)) : 0 %>" data-suffix="M+">$0M+</div>
+                <div class="stat-label">Combined Partner Revenue</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="<%= managedStats ? (managedStats.projectsCompleted || 0) : 0 %>" data-suffix="+">0+</div>
+                <div class="stat-label">Projects Completed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="<%= managedStats ? (managedStats.manualHoursAutomated || 0) : 0 %>" data-suffix="+">0+</div>
+                <div class="stat-label">Manual Hours Automated</div>
+            </div>
+        </div>
+
+        <!-- Client Carousel -->
+        <% if (featuredProjects && featuredProjects.length > 0) { %>
+        <div class="client-carousel">
+            <% featuredProjects.forEach(project => { %>
+                <div class="client-card">
+                    <div class="client-card-header">
+                        <img src="<%= project.clientLogoUrl %>" alt="<%= project.clientName || 'Client' %> Logo" class="client-logo">
+                        <h3 class="client-name"><%= project.clientName || 'Confidential Client' %></h3>
+                    </div>
+                    <div class="client-card-body">
+                        <p class="success-snippet">"<%= project.successSnippet %>"</p>
+                    </div>
+                    <div class="client-card-footer">
+                        <a href="/projects/<%= project.slug %>" class="card-link">View Case Study →</a>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+        <% } %>
     </div>
 </section>
 
 <!-- Services Preview Section -->
-<section id="services-preview" class="section section-darker">
+<section id="services-preview" class="section section-muted">
     <div class="container">
         <div class="section-header">
             <h2 class="section-title">What We Offer</h2>
             <p class="section-description">A glimpse into our comprehensive automation solutions designed for your business needs.</p>
         </div>
         <div class="grid-container grid-3-col">
-            <div class="content-card service-card">
+            <div class="content-card service-card" data-href="/services#process-automation" tabindex="0" role="link" aria-label="Process Automation">
                 <div class="card-icon"><i class="fas fa-robot fa-fw"></i></div>
                 <h3>Process Automation</h3>
                 <p>Automate repetitive tasks and workflows using tools like n8n and Make to increase productivity and reduce errors.</p>
-                <a href="/services#process-automation" class="card-link">Learn More →</a>
+                <a href="/services#process-automation" class="card-link reveal-on-hover">Read More →</a>
             </div>
-            <div class="content-card service-card">
+            <div class="content-card service-card" data-href="/services#ai-integration" tabindex="0" role="link" aria-label="AI Integration">
                 <div class="card-icon"><i class="fas fa-brain fa-fw"></i></div>
                 <h3>AI Integration</h3>
                 <p>Leverage AI models (OpenAI, Claude) for tasks like data analysis, content generation, and intelligent decision-making.</p>
-                 <a href="/services#ai-integration" class="card-link">Learn More →</a>
+                 <a href="/services#ai-integration" class="card-link reveal-on-hover">Read More →</a>
             </div>
-            <div class="content-card service-card">
+            <div class="content-card service-card" data-href="/services#custom-solutions" tabindex="0" role="link" aria-label="Custom Solutions">
                 <div class="card-icon"><i class="fas fa-database fa-fw"></i></div>
                 <h3>Custom Solutions</h3>
                 <p>Tailored software and integrations connecting tools like Airtable, CRMs, and APIs for your specific workflows.</p>
-                 <a href="/services#custom-solutions" class="card-link">Learn More →</a>
+                 <a href="/services#custom-solutions" class="card-link reveal-on-hover">Read More →</a>
             </div>
         </div>
         <div style="text-align: center; margin-top: 3rem;">
@@ -158,12 +312,14 @@
     </div>
  </section>
 
+ 
+
 <!-- Call to Action Section -->
-<section id="cta" class="cta-section">
+<section id="cta" class="cta-section cta-alt full-bleed">
      <div class="container">
          <div class="cta-content">
-             <h2>Ready to Transform Your Business?</h2>
-             <p>Contact us today for a free consultation and discover how automation can drive your success.</p>
+             <h2 class="section-title cta-title">Ready to Transform Your Business?</h2>
+             <p class="cta-description">Contact us today for a free consultation and discover how automation can drive your success.</p>
              <a href="/contact" class="cta-button primary-btn glow-button">Get Started Now</a>
          </div>
      </div>

@@ -1,0 +1,42 @@
+<%- include('../partials/header', { pageTitle: 'Inquiries' }) %>
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-semibold text-gray-100">Inquiries</h1>
+    <div>
+      <a href="/admin/inquiries" class="px-3 py-1.5 text-sm rounded border border-gray-700 <%= !status ? 'bg-primary text-white' : 'text-gray-200' %>">All</a>
+      <a href="/admin/inquiries?status=New" class="px-3 py-1.5 text-sm rounded border border-gray-700 <%= status==='New' ? 'bg-primary text-white' : 'text-gray-200' %>">New</a>
+      <a href="/admin/inquiries?status=Viewed" class="px-3 py-1.5 text-sm rounded border border-gray-700 <%= status==='Viewed' ? 'bg-primary text-white' : 'text-gray-200' %>">Viewed</a>
+      <a href="/admin/inquiries?status=Responded" class="px-3 py-1.5 text-sm rounded border border-gray-700 <%= status==='Responded' ? 'bg-primary text-white' : 'text-gray-200' %>">Responded</a>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto rounded border border-gray-700">
+    <table class="min-w-full text-sm">
+      <thead class="bg-gray-800">
+        <tr>
+          <th class="px-4 py-2 text-left">Status</th>
+          <th class="px-4 py-2 text-left">Name</th>
+          <th class="px-4 py-2 text-left">Subject</th>
+          <th class="px-4 py-2 text-left">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% (inquiries || []).forEach(function(i){ %>
+          <tr class="border-t border-gray-800 hover:bg-gray-800/40">
+            <td class="px-4 py-2">
+              <% const cls = i.status==='New' ? 'bg-amber-500/20 text-amber-300' : (i.status==='Viewed' ? 'bg-indigo-500/20 text-indigo-300' : 'bg-emerald-500/20 text-emerald-300'); %>
+              <span class="px-2 py-0.5 rounded text-xs font-semibold <%= cls %>"><%= i.status %></span>
+            </td>
+            <td class="px-4 py-2"><a class="text-primary hover:underline" href="/admin/inquiries/<%= i._id %>"><%= i.name %></a></td>
+            <td class="px-4 py-2"><%= i.subject %></td>
+            <td class="px-4 py-2 text-gray-400"><%= new Date(i.createdAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) %></td>
+          </tr>
+        <% }) %>
+        <% if (!inquiries || inquiries.length === 0) { %>
+          <tr><td class="px-4 py-4 text-gray-400" colspan="4">No inquiries found.</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<%- include('../partials/footer') %>

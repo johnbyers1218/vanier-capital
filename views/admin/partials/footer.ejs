@@ -2,10 +2,11 @@
 <%# Footer partial specifically for the Admin Panel layout %>
 
             <%# End of page-specific content (placed before this include in other files) %>
+            </div>
 
-        </main> <!-- /.admin-main-content -->
+        </main>
 
-    </div> <!-- /.admin-page-wrapper -->
+    </div>
 
     <%# ======================================== %>
     <%# JavaScript Files                       %>
@@ -18,11 +19,31 @@
 
     <%# Add any admin-specific JavaScript files here %>
     <%# Example: JS for a rich text editor, confirmation dialogs, etc. %>
+    <div class="text-center text-gray-500 text-xs mt-6">
+        Need formatting tips? Read the <a href="/AUTHORING_GUIDE.md" target="_blank" rel="noopener" class="text-primary hover:text-primary-hover">Authoring Guide</a>.
+    </div>
     <%# <script src="/js/admin-scripts.js"></script> %>
 
     <%# Example: Confirmation for delete buttons %>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+                        // Toasts
+                        (function(){
+                            const root = document.getElementById('toast-root');
+                            if (!root) return;
+                              const success = JSON.parse('<%- JSON.stringify(successMessage || []) %>');
+                              const errors = JSON.parse('<%- JSON.stringify(errorMessage || []) %>');
+                            const makeToast = (text, type) => {
+                                const el = document.createElement('div');
+                                el.className = 'pointer-events-auto flex items-center gap-2 rounded-md px-4 py-3 text-sm shadow border ' + (type==='success' ? 'bg-green-900/80 text-green-100 border-green-700' : 'bg-red-900/80 text-red-100 border-red-700');
+                                el.innerHTML = (type==='success' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-circle"></i>') + ' <span>'+String(text)+'</span>';
+                                root.appendChild(el);
+                                setTimeout(()=>{ el.style.opacity = '0'; el.style.transform = 'translateY(-6px)'; setTimeout(()=> el.remove(), 300); }, 3500);
+                            };
+                            success.forEach(m => makeToast(m, 'success'));
+                            errors.forEach(m => makeToast(m, 'error'));
+                        })();
+
             const deleteForms = document.querySelectorAll('form.delete-form'); // Assuming delete buttons are inside forms with this class
 
             deleteForms.forEach(form => {
@@ -34,7 +55,58 @@
                     // If confirmed, the form submits as usual
                 });
             });
-        });
+                });
+        </script>
+
+        <script>
+            // Instant search dropdown for admin header
+            (function(){
+                const input = document.getElementById('adminGlobalSearch');
+                const dd = document.getElementById('adminSearchDropdown');
+                if (!input || !dd) return;
+                const list = dd.querySelector('ul');
+                let timer = null, idx = -1;
+                const hide = () => { dd.classList.add('hidden'); idx = -1; };
+                const show = () => { dd.classList.remove('hidden'); };
+                const render = (items) => {
+                    list.innerHTML = '';
+                    items.forEach((r, i) => {
+                        const li = document.createElement('li');
+                        li.setAttribute('role','option');
+                        li.className = 'px-3 py-2 hover:bg-gray-700 cursor-pointer flex items-center justify-between';
+                        li.innerHTML = `<span class="text-gray-100">${r.title}</span><span class="text-xs text-gray-400 ml-3">${r.type}</span>`;
+                        li.addEventListener('mouseenter', ()=>{ idx=i; highlight(); });
+                        li.addEventListener('click', ()=>{ window.location.href = r.href; });
+                        list.appendChild(li);
+                    });
+                    if (items.length) show(); else hide();
+                };
+                const highlight = () => {
+                    [...list.children].forEach((li, i) => li.classList.toggle('bg-gray-700', i===idx));
+                };
+                const search = async (q) => {
+                    try {
+                        const res = await fetch(`/admin/search/instant?q=${encodeURIComponent(q)}`);
+                        const json = await res.json();
+                        render(json.results || []);
+                    } catch { /* ignore */ }
+                };
+                input.addEventListener('input', ()=>{
+                    const q = input.value.trim();
+                    clearTimeout(timer);
+                    if (!q) return hide();
+                    timer = setTimeout(()=>search(q), 160);
+                });
+                input.addEventListener('keydown', (e)=>{
+                    const items = list.children.length;
+                    if (!items) return;
+                    if (e.key === 'ArrowDown') { e.preventDefault(); idx = (idx+1)%items; highlight(); }
+                    else if (e.key === 'ArrowUp') { e.preventDefault(); idx = (idx-1+items)%items; highlight(); }
+                    else if (e.key === 'Enter' && idx>=0) { e.preventDefault(); list.children[idx].click(); }
+                    else if (e.key === 'Escape') { hide(); }
+                });
+                document.addEventListener('click', (e)=>{ if (!dd.contains(e.target) && e.target !== input) hide(); });
+            })();
     </script>
 
 </body>

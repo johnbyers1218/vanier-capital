@@ -28,6 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
         loadProjects(); // Load all projects on the /projects page
         initProjectFilters(); // Activate filter buttons if present
     }
+    if (document.querySelector('.blog-filter-navigation')) {
+        initBlogFilters(); // Activate blog filter buttons if present
+    }
     if (document.getElementById('testimonials-grid-container')) {
         loadTestimonials(); // Load testimonials on the /testimonials page
     }
@@ -35,13 +38,46 @@ document.addEventListener('DOMContentLoaded', () => {
         loadProjectPreview(); // Load preview on the homepage /
     }
 
+    // Initialize stat counters if stats are present on the page
+    if (document.querySelector('.stat-number')) {
+        initStatsCounter();
+    }
+
     // Initialize form handlers if forms exist
     if (document.getElementById('contact-form')) {
         initContactAndScheduleForm();
     }
+    // Vector world map disabled per request; keep the static SVG + overlay only
+    (function ensureVectorMap() {
+        const staticWrap = document.getElementById('world-map-static-wrap');
+        if (staticWrap) staticWrap.style.display = '';
+        // Remove the legacy vector container to avoid reserved whitespace
+        const vector = document.getElementById('world-map');
+        if (vector && vector.parentNode) {
+            try { vector.parentNode.removeChild(vector); } catch (_) { vector.style.display = 'none'; }
+        }
+    })();
     // Schedule form is initialized dynamically after contact form success
 
+    // Initialize newsletter form feedback if present
+    initNewsletterForm();
+
+    // Initialize Legal pages Table of Contents if present
+    initLegalToc();
   
+});
+
+// Blur-up images: remove blur when loaded
+document.addEventListener('DOMContentLoaded', () => {
+    const imgs = document.querySelectorAll('img.blur-up');
+    imgs.forEach(img => {
+        if (img.complete) {
+            img.classList.add('is-loaded');
+        } else {
+            img.addEventListener('load', () => img.classList.add('is-loaded'), { once: true });
+            img.addEventListener('error', () => img.classList.add('is-loaded'), { once: true });
+        }
+    });
 });
 
 
@@ -208,69 +244,148 @@ function generateExcerptFromHtml(htmlContent, maxLength = 150) {
 
 
 /** Creates HTML for a single Project card (for listing pages) */
-function createProjectCardHtml(project, isPreview = false) { // isPreview can still be used for minor variations if needed
-    // Generate an excerpt from the potentially rich HTML description
-    
-    const excerpt = generateExcerptFromHtml(project.description, isPreview ? 80 : 120); // Shorter excerpt for preview
+function createProjectCardHtml(project, isPreview = false) {
+    // Prefer explicit excerpt; fallback to generating from HTML description
+    const excerpt = project.excerpt && String(project.excerpt).trim().length
+        ? String(project.excerpt)
+        : generateExcerptFromHtml(project.description, isPreview ? 80 : 120);
 
     const imageHtml = project.image
-        ? `<div class="project-image-preview" style="height: 200px; overflow: hidden; border-radius: var(--border-radius) var(--border-radius) 0 0;">
-             <img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
-           </div>`
-        : `<div class="project-image-preview" style="height: 200px; background-color: rgba(255,255,255,0.05); border-radius: var(--border-radius) var(--border-radius) 0 0; display: flex; align-items: center; justify-content: center; color: var(--gray-text);">
-             <i class="fas fa-project-diagram fa-3x"></i>
+        ? `<img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}" loading="lazy" class="project-image">`
+        : `<div class="project-image-placeholder">
+             <i class="fas fa-project-diagram"></i>
            </div>`;
 
     // Link to the single project page using its slug
-    const projectDetailUrl = `/projects/${escapeHtml(project.slug || 'no-slug-found')}`; // Added fallback for debugging
-    const linkHtml = `<a href="${projectDetailUrl}" class="card-link cta-button secondary-btn">View Case Study →</a>`;
+    const projectDetailUrl = `/projects/${escapeHtml(project.slug || 'no-slug-found')}`;
+    const industryNames = Array.isArray(project.industries) && project.industries.length ? project.industries.map(i => i.name) : [];
+    const serviceNames = Array.isArray(project.serviceTypes) && project.serviceTypes.length ? project.serviceTypes.map(s => s.name) : [];
+    const industryChips = industryNames.map(n => `<span class="chip">${escapeHtml(n)}</span>`).join('');
+    const serviceChips = serviceNames.map(n => `<span class=\"chip chip-muted\">${escapeHtml(n)}</span>`).join('');
 
+    // Entire card is clickable; avoid nested anchors inside
     return `
-        <article class="content-card project-card" data-category="${escapeHtml(project.category || 'uncategorized')}">
+    <a class="project-card" href="${projectDetailUrl}" aria-label="View case study: ${escapeHtml(project.title)}" data-industries="${escapeHtml(industryNames.join('|'))}" data-services="${escapeHtml(serviceNames.join('|'))}">
             ${imageHtml}
-            <div class="project-info">
-                <h3><a href="${projectDetailUrl}" style="color: inherit; text-decoration: none;">${escapeHtml(project.title)}</a></h3>
-                <span class="project-category">
-                    Category: ${escapeHtml(project.category)}
-                </span>
-                <p>${escapeHtml(excerpt)}</p>
-                ${linkHtml}
+            <div class="project-content">
+                <h3 class="project-title">${escapeHtml(project.title)}</h3>
+        <div class="project-meta">${industryChips}</div>
+        ${serviceChips ? `<div class="project-meta">${serviceChips}</div>` : ''}
+                <p class="project-description">${escapeHtml(excerpt)}</p>
+                <div class="project-meta project-cta">
+                    <span class="project-link">View Case Study →</span>
+                </div>
             </div>
-        </article>
+        </a>
     `;
 }
 
 // --- Loaders --- (loadProjects will use the updated createProjectCardHtml)
-function loadProjects() {
-    loadGenericContent('/api/projects', 'projects-grid-container', createProjectCardHtml, 'projects');
+async function loadProjects(page = 1, activeIndustryIds = [], activeServiceIds = []) {
+    const container = document.getElementById('projects-grid-container');
+    if (!container) {
+        console.warn('projects container not found on this page.');
+        return;
+    }
+    
+    renderLoadingIndicator(container);
+    
+    try {
+        const params = new URLSearchParams();
+        params.set('page', String(page));
+        params.set('perPage', '9');
+        (activeIndustryIds || []).forEach(id => params.append('industries', id));
+        (activeServiceIds || []).forEach(id => params.append('services', id));
+        const data = await fetchData(`/api/projects?${params.toString()}`);
+        if (data.projects && data.projects.length > 0) {
+            container.innerHTML = ''; // Clear loading
+            data.projects.forEach(project => {
+                container.insertAdjacentHTML('beforeend', createProjectCardHtml(project));
+            });
+
+            // Build curated dual filters (preloaded full lists from server)
+            buildDualProjectFiltersFromServer(data.filters);
+            try { document.dispatchEvent(new CustomEvent('projectFiltersUpdated')); } catch(_) {}
+            updateDualFilterCounts(data.filters);
+            renderProjectsPagination(data.pagination);
+        } else {
+            renderNoDataMessage(container, 'projects');
+            // Still render filters even if no projects on this page
+            if (data && data.filters) {
+                buildDualProjectFiltersFromServer(data.filters);
+                updateDualFilterCounts(data.filters);
+                renderProjectsPagination(data.pagination);
+                try { document.dispatchEvent(new CustomEvent('projectFiltersUpdated')); } catch(_) {}
+            }
+        }
+    } catch (error) {
+        renderErrorMessage(container, `Could not load projects. ${error.message}`);
+    }
+}
+
+// Human-friendly category label mapping
+function formatCategoryLabel(slug) {
+    if (!slug) return '';
+    const s = String(slug).toLowerCase();
+    const map = new Map([
+        ['real-estate', 'Real Estate'],
+        ['e-commerce', 'E‑Commerce'],
+        ['ai', 'AI'],
+        ['ml', 'Machine Learning'],
+        ['machine-learning', 'Machine Learning'],
+        ['data-engineering', 'Data Engineering'],
+        ['automation', 'Automation'],
+        ['finance', 'Finance'],
+        ['healthcare', 'Healthcare'],
+        ['logistics', 'Logistics'],
+    ]);
+    if (map.has(s)) return map.get(s);
+    return s.replace(/[-_]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+// Human-friendly service label mapping
+function formatServiceLabel(slug) {
+    if (!slug) return '';
+    const s = String(slug).toLowerCase();
+    const map = new Map([
+        ['ai-chatbots', 'AI Chatbots'],
+        ['chatbots', 'AI Chatbots'],
+        ['rpa_invoice_processing', 'Invoice Processing Automation'],
+        ['invoice-processing', 'Invoice Processing Automation'],
+        ['document-processing', 'Document Processing'],
+        ['workflow-automation', 'Workflow Automation'],
+        ['data-engineering', 'Data Engineering'],
+        ['sales-automation', 'Sales Automation'],
+        ['marketing-automation', 'Marketing Automation'],
+        ['lead-enrichment', 'Lead Enrichment'],
+        ['customer-support-automation', 'Customer Support Automation'],
+    ]);
+    if (map.has(s)) return map.get(s);
+    return s.replace(/[-_]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
 // createFeaturedProjectHtml needs to be updated to use an excerpt too if its description is HTML
 function createFeaturedProjectHtml(project) {
-    const imageHtml = project.image
-        ? `<div class="featured-project-image" style="min-height: 350px;">
-               <img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
-           </div>`
-        : `<div class="featured-project-image" style="min-height: 350px; background-color: #222; display: flex; align-items: center; justify-content: center; color: var(--gray-text);"> <i class="fas fa-project-diagram fa-4x"></i></div>`;
+        const projectDetailUrl = `/projects/${escapeHtml(project.slug)}`;
+    const image = project.image
+        ? `<img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:16px 0 0 16px;display:block;">`
+        : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f3f4f6;color:#9ca3af;border-radius:16px 0 0 16px"><i class="fas fa-project-diagram fa-3x"></i></div>`;
+    const categoryLabel = (Array.isArray(project.industries) && project.industries.length) ? project.industries[0].name : '';
+        // Show full excerpt (no truncation); prefer explicit excerpt if available
+        const excerpt = project.excerpt ? String(project.excerpt) : generateExcerptFromHtml(project.description, 10000);
 
-    // Link to the single project page for the "View Details" button
-    const projectDetailUrl = `/projects/${escapeHtml(project.slug)}`;
-    const linkHtml = `<a href="${projectDetailUrl}" class="cta-button primary-btn" style="margin-top: auto; align-self: flex-start;">View Case Study</a>`;
-
-    // Generate an excerpt for the featured project's description
-    const excerpt = generateExcerptFromHtml(project.description, 200); // Longer excerpt for featured
-
-    return `
-        <div class="featured-project-content" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0; align-items: stretch; background-color: var(--card-bg); border-radius: var(--border-radius); overflow:hidden; border: 1px solid var(--card-border); box-shadow: 0 5px 15px rgba(0,0,0,0.15);">
-            ${imageHtml}
-            <div class="featured-project-details" style="padding: 2rem 2.5rem; display: flex; flex-direction: column;">
-                <h3><a href="${projectDetailUrl}" style="color: inherit; text-decoration: none;">${escapeHtml(project.title)}</a></h3>
-                <p class="project-category" style="color: var(--primary-color); font-weight: 600; margin-bottom: 1rem; display: inline-block;">${escapeHtml(project.category)}</p>
-                <p style="flex-grow: 1; margin-bottom: 1.5rem;">${escapeHtml(excerpt)}</p>
-                ${linkHtml}
-            </div>
-        </div>
-    `;
+        return `
+            <div class="featured-card" style="display:grid;grid-template-columns:1.1fr 1fr;gap:0;align-items:stretch;max-width:1080px;margin:0 auto;padding:0;border-radius:16px;border:1px solid #e5e7eb;background:#ffffff;box-shadow:0 8px 24px rgba(0,0,0,0.08);color:#0f172a;overflow:hidden;">
+                <div class="featured-media" style="min-height:280px;height:100%;overflow:hidden;">${image}</div>
+                <div class="featured-body" style="display:flex;flex-direction:column;min-height:280px;padding:20px;">
+                    ${categoryLabel ? `<div class="featured-category" style="margin-bottom:10px;"><span class="pill" style="font-size:.9rem;padding:.35rem .6rem;border-radius:999px;background:#eff6ff;color:#1d4ed8;">${escapeHtml(categoryLabel)}</span></div>` : ''}
+                    <h3 class="featured-title" style="font-size:1.5rem;line-height:1.25;margin:0 0 10px 0;"><a href="${projectDetailUrl}" style="color:inherit;text-decoration:none;">${escapeHtml(project.title)}</a></h3>
+                    <p class="featured-excerpt" style="color:#374151;line-height:1.7;margin:0 0 14px 0;">${escapeHtml(excerpt)}</p>
+                    <div style="margin-top:auto;display:flex;gap:12px;">
+                        <a href="${projectDetailUrl}" class="cta-button primary-btn" style="align-self:flex-start;">View Case Study <span class="icon-arrow">&rarr;</span></a>
+                    </div>
+                </div>
+            </div>`;
 }
 
 
@@ -297,13 +412,1108 @@ document.addEventListener('DOMContentLoaded', () => {
         loadFeaturedProject();
     }
     if (document.getElementById('featured-testimonial-container')) {
-        loadFeaturedTestimonial();
+        // Prefer top-3 by largest clients if available; otherwise fallback to one featured
+        loadTopClientTestimonials(3).catch(() => loadFeaturedTestimonial());
     }
 
     if (document.getElementById('contact-form'))initContactAndScheduleForm();
+    // Vector world map disabled; rely on static SVG with overlay pins
+    initMapModal();
+    initStaticOverlayPins();
     // Schedule form is initialized dynamically
    
 });
+// --- Dynamic pins over static SVG map ---
+function initStaticOverlayPins() {
+    const wrap = document.getElementById('world-map-static-wrap');
+    const overlay = document.getElementById('world-map-overlay');
+    if (!wrap || !overlay) return;
+    // Ensure proper stacking context
+    wrap.style.position = wrap.style.position || 'relative';
+    // Make the overlay interactive specifically for preview mode (tooltips + modal trigger)
+    overlay.classList.add('is-interactive');
+    overlay.style.pointerEvents = 'auto';
+    overlay.style.zIndex = '2';
+    overlay.style.cursor = 'pointer';
+    // Crop view: show all continents while removing Antarctica only (bottom crop only)
+    // Slightly crop the left to improve framing; bottom ~18% trims Antarctica but preserves Australia and southern tips
+    // Then scale/translate so the visible window fills the wrapper with no inner padding
+    const crop = { top: 0, right: 0, bottom: 18, left: 10 }; // percentages of full image
+    const clipPathCss = `inset(${crop.top}% ${crop.right}% ${crop.bottom}% ${crop.left}%)`;
+    // IMPORTANT: do NOT apply clip/transform to the overlay SVG; only to the image.
+    // Applying transforms to both causes double-scaling and pin drift. We'll compute
+    // pin positions in wrapper coordinates with crop offsets baked in.
+    // If we're only cropping the bottom, anchor scaling at the top so the top is not cut off
+    const anchorTop = (crop.top === 0 && crop.bottom > 0); // anchor to top whenever we only remove from bottom (regardless of left/right)
+    // When cropping only from the left, also anchor horizontally to the left to avoid empty space
+    const anchorLeft = (crop.left > 0 && crop.right === 0);
+    const anchorRight = (crop.right > 0 && crop.left === 0);
+    // No overlay transform here
+    // Forward clicks on overlay (pins or empty areas) to open the modal
+    overlay.addEventListener('click', () => {
+        const btn = document.getElementById('open-map-modal');
+        if (btn && typeof btn.click === 'function') btn.click();
+    });
+    // Contain any scaled content within the card
+    if (wrap && wrap.style) {
+        wrap.style.overflow = 'hidden';
+    }
+    const img = wrap.querySelector('img.world-map-static');
+    // Remove native title tooltip from the underlying button; keep aria-label for a11y
+    const openBtn = document.getElementById('open-map-modal');
+    if (openBtn) {
+        if (openBtn.hasAttribute('title')) openBtn.removeAttribute('title');
+    }
+    // Overlay remains aria-hidden and purely interactive; button retains aria-label for screen readers
+
+    // Create a lightweight tooltip used on hover (static preview only)
+    let tooltip = wrap.querySelector('.map-overlay-tooltip');
+    if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.className = 'map-overlay-tooltip';
+        tooltip.style.position = 'absolute';
+        tooltip.style.pointerEvents = 'none';
+        tooltip.style.background = '#111827';
+        tooltip.style.color = '#fff';
+        tooltip.style.padding = '6px 8px';
+        tooltip.style.borderRadius = '6px';
+        tooltip.style.fontSize = '.8rem';
+        tooltip.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)';
+        tooltip.style.opacity = '0';
+        tooltip.style.transform = 'translateY(-6px)';
+        tooltip.style.transition = 'opacity 120ms ease, transform 120ms ease';
+        wrap.appendChild(tooltip);
+    }
+    // Ensure tooltip appears above the SVG overlay (which uses z-index: 2)
+    tooltip.style.zIndex = '3';
+
+    // Add an on-map hint inviting users to explore the interactive map
+    let hint = wrap.querySelector('.map-click-hint');
+    if (!hint) {
+        hint = document.createElement('div');
+        hint.className = 'map-click-hint';
+        hint.setAttribute('role', 'note');
+        hint.textContent = 'Click the map to explore client locations';
+        hint.style.position = 'absolute';
+        hint.style.left = '12px';
+        hint.style.bottom = '12px';
+        hint.style.zIndex = '3';
+        hint.style.background = 'rgba(17,24,39,0.80)';
+        hint.style.color = '#fff';
+        hint.style.fontSize = '.82rem';
+        hint.style.padding = '6px 10px';
+        hint.style.borderRadius = '999px';
+        hint.style.userSelect = 'none';
+        wrap.appendChild(hint);
+    }
+
+    // Fetch locations
+    fetch('/api/clients/locations').then(r => r.ok ? r.json() : ({locations:[]})).then(data => {
+        const points = normalizeAndGeocodeLocations((data && data.locations) || []).points;
+        const kick = () => { renderPins(); let t; window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(renderPins, 120); }); };
+        if (img && !img.complete) { img.addEventListener('load', kick, { once: true }); } else { kick(); }
+
+    function renderPins() {
+            // Measure rendered image box for accurate projection
+            const wrapBox = wrap.getBoundingClientRect();
+            // We'll use the wrapper's box as the overlay coordinate system.
+            const w = Math.max(1, Math.floor(wrapBox.width));
+            const h = Math.max(1, Math.floor(wrapBox.height));
+            // Ensure the parent card doesn't enforce a large min-height (shrink to fit)
+            try {
+                const card = wrap.closest('.world-map-card');
+                if (card) { card.style.minHeight = 'auto'; card.style.height = 'auto'; }
+            } catch (_) { /* ignore */ }
+            // Position overlay to exactly cover the wrapper (visible image window)
+            const offsetLeft = 0;
+            const offsetTop = 0;
+            overlay.style.position = 'absolute';
+            overlay.style.left = `${offsetLeft}px`;
+            overlay.style.top = `${offsetTop}px`;
+            overlay.style.width = `${w}px`;
+            overlay.style.height = `${h}px`;
+            overlay.setAttribute('viewBox', `0 0 ${w} ${h}`);
+            overlay.setAttribute('width', String(w));
+            overlay.setAttribute('height', String(h));
+            overlay.innerHTML = '';
+            // Apply clip/transform to the image only so the basemap is windowed
+            if (img && img.style) {
+                img.style.clipPath = clipPathCss;
+                img.style.transformOrigin = anchorLeft ? 'left top' : (anchorRight ? 'right top' : (anchorTop ? 'center top' : 'center center'));
+                {
+                    const fracW = 1 - (crop.left + crop.right) / 100;
+                    const fracH = 1 - (crop.top + crop.bottom) / 100;
+                    const scaleX = fracW > 0 ? 1 / fracW : 1;
+                    const scaleY = fracH > 0 ? 1 / fracH : 1;
+                    const tx = anchorLeft ? -crop.left : (anchorRight ? crop.right : (crop.left - crop.right) / 2);
+                    const ty = anchorTop ? 0 : (crop.top - crop.bottom) / 2;
+                    img.style.transform = `translate(${tx}%, ${ty}%) scale(${scaleX}, ${scaleY})`;
+                }
+                img.style.display = 'block';
+                img.style.width = '100%';
+                // Fill wrapper height to avoid inner padding; wrapper overflow hides scaled overflow
+                img.style.height = '100%';
+                // Ensure the SVG basemap fully fills the image box so edges are flush with the container
+                img.style.objectFit = 'fill';
+            }
+            // Choose projection based on the image's declared data-projection or auto-detect
+            // Force Robinson to match the static basemap projection
+            const projName = (img && img.dataset && img.dataset.projection) ? String(img.dataset.projection).toLowerCase() : 'robinson';
+            const use = projName;
+
+            // Projection helpers
+            const toRad = d => d * Math.PI / 180;
+            function robinsonProject(lon, lat, width, height) {
+                // Table-driven Robinson forward projection (Snyder), 5° increments
+                // Use independent horizontal and vertical scales so pins align even when the basemap is non-uniformly scaled
+                const RX = [
+                    0.8487,0.8470,0.8442,0.8423,0.8405,0.8386,0.8368,0.8349,0.8330,0.8311,
+                    0.8293,0.8274,0.8256,0.8237,0.8218,0.8199,0.8180,0.8162,0.8143
+                ];
+                const RY = [
+                    0.0000,0.0837,0.1671,0.2503,0.3333,0.4162,0.4990,0.5816,0.6642,0.7466,
+                    0.8289,0.9110,0.9931,1.0750,1.1566,1.2379,1.3189,1.3994,1.4796
+                ];
+                const absLat = Math.abs(lat);
+                const deg = Math.min(90, Math.max(0, absLat));
+                const i = Math.min(18, Math.floor(deg / 5));
+                const f = Math.min(1, Math.max(0, (deg - i * 5) / 5));
+                const rx = i < 18 ? RX[i] + (RX[i + 1] - RX[i]) * f : RX[18];
+                const ry = i < 18 ? RY[i] + (RY[i + 1] - RY[i]) * f : RY[18];
+                // Independent scales: width maps to 2 * RX[0] * pi; height maps to 2 * max(RY)
+                const maxRY = RY[18];
+                const scaleX = width / (2 * RX[0] * Math.PI);
+                const scaleY = height / (2 * maxRY);
+                const x = scaleX * rx * toRad(lon);
+                const y = scaleY * (lat < 0 ? -ry : ry);
+                const cx = width / 2 + x;
+                const cy = height / 2 - y;
+                return [cx, cy];
+            }
+
+            function eqrectProject(lon, lat, width, height) {
+                return [
+                    (lon + 180) * (width / 360),
+                    (90 - lat) * (height / 180)
+                ];
+            }
+
+            const svgNS = 'http://www.w3.org/2000/svg';
+            // Wrapper projection using Robinson on ORIGINAL canvas, then adjust for CROPPING only
+            const g = document.createElementNS(svgNS, 'g');
+            const original = { width: 2000, height: 1100 };
+
+            // --- Affine projector from Robinson(original) -> WRAPPER pixels, fit to anchors measured on the visible map ---
+            function invert3x3(m) {
+                const [a,b,c,d,e,f,g,h,i] = [m[0][0],m[0][1],m[0][2], m[1][0],m[1][1],m[1][2], m[2][0],m[2][1],m[2][2]];
+                const A =   e*i - f*h;
+                const B = -(d*i - f*g);
+                const C =   d*h - e*g;
+                const D = -(b*i - c*h);
+                const E =   a*i - c*g;
+                const F = -(a*h - b*g);
+                const G =   b*f - c*e;
+                const H = -(a*f - c*d);
+                const I =   a*e - b*d;
+                const det = a*A + b*B + c*C;
+                if (Math.abs(det) < 1e-9) return null;
+                const invDet = 1/det;
+                return [
+                    [A*invDet, D*invDet, G*invDet],
+                    [B*invDet, E*invDet, H*invDet],
+                    [C*invDet, F*invDet, I*invDet]
+                ];
+            }
+
+            function mul3x3vec3(m, v) { return [
+                m[0][0]*v[0] + m[0][1]*v[1] + m[0][2]*v[2],
+                m[1][0]*v[0] + m[1][1]*v[1] + m[1][2]*v[2],
+                m[2][0]*v[0] + m[2][1]*v[1] + m[2][2]*v[2]
+            ]; }
+
+            function createAffineProjector(anchorDefs, originalSize) {
+                // Build normal equations for least-squares affine fit: [xr, yr, 1] -> [Xw, Yw]
+                let AtA = [[0,0,0],[0,0,0],[0,0,0]]; let AtX=[0,0,0]; let AtY=[0,0,0];
+                for (const a of anchorDefs) {
+                    const [xr, yr] = robinsonProject(a.geo.lon, a.geo.lat, originalSize.width, originalSize.height);
+                    const v = [xr, yr, 1];
+                    // accumulate AtA
+                    AtA[0][0]+=v[0]*v[0]; AtA[0][1]+=v[0]*v[1]; AtA[0][2]+=v[0]*v[2];
+                    AtA[1][0]+=v[1]*v[0]; AtA[1][1]+=v[1]*v[1]; AtA[1][2]+=v[1]*v[2];
+                    AtA[2][0]+=v[2]*v[0]; AtA[2][1]+=v[2]*v[1]; AtA[2][2]+=v[2]*v[2];
+                    // accumulate AtB for X, Y
+                    AtX[0]+=v[0]*a.pixel.x; AtX[1]+=v[1]*a.pixel.x; AtX[2]+=v[2]*a.pixel.x;
+                    AtY[0]+=v[0]*a.pixel.y; AtY[1]+=v[1]*a.pixel.y; AtY[2]+=v[2]*a.pixel.y;
+                }
+                const inv = invert3x3(AtA);
+                if (!inv) {
+                    // Fallback: no-op mapping; place everything at center
+                    return { project: () => [w/2, h/2] };
+                }
+                const coeffX = mul3x3vec3(inv, AtX);
+                const coeffY = mul3x3vec3(inv, AtY);
+                return {
+                    project: (lon, lat) => {
+                        const [xr, yr] = robinsonProject(lon, lat, originalSize.width, originalSize.height);
+                        const X = coeffX[0]*xr + coeffX[1]*yr + coeffX[2];
+                        const Y = coeffY[0]*xr + coeffY[1]*yr + coeffY[2];
+                        return [X, Y];
+                    }
+                };
+            }
+
+            // Anchors provided in WRAPPER pixels (measured on the live, visible map)
+            const anchorGeoList = [
+                { lon: -74.0060, lat: 40.7128 }, // NYC
+                { lon: -80.1918, lat: 25.7617 }, // Miami
+                { lon:  13.3615, lat: 38.1157 }, // Palermo
+                { lon: -70.1823, lat: 42.0584 }, // Provincetown
+                { lon:   8.9463, lat: 44.4056 }, // Genoa
+                { lon:   2.3768, lat: 51.0344 }  // Dunkirk
+            ];
+            const anchorPixelsProvided = [
+                { x: 289, y: 202 }, // NYC
+                { x: 251, y: 272 }, // Miami
+                { x: 590, y: 209 }, // Palermo
+                { x: 303, y: 197 }, // Provincetown
+                { x: 569, y: 187 }, // Genoa
+                { x: 547, y: 157 }  // Dunkirk
+            ];
+
+            // Make anchors responsive: cache normalized positions on first render, rescale on resize
+            let norms = null;
+            if (wrap.dataset.anchorNorms) {
+                try { norms = JSON.parse(wrap.dataset.anchorNorms); } catch (_) { norms = null; }
+            }
+            if (!norms || norms.length !== anchorPixelsProvided.length) {
+                norms = anchorPixelsProvided.map(p => ({ x: p.x / w, y: p.y / h }));
+                wrap.dataset.anchorNorms = JSON.stringify(norms);
+            }
+            const anchorsForFit = anchorGeoList.map((geo, i) => ({ geo, pixel: { x: norms[i].x * w, y: norms[i].y * h } }));
+
+            const projector = createAffineProjector(anchorsForFit, original);
+
+            // Project then group by proximity and fan out directly in WRAPPER coordinates
+            const projected = points.map(p => {
+                const [x, y] = projector.project(p.lon, p.lat);
+                return { p, x, y };
+            });
+            // Tighten grouping so nearby-but-distinct places (e.g., NYC vs Long Island) don't get fanned out
+            const threshold = 5; // px (was 12)
+            const groups = [];
+            projected.forEach(item => {
+                let found = null;
+                for (const grp of groups) {
+                    const dx = item.x - grp.x;
+                    const dy = item.y - grp.y;
+                    if ((dx*dx + dy*dy) <= threshold*threshold) { found = grp; break; }
+                }
+                if (found) found.items.push(item); else groups.push({ x: item.x, y: item.y, items: [item] });
+            });
+        groups.forEach(grp => {
+                const n = grp.items.length;
+                const r = n > 1 ? 9 : 0; // increased fan-out radius for clearer separation
+                grp.items.forEach((item, idx) => {
+                    const angle = n > 1 ? (idx / n) * Math.PI * 2 : 0;
+                    const cx = n > 1 ? grp.x + r * Math.cos(angle) : item.x;
+                    const cy = n > 1 ? grp.y + r * Math.sin(angle) : item.y;
+                    const c = document.createElementNS(svgNS, 'circle');
+                    c.setAttribute('cx', String(cx));
+                    c.setAttribute('cy', String(cy));
+                    c.setAttribute('r', '6');
+                    c.setAttribute('fill', '#0ea5e9');
+                    c.setAttribute('stroke', '#0369a1');
+                    c.setAttribute('stroke-width', '1');
+            // Ensure circles themselves can capture events even if parent styles change
+            c.style.pointerEvents = 'auto';
+                    c.addEventListener('mouseenter', () => {
+                        tooltip.textContent = item.p.label || '';
+                        tooltip.style.left = `${offsetLeft + cx + 10}px`;
+                        tooltip.style.top = `${offsetTop + cy - 10}px`;
+                        tooltip.style.opacity = '1';
+                        tooltip.style.transform = 'translateY(-10px)';
+                    });
+                    c.addEventListener('mousemove', (e) => {
+                        tooltip.style.left = `${e.clientX - wrapBox.left + 10}px`;
+                        tooltip.style.top = `${e.clientY - wrapBox.top - 10}px`;
+                    });
+                    c.addEventListener('mouseleave', () => {
+                        tooltip.style.opacity = '0';
+                        tooltip.style.transform = 'translateY(-6px)';
+                    });
+            // Avoid opening modal when user clicks a pin intending to just hover
+            c.addEventListener('click', (e) => { e.stopPropagation(); });
+                    g.appendChild(c);
+                });
+            });
+            overlay.appendChild(g);
+        }
+    }).catch(() => {/* ignore */});
+}
+// --- Modal interactive map (Leaflet on demand) ---
+function initMapModal() {
+    const openBtn = document.getElementById('open-map-modal');
+    const modal = document.getElementById('map-modal');
+    const closeBtn = document.getElementById('close-map-modal');
+    if (!openBtn || !modal || !closeBtn) return;
+    const backdrop = modal.querySelector('.map-backdrop');
+    const container = document.getElementById('interactive-map');
+    let mapInstance = null;
+    function open() {
+        modal.hidden = false; modal.setAttribute('aria-hidden', 'false');
+        // Lazy-load Leaflet assets only when opened
+        if (!mapInstance) {
+            loadLeaflet().then(({ L }) => {
+                mapInstance = L.map(container).setView([20, 0], 2);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(mapInstance);
+                // Load client locations and plot markers, then fit bounds
+                fetch('/api/clients/locations')
+                    .then(r => r.ok ? r.json() : ({ locations: [] }))
+                    .then(data => {
+                        const pts = normalizeAndGeocodeLocations((data && data.locations) || []).points;
+                        if (Array.isArray(pts) && pts.length) {
+                            const latlngs = [];
+                            pts.forEach(p => {
+                                const m = L.circleMarker([p.lat, p.lon], {
+                                    radius: 6, color: '#0369a1', weight: 1, fillColor: '#0ea5e9', fillOpacity: 0.9
+                                }).addTo(mapInstance);
+                                if (p.label) m.bindTooltip(p.label, { permanent: false, direction: 'top' });
+                                latlngs.push([p.lat, p.lon]);
+                            });
+                            try {
+                                const b = L.latLngBounds(latlngs);
+                                mapInstance.fitBounds(b.pad(0.15), { animate: true, duration: 0.6 });
+                            } catch (_) { /* ignore */ }
+                        }
+                    })
+                    .catch(() => { /* ignore */ });
+            }).catch(err => {
+                console.error('Leaflet load error', err);
+                // Graceful fallback: show the static SVG at large size in the modal
+                container.innerHTML = '<img src="/images/world-map-robinson-ne.svg" alt="World map" style="width:100%;height:100%;object-fit:contain;display:block;"/>';
+            });
+        }
+    }
+    function close() { modal.setAttribute('aria-hidden','true'); modal.hidden = true; }
+
+    openBtn.addEventListener('click', open);
+    closeBtn.addEventListener('click', close);
+    backdrop.addEventListener('click', close);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') close(); });
+}
+
+function loadLeaflet() {
+    // Load Leaflet CSS and JS dynamically only when needed
+    return new Promise((resolve, reject) => {
+        if (window.L) return resolve({ L: window.L });
+        const css = document.createElement('link');
+        css.rel = 'stylesheet'; css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        document.head.appendChild(css);
+        const s = document.createElement('script');
+        s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        s.onload = () => resolve({ L: window.L });
+        s.onerror = reject; document.head.appendChild(s);
+    });
+}
+
+// --- World Map (minimal, dependency-free) ---
+function initWorldMap() {
+    const container = document.getElementById('world-map');
+    if (!container || container.dataset.initialized === 'true') return;
+    container.dataset.initialized = 'true';
+
+    // Fetch locations and then render
+    Promise.all([
+        // Use plain fetch for resilience; handle non-200s gracefully
+        fetch('/api/clients/locations').then(r => r.ok ? r.json() : ({ success:false, locations: [] })).catch(() => ({ success:false, locations: [] })),
+        // Prefer TopoJSON (smaller) when available, then fallback to GeoJSON
+        fetch('/js/world-topo.min.json').then(r => r.ok ? r.json() : null).catch(() => null),
+        fetch('/js/world-geo.min.json').then(r => r.ok ? r.json() : null).catch(() => null)
+    ])
+        .then(([locResp, topo, geo]) => {
+            let worldGeo = null;
+            try {
+                if (topo && topo.type === 'Topology') {
+                    worldGeo = topoToGeoFeatureCollection(topo);
+                }
+            } catch (_) { /* ignore and fallback */ }
+            if (!worldGeo && geo && geo.type) {
+                worldGeo = geo;
+            }
+            const locations = (locResp && Array.isArray(locResp.locations)) ? locResp.locations : [];
+            const { points, unknowns } = normalizeAndGeocodeLocations(locations);
+            if (unknowns.length) console.warn('[WorldMap] Unknown locations (no coords):', unknowns);
+            // Always pass world data if available; projection is driven by pin-bounds when pins exist.
+            const worldForRender = worldGeo;
+            // Initial render; if container hasn't laid out yet, defer slightly
+            const doRender = () => renderWorldMap(container, points, worldForRender);
+            const rect = container.getBoundingClientRect();
+            if (!rect.width || rect.width < 10) {
+                setTimeout(doRender, 100);
+            } else {
+                doRender();
+            }
+
+            // Re-render on window resize (debounced)
+            let t;
+            window.addEventListener('resize', () => {
+                clearTimeout(t);
+                t = setTimeout(doRender, 150);
+            });
+
+            // Re-render on container size changes (ResizeObserver) for layout shifts
+            try {
+                if (typeof ResizeObserver !== 'undefined') {
+                    let roTimer;
+                    const ro = new ResizeObserver(() => {
+                        clearTimeout(roTimer);
+                        roTimer = setTimeout(doRender, 120);
+                    });
+                    ro.observe(container);
+                    container._worldMapRO = ro;
+                }
+            } catch (_) { /* ignore */ }
+        })
+        .catch(err => {
+            console.error('[WorldMap] Failed to initialize map:', err);
+            // Fallback: attempt to render empty map grid
+            try {
+                renderWorldMap(container, [], null);
+            } catch (e) {
+                container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#6b7280;">Map unavailable.</div>';
+            }
+        });
+}
+
+function normalizeAndGeocodeLocations(rawLocations) {
+    const points = [];
+    const unknowns = [];
+
+    rawLocations.forEach(raw => {
+        const loc = (raw || '').trim();
+        if (!loc) return;
+        const normalized = normalizeLocationString(loc);
+        const p = getLatLonForLocation(normalized);
+        if (p) {
+            points.push({ label: p.label || loc, lat: p.lat, lon: p.lon, raw });
+        } else {
+            unknowns.push(loc);
+        }
+    });
+    return { points, unknowns };
+}
+
+function normalizeLocationString(s) {
+    let x = String(s).trim().replace(/\s+/g, ' ');
+    // Common replacements
+    x = x.replace(/\bU\.?S\.?A\b|\bU\.?S\.?\b|\bUnited States of America\b/i, 'United States');
+    x = x.replace(/\bUK\b|\bU\.K\.\b|\bGreat Britain\b|\bBritain\b/i, 'United Kingdom');
+    x = x.replace(/\bUAE\b|\bU\.A\.E\.\b|\bU\.A\.E\b|\bEmirates\b/i, 'United Arab Emirates');
+    x = x.replace(/\bSF\b/i, 'San Francisco, CA, United States');
+    x = x.replace(/\bNYC\b/i, 'New York, NY, United States');
+    return x;
+}
+
+// Minimal coordinate lookup (countries, select states, and common cities)
+const COUNTRY_CENTER = {
+    'united states': { lat: 39.8, lon: -98.6 },
+    'canada': { lat: 62.0, lon: -96.0 },
+    'united kingdom': { lat: 55.0, lon: -3.2 },
+    'australia': { lat: -25.3, lon: 133.8 },
+    'germany': { lat: 51.2, lon: 10.4 },
+    'france': { lat: 46.2, lon: 2.2 },
+    'india': { lat: 22.3, lon: 78.5 },
+    'singapore': { lat: 1.3521, lon: 103.8198 },
+    'netherlands': { lat: 52.1, lon: 5.3 },
+    'brazil': { lat: -14.2, lon: -51.9 },
+    'mexico': { lat: 23.6, lon: -102.5 },
+    'spain': { lat: 40.2, lon: -3.7 },
+    'italy': { lat: 42.5, lon: 12.5 },
+    'sweden': { lat: 60.1, lon: 18.6 },
+    'norway': { lat: 60.5, lon: 8.5 },
+    'denmark': { lat: 56.0, lon: 9.5 },
+    'switzerland': { lat: 46.8, lon: 8.2 },
+    'japan': { lat: 36.2, lon: 138.3 },
+    'south korea': { lat: 36.5, lon: 127.9 },
+    'united arab emirates': { lat: 24.3, lon: 54.4 },
+    'israel': { lat: 31.0, lon: 35.0 },
+    'south africa': { lat: -30.6, lon: 22.9 },
+    'ireland': { lat: 53.2, lon: -8.1 },
+    'portugal': { lat: 39.4, lon: -8.2 },
+    'new zealand': { lat: -41.8, lon: 172.9 }
+};
+
+const US_STATE_CENTER = {
+    'california': { lat: 36.7, lon: -119.4 },
+    'texas': { lat: 31.0, lon: -100.0 },
+    'florida': { lat: 28.0, lon: -82.0 },
+    'new york': { lat: 42.9, lon: -75.5 },
+    'illinois': { lat: 40.0, lon: -89.0 },
+    'washington': { lat: 47.4, lon: -120.5 },
+    'massachusetts': { lat: 42.2, lon: -71.8 },
+    'colorado': { lat: 39.0, lon: -105.5 },
+    'georgia': { lat: 32.6, lon: -83.4 },
+    'pennsylvania': { lat: 40.9, lon: -77.8 },
+    'ohio': { lat: 40.3, lon: -82.8 },
+    'arizona': { lat: 34.2, lon: -111.7 },
+    'north carolina': { lat: 35.5, lon: -80.0 },
+    'virginia': { lat: 37.5, lon: -78.7 }
+};
+
+// Common state/province abbreviations → full name
+const US_STATE_ABBR = {
+    'al': 'alabama', 'ak': 'alaska', 'az': 'arizona', 'ar': 'arkansas', 'ca': 'california',
+    'co': 'colorado', 'ct': 'connecticut', 'de': 'delaware', 'fl': 'florida', 'ga': 'georgia',
+    'hi': 'hawaii', 'id': 'idaho', 'il': 'illinois', 'in': 'indiana', 'ia': 'iowa',
+    'ks': 'kansas', 'ky': 'kentucky', 'la': 'louisiana', 'me': 'maine', 'md': 'maryland',
+    'ma': 'massachusetts', 'mi': 'michigan', 'mn': 'minnesota', 'ms': 'mississippi', 'mo': 'missouri',
+    'mt': 'montana', 'ne': 'nebraska', 'nv': 'nevada', 'nh': 'new hampshire', 'nj': 'new jersey',
+    'nm': 'new mexico', 'ny': 'new york', 'nc': 'north carolina', 'nd': 'north dakota', 'oh': 'ohio',
+    'ok': 'oklahoma', 'or': 'oregon', 'pa': 'pennsylvania', 'ri': 'rhode island', 'sc': 'south carolina',
+    'sd': 'south dakota', 'tn': 'tennessee', 'tx': 'texas', 'ut': 'utah', 'vt': 'vermont',
+    'va': 'virginia', 'wa': 'washington', 'wv': 'west virginia', 'wi': 'wisconsin', 'wy': 'wyoming'
+};
+
+const CA_PROV_ABBR = {
+    'ab': 'alberta', 'bc': 'british columbia', 'mb': 'manitoba', 'nb': 'new brunswick', 'nl': 'newfoundland and labrador',
+    'ns': 'nova scotia', 'nt': 'northwest territories', 'nu': 'nunavut', 'on': 'ontario', 'pe': 'prince edward island',
+    'qc': 'quebec', 'sk': 'saskatchewan', 'yt': 'yukon'
+};
+
+const CITY_COORDS = {
+    'new york, ny, united states': { lat: 40.7128, lon: -74.0060 },
+    'long island, ny, united states': { lat: 40.7891, lon: -73.1350 },
+    'long island, united states': { lat: 40.7891, lon: -73.1350 },
+    'san francisco, ca, united states': { lat: 37.7749, lon: -122.4194 },
+    'los angeles, ca, united states': { lat: 34.0522, lon: -118.2437 },
+    'austin, tx, united states': { lat: 30.2672, lon: -97.7431 },
+    'chicago, il, united states': { lat: 41.8781, lon: -87.6298 },
+    'miami, fl, united states': { lat: 25.7617, lon: -80.1918 },
+    'tampa, fl, united states': { lat: 27.9506, lon: -82.4572 },
+    'tampa, united states': { lat: 27.9506, lon: -82.4572 },
+    'seattle, wa, united states': { lat: 47.6062, lon: -122.3321 },
+    'boston, ma, united states': { lat: 42.3601, lon: -71.0589 },
+    'atlanta, ga, united states': { lat: 33.7490, lon: -84.3880 },
+    'denver, co, united states': { lat: 39.7392, lon: -104.9903 },
+    'dallas, tx, united states': { lat: 32.7767, lon: -96.7970 },
+    'houston, tx, united states': { lat: 29.7604, lon: -95.3698 },
+    'london, united kingdom': { lat: 51.5074, lon: -0.1278 },
+    'toronto, canada': { lat: 43.6532, lon: -79.3832 },
+    'kitchener, canada': { lat: 43.4516, lon: -80.4925 },
+    'vancouver, canada': { lat: 49.2827, lon: -123.1207 },
+    'montreal, canada': { lat: 45.5019, lon: -73.5674 },
+    'calgary, canada': { lat: 51.0447, lon: -114.0719 },
+    'ottawa, canada': { lat: 45.4215, lon: -75.6972 },
+    'sydney, australia': { lat: -33.8688, lon: 151.2093 },
+    'melbourne, australia': { lat: -37.8136, lon: 144.9631 },
+    'singapore': { lat: 1.3521, lon: 103.8198 },
+    'amsterdam, netherlands': { lat: 52.3676, lon: 4.9041 },
+    'paris, france': { lat: 48.8566, lon: 2.3522 },
+    'madrid, spain': { lat: 40.4168, lon: -3.7038 },
+    'barcelona, spain': { lat: 41.3874, lon: 2.1686 },
+    'berlin, germany': { lat: 52.5200, lon: 13.4050 },
+    'munich, germany': { lat: 48.1351, lon: 11.5820 },
+    'provincetown, ma, united states': { lat: 42.0584, lon: -70.1823 },
+    'palermo, italy': { lat: 38.1157, lon: 13.3615 },
+    'genoa, italy': { lat: 44.4056, lon: 8.9463 },
+    'dunkirk, france': { lat: 51.0344, lon: 2.3768 },
+    'rome, italy': { lat: 41.9028, lon: 12.4964 },
+    'zurich, switzerland': { lat: 47.3769, lon: 8.5417 },
+    'dubai, united arab emirates': { lat: 25.2048, lon: 55.2708 },
+    'tel aviv, israel': { lat: 32.0853, lon: 34.7818 },
+    'johannesburg, south africa': { lat: -26.2041, lon: 28.0473 },
+    'dublin, ireland': { lat: 53.3498, lon: -6.2603 },
+    'lisbon, portugal': { lat: 38.7223, lon: -9.1393 },
+    'auckland, new zealand': { lat: -36.8485, lon: 174.7633 }
+};
+
+function getLatLonForLocation(locStr) {
+    const s = String(locStr).trim();
+    const lower = s.toLowerCase();
+
+    // Try city exact
+    if (CITY_COORDS[lower]) return { ...CITY_COORDS[lower], label: s };
+
+    // Try patterns like "City, State, Country" or "City, Country"
+    const parts = s.split(',').map(p => p.trim());
+    if (parts.length >= 2) {
+        const city = parts[0];
+        let region = parts[1] || '';
+        let country = parts.length >= 3 ? parts[2] : '';
+
+        const cityLower = city.toLowerCase();
+        let regionLower = region.toLowerCase();
+        let countryLower = (country || '').toLowerCase();
+
+        // Normalize country
+        if (!countryLower && (US_STATE_ABBR[regionLower] || US_STATE_CENTER[regionLower])) countryLower = 'united states';
+        if (!countryLower && CA_PROV_ABBR[regionLower]) countryLower = 'canada';
+
+        // Expand region abbreviations to full names for state-center fallback
+        const regionIsUSAbbr = US_STATE_ABBR[regionLower];
+        const regionIsCAAbbr = CA_PROV_ABBR[regionLower];
+        const regionFull = regionIsUSAbbr || regionIsCAAbbr || regionLower;
+
+        // 1) Try CITY_COORDS with full string as provided (handles entries like "New York, NY, United States")
+        const maybeCityCountry = `${cityLower}, ${[region, country].filter(Boolean).join(', ').toLowerCase()}`.replace(/, $/, '');
+        if (CITY_COORDS[maybeCityCountry]) return { ...CITY_COORDS[maybeCityCountry], label: s };
+
+        // 2) Try city + country (ignoring region) if we have a country
+        if (countryLower) {
+            const keyCityCountry = `${cityLower}, ${countryLower}`;
+            if (CITY_COORDS[keyCityCountry]) return { ...CITY_COORDS[keyCityCountry], label: s };
+        }
+
+        // 3) Try region/state center in US if region recognized
+        if (US_STATE_CENTER[regionFull]) return { ...US_STATE_CENTER[regionFull], label: s };
+
+        // 4) As a final hint, if region is US two-letter and we have city + abbr + country in dict
+        if (regionIsUSAbbr && countryLower) {
+            const keyCityStateAbbr = `${cityLower}, ${regionLower}, ${countryLower}`;
+            if (CITY_COORDS[keyCityStateAbbr]) return { ...CITY_COORDS[keyCityStateAbbr], label: s };
+        }
+    }
+
+    // Country-level fallback
+    if (COUNTRY_CENTER[lower]) return { ...COUNTRY_CENTER[lower], label: s };
+
+    return null; // unknown
+}
+
+function renderWorldMap(container, points, worldGeo) {
+    const rect = container.getBoundingClientRect ? container.getBoundingClientRect() : { width: container.clientWidth, height: container.clientHeight };
+    const width = Math.max(1, Math.floor(rect.width || container.clientWidth || 800));
+    const height = Math.max(1, Math.floor(rect.height || container.clientHeight || 420));
+    // Clear previous
+    container.innerHTML = '';
+
+    // Create SVG
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    svg.setAttribute('width', String(width));
+    svg.setAttribute('height', String(height));
+    svg.style.display = 'block';
+    // Keep transparent to let CSS fallback image show through when needed
+    svg.style.background = 'transparent';
+
+    // --- Projection: prefer full-world when outline data is present so land is always visible ---
+    // Auto-zoom to current pins if present; otherwise show a pleasant full-world frame
+    const havePoints = Array.isArray(points) && points.length > 0;
+    const bounds = havePoints
+        ? computeLonLatBounds(points)
+        : { minLon: -180, maxLon: 180, minLat: -60, maxLat: 80 };
+    const project = makeProjection(bounds, width, height);
+
+    // Removed grid underlay for a cleaner look
+
+    if (worldGeo && worldGeo.features) {
+    const landGroup = document.createElementNS(svgNS, 'g');
+    // Softer styling when zoomed to pins to avoid edge artifacts; slightly richer when no pins.
+    const fillColor = havePoints ? 'none' : '#bfdbfe';
+    const strokeColor = havePoints ? '#93c5fd' : '#3b82f6';
+    landGroup.setAttribute('fill', fillColor);
+    landGroup.setAttribute('stroke', strokeColor);
+    landGroup.setAttribute('stroke-width', havePoints ? '1' : '1.5');
+    if (havePoints) {
+        landGroup.setAttribute('stroke-opacity', '0.9');
+        landGroup.setAttribute('stroke-linecap', 'round');
+        landGroup.setAttribute('stroke-linejoin', 'round');
+    } else {
+        landGroup.setAttribute('opacity', '0.95');
+    }
+
+        // Convert GeoJSON coords (lon/lat) to SVG paths via dynamic equirectangular projection
+        // and break segments that jump across the antimeridian to prevent tall vertical seams.
+    const closeRings = !havePoints; // only close paths when filling (no points mode)
+    const toPath = (coords) => coords
+            .map(ring => {
+                const parts = [];
+                let d = '';
+                let prevX = null;
+                const seamJump = Math.max(40, width * 0.25); // threshold in px to detect wrap jumps
+                for (let i = 0; i < ring.length; i++) {
+                    const lon = ring[i][0];
+                    const lat = ring[i][1];
+                    const x = project.lon(lon);
+                    const y = project.lat(lat);
+                    const isBreak = prevX !== null && Math.abs(x - prevX) > seamJump;
+                    if (isBreak) {
+                        // close previous subpath only when filling; otherwise just push the open polyline
+                        if (d) { parts.push(closeRings ? (d + ' Z') : d); d = ''; }
+                        d = `M${x},${y}`; // start new subpath
+                    } else if (!d) {
+                        d = `M${x},${y}`;
+                    } else {
+                        d += ` L${x},${y}`;
+                    }
+                    prevX = x;
+                }
+                if (d) parts.push(closeRings ? (d + ' Z') : d);
+                return parts.join(' ');
+            })
+            .join(' ');
+
+        try {
+            (worldGeo.features || []).forEach(feat => {
+                const geom = feat.geometry || {};
+                if (geom.type === 'Polygon') {
+                    const d = toPath(geom.coordinates || []);
+                    const path = document.createElementNS(svgNS, 'path');
+                    path.setAttribute('d', d);
+                    landGroup.appendChild(path);
+                } else if (geom.type === 'MultiPolygon') {
+                    (geom.coordinates || []).forEach(poly => {
+                        const d = toPath(poly || []);
+                        const path = document.createElementNS(svgNS, 'path');
+                        path.setAttribute('d', d);
+                        landGroup.appendChild(path);
+                    });
+                }
+            });
+            if (havePoints) {
+                // Clip to current viewBox to avoid wrap seams at the edges
+                const defs = document.createElementNS(svgNS, 'defs');
+                const clip = document.createElementNS(svgNS, 'clipPath');
+                const clipId = 'wm-clip';
+                clip.setAttribute('id', clipId);
+                const rect = document.createElementNS(svgNS, 'rect');
+                rect.setAttribute('x', '0'); rect.setAttribute('y', '0');
+                rect.setAttribute('width', String(width));
+                rect.setAttribute('height', String(height));
+                clip.appendChild(rect); defs.appendChild(clip);
+                svg.appendChild(defs);
+                landGroup.setAttribute('clip-path', `url(#${clipId})`);
+            }
+            svg.appendChild(landGroup);
+        } catch (e) {
+            console.warn('[WorldMap] Failed to render world outline, using built-in fallback:', e);
+            renderFallbackWorld(svg, project, width, height);
+        }
+    } else if (!havePoints) {
+        // Use built-in fallback outline only when no points are present
+        renderFallbackWorld(svg, project, width, height);
+    }
+
+    // Tooltip div
+    const tooltip = document.createElement('div');
+    tooltip.style.position = 'absolute';
+    tooltip.style.pointerEvents = 'none';
+    tooltip.style.background = '#111827';
+    tooltip.style.color = '#fff';
+    tooltip.style.padding = '6px 8px';
+    tooltip.style.borderRadius = '6px';
+    tooltip.style.fontSize = '.8rem';
+    tooltip.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)';
+    tooltip.style.opacity = '0';
+    tooltip.style.transform = 'translateY(-6px)';
+    tooltip.style.transition = 'opacity 120ms ease, transform 120ms ease';
+    container.style.position = 'relative';
+    container.appendChild(tooltip);
+
+    // Plot points with minimal overlap fan-out
+    const dotGroup = document.createElementNS(svgNS, 'g');
+    let delay = 0;
+    const projected = points.map(p => ({ p, x: project.lon(p.lon), y: project.lat(p.lat) }));
+    const threshold = 6; // px (was 10)
+    const groups = [];
+    projected.forEach(item => {
+        let found = null;
+        for (const grp of groups) {
+            const dx = item.x - grp.x, dy = item.y - grp.y;
+            if ((dx*dx + dy*dy) <= threshold*threshold) { found = grp; break; }
+        }
+        if (found) found.items.push(item); else groups.push({ x: item.x, y: item.y, items: [item] });
+    });
+    groups.forEach(grp => {
+        const n = grp.items.length;
+        const r = n > 1 ? 5 : 0; // smaller fan-out radius
+        grp.items.forEach((item, idx) => {
+            const cx = n > 1 ? grp.x + r * Math.cos((idx / n) * Math.PI * 2) : item.x;
+            const cy = n > 1 ? grp.y + r * Math.sin((idx / n) * Math.PI * 2) : item.y;
+            const circle = document.createElementNS(svgNS, 'circle');
+            circle.setAttribute('cx', String(cx));
+            circle.setAttribute('cy', String(cy));
+            circle.setAttribute('r', '4.5');
+            circle.setAttribute('fill', '#0ea5e9');
+            circle.setAttribute('stroke', '#0369a1');
+            circle.setAttribute('stroke-width', '1');
+            circle.style.opacity = '0';
+            circle.style.transition = 'opacity 300ms ease, transform 200ms ease';
+
+            // Hover interactions
+            circle.addEventListener('mouseenter', (e) => {
+                circle.setAttribute('fill', '#22d3ee');
+                tooltip.textContent = item.p.label;
+                tooltip.style.left = `${cx + 10}px`;
+                tooltip.style.top = `${cy - 10}px`;
+                tooltip.style.opacity = '1';
+                tooltip.style.transform = 'translateY(-10px)';
+            });
+            circle.addEventListener('mousemove', (e) => {
+                const pt = getMouseSvgCoords(e, svg);
+                tooltip.style.left = `${pt.x + 10}px`;
+                tooltip.style.top = `${pt.y - 10}px`;
+            });
+            circle.addEventListener('mouseleave', () => {
+                circle.setAttribute('fill', '#0ea5e9');
+                tooltip.style.opacity = '0';
+                tooltip.style.transform = 'translateY(-6px)';
+            });
+
+            dotGroup.appendChild(circle);
+            setTimeout(() => { circle.style.opacity = '1'; }, delay);
+            delay += 35; // staggered entrance
+        });
+    });
+    svg.appendChild(dotGroup);
+
+    container.appendChild(svg);
+
+    // Add or update a small on-map badge showing total client count
+    try {
+        const id = 'world-map-client-count';
+        let badge = container.querySelector(`#${id}`);
+        const count = Array.isArray(points) ? points.length : 0;
+        if (!badge) {
+            badge = document.createElement('div');
+            badge.id = id;
+            badge.style.position = 'absolute';
+            badge.style.top = '10px';
+            badge.style.left = '10px';
+            badge.style.background = 'rgba(17,24,39,0.85)';
+            badge.style.color = '#fff';
+            badge.style.padding = '6px 10px';
+            badge.style.borderRadius = '999px';
+            badge.style.fontSize = '.8rem';
+            badge.style.lineHeight = '1';
+            badge.style.boxShadow = '0 6px 20px rgba(0,0,0,0.2)';
+            badge.style.userSelect = 'none';
+            container.appendChild(badge);
+        }
+        badge.textContent = `${count} client${count === 1 ? '' : 's'}`;
+    } catch (_) { /* ignore */ }
+}
+
+// Convert a minimal TopoJSON topology to a GeoJSON FeatureCollection (MultiPolygon only)
+function topoToGeoFeatureCollection(topology) {
+    const objects = topology.objects || {};
+    const keys = Object.keys(objects);
+    if (keys.length === 0) throw new Error('No objects in topology');
+    // Find a MultiPolygon/Polygon object
+    let obj = null;
+    for (const k of keys) {
+        const candidate = objects[k];
+        if (candidate && (candidate.type === 'MultiPolygon' || candidate.type === 'Polygon' || candidate.geometries)) {
+            obj = candidate; break;
+        }
+    }
+    if (!obj) throw new Error('No suitable object in topology');
+
+    const scale = topology.transform && topology.transform.scale ? topology.transform.scale : null;
+    const translate = topology.transform && topology.transform.translate ? topology.transform.translate : null;
+    const arcs = topology.arcs || [];
+
+    // Decode an arc index into absolute lon/lat coordinates
+    function decodeArc(idx) {
+        const forward = idx >= 0;
+        const arc = arcs[forward ? idx : ~idx];
+        if (!arc) return [];
+        let x = 0, y = 0;
+        const pts = [];
+        const iter = forward ? arc : [...arc].reverse();
+        for (let i = 0; i < iter.length; i++) {
+            let dx = iter[i][0];
+            let dy = iter[i][1];
+            // If transform provided, values are delta-encoded integers; otherwise assume absolute lon/lat
+            if (scale && translate) {
+                x += dx; y += dy;
+                const lon = x * scale[0] + translate[0];
+                const lat = y * scale[1] + translate[1];
+                pts.push([lon, lat]);
+            } else {
+                // Treat as absolute lon/lat points
+                pts.push([dx, dy]);
+            }
+        }
+        return pts;
+    }
+
+    function decodePolygon(arcRings) {
+        // arcRings: array of rings, each ring is array of arc indices
+        return arcRings.map(ring => {
+            const coords = [];
+            ring.forEach((arcIdx, i) => {
+                const segment = decodeArc(arcIdx);
+                if (segment.length === 0) return;
+                // Avoid duplicating the first point when concatenating arcs
+                if (coords.length > 0 && segment.length > 0) segment.shift();
+                coords.push(...segment);
+            });
+            return coords;
+        });
+    }
+
+    let multi = [];
+    if (obj.type === 'Polygon') {
+        multi = [decodePolygon(obj.arcs)];
+    } else if (obj.type === 'MultiPolygon') {
+        multi = obj.arcs.map(poly => decodePolygon(poly));
+    } else if (obj.geometries && Array.isArray(obj.geometries)) {
+        obj.geometries.forEach(g => {
+            if (g.type === 'Polygon') multi.push(decodePolygon(g.arcs));
+            else if (g.type === 'MultiPolygon') multi.push(...g.arcs.map(poly => decodePolygon(poly)));
+        });
+    }
+
+    return { type: 'FeatureCollection', features: [{ type: 'Feature', properties: {}, geometry: { type: 'MultiPolygon', coordinates: multi } }] };
+}
+
+// Draw a very simplified world silhouette so the map is never blank
+function renderFallbackWorld(svg, project, width, height) {
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const land = document.createElementNS(svgNS, 'g');
+    land.setAttribute('fill', '#c7e0ff');
+    land.setAttribute('stroke', '#2563eb');
+    land.setAttribute('stroke-width', '1.2');
+    land.setAttribute('opacity', '0.95');
+
+    // Minimal continent polygons (lon, lat) – intentionally coarse but recognizable
+    const polys = [
+        // North America
+        [
+            [-168, 72], [-130, 72], [-100, 65], [-80, 50], [-90, 30], [-100, 18], [-125, 20], [-160, 35], [-168, 55]
+        ],
+        // South America
+        [
+            [-82, 12], [-60, 10], [-50, -10], [-55, -30], [-60, -45], [-72, -50], [-80, -35]
+        ],
+        // Europe/Africa/West Asia
+        [
+            [-10, 72], [10, 68], [30, 62], [40, 50], [55, 40], [65, 30], [55, 20], [35, 15], [25, 5], [15, -5], [10, -20], [5, -35], [-5, -35], [-10, -5], [-10, 20], [-10, 40]
+        ],
+        // Asia (east)
+        [
+            [65, 55], [90, 50], [110, 45], [120, 35], [125, 25], [135, 35], [140, 45], [150, 50], [160, 55], [170, 60], [170, 45], [150, 35], [140, 25], [130, 15], [110, 20], [90, 25], [75, 35]
+        ],
+        // Africa (south part to connect visually)
+        [
+            [15, -5], [20, -15], [22, -25], [25, -35], [28, -32], [30, -25], [32, -15], [30, -5]
+        ],
+        // Australia
+        [
+            [112, -12], [155, -12], [155, -43], [114, -43]
+        ]
+    ];
+
+    const toPath = (ring) => ring.map(([lon, lat], i) => `${i ? 'L' : 'M'}${project.lon(lon)},${project.lat(lat)}`).join(' ') + ' Z';
+    polys.forEach(coords => {
+        const p = document.createElementNS(svgNS, 'path');
+        p.setAttribute('d', toPath(coords));
+        land.appendChild(p);
+    });
+    svg.appendChild(land);
+}
+
+function appendGrid(svg, width, height, project, bounds) {
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const gridGroup = document.createElementNS(svgNS, 'g');
+    gridGroup.setAttribute('opacity', '0.45');
+    const lonStart = bounds.minLon;
+    const lonEnd = bounds.maxLon;
+    const latStart = bounds.minLat;
+    const latEnd = bounds.maxLat;
+    const lonStep = niceDegreeStep(lonEnd - lonStart);
+    const latStep = niceDegreeStep(latEnd - latStart, true);
+    for (let lon = Math.ceil(lonStart / lonStep) * lonStep; lon <= lonEnd; lon += lonStep) {
+        const x = project.lon(lon);
+        const line = document.createElementNS(svgNS, 'line');
+        line.setAttribute('x1', String(x));
+        line.setAttribute('y1', '0');
+        line.setAttribute('x2', String(x));
+        line.setAttribute('y2', String(height));
+        line.setAttribute('stroke', '#d1d5db');
+        line.setAttribute('stroke-width', '1');
+        gridGroup.appendChild(line);
+    }
+    for (let lat = Math.ceil(latStart / latStep) * latStep; lat <= latEnd; lat += latStep) {
+        const y = project.lat(lat);
+        const line = document.createElementNS(svgNS, 'line');
+        line.setAttribute('x1', '0');
+        line.setAttribute('y1', String(y));
+        line.setAttribute('x2', String(width));
+        line.setAttribute('y2', String(y));
+        line.setAttribute('stroke', '#d1d5db');
+        line.setAttribute('stroke-width', '1');
+        gridGroup.appendChild(line);
+    }
+    svg.appendChild(gridGroup);
+}
+
+// Choose a pleasant grid step based on span (degrees)
+function niceDegreeStep(span, isLat = false) {
+    const abs = Math.max(1, Math.abs(span));
+    if (abs <= 20) return isLat ? 5 : 10;
+    if (abs <= 60) return isLat ? 10 : 15;
+    if (abs <= 120) return isLat ? 15 : 30;
+    return isLat ? 30 : 60;
+}
+
+function computeLonLatBounds(points) {
+    if (!Array.isArray(points) || points.length === 0) {
+        return { minLon: -180, maxLon: 180, minLat: -60, maxLat: 80 };
+    }
+    let minLon = 180, maxLon = -180, minLat = 90, maxLat = -90;
+    points.forEach(p => {
+        if (typeof p.lon === 'number') { minLon = Math.min(minLon, p.lon); maxLon = Math.max(maxLon, p.lon); }
+        if (typeof p.lat === 'number') { minLat = Math.min(minLat, p.lat); maxLat = Math.max(maxLat, p.lat); }
+    });
+    // Add padding (tighter to emphasize current pins)
+    const lonSpan = Math.max(8, (maxLon - minLon));
+    const latSpan = Math.max(6, (maxLat - minLat));
+    const lonPad = Math.max(4, lonSpan * 0.12);
+    const latPad = Math.max(3, latSpan * 0.12);
+    minLon = Math.max(-180, minLon - lonPad);
+    maxLon = Math.min(180, maxLon + lonPad);
+    minLat = Math.max(-85, minLat - latPad);
+    maxLat = Math.min(85, maxLat + latPad);
+    // Handle degenerate case (single point)
+    if (!isFinite(lonSpan) || lonSpan < 1) { minLon = Math.max(-180, minLon - 5); maxLon = Math.min(180, maxLon + 5); }
+    if (!isFinite(latSpan) || latSpan < 1) { minLat = Math.max(-85, minLat - 3); maxLat = Math.min(85, maxLat + 3); }
+    return { minLon, maxLon, minLat, maxLat };
+}
+
+function makeProjection(bounds, width, height) {
+    const lonSpan = (bounds.maxLon - bounds.minLon) || 1;
+    const latSpan = (bounds.maxLat - bounds.minLat) || 1;
+    return {
+        lon: (lon) => (lon - bounds.minLon) * (width / lonSpan),
+        lat: (lat) => (bounds.maxLat - lat) * (height / latSpan)
+    };
+}
+
+function projectLon(lon, width) {
+    // Equirectangular: map -180..180 to 0..width
+    return (lon + 180) * (width / 360);
+}
+function projectLat(lat, height) {
+    // Equirectangular: map 90..-90 to 0..height
+    return (90 - lat) * (height / 180);
+}
+
+function getMouseSvgCoords(evt, svgEl) {
+    const pt = svgEl.createSVGPoint();
+    pt.x = evt.clientX; pt.y = evt.clientY;
+    try {
+        const ctm = svgEl.getScreenCTM().inverse();
+        const sp = pt.matrixTransform(ctm);
+        return { x: sp.x, y: sp.y };
+    } catch (_) {
+        return { x: evt.offsetX, y: evt.offsetY };
+    }
+}
 
 
 // loadProjectPreview needs to correctly use createProjectCardHtml for the homepage preview
@@ -312,7 +1522,7 @@ async function loadProjectPreview() {
     if (!container) return;
     renderLoadingIndicator(container);
     try {
-        const data = await fetchData('/api/projects?featured=true&limit=3'); // Fetch featured, or just latest
+    const data = await fetchData('/api/projects?featured=true&perPage=3&page=1'); // Fetch featured, or just latest
         container.innerHTML = '';
         if (data.projects && data.projects.length > 0) {
             // Show only a few, e.g., 3. Ensure `isPubliclyVisible` is checked by API or here.
@@ -333,27 +1543,88 @@ async function loadProjectPreview() {
 /** Creates HTML for a single Testimonial card */
 function createTestimonialCardHtml(testimonial) {
     const ratingStars = testimonial.rating ?
-        '<span class="star">★</span>'.repeat(testimonial.rating) +
-        '<span class="star" style="color: #555;">★</span>'.repeat(5 - testimonial.rating)
+        '<span class="star" aria-hidden="true">★</span>'.repeat(testimonial.rating) +
+        '<span class="star star-muted" aria-hidden="true">★</span>'.repeat(5 - testimonial.rating)
         : '';
-    const ratingHtml = testimonial.rating ? `<div class="rating">${ratingStars}</div>` : '';
+    const ratingHtml = testimonial.rating ? `<div class="rating" role="img" aria-label="Rated ${testimonial.rating} out of 5">${ratingStars}</div>` : '';
 
     const authorTitle = `${escapeHtml(testimonial.position || '')}${testimonial.position && testimonial.company ? ', ' : ''}${escapeHtml(testimonial.company || '')}`;
 
+    // Optional client logo/link and project link
+    let clientLogoHtml = '';
+    let caseStudyLinkHtml = '';
+    try {
+        const client = (testimonial.project && testimonial.project.client) ? testimonial.project.client : (testimonial.client || null);
+        if (client && (client.logoUrl || client.name)) {
+            const logoImg = client.logoUrl ? `<img class="client-logo" src="${escapeHtml(client.logoUrl)}" alt="${escapeHtml(client.name || 'Client logo')}" loading="lazy"/>` : '';
+            const nameCaption = client.name ? `<div class="logo-name">${escapeHtml(client.name)}</div>` : '';
+            const linkStart = client.websiteUrl ? `<a href="${escapeHtml(client.websiteUrl)}" class="logo-link" target="_blank" rel="noopener">` : '<div class="logo-link">';
+            const linkEnd = client.websiteUrl ? '</a>' : '</div>';
+            clientLogoHtml = `<div class="logo-item" style="justify-content:flex-end;">${linkStart}${logoImg}${nameCaption}${linkEnd}</div>`;
+        }
+        if (testimonial.project && testimonial.project.slug) {
+            caseStudyLinkHtml = `<a href="/projects/${escapeHtml(testimonial.project.slug)}" class="card-link">Read the Case Study →</a>`;
+        }
+    } catch(_) { /* no-op */ }
+
+    const industry = testimonial._resolvedIndustry || testimonial.project?.industry || testimonial.project?.client?.industry || '';
+    const services = Array.isArray(testimonial.project?.services) ? testimonial.project.services : [];
+    const industryLabel = industry ? formatCategoryLabel(String(industry)) : '';
+
     return `
-        <div class="testimonial-card">
+    <div class="testimonial-card" data-services="${escapeHtml(services.join(','))}" data-industry="${escapeHtml(String(industry || ''))}">
+            ${industryLabel ? `<div class="testimonial-industry"><span class="eyebrow">${escapeHtml(industryLabel)}</span></div>` : ''}
             <div class="testimonial-quote">
-                <span class="quote-mark">"</span>
                 <p>${escapeHtml(testimonial.content)}</p>
-                <span class="quote-mark closing">"</span>
             </div>
             <div class="testimonial-author-info">
-                <img src="/images/placeholder-client.png" alt="${escapeHtml(testimonial.author)}" loading="lazy" class="author-image">
                 <div>
                     <h3>${escapeHtml(testimonial.author)}</h3>
                     ${authorTitle ? `<p>${authorTitle}</p>` : ''}
                     ${ratingHtml}
                 </div>
+                ${clientLogoHtml}
+            </div>
+            ${caseStudyLinkHtml ? `<div style="margin-top:.5rem;">${caseStudyLinkHtml}</div>` : ''}
+        </div>
+    `;
+}
+
+/** Creates HTML for testimonial carousel slide */
+function createTestimonialSlideHtml(testimonial) {
+    const ratingStars = testimonial.rating ?
+        '<span class="star" aria-hidden="true">★</span>'.repeat(testimonial.rating) +
+        '<span class="star star-muted" aria-hidden="true">★</span>'.repeat(5 - testimonial.rating)
+        : '';
+    const ratingHtml = testimonial.rating ? `<div class="rating" role="img" aria-label="Rated ${testimonial.rating} out of 5">${ratingStars}</div>` : '';
+
+    const authorTitle = `${escapeHtml(testimonial.position || '')}${testimonial.position && testimonial.company ? ', ' : ''}${escapeHtml(testimonial.company || '')}`;
+
+    // Optional client logo and link (if testimonial is linked to a project with a client)
+    let clientLogoHtml = '';
+    try {
+        const client = testimonial.project && testimonial.project.client ? testimonial.project.client : null;
+        if (client && (client.logoUrl || client.name)) {
+            const logoImg = client.logoUrl ? `<img class="client-logo" src="${escapeHtml(client.logoUrl)}" alt="${escapeHtml(client.name || 'Client logo')}" loading="lazy"/>` : '';
+            const nameCaption = client.name ? `<div class="logo-name">${escapeHtml(client.name)}</div>` : '';
+            const linkStart = client.websiteUrl ? `<a href="${escapeHtml(client.websiteUrl)}" class="logo-link" target="_blank" rel="noopener">` : '<div class="logo-link">';
+            const linkEnd = client.websiteUrl ? '</a>' : '</div>';
+            clientLogoHtml = `<div class="logo-item" style="justify-content:flex-end;">${linkStart}${logoImg}${nameCaption}${linkEnd}</div>`;
+        }
+    } catch(_) { /* no-op */ }
+
+    return `
+        <div class="testimonial-slide">
+            <div class="quote-content">
+                <p class="quote-text">${escapeHtml(testimonial.content)}</p>
+            </div>
+            <div class="author-info">
+                <div>
+                    <div class="author-name">${escapeHtml(testimonial.author)}</div>
+                    ${authorTitle ? `<div class="author-title">${authorTitle}</div>` : ''}
+                    ${ratingHtml}
+                </div>
+                ${clientLogoHtml}
             </div>
         </div>
     `;
@@ -384,64 +1655,665 @@ async function loadGenericContent(apiPath, containerId, cardRenderer, typeName) 
     }
 }
 
-function loadProjects() {
-    loadGenericContent('/api/projects', 'projects-grid-container', createProjectCardHtml, 'projects');
-}
-
 function loadTestimonials() {
-    loadGenericContent('/api/testimonials', 'testimonials-grid-container', createTestimonialCardHtml, 'testimonials');
+    // Load carousel testimonials
+    loadTestimonialsCarousel();
+    
+    // Load grid testimonials
+    loadTestimonialsGrid();
 }
 
-async function loadProjectPreview() {
-    const container = document.getElementById('projects-preview-grid');
+async function loadTestimonialsGrid() {
+    const container = document.getElementById('testimonials-grid-container');
     if (!container) return;
     renderLoadingIndicator(container);
     try {
-        const data = await fetchData('/api/projects');
-        container.innerHTML = ''; // Clear loading/placeholders
-        if (data.projects && data.projects.length > 0) {
-            const projectsToShow = data.projects.slice(0, 3); // Show max 3
-            projectsToShow.forEach(project => {
-                container.insertAdjacentHTML('beforeend', createProjectCardHtml(project, true));
-            });
-             // Add empty placeholders if needed for grid layout visually
-             while (container.children.length % 3 !== 0 && container.children.length < 3) {
-                 container.insertAdjacentHTML('beforeend', '<div style="visibility: hidden; height: 0;"></div>');
-             }
-             
-        } else {
-            renderNoDataMessage(container, 'projects');
+        const data = await fetchData('/api/testimonials');
+        const list = data.testimonials || [];
+        if (!list.length) {
+            renderNoDataMessage(container, 'testimonials');
+            return;
         }
-    } catch (error) {
-        renderErrorMessage(container, `Could not load projects preview. ${error.message}`);
+        container.innerHTML = '';
+        list.forEach(t => container.insertAdjacentHTML('beforeend', createTestimonialCardHtml(t)));
+        buildTestimonialFilters(list);
+        initTestimonialFilters();
+        updateTestimonialFilterCounts();
+    } catch (err) {
+        renderErrorMessage(container, `Could not load testimonials. ${err.message}`);
     }
 }
 
+function buildTestimonialFilters(testimonials) {
+    const wrap = document.getElementById('testimonial-filters');
+    if (!wrap) return;
+    const industries = new Map();
+    testimonials.forEach(t => {
+    const ind = String(t._resolvedIndustry || t.project?.industry || t.project?.client?.industry || 'unspecified').toLowerCase();
+        industries.set(ind, (industries.get(ind) || 0) + 1);
+    });
+    const indItems = Array.from(industries.entries()).sort((a,b) => b[1]-a[1] || a[0].localeCompare(b[0]));
+    const total = testimonials.length;
+    let html = '<div class="filter-navigation">';
+    html += '<div class="filter-group" role="tablist" aria-label="Filter by Industry">';
+    html += `
+        <button class="filter-btn active" data-filter="all" data-scope="industry" aria-pressed="true">
+            <span class="filter-label">All Industries</span>
+            <span class="filter-count" data-count="all">${total}</span>
+        </button>`;
+    indItems.forEach(([ind, count]) => {
+        const label = formatCategoryLabel(ind);
+        html += `
+        <button class="filter-btn" data-filter="${ind}" data-scope="industry" aria-pressed="false">
+            <span class="filter-label">${label}</span>
+            <span class="filter-count" data-count="${ind}">${count}</span>
+        </button>`;
+    });
+    html += '</div>';
+    html += '</div>';
+    wrap.innerHTML = html;
+}
+
+function initTestimonialFilters() {
+    const wrap = document.getElementById('testimonial-filters');
+    const grid = document.getElementById('testimonials-grid-container');
+    if (!wrap || !grid) return;
+    const groups = wrap.querySelectorAll('.filter-group');
+    if (!groups.length) return;
+    const summary = document.getElementById('testimonial-active-summary');
+    const renderSummary = () => {
+        if (!summary) return;
+        const activeInd = wrap.querySelector('.filter-group [data-scope="industry"] .filter-btn.active')?.getAttribute('data-filter') || 'all';
+        const chips = [];
+        if (activeInd !== 'all') {
+            const label = formatCategoryLabel(activeInd);
+            chips.push(`<span class="active-chip chip-industry" data-scope="industry" data-value="${escapeHtml(activeInd)}">${escapeHtml(label)} <button class="remove-chip" aria-label="Remove industry filter ${escapeHtml(label)}">×</button></span>`);
+        }
+        summary.innerHTML = chips.join('');
+        summary.querySelectorAll('.remove-chip').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const chip = e.currentTarget.closest('.active-chip');
+                if (!chip) return;
+                const scope = chip.getAttribute('data-scope');
+                // Reset the corresponding group to 'all'
+                const group = wrap.querySelector(`.filter-group [data-scope="${scope}"]`)?.closest('.filter-group');
+                if (!group) return;
+                group.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed','false'); });
+                const allBtn = group.querySelector('.filter-btn[data-filter="all"][data-scope]') || group.querySelector('.filter-btn[data-filter="all"]');
+                if (allBtn) { allBtn.classList.add('active'); allBtn.setAttribute('aria-pressed','true'); }
+                const newInd = wrap.querySelector('.filter-group [data-scope="industry"] .filter-btn.active')?.getAttribute('data-filter') || 'all';
+                filterTestimonialsByIndustry(newInd);
+                renderSummary();
+            });
+        });
+    };
+    groups.forEach(group => {
+        group.addEventListener('click', (e) => {
+            const btn = e.target.closest('.filter-btn');
+            if (!btn) return;
+            e.preventDefault();
+            const scope = btn.getAttribute('data-scope');
+            group.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed','false'); });
+            btn.classList.add('active');
+            btn.setAttribute('aria-pressed','true');
+            const activeInd = wrap.querySelector('.filter-group [data-scope="industry"] .filter-btn.active')?.getAttribute('data-filter') || 'all';
+            filterTestimonialsByIndustry(activeInd);
+            renderSummary();
+        });
+    });
+    renderSummary();
+}
+
+function updateTestimonialFilterCounts() {
+    const cards = document.querySelectorAll('#testimonials-grid-container .testimonial-card');
+    const buttons = document.querySelectorAll('#testimonial-filters .filter-btn');
+    const counts = {};
+    let total = 0;
+    cards.forEach(card => {
+        const industry = card.dataset.industry || 'unspecified';
+        counts[industry] = (counts[industry] || 0) + 1;
+        total++;
+    });
+    buttons.forEach(btn => {
+        const val = btn.getAttribute('data-filter');
+        const el = btn.querySelector('.filter-count');
+        if (!el) return;
+        if (val === 'all') el.textContent = total; else el.textContent = counts[val] || 0;
+    });
+}
+
+function filterTestimonialsByIndustry(industryFilter = 'all') {
+    const cards = document.querySelectorAll('#testimonials-grid-container .testimonial-card');
+    cards.forEach((card, idx) => {
+        const industry = (card.dataset.industry || '').toLowerCase();
+        const show = (industryFilter === 'all' || industry === industryFilter);
+        if (show) {
+            card.style.display = 'block';
+            card.style.animation = `fadeInUp 0.6s ease forwards ${idx * 0.06}s`;
+        } else {
+            card.style.animation = 'fadeOut 0.25s ease forwards';
+            setTimeout(() => { if (!show) card.style.display = 'none'; }, 250);
+        }
+    });
+}
+
+// --- Testimonials Carousel Functions ---
+
+async function loadTestimonialsCarousel() {
+    const carouselContainer = document.getElementById('carousel-track');
+    if (!carouselContainer) return;
+
+    try {
+        const data = await fetchData('/api/testimonials');
+        if (data.testimonials && data.testimonials.length > 0) {
+            carouselContainer.innerHTML = '';
+            
+            // Create slides
+            data.testimonials.forEach(testimonial => {
+                carouselContainer.insertAdjacentHTML('beforeend', createTestimonialSlideHtml(testimonial));
+            });
+            
+            // Initialize carousel
+            initTestimonialsCarousel(data.testimonials.length);
+            
+            // Initialize stats counter
+            initStatsCounter();
+        } else {
+            carouselContainer.innerHTML = '<div class="testimonial-loading"><p>No testimonials available.</p></div>';
+        }
+    } catch (error) {
+        console.error('Error loading testimonials carousel:', error);
+        carouselContainer.innerHTML = '<div class="testimonial-loading"><p>Error loading testimonials.</p></div>';
+    }
+}
+
+let currentSlide = 0;
+let totalSlides = 0;
+let isAnimating = false;
+let autoTimer = null;
+const AUTO_MS = 7000;
+
+function initTestimonialsCarousel(slideCount) {
+    totalSlides = slideCount;
+    currentSlide = 0;
+    
+    createCarouselDots();
+    // Set initial slide states for 3D glide effect
+    applySlideStates();
+    updateCarousel();
+    
+    // Add event listeners
+    const prevBtn = document.querySelector('.prev-btn');
+    const nextBtn = document.querySelector('.next-btn');
+    
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => prevSlide());
+    }
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => nextSlide());
+    }
+    
+    // Auto-advance
+    startAutoAdvance();
+    
+    // Keyboard support
+    const region = document.getElementById('testimonials-carousel');
+    if (region) {
+        region.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') { e.preventDefault(); nextSlide(true); }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(true); }
+        });
+        // Pause auto on focus/hover, resume on blur/mouseleave
+        region.addEventListener('mouseenter', pauseAutoAdvance);
+        region.addEventListener('mouseleave', startAutoAdvance);
+        region.addEventListener('focusin', pauseAutoAdvance);
+        region.addEventListener('focusout', startAutoAdvance);
+    }
+    
+    // Touch/swipe support
+    addTouchSupport();
+}
+
+function createCarouselDots() {
+    const dotsContainer = document.getElementById('carousel-dots');
+    if (!dotsContainer) return;
+    
+    dotsContainer.innerHTML = '';
+    
+    for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement('button');
+        dot.className = 'carousel-dot';
+        dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+        dot.addEventListener('click', () => goToSlide(i));
+        dotsContainer.appendChild(dot);
+    }
+}
+
+function updateCarousel() {
+    const track = document.getElementById('carousel-track');
+    const dots = document.querySelectorAll('.carousel-dot');
+    const prevBtn = document.querySelector('.prev-btn');
+    const nextBtn = document.querySelector('.next-btn');
+    const announcer = document.getElementById('carousel-announcer');
+    
+    if (track) {
+        track.classList.add('is-animating');
+        track.style.transform = `translateX(-${currentSlide * 100}%)`;
+        setTimeout(() => track.classList.remove('is-animating'), 650);
+    }
+    
+    // Update dots
+    dots.forEach((dot, index) => {
+        const active = index === currentSlide;
+        dot.classList.toggle('active', active);
+        dot.setAttribute('aria-selected', active ? 'true' : 'false');
+        dot.setAttribute('aria-label', `Slide ${index + 1}${active ? ' (current)' : ''}`);
+    });
+    
+    // Keep controls always enabled for continuous loop feel
+    if (prevBtn) prevBtn.disabled = false;
+    if (nextBtn) nextBtn.disabled = false;
+
+    // Announce for screen readers
+    if (announcer) {
+        announcer.textContent = `Showing testimonial ${currentSlide + 1} of ${totalSlides}`;
+    }
+}
+
+function prevSlide(userInitiated = false) {
+    if (isAnimating) return;
+    isAnimating = true;
+    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+    applySlideStates();
+    updateCarousel();
+    setTimeout(() => { isAnimating = false; }, 600);
+    if (userInitiated) restartAutoAdvance();
+}
+
+function nextSlide(userInitiated = false) {
+    if (isAnimating) return;
+    isAnimating = true;
+    currentSlide = (currentSlide + 1) % totalSlides;
+    applySlideStates();
+    updateCarousel();
+    setTimeout(() => { isAnimating = false; }, 600);
+    if (userInitiated) restartAutoAdvance();
+}
+
+function goToSlide(slideIndex) {
+    if (isAnimating || slideIndex === currentSlide) return;
+    isAnimating = true;
+    currentSlide = slideIndex;
+    applySlideStates();
+    updateCarousel();
+    setTimeout(() => { isAnimating = false; }, 600);
+}
+
+function applySlideStates() {
+    const slides = Array.from(document.querySelectorAll('.testimonial-slide'));
+    slides.forEach((slide, idx) => {
+        slide.classList.remove('entering', 'entered', 'exiting');
+        if (idx === currentSlide) {
+            slide.classList.add('entered');
+        } else if (idx === (currentSlide - 1 + totalSlides) % totalSlides) {
+            slide.classList.add('exiting');
+        } else if (idx === (currentSlide + 1) % totalSlides) {
+            slide.classList.add('entering');
+        }
+    });
+}
+
+function addTouchSupport() {
+    const carousel = document.querySelector('.testimonial-carousel');
+    if (!carousel) return;
+    
+    let startX = 0;
+    let currentX = 0;
+    let isDragging = false;
+    
+    carousel.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        isDragging = true;
+    });
+    
+    carousel.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        currentX = e.touches[0].clientX;
+    });
+    
+    carousel.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        
+        const diffX = startX - currentX;
+        const threshold = 50;
+        
+        if (Math.abs(diffX) > threshold) {
+            if (diffX > 0) {
+                nextSlide(true);
+            } else {
+                prevSlide(true);
+            }
+        }
+    });
+}
+
+// Auto-advance helpers
+function startAutoAdvance() {
+    pauseAutoAdvance();
+    autoTimer = setInterval(() => {
+        if (!isAnimating) nextSlide();
+    }, AUTO_MS);
+}
+
+function pauseAutoAdvance() {
+    if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+}
+
+function restartAutoAdvance() {
+    startAutoAdvance();
+}
+
+// Stats Counter Animation
+function initStatsCounter() {
+    const statsNumbers = document.querySelectorAll('.stat-number');
+    const observerOptions = {
+        threshold: 0.5,
+        rootMargin: '0px 0px -100px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const target = entry.target;
+                if (target.dataset.animated === 'true') { return; }
+                const finalValue = parseInt(target.getAttribute('data-count')) || 0;
+                animateCounter(target, 0, finalValue, 2000);
+                target.dataset.animated = 'true';
+                observer.unobserve(target);
+            }
+        });
+    }, observerOptions);
+    
+    statsNumbers.forEach(stat => {
+        observer.observe(stat);
+    });
+}
+
+function animateCounter(element, start, end, duration) {
+    const increment = (end - start) / (duration / 16);
+    let current = start;
+    const suffix = element.getAttribute('data-suffix') || '';
+    const prefix = element.getAttribute('data-prefix') || '';
+    const timer = setInterval(() => {
+        current += increment;
+        if (current >= end) {
+            current = end;
+            clearInterval(timer);
+        }
+        const value = Math.floor(current).toLocaleString();
+        element.textContent = `${prefix}${value}${suffix}`;
+    }, 16);
+}
 
 // --- Project Filtering ---
 
 function initProjectFilters() {
-    const filterButtons = document.querySelectorAll('.projects-filter .filter-btn');
     const projectGrid = document.getElementById('projects-grid-container');
-    if (!filterButtons.length || !projectGrid) return;
+    if (!projectGrid) return;
+    const industryWrap = document.getElementById('industry-filters');
+    const serviceWrap = document.getElementById('service-filters');
+    const pager = document.getElementById('projects-pagination');
+    // Collapsible & search controls
+    const indToggle = document.getElementById('industryToggle');
+    const svcToggle = document.getElementById('serviceToggle');
+    const indSearch = document.getElementById('industryFilterSearch');
+    const svcSearch = document.getElementById('serviceFilterSearch');
+
+    function setCollapsed(el, toggle, collapsed){
+        if (!el || !toggle) return;
+        el.dataset.collapsed = collapsed ? 'true' : 'false';
+        toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        toggle.textContent = collapsed ? 'Show more…' : 'Show less';
+        el.style.maxHeight = collapsed ? '84px' : '9999px';
+    }
+    if (indToggle && industryWrap) indToggle.addEventListener('click', ()=> setCollapsed(industryWrap, indToggle, industryWrap.dataset.collapsed !== 'false'));
+    if (svcToggle && serviceWrap) svcToggle.addEventListener('click', ()=> setCollapsed(serviceWrap, svcToggle, serviceWrap.dataset.collapsed !== 'false'));
+
+    function wireLiveSearch(input, container){
+        if (!input || !container) return;
+        input.addEventListener('input', ()=>{
+            const q = input.value.trim().toLowerCase();
+            container.querySelectorAll('.filter-btn').forEach(btn => {
+                const label = (btn.querySelector('.filter-label')?.textContent || '').toLowerCase();
+                const show = !q || label.includes(q);
+                btn.style.display = show ? 'inline-flex' : 'none';
+            });
+        });
+    }
+    wireLiveSearch(indSearch, industryWrap);
+    wireLiveSearch(svcSearch, serviceWrap);
+
+    function adjustToggleVisibility(){
+        const threshold = 84; // px; ~two rows
+        if (industryWrap && indToggle) {
+            const needs = industryWrap.scrollHeight > threshold + 4; // small fudge
+            indToggle.style.display = needs ? 'inline-block' : 'none';
+            // If not needed, ensure it's expanded enough to show all
+            if (!needs) setCollapsed(industryWrap, indToggle, false);
+        }
+        if (serviceWrap && svcToggle) {
+            const needs = serviceWrap.scrollHeight > threshold + 4;
+            svcToggle.style.display = needs ? 'inline-block' : 'none';
+            if (!needs) setCollapsed(serviceWrap, svcToggle, false);
+        }
+    }
+    document.addEventListener('projectFiltersUpdated', adjustToggleVisibility);
+
+    // Curated dual-filter mode if both wrappers exist
+    if (industryWrap && serviceWrap) {
+        // Parse initial state from URL (deep-linking)
+        const url = new URL(window.location.href);
+        const pageQ = parseInt(url.searchParams.get('page') || '1', 10) || 1;
+        const indsQ = url.searchParams.getAll('industries');
+        const svcsQ = url.searchParams.getAll('services');
+        window.__projFilterState = window.__projFilterState || { industries: new Set(indsQ), services: new Set(svcsQ), page: pageQ };
+        const state = window.__projFilterState;
+
+        function handleClick(e, type) {
+            const btn = e.target.closest('.filter-btn');
+            if (!btn) return;
+            e.preventDefault();
+            const id = btn.getAttribute('data-id');
+            if (!id) return;
+            if (btn.classList.contains('active')) {
+                btn.classList.remove('active');
+                state[type].delete(id);
+                btn.setAttribute('aria-pressed', 'false');
+            } else {
+                btn.classList.add('active');
+                state[type].add(id);
+                btn.setAttribute('aria-pressed', 'true');
+            }
+            state.page = 1;
+            // Sync URL (deep-linking)
+            syncProjectsUrl(state);
+            loadProjects(state.page, Array.from(state.industries), Array.from(state.services));
+        }
+
+        industryWrap.addEventListener('click', (e) => handleClick(e, 'industries'));
+        serviceWrap.addEventListener('click', (e) => handleClick(e, 'services'));
+
+        if (pager) {
+            pager.addEventListener('click', (e) => {
+                const a = e.target.closest('a[data-page]');
+                if (!a) return;
+                e.preventDefault();
+                const nextPage = parseInt(a.getAttribute('data-page'), 10) || 1;
+                if (a.classList.contains('disabled') || nextPage === state.page) return;
+                state.page = nextPage;
+                syncProjectsUrl(state);
+                loadProjects(state.page, Array.from(state.industries), Array.from(state.services));
+                // Scroll to grid top for better UX
+                try { projectGrid.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch(_) { /* ignore */ }
+            });
+        }
+        // Initial load honors deep-linked state
+        setTimeout(() => {
+            markActiveButtonsFromState(state);
+            loadProjects(state.page, Array.from(state.industries), Array.from(state.services));
+        }, 0);
+        return; // done wiring curated mode
+    }
+
+    // No legacy single-group category fallback anymore
+    return;
+}
+
+function updateFilterCounts() {
+    const projectCards = document.querySelectorAll('.project-card');
+    const filterButtons = document.querySelectorAll('#project-filters .filter-btn');
+    
+    // Count projects by category
+    const categoryCounts = {};
+    let totalCount = 0;
+
+    projectCards.forEach(card => {
+        const category = 'all';
+        categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+        totalCount++;
+    });
+
+    // Update count displays
+    filterButtons.forEach(button => {
+        const filterValue = button.getAttribute('data-filter');
+        const countElement = button.querySelector('.filter-count');
+        
+        if (countElement) {
+            countElement.textContent = totalCount;
+        }
+    });
+}
+
+// filterProjects removed (legacy)
+
+// --- Blog Filtering ---
+
+function initBlogFilters() {
+    const filterButtons = document.querySelectorAll('.blog-filter-navigation .filter-btn');
+    const blogGrid = document.querySelector('.blog-list');
+    const searchInput = document.querySelector('.blog-search #blogSearch');
+    if (!filterButtons.length || !blogGrid) return;
+
+    // Update filter counts on load
+    updateBlogFilterCounts();
+
+    // Respect server-selected category (from query param) if present; don't override existing classes, only ensure filtering is applied
+    const nav = document.querySelector('.blog-filter-navigation');
+    const currentCategory = nav?.getAttribute('data-current-category') || nav?.getAttribute('data-current-tag') || '';
+    if (currentCategory) {
+        const btn = document.querySelector(`.blog-filter-navigation .filter-btn[data-filter="${CSS.escape(currentCategory)}"]`);
+        if (btn) {
+            // Ensure ARIA state matches class without forcing reflow of classes
+            filterButtons.forEach(b => b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'));
+            filterBlogPosts(currentCategory, searchInput ? searchInput.value.trim().toLowerCase() : '');
+        }
+    } else {
+        // No tag query; ensure filtering runs with 'all' and ARIA reflects current active button
+        const activeBtn = document.querySelector('.blog-filter-navigation .filter-btn.active') || document.querySelector('.blog-filter-navigation .filter-btn[data-filter="all"]');
+        if (activeBtn) {
+            filterButtons.forEach(b => b.setAttribute('aria-pressed', b === activeBtn ? 'true' : 'false'));
+            filterBlogPosts(activeBtn.getAttribute('data-filter') || 'all', searchInput ? searchInput.value.trim().toLowerCase() : '');
+        }
+    }
 
     filterButtons.forEach(button => {
         button.addEventListener('click', (e) => {
-            const filterValue = e.target.getAttribute('data-filter');
+            e.preventDefault();
+            const filterValue = button.getAttribute('data-filter');
             
-            filterButtons.forEach(btn => btn.classList.remove('active'));
-            e.target.classList.add('active');
-
-            // Simple Show/Hide Filter
-            const projectCards = projectGrid.querySelectorAll('.project-card');
-            projectCards.forEach(card => {
-                 const category = card.dataset.category;
-                 const shouldShow = (filterValue === 'all' || category === filterValue);
-                 card.style.display = shouldShow ? 'flex' : 'none'; // Use flex since card uses flex
+            // Update active states
+            filterButtons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-pressed', 'false');
             });
+            button.classList.add('active');
+            button.setAttribute('aria-pressed', 'true');
+
+            // Filter blog posts with smooth animation & sync URL for deep-linking
+            filterBlogPosts(filterValue, searchInput ? searchInput.value.trim().toLowerCase() : '');
+            try {
+                const url = new URL(window.location.href);
+                if (filterValue && filterValue !== 'all') url.searchParams.set('category', filterValue); else url.searchParams.delete('category');
+                window.history.replaceState(null, '', url.toString());
+            } catch(_) { /* ignore */ }
         });
     });
+
+    // Search input listener
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            const active = document.querySelector('.blog-filter-navigation .filter-btn.active');
+            const filterValue = active ? active.getAttribute('data-filter') : 'all';
+            filterBlogPosts(filterValue, searchInput.value.trim().toLowerCase());
+        });
+    }
+}
+
+function updateBlogFilterCounts() {
+    const filterButtons = document.querySelectorAll('.blog-filter-navigation .filter-btn');
+    if (!filterButtons.length) return;
+
+    // If server rendered counts exist (numbers inside .filter-count), don't override them.
+    const hasServerCounts = Array.from(filterButtons).some(btn => {
+        const el = btn.querySelector('.filter-count');
+        return el && /\d/.test(el.textContent);
+    });
+
+    if (hasServerCounts) return; // Trust server numbers
+
+    // Fallback: compute from DOM if server didn't provide counts
+    const blogCards = document.querySelectorAll('.blog-post-summary');
+    const tagCounts = {};
+    let totalCount = 0;
+
+    blogCards.forEach(card => {
+        const cats = card.dataset.categories ? card.dataset.categories.split(',').map(t => t.trim().toLowerCase()).filter(Boolean) : [];
+        cats.forEach(slug => { if (slug) tagCounts[slug] = (tagCounts[slug] || 0) + 1; });
+        totalCount++;
+    });
+
+    filterButtons.forEach(button => {
+        const filterValue = button.getAttribute('data-filter');
+        const countElement = button.querySelector('.filter-count');
+        if (!countElement) return;
+        if (filterValue === 'all') countElement.textContent = totalCount; else countElement.textContent = tagCounts[filterValue] || 0;
+    });
+}
+
+function filterBlogPosts(filterValue, searchTerm = '') {
+    const blogCards = document.querySelectorAll('.blog-post-summary');
     
+    blogCards.forEach((card, index) => {
+    const tags = card.dataset.categories ? card.dataset.categories.split(',') : [];
+    // Search matches title text
+    const titleEl = card.querySelector('.blog-post-summary-title');
+    const textContent = titleEl ? titleEl.textContent.toLowerCase() : '';
+    const matchesSearch = !searchTerm || textContent.includes(searchTerm);
+    const matchesTag = (filterValue === 'all' || tags.includes(filterValue));
+    const shouldShow = matchesTag && matchesSearch;
+        
+        if (shouldShow) {
+            card.style.display = 'flex';
+            card.style.animation = `fadeInUp 0.6s ease forwards ${index * 0.1}s`;
+        } else {
+            card.style.animation = 'fadeOut 0.3s ease forwards';
+            setTimeout(() => {
+                if (!shouldShow) card.style.display = 'none';
+            }, 300);
+        }
+    });
 }
 
 
@@ -518,6 +2390,13 @@ function initContactAndScheduleForm() {
         return;
     }
 
+    // Prevent double-initialization (can occur due to multiple DOMContentLoaded hooks)
+    if (mainForm.getAttribute('data-initialized') === '1') {
+        console.log('Contact form already initialized, skipping re-bind.');
+        return;
+    }
+    mainForm.setAttribute('data-initialized', '1');
+
     const originalButtonHtml = submitButton.innerHTML;
 
 
@@ -538,18 +2417,26 @@ function initContactAndScheduleForm() {
 
         const formData = new FormData(mainForm);
         const formObject = Object.fromEntries(formData.entries());
+        // Backward compatibility: if name was present, split it; else use firstName/lastName
+        if (!formObject.firstName && !formObject.lastName && formObject.name) {
+            const parts = String(formObject.name).trim().split(/\s+/);
+            formObject.firstName = parts.shift() || '';
+            formObject.lastName = parts.join(' ');
+        }
 
-        // Explicitly get checkbox values
+    // Explicitly get checkbox values
         const privacyCheckbox = document.getElementById('privacy');
         formObject.privacy = privacyCheckbox ? (privacyCheckbox.checked ? 'on' : 'off') : 'off';
-        formObject.requestedMeeting = (hiddenRequestedMeetingInput.value === 'true');
+    // Optional hidden flag for scheduling path; default to false if not present
+    const hiddenRequestedMeetingInput = document.getElementById('requestedMeeting');
+    formObject.requestedMeeting = hiddenRequestedMeetingInput ? (hiddenRequestedMeetingInput.value === 'true') : false;
 
 
         console.log('Submitting combined form data:', formObject);
         let dataFromApi; // To store API response for use in finally block
 
         try {
-            dataFromApi = await fetchData('/api/contact', {
+            dataFromApi = await fetchData('/api/contact-submission', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formObject)
@@ -624,8 +2511,8 @@ async function loadFeaturedProject() {
     container.innerHTML = '<p style="text-align: center; padding: 1rem; color: var(--gray-text);">Loading featured project...</p>'; // Simple loading state
 
     try {
-        // Fetch only the featured project, limit 1
-        const data = await fetchData('/api/projects?featured=true&limit=1');
+        // Fetch only the featured project, perPage 1
+        const data = await fetchData('/api/projects?featured=true&perPage=1&page=1');
 
         if (data.projects && data.projects.length > 0) {
             const featuredProject = data.projects[0];
@@ -677,9 +2564,6 @@ function createFeaturedTestimonialHtml(testimonial) {
      const ratingHtml = testimonial.rating ? `<div class="rating">${ratingStars}</div>` : '';
      const authorTitle = `${escapeHtml(testimonial.position || '')}${testimonial.position && testimonial.company ? ', ' : ''}${escapeHtml(testimonial.company || '')}`;
 
-     // Using placeholder image as per previous setup. Ensure this image exists.
-     const authorImage = testimonial.authorImage || '/images/placeholder-client.png';
-
      return `
          <div class="featured-testimonial" style="background-color: var(--card-hover-bg); padding: 2.5rem; border-radius: var(--border-radius); border: 1px solid var(--primary-color); max-width: 900px; margin: 0 auto;">
               <div class="testimonial-quote">
@@ -688,7 +2572,6 @@ function createFeaturedTestimonialHtml(testimonial) {
                   <span class="quote-mark closing">"</span>
               </div>
                <div class="testimonial-author-info">
-                  <img src="${escapeHtml(authorImage)}" alt="${escapeHtml(testimonial.author)}" class="author-image">
                   <div>
                       <h3>${escapeHtml(testimonial.author)}</h3>
                       ${authorTitle ? `<p>${authorTitle}</p>` : ''}
@@ -705,40 +2588,7 @@ function createFeaturedTestimonialHtml(testimonial) {
 
 // ... (other functions like escapeHtml, fetchData, etc. remain the same) ...
 
-/** Creates HTML for the featured project section */
-function createFeaturedProjectHtml(project) {
-    // Similar structure to the static version, using dynamic data
-    // Ensure escapeHtml is used for user-generated content
-    const imageHtml = project.image
-        ? `<div class="featured-project-image" style="min-height: 350px;">
-               <img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
-           </div>`
-        : `<div class="featured-project-image" style="min-height: 350px; background-color: #222; display: flex; align-items: center; justify-content: center; color: var(--gray-text);"> <i class="fas fa-project-diagram fa-4x"></i></div>`;
-
-    // Determine the correct link: to the project itself if a link exists, otherwise to the main /projects page
-    const linkHtml = project.link
-        ? `<a href="${escapeHtml(project.link)}" class="cta-button primary-btn" target="_blank" rel="noopener noreferrer" style="margin-top: auto; align-self: flex-start;">View Details</a>`
-        : `<a href="/projects" class="cta-button primary-btn" style="margin-top: auto; align-self: flex-start;">More Projects</a>`;
-
-    // --- REMOVED highlightsHtml ---
-    // const highlightsHtml = `
-    //     <ul class="project-highlights" style="margin: 1rem 0 1.5rem 0; list-style: none; padding: 0; font-size: 0.9rem;">
-    //         <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;"><i class="fas fa-check-circle" style="color: var(--primary-color); position: absolute; left: 0; top: 5px;"></i>Key Feature 1</li>
-    //         <li style="margin-bottom: 0.5rem; position: relative; padding-left: 1.5rem;"><i class="fas fa-check-circle" style="color: var(--primary-color); position: absolute; left: 0; top: 5px;"></i>Significant Result</li>
-    //     </ul>`;
-
-    return `
-        <div class="featured-project-content" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0; align-items: stretch; background-color: var(--card-bg); border-radius: var(--border-radius); overflow:hidden; border: 1px solid var(--card-border); box-shadow: 0 5px 15px rgba(0,0,0,0.15);">
-            ${imageHtml}
-            <div class="featured-project-details" style="padding: 2rem 2.5rem; display: flex; flex-direction: column;">
-                <h3 style="color: var(--light-text);">${escapeHtml(project.title)}</h3>
-                <p class="project-category" style="color: var(--primary-color); font-weight: 600; margin-bottom: 1rem; display: inline-block;">${escapeHtml(project.category)}</p>
-                <p style="flex-grow: 1; margin-bottom: 1.5rem;">${escapeHtml(project.description)}</p> 
-                ${linkHtml}
-            </div>
-        </div>
-    `;
-}
+// createFeaturedProjectHtml is defined earlier with the unified featured-card markup.
 
 // ... (rest of your apps.js file, including loadFeaturedProject and DOMContentLoaded listener) ...
 
@@ -768,8 +2618,33 @@ document.addEventListener('DOMContentLoaded', () => {
         loadProjectPreview();
     }
 
+    // Ensure stat counters on pages without carousel
+    if (document.querySelector('.stat-number')) {
+        initStatsCounter();
+    }
+
     // ... form handlers etc. ...
 });
+
+// Render up to N testimonials from the largest clients by valuation (visible-only)
+async function loadTopClientTestimonials(n = 3) {
+    const container = document.getElementById('featured-testimonial-container');
+    if (!container) return;
+    try {
+        const data = await fetchData(`/api/testimonials?topClients=${encodeURIComponent(n)}&limit=${encodeURIComponent(n)}`);
+        if (data && data.success && Array.isArray(data.testimonials) && data.testimonials.length > 0) {
+            const items = data.testimonials.slice(0, n);
+            // Build stacked cards centered
+            container.innerHTML = items.map(createFeaturedTestimonialHtml).join('');
+        } else {
+            throw new Error('No testimonials for top clients');
+        }
+    } catch (err) {
+        // Bubble up so caller can fallback
+        console.warn('Top-client testimonials unavailable:', err.message);
+        throw err;
+    }
+}
 
 function initScheduleForm() {
     const scheduleForm = document.getElementById('schedule-form');
@@ -810,101 +2685,144 @@ function initScheduleForm() {
 
 // --- FAQ Accordion ---
 
-// Inside public/js/apps.js
+// Global flag to prevent multiple FAQ initializations
+window.faqInitialized = window.faqInitialized || false;
 
 function initFAQAccordion() {
-    const faqItems = document.querySelectorAll('.faq-item'); // Get all items
+    if (window.faqInitialized) {
+        console.log('FAQ Accordion: Already initialized, skipping...');
+        return;
+    }
+    
+    console.log('FAQ Accordion: Starting initialization...');
+    
+    // Clear any existing FAQ handlers
+    const existingFaqItems = document.querySelectorAll('.faq-item');
+    existingFaqItems.forEach(item => {
+        const question = item.querySelector('.faq-question');
+        if (question) {
+            // Remove all event listeners by replacing the element
+            const clone = question.cloneNode(true);
+            question.parentNode.replaceChild(clone, question);
+        }
+    });
+    
+    const faqItems = document.querySelectorAll('.faq-item');
+    console.log(`FAQ Accordion: Found ${faqItems.length} FAQ items`);
+    
     if (!faqItems.length) {
-  
-        return; // Exit if no items found
+        console.warn('FAQ Accordion: No FAQ items found');
+        return;
     }
 
-    faqItems.forEach((item, index) => { // Loop through each item
+    faqItems.forEach((item, index) => {
         const question = item.querySelector('.faq-question');
         const answer = item.querySelector('.faq-answer');
 
-        // Ensure both question and answer elements exist for this item
-        if (question && answer) {
-            // Ensure unique IDs for accessibility mapping if not already set in EJS
-            const answerId = `faq-answer-${index + 1}`;
-            if (!answer.id) { // Set ID if missing
-                answer.id = answerId;
-            }
-            question.setAttribute('aria-controls', answerId);
-
-            // Set initial state correctly
-            const isInitiallyExpanded = question.classList.contains('expanded'); // Check if manually expanded
-            question.setAttribute('aria-expanded', isInitiallyExpanded ? 'true' : 'false');
-            if (!isInitiallyExpanded) {
-                 answer.setAttribute('hidden', ''); // Hide if not initially expanded
-                 answer.style.maxHeight = null;
-            } else {
-                 answer.removeAttribute('hidden');
-                 answer.style.maxHeight = answer.scrollHeight + "px"; // Set initial height if expanded
-            }
-
-            // Make question focusable and indicate clickable nature
-            question.style.cursor = 'pointer';
-            question.setAttribute('tabindex', '0');
-
-            // Define the toggle function
-            const toggleAnswer = (event) => {
-                 // Prevent default if it's a keydown for space/enter on a button-like element
-                 if (event.type === 'keydown' && (event.key !== 'Enter' && event.key !== ' ')) {
-                    return;
-                 }
-                 event.preventDefault(); // Prevent default for space/enter keydown
-
-                 const isExpanded = question.getAttribute('aria-expanded') === 'true';
-
-                 // --- Optional: Accordion Behavior (Close others) ---
-                 // Uncomment this block if you want only ONE answer open at a time
-                 /*
-                 if (!isExpanded) { // Only close others when opening a new one
-                     faqItems.forEach(otherItem => {
-                         if (otherItem !== item) {
-                             const otherQuestion = otherItem.querySelector('.faq-question');
-                             const otherAnswer = otherItem.querySelector('.faq-answer');
-                             if (otherQuestion && otherAnswer) {
-                                 otherQuestion.setAttribute('aria-expanded', 'false');
-                                 otherAnswer.setAttribute('hidden', '');
-                                 otherAnswer.style.maxHeight = null;
-                             }
-                         }
-                     });
-                 }
-                 */
-                 // --- End Optional Accordion Behavior ---
-
-
-                 // Toggle the current item's state
-                 question.setAttribute('aria-expanded', !isExpanded);
-                 if (!isExpanded) { // If opening
-                     answer.removeAttribute('hidden');
-                     // Important: Set max-height *after* removing hidden to measure scrollHeight correctly
-                     // Use requestAnimationFrame for smoother transition start
-                     requestAnimationFrame(() => {
-                           answer.style.maxHeight = answer.scrollHeight + "px";
-                     });
-                 } else { // If closing
-                     answer.style.maxHeight = null;
-                     // Add hidden attribute *after* transition ends for accessibility
-                      answer.addEventListener('transitionend', () => {
-                          if (question.getAttribute('aria-expanded') === 'false') { // Check state again in case of rapid clicks
-                             answer.setAttribute('hidden', '');
-                          }
-                      }, { once: true }); // Remove listener after it runs once
-                 }
-            };
-
-            // Add event listeners
-            question.addEventListener('click', toggleAnswer);
-            question.addEventListener('keydown', toggleAnswer); // Handle Enter/Space keys
-
-        } else {
-             console.warn('FAQ item missing question or answer element:', item);
+        if (!question || !answer) {
+            console.warn(`FAQ ${index + 1}: Missing question or answer element`);
+            return;
         }
+
+        console.log(`FAQ ${index + 1}: Initializing...`);
+
+        // Set unique IDs for accessibility
+        const answerId = `faq-answer-${index + 1}`;
+        answer.id = answerId;
+        question.setAttribute('aria-controls', answerId);
+        question.setAttribute('aria-expanded', 'false');
+        question.setAttribute('tabindex', '0');
+        question.setAttribute('role', 'button');
+        
+        // Mark as initialized to prevent double initialization
+        question.dataset.faqInitialized = 'true';
+
+    // Initialize CSS (force closed)
+    item.classList.remove('is-open');
+    answer.style.overflow = 'hidden';
+    // We'll animate max-height and then set it to 'none' when opened so content isn't clipped
+    answer.style.transition = 'max-height 0.3s ease, padding 0.2s ease';
+    answer.style.maxHeight = '0px';
+
+        // When the open transition ends, clear the max-height so it auto-sizes to content
+        answer.addEventListener('transitionend', (ev) => {
+            if (ev.propertyName === 'max-height' && item.classList.contains('is-open')) {
+                // Allow natural height after animation completes
+                answer.style.maxHeight = 'none';
+            }
+        });
+
+        // Toggle function with state tracking
+        const toggleFAQ = (event) => {
+            console.log(`FAQ ${index + 1}: Click event received`);
+            
+            // Only handle specific events
+            if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') {
+                return;
+            }
+            
+            // Prevent all event propagation
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            event.stopPropagation();
+
+            const currentState = question.getAttribute('aria-expanded');
+            const isExpanded = currentState === 'true';
+            console.log(`FAQ ${index + 1}: Current state: ${currentState}, isExpanded: ${isExpanded}`);
+
+        // Close all other FAQs first
+            faqItems.forEach((otherItem, otherIndex) => {
+                if (otherItem !== item) {
+                    const otherQuestion = otherItem.querySelector('.faq-question');
+                    const otherAnswer = otherItem.querySelector('.faq-answer');
+                    if (otherQuestion && otherAnswer && otherQuestion.getAttribute('aria-expanded') === 'true') {
+                        otherQuestion.setAttribute('aria-expanded', 'false');
+            otherAnswer.style.maxHeight = '0px';
+            otherItem.classList.remove('is-open');
+                        console.log(`FAQ ${otherIndex + 1}: Force closed`);
+                    }
+                }
+            });
+
+            // Toggle current FAQ
+            if (!isExpanded) {
+                // Open: measure current content height and animate to it
+                question.setAttribute('aria-expanded', 'true');
+                item.classList.add('is-open');
+                // If previously set to 'none', reset to the pixel height first so transition can run
+                if (answer.style.maxHeight === 'none') {
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                } else {
+                    // Ensure we start from 0 then go to measured height
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                }
+                console.log(`FAQ ${index + 1}: Opening to ${answer.scrollHeight}px`);
+            } else {
+                // Close: if maxHeight was 'none', set it to current height to enable transition to 0
+                question.setAttribute('aria-expanded', 'false');
+                if (getComputedStyle(answer).maxHeight === 'none' || answer.style.maxHeight === 'none') {
+                    // Set to actual pixel height to transition from
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                    // Force reflow to apply the height before transitioning to 0
+                    // eslint-disable-next-line no-unused-expressions
+                    answer.offsetHeight;
+                }
+                answer.style.maxHeight = '0px';
+                item.classList.remove('is-open');
+                console.log(`FAQ ${index + 1}: Closed`);
+            }
+            
+            return false;
+        };
+
+        // Add single event listener with capture
+        question.addEventListener('click', toggleFAQ, true);
+        
+        console.log(`FAQ ${index + 1}: Successfully initialized`);
     });
+
+    window.faqInitialized = true;
+    console.log('FAQ Accordion: Initialization complete');
 }
 
 // Ensure this function is called within the main DOMContentLoaded listener in apps.js
@@ -955,4 +2873,401 @@ function populateTimezoneDropdown(selectId) {
         console.error("Error populating timezone dropdown:", error);
         selectElement.innerHTML = '<option value="">Could not load timezones</option>';
     }
+}
+
+// Build filter buttons dynamically from projects' categories
+function buildProjectFilters(projects) {
+    const filterGroup = document.getElementById('project-filters');
+    if (!filterGroup) return;
+    const categories = new Map();
+    projects.forEach(p => {
+        const cat = (p.category || 'uncategorized').toLowerCase();
+        categories.set(cat, (categories.get(cat) || 0) + 1);
+    });
+    // Sort by count desc then name
+    const items = Array.from(categories.entries()).sort((a,b) => b[1]-a[1] || a[0].localeCompare(b[0]));
+
+    // Build All button first
+    const total = projects.length;
+    let html = `
+        <button class="filter-btn active" data-filter="all" aria-pressed="true">
+            <span class="filter-label">All Projects</span>
+            <span class="filter-count" data-count="all">${total}</span>
+        </button>`;
+
+    // Build category buttons
+    items.forEach(([cat, count]) => {
+        const label = formatCategoryLabel(cat);
+        html += `
+        <button class="filter-btn" data-filter="${cat}" aria-pressed="false">
+            <span class="filter-label">${label}</span>
+            <span class="filter-count" data-count="${cat}">${count}</span>
+        </button>`;
+    });
+
+    filterGroup.innerHTML = html;
+}
+
+// --- Newsletter form micro-interactions ---
+function initNewsletterForm() {
+    // Support multiple signup forms across the site (e.g., blog CTA and footer)
+    const forms = Array.from(document.querySelectorAll('.signup-form')).filter(f => !f.dataset.initialized);
+    if (!forms.length) return;
+
+    forms.forEach(form => {
+        // Only attach to newsletter forms that actually have an email input
+        const input = form.querySelector('input[type="email"]');
+        if (!input) return;
+        form.dataset.initialized = 'true';
+
+        // Prefer a .form-message element; fallback to #newsletterMessage if present
+        let msg = form.querySelector('.form-message') || form.querySelector('#newsletterMessage');
+        if (!msg) {
+            // Create a lightweight message element if not present
+            msg = document.createElement('p');
+            msg.className = 'form-message';
+            msg.setAttribute('aria-live', 'polite');
+            msg.hidden = true;
+            // Insert after form if possible
+            (form.appendChild) && form.appendChild(msg);
+        }
+
+        function showMessage(text, type) {
+            if (!msg) return;
+            msg.textContent = text;
+            msg.hidden = false;
+            msg.classList.remove('error', 'success');
+            if (type) msg.classList.add(type);
+        }
+
+        let isSubmitting = false;
+        let debounceTimer;
+
+    function setLoading(loading) {
+            isSubmitting = loading;
+            const btn = form.querySelector('button[type="submit"]');
+            if (btn) {
+                btn.disabled = loading;
+                btn.dataset.loading = loading ? '1' : '0';
+        btn.setAttribute('aria-busy', loading ? 'true' : 'false');
+            }
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (isSubmitting) return;
+            const value = (input.value || '').trim();
+            // very basic email check; server will validate again
+            const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+            if (!emailOk) {
+                showMessage('Please enter a valid email address.', 'error');
+                input.focus();
+                return;
+            }
+            // Debounce quick double-submits
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(async () => {
+                try {
+                    setLoading(true);
+                    // If the newsletter form has first/last name fields nearby, include them
+                    const firstNameEl = document.getElementById('footerNewsletterFirstName');
+                    const lastNameEl = document.getElementById('footerNewsletterLastName');
+                    const bodyPayload = { email: value };
+                    if (firstNameEl && firstNameEl.value) bodyPayload.firstName = firstNameEl.value.trim();
+                    if (lastNameEl && lastNameEl.value) bodyPayload.lastName = lastNameEl.value.trim();
+                    const resp = await fetch('/api/subscribe', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(bodyPayload)
+                    });
+                    const data = await resp.json().catch(() => ({ success: false, message: 'Unexpected response.' }));
+                    if (resp.ok && data.success) {
+                        if (data.redirect) { window.location.href = data.redirect; return; }
+                        // For two-stage flow, default to redirecting; fallback message only
+                        showMessage(data.message || 'Continue to complete your profile…', 'success');
+                        input.value = '';
+                    } else {
+                        showMessage(data.message || 'Sorry, something went wrong. Please try again.', 'error');
+                    }
+                } catch (err) {
+                    showMessage('Network error. Please try again.', 'error');
+                } finally {
+                    setLoading(false);
+                }
+            }, 200);
+        });
+    });
+}
+
+// Curated dual filters helpers
+function buildDualProjectFilters(projects) {
+    const industryWrap = document.getElementById('industry-filters');
+    const serviceWrap = document.getElementById('service-filters');
+    if (!industryWrap || !serviceWrap) return; // no-op
+    // Build only once per page load to preserve active selections
+    if (industryWrap.childElementCount > 0 || serviceWrap.childElementCount > 0) return;
+    const indMap = new Map();
+    const svcMap = new Map();
+    projects.forEach(p => {
+        (p.industries || []).forEach(i => {
+            const id = String(i && (i._id || i.id || i));
+            const name = String(i && (i.name || i));
+            if (id && name) indMap.set(id, name);
+        });
+        (p.serviceTypes || []).forEach(s => {
+            const id = String(s && (s._id || s.id || s));
+            const name = String(s && (s.name || s));
+            if (id && name) svcMap.set(id, name);
+        });
+    });
+    const indHtml = Array.from(indMap.entries())
+        .sort((a,b) => a[1].localeCompare(b[1]))
+        .map(([id, name]) => `<button class="filter-btn" data-id="${escapeHtml(id)}" aria-pressed="false"><span class="filter-label">${escapeHtml(name)}</span></button>`)
+        .join('');
+    const svcHtml = Array.from(svcMap.entries())
+        .sort((a,b) => a[1].localeCompare(b[1]))
+        .map(([id, name]) => `<button class="filter-btn" data-id="${escapeHtml(id)}" aria-pressed="false"><span class="filter-label">${escapeHtml(name)}</span></button>`)
+        .join('');
+    industryWrap.innerHTML = indHtml;
+    serviceWrap.innerHTML = svcHtml;
+}
+
+function updateDualFilterCounts(filters) {
+    // Server-driven counts when provided
+    if (filters && filters.industries && filters.services) {
+        const indWrap = document.getElementById('industry-filters');
+        const svcWrap = document.getElementById('service-filters');
+        if (indWrap) {
+            const counts = new Map(filters.industries.map(f => [String(f._id), Number(f.count || 0)]));
+            indWrap.querySelectorAll('.filter-btn').forEach(btn => {
+                const id = btn.getAttribute('data-id');
+                const count = counts.get(String(id)) || 0;
+                let countEl = btn.querySelector('.filter-count');
+                if (!countEl) {
+                    countEl = document.createElement('span');
+                    countEl.className = 'filter-count';
+                    btn.appendChild(countEl);
+                }
+                countEl.textContent = String(count);
+            });
+        }
+        if (svcWrap) {
+            const counts = new Map(filters.services.map(f => [String(f._id), Number(f.count || 0)]));
+            svcWrap.querySelectorAll('.filter-btn').forEach(btn => {
+                const id = btn.getAttribute('data-id');
+                const count = counts.get(String(id)) || 0;
+                let countEl = btn.querySelector('.filter-count');
+                if (!countEl) {
+                    countEl = document.createElement('span');
+                    countEl.className = 'filter-count';
+                    btn.appendChild(countEl);
+                }
+                countEl.textContent = String(count);
+            });
+        }
+    }
+}
+
+function renderProjectsPagination(pagination) {
+    const pager = document.getElementById('projects-pagination');
+    if (!pager || !pagination) return;
+    const page = Number(pagination.page || 1);
+    const totalPages = Number(pagination.totalPages || 1);
+    if (totalPages <= 1) { pager.innerHTML = ''; return; }
+    const link = (p, label, { active=false, disabled=false } = {}) => `<a href="#" data-page="${p}" class="pager-link${active?' active':''}${disabled?' disabled':''}">${label}</a>`;
+    let html = '';
+    html += link(Math.max(1, page - 1), 'Prev', { disabled: page <= 1 });
+    for (let i = 1; i <= totalPages; i++) html += link(i, String(i), { active: i === page });
+    html += link(Math.min(totalPages, page + 1), 'Next', { disabled: page >= totalPages });
+    pager.innerHTML = html;
+}
+
+// Build filters using server-provided full list (preload stable bar)
+function buildDualProjectFiltersFromServer(filters) {
+    const industryWrap = document.getElementById('industry-filters');
+    const serviceWrap = document.getElementById('service-filters');
+    if (!industryWrap || !serviceWrap || !filters) return;
+    const indHtml = (filters.industries || [])
+        .slice().sort((a,b) => String(a.name).localeCompare(String(b.name)))
+        .map(f => `<button class="filter-btn" data-id="${escapeHtml(String(f._id))}" aria-pressed="false"><span class="filter-label">${escapeHtml(String(f.name))}</span><span class="filter-count">${Number(f.count||0)}</span></button>`)
+        .join('');
+    const svcHtml = (filters.services || [])
+        .slice().sort((a,b) => String(a.name).localeCompare(String(b.name)))
+        .map(f => `<button class="filter-btn" data-id="${escapeHtml(String(f._id))}" aria-pressed="false"><span class="filter-label">${escapeHtml(String(f.name))}</span><span class="filter-count">${Number(f.count||0)}</span></button>`)
+        .join('');
+    industryWrap.innerHTML = indHtml;
+    serviceWrap.innerHTML = svcHtml;
+    // Apply active classes from deep-linked state, if any
+    if (window.__projFilterState) markActiveButtonsFromState(window.__projFilterState);
+}
+
+function markActiveButtonsFromState(state) {
+    try {
+        const indWrap = document.getElementById('industry-filters');
+        const svcWrap = document.getElementById('service-filters');
+        if (indWrap) indWrap.querySelectorAll('.filter-btn').forEach(btn => {
+            const id = btn.getAttribute('data-id');
+            const active = state.industries.has(id);
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        if (svcWrap) svcWrap.querySelectorAll('.filter-btn').forEach(btn => {
+            const id = btn.getAttribute('data-id');
+            const active = state.services.has(id);
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+    } catch(_) { /* ignore */ }
+}
+
+function syncProjectsUrl(state) {
+    try {
+        const url = new URL(window.location.href);
+        url.searchParams.set('page', String(state.page || 1));
+        // Clear existing multi params before appending new
+        ['industries','services'].forEach(k => url.searchParams.delete(k));
+        Array.from(state.industries).forEach(id => url.searchParams.append('industries', id));
+        Array.from(state.services).forEach(id => url.searchParams.append('services', id));
+        window.history.replaceState(null, '', url.toString());
+    } catch(_) { /* ignore */ }
+}
+
+// --- Legal pages: Table of Contents ---
+function initLegalToc() {
+    const main = document.getElementById('legal-main');
+    const tocList = document.getElementById('legal-toc-list');
+    if (!main || !tocList) return;
+
+    const headings = Array.from(main.querySelectorAll('h2, h3, h4'));
+    if (!headings.length) return;
+
+    const slugCounts = new Map();
+    const slugify = (text) => {
+        const base = (text || '')
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .trim()
+            .replace(/\s+/g, '-');
+        const count = (slugCounts.get(base) || 0) + 1;
+        slugCounts.set(base, count);
+        return count > 1 ? `${base}-${count}` : base;
+    };
+
+    // Ensure headings have IDs
+    headings.forEach(h => {
+        if (!h.id) h.id = slugify(h.textContent);
+    });
+
+    // Build nested list: h2 as top-level, h3 as children
+    const frag = document.createDocumentFragment();
+    let currentTopLi = null;
+    let currentSubUl = null;
+    let currentSubSubUl = null;
+
+    headings.forEach(h => {
+    const tag = h.tagName.toLowerCase();
+    const level = tag === 'h2' ? 2 : tag === 'h3' ? 3 : 4;
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = `#${h.id}`;
+        a.textContent = h.textContent;
+        a.addEventListener('click', (e) => {
+            e.preventDefault();
+            scrollToHeading(h);
+            setActiveLink(a);
+        });
+        li.appendChild(a);
+
+        if (level === 2) {
+            currentTopLi = li;
+            currentSubUl = document.createElement('ul');
+            currentSubSubUl = null;
+            currentTopLi.appendChild(currentSubUl);
+            frag.appendChild(currentTopLi);
+        } else if (level === 3) {
+            if (!currentSubUl && currentTopLi) {
+                currentSubUl = document.createElement('ul');
+                currentTopLi.appendChild(currentSubUl);
+            }
+            if (currentSubUl) {
+                currentSubUl.appendChild(li);
+                currentSubSubUl = null;
+            } else {
+                frag.appendChild(li);
+            }
+        } else if (level === 4) {
+            if (!currentSubSubUl) {
+                currentSubSubUl = document.createElement('ul');
+                if (currentSubUl) currentSubUl.appendChild(currentSubSubUl);
+            }
+            if (currentSubSubUl) {
+                currentSubSubUl.appendChild(li);
+            } else {
+                frag.appendChild(li);
+            }
+        } else {
+            // If the first heading is h3, just append flat
+            frag.appendChild(li);
+        }
+    });
+
+    tocList.innerHTML = '';
+    tocList.appendChild(frag);
+
+    // Active state handling on scroll
+    const linkById = new Map();
+    tocList.querySelectorAll('a').forEach(a => {
+        const id = a.getAttribute('href').slice(1);
+        linkById.set(id, a);
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+        // Pick the first visible heading nearest to top
+        const visible = entries
+            .filter(e => e.isIntersecting)
+            .sort((a, b) => Math.abs(a.boundingClientRect.top) - Math.abs(b.boundingClientRect.top));
+        if (!visible.length) return;
+        const id = visible[0].target.id;
+        const link = linkById.get(id);
+        if (link) setActiveLink(link);
+    }, {
+        // Offset by header height using rootMargin
+        root: null,
+        rootMargin: `-${getHeaderOffset() + 24}px 0px -70% 0px`,
+        threshold: [0, 1.0]
+    });
+
+    headings.forEach(h => observer.observe(h));
+
+    // If page loads with a hash, adjust scroll position with header offset
+    if (location.hash) {
+        const target = document.getElementById(location.hash.slice(1));
+        if (target) {
+            setTimeout(() => scrollToHeading(target), 0);
+        }
+    }
+
+    function setActiveLink(active) {
+        tocList.querySelectorAll('a').forEach(a => a.classList.remove('is-active'));
+        active.classList.add('is-active');
+    }
+
+    function scrollToHeading(target) {
+        const offset = getHeaderOffset() + 16; // small extra padding
+        const top = window.scrollY + target.getBoundingClientRect().top - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+        // Ensure focus for accessibility
+        if (target && typeof target.focus === 'function') {
+            target.setAttribute('tabindex', '-1');
+            target.focus({ preventScroll: true });
+        }
+    }
+}
+
+function getHeaderOffset() {
+    const header = document.getElementById('site-header');
+    if (!header) return 72;
+    // Prefer actual height; fall back to CSS var
+    const h = header.offsetHeight || 72;
+    return Number.isFinite(h) ? h : 72;
 }

@@ -3,76 +3,131 @@
 
 <%- include('../partials/header', { pageTitle: 'Manage Blog Posts' }) %>
 
-<div class="admin-actions-bar" style="margin-bottom: 1.5rem; text-align: right;">
-    <a href="/admin/blog/new" class="cta-button primary-btn">
-        <i class="fas fa-plus"></i> Add New Blog Post
-    </a>
+<div class="flex items-start justify-between mb-6">
+    <div>
+        <h2 class="text-2xl font-bold text-gray-100">Manage Blog Posts</h2>
+        <p class="text-gray-400 mt-1">Create, edit, and publish content for your blog.</p>
+        <div class="mt-3 inline-flex items-center gap-2 rounded-lg bg-gray-800/60 border border-gray-700 p-1">
+            <% const baseSort = sort || 'publishedDate'; const baseOrder = order || 'desc'; %>
+            <a href="/admin/blog?<%= new URLSearchParams({ sort: baseSort, order: baseOrder, status: '' }).toString() %>" class="px-3 py-1.5 text-sm rounded-md <%= (!status || status==='all') ? 'bg-gray-700 text-white' : 'text-gray-300 hover:text-white' %>">All</a>
+            <a href="/admin/blog?<%= new URLSearchParams({ sort: baseSort, order: baseOrder, status: 'published' }).toString() %>" class="px-3 py-1.5 text-sm rounded-md <%= status==='published' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:text-white' %>">Published</a>
+            <a href="/admin/blog?<%= new URLSearchParams({ sort: baseSort, order: baseOrder, status: 'draft' }).toString() %>" class="px-3 py-1.5 text-sm rounded-md <%= status==='draft' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:text-white' %>">Draft</a>
+        </div>
+    </div>
+    <div>
+        <a href="/admin/blog/new" class="inline-flex items-center gap-2 bg-primary text-white font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            <i class="fas fa-plus"></i> Add New Blog Post
+        </a>
+    </div>
 </div>
 
-<div class="admin-content-container">
+<div>
     <% if (posts && posts.length > 0) { %>
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>Title & Slug</th>
-                    <th>Author</th>
-                    <th>Status</th> 
-                    <th>Published Date</th>
-                    <th>Last Updated</th>
-                    <th class="actions">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% posts.forEach(post => { %>
+        <div class="overflow-x-auto bg-gray-800 rounded-lg shadow-md border border-gray-700">
+            <table class="min-w-full divide-y divide-gray-700">
+                                <thead class="bg-gray-800/60">
                     <tr>
-                        <td>
-                            <a href="/admin/blog/edit/<%= post._id %>" title="Edit: <%= post.title %>" style="font-weight: 500; color: var(--light-text); text-decoration: none;">
-                                <%= post.title %>
-                            </a>
-                            <br>
-                            <small style="color: var(--gray-text); font-size: 0.8em;">Slug: <%= post.slug %></small>
-                            <% if(post.isPublished && post.slug) { %>
-                                 <a href="/blog/<%= post.slug %>" target="_blank" title="View Live Post" style="margin-left: 10px; font-size: 0.8em; color: var(--primary-color); text-decoration:none;">
-                                     <i class="fas fa-external-link-alt fa-xs"></i> View
-                                 </a>
-                            <% } %>
-                        </td>
-                        <td>
-                            <%# Display authorDisplayName first, then fallback %>
-                            <%= post.authorDisplayName || (post.author ? (post.author.fullName || post.author.username) : 'N/A') %>
-                        </td>
-                        <td> 
-                            <% if (post.isPublished) { %>
-                                <span style="color: #28a745; font-weight: bold; background-color: rgba(40, 167, 69, 0.1); padding: 3px 6px; border-radius: 3px; font-size: 0.85em;">Published</span>
-                            <% } else { %>
-                                <span style="color: #ffc107; font-weight: bold; background-color: rgba(255, 193, 7, 0.1); padding: 3px 6px; border-radius: 3px; font-size: 0.85em;">Draft</span>
-                            <% } %>
-                        </td>
-                        <td>
-                             <% if (post.publishedDate) { %>
-                                <%= new Date(post.publishedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %>
-                             <% } else { %>
-                                 -
-                             <% } %>
-                        </td>
-                        <td><%= post.updatedAt ? new Date(post.updatedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '-' %></td>
-                        <td class="actions">
-                            <a href="/admin/blog/edit/<%= post._id %>" class="edit-btn" title="Edit Blog Post">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                            <form action="/admin/blog/delete/<%= post._id %>" method="POST" style="display: inline;" class="delete-form">
-                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                <button type="submit" class="delete-btn" title="Delete Blog Post">
-                                    <i class="fas fa-trash-alt"></i> Delete
-                                </button>
-                            </form>
-                        </td>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Title & Slug</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Author</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                                    <a href="/admin/blog?<%= new URLSearchParams({ sort: 'publishedDate', order: (sort==='publishedDate' && order==='desc') ? 'asc' : 'desc', status: (status||'') }).toString() %>" class="inline-flex items-center gap-1 hover:text-white">
+                                                        Published Date
+                                                        <% if (sort==='publishedDate') { %>
+                                                            <i class="fas fa-sort-<%= order==='desc' ? 'down' : 'up' %>"></i>
+                                                        <% } else { %>
+                                                            <i class="fas fa-sort text-gray-500"></i>
+                                                        <% } %>
+                                                    </a>
+                                                </th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                                    <a href="/admin/blog?<%= new URLSearchParams({ sort: 'viewCount', order: (sort==='viewCount' && order==='desc') ? 'asc' : 'desc', status: (status||'') }).toString() %>" class="inline-flex items-center gap-1 hover:text-white">
+                                                        Views
+                                                        <% if (sort==='viewCount') { %>
+                                                            <i class="fas fa-sort-<%= order==='desc' ? 'down' : 'up' %>"></i>
+                                                        <% } else { %>
+                                                            <i class="fas fa-sort text-gray-500"></i>
+                                                        <% } %>
+                                                    </a>
+                                                </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Last Updated</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
                     </tr>
-                <% }) %>
-            </tbody>
-        </table>
+                </thead>
+                <tbody class="bg-gray-800 divide-y divide-gray-700">
+                    <% posts.forEach(post => { %>
+                        <tr class="hover:bg-gray-800/70">
+                            <td class="px-6 py-4 text-sm text-gray-100">
+                                <a href="/admin/blog/edit/<%= post._id %>" class="font-medium text-gray-100 hover:text-primary">
+                                    <%= post.title %>
+                                </a>
+                                <div class="text-xs text-gray-400">Slug: <%= post.slug %>
+                                    <% if(post.isPublished && post.slug) { %>
+                                        <a href="/blog/<%= post.slug %>" target="_blank" class="ml-2 text-primary hover:text-primary-hover"><i class="fas fa-external-link-alt fa-xs"></i> View</a>
+                                    <% } %>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300"><%= post.authorDisplayName || (post.author ? (post.author.fullName || post.author.username) : 'N/A') %></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                                <% if (post.isPublished) { %>
+                                    <span class="inline-flex items-center rounded-md bg-green-900/30 text-green-300 px-2 py-1 text-xs font-semibold">Published</span>
+                                <% } else { %>
+                                    <span class="inline-flex items-center rounded-md bg-yellow-900/30 text-yellow-300 px-2 py-1 text-xs font-semibold">Draft</span>
+                                <% } %>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                                <% if (post.publishedDate) { %>
+                                    <%= new Date(post.publishedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %>
+                                <% } else { %>
+                                    -
+                                <% } %>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300"><%= typeof post.viewCount === 'number' ? post.viewCount : 0 %></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400"><%= post.updatedAt ? new Date(post.updatedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '-' %></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                                <div class="inline-flex items-center gap-2">
+                                    <a href="/admin/blog/edit/<%= post._id %>" class="inline-flex items-center gap-1 bg-gray-700 text-gray-100 font-semibold py-1.5 px-3 rounded-lg border border-gray-600 shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" title="Edit Blog Post">
+                                        <i class="fas fa-edit"></i>
+                                        <span>Edit</span>
+                                    </a>
+                                    <form action="/admin/blog/delete/<%= post._id %>" method="POST" class="delete-form inline-block">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                        <button type="submit" class="inline-flex items-center gap-1 bg-danger text-white font-semibold py-1.5 px-3 rounded-lg shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-danger delete-btn" title="Delete Blog Post">
+</div>
+<script>
+// Remove inline delete confirmation, use delegated event listener
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.delete-form .delete-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            if (!confirm('Are you sure you want to delete this blog post? This action cannot be undone.')) {
+                e.preventDefault();
+            }
+        });
+    });
+});
+</script>
+                                            <i class="fas fa-trash-alt"></i>
+                                            <span>Delete</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
     <% } else { %>
-        <p style="text-align: center; padding: 2rem; background-color: var(--card-bg); border-radius: 5px;">No blog posts found. <a href="/admin/blog/new" style="color: var(--primary-color);">Write the first one!</a></p>
+        <div class="bg-gray-800 rounded-lg shadow-md border border-gray-700 p-8 text-center">
+            <div class="mx-auto mb-3 h-12 w-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300">
+                <i class="fas fa-newspaper"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-100">No Blog Posts Yet</h3>
+            <p class="text-gray-400 mt-1">Write your first post to get started.</p>
+            <a href="/admin/blog/new" class="mt-4 inline-flex items-center gap-2 bg-primary text-white font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                <i class="fas fa-plus"></i> Write First Post
+            </a>
+        </div>
     <% } %>
 </div>
 

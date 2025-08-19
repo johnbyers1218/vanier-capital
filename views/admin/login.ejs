@@ -1,144 +1,44 @@
-<!-- views/admin/login.ejs -->
-<!-- Admin Login Page - Standalone page -->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Prevent indexing of admin login page -->
-    <meta name="robots" content="noindex, nofollow">
-    <title>Admin Login | FND Automations</title>
-    <!-- Link main public CSS -->
-    <link rel="stylesheet" href="/css/style.css">
-    <!-- Link optional admin-specific CSS -->
-    <link rel="stylesheet" href="/css/admin-style.css">
-    <style>
-        /* Styles specific to the login page for centering and appearance */
-        body.login-page {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: var(--dark-bg); /* Use theme background */
-            padding: 1rem; /* Add padding for small screens */
-        }
-        .login-container {
-            background-color: var(--card-bg);
-            padding: 2.5rem 2rem; /* Adjusted padding */
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            border: 1px solid var(--card-border);
-        }
-        .login-container .logo {
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-            color: var(--primary-color);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .login-container h1 {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-            color: var(--light-text);
-            font-weight: 500;
-        }
-        .login-form .form-group {
-            margin-bottom: 1.5rem;
-            text-align: left;
-        }
-        .login-form label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-             color: var(--light-text);
-             font-size: 0.95rem;
-        }
-        .login-form input[type="text"],
-        .login-form input[type="password"] {
-            width: 100%;
-            padding: 12px 15px; /* Consistent padding */
-            background-color: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: var(--border-radius);
-            color: var(--light-text);
-            font-size: 1rem;
-        }
-         .login-form input:focus {
-             border-color: var(--primary-color);
-             outline: none;
-             box-shadow: 0 0 0 3px rgba(0, 168, 232, 0.2);
-         }
-        .login-form .submit-btn {
-            width: 100%;
-            padding: 12px;
-            font-size: 1.1rem;
-            margin-top: 1rem;
-            /* Inherits .cta-button.primary-btn styles */
-        }
-        /* Error message specific to login (uses flash message style) */
-        .login-error-placeholder { /* Div to hold flash messages */
-             min-height: 40px; /* Reserve space even when no message */
-             margin-bottom: 1.5rem;
-        }
-        .flash-message.error { /* Style defined in header/admin-style.css */
-            text-align: center;
-            font-size: 0.95em;
-            justify-content: center;
-        }
-        .flash-message.success { /* Style for success message on redirect */
-             text-align: center;
-             font-size: 0.95em;
-             justify-content: center;
-        }
-    </style>
-</head>
-<body class="login-page">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Admin Login</title>
+        <link rel="stylesheet" href="/css/admin-style.css" />
+    </head>
+    <body class="min-h-screen bg-gray-950 text-gray-100">
+        <div class="max-w-md mx-auto py-10">
+            <h1 class="text-2xl font-semibold mb-6">Admin Login</h1>
 
-    <div class="login-container">
-        <div class="logo">FND Admin</div>
-        <h1>Administrator Login</h1>
-
-        <!-- Placeholder for Flash Messages -->
-        <div class="login-error-placeholder">
-             <% if (errorMessage && errorMessage.length > 0) { %>
-                  <% errorMessage.forEach(msg => { %>
-                      <div class="flash-message error">
-                         <i></i> <span><%= msg %></span>
-                      </div>
-                  <% }) %>
-             <% } %>
-             <% if (successMessage && successMessage.length > 0) { %>
-                 <% successMessage.forEach(msg => { %>
-                     <div class="flash-message success">
-                         <i></i> <span><%= msg %></span>
-                     </div>
-                 <% }) %>
+            <% if (errorMessage && errorMessage.length) { %>
+                <% errorMessage.forEach(msg => { %>
+                    <div class="mb-4 rounded border-l-4 border-red-500 bg-red-900/30 text-red-200 px-3 py-2 text-sm" role="alert">
+                        <%= msg %>
+                    </div>
+                <% }) %>
             <% } %>
+
+            <% if (successMessage && successMessage.length) { %>
+                <% successMessage.forEach(msg => { %>
+                    <div class="mb-4 rounded border-l-4 border-green-500 bg-green-900/30 text-green-200 px-3 py-2 text-sm" role="alert">
+                        <%= msg %>
+                    </div>
+                <% }) %>
+            <% } %>
+
+            <form action="/admin/login" method="POST" class="space-y-4">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+                <div>
+                    <label for="username" class="block text-sm font-medium">Username</label>
+                    <input id="username" name="username" type="text" required autofocus class="mt-1 w-full rounded-md bg-gray-900 border border-gray-700 px-3 py-2" />
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium">Password</label>
+                    <input id="password" name="password" type="password" required class="mt-1 w-full rounded-md bg-gray-900 border border-gray-700 px-3 py-2" />
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold px-4 py-2 rounded-md">Login</button>
+            </form>
         </div>
-        <!-- End Flash Messages -->
-
-
-        <form action="/admin/login" method="POST" class="login-form">
-            <!-- IMPORTANT: Include CSRF Token -->
-            <!-- csrfToken is available via res.locals set in app.js -->
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-
-            <div class="form-group">
-                <label for="username">Username</label>
-                <!-- Repopulate username on failed attempt (passed from route handler) -->
-                <input type="text" id="username" name="username" value="<%= typeof username !== 'undefined' ? username : '' %>" required autofocus>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <button type="submit" class="submit-btn cta-button primary-btn">Login</button>
-        </form>
-    </div>
-
-</body>
+    </body>
 </html>

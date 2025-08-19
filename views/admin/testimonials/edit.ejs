@@ -3,15 +3,14 @@
 
 <%- include('../partials/header', { pageTitle: editing ? 'Edit Testimonial' : 'Add New Testimonial' }) %>
 
-<div class="admin-form-container">
-
-    <h2><%= editing ? 'Edit Testimonial' : 'Add New Testimonial' %></h2>
-
-    <%# Display Validation Errors %>
+<div class="max-w-4xl mx-auto">
+    <style>
+        /* Toggle styles are centralized in admin-style.css */
+    </style>
     <% if (typeof errorMessages !== 'undefined' && errorMessages && errorMessages.length > 0) { %>
-        <div class="validation-errors">
-            <p><strong>Please correct the following errors:</strong></p>
-            <ul>
+        <div class="rounded-lg border border-red-700/40 bg-red-900/20 text-red-200 p-4 mb-4" role="alert" aria-live="polite">
+            <p class="font-semibold mb-2">Please correct the following errors:</p>
+            <ul class="list-disc pl-5 space-y-1">
                 <% errorMessages.forEach(err => { %>
                     <li><%= err.msg %></li>
                 <% }) %>
@@ -19,60 +18,99 @@
         </div>
     <% } %>
 
-    <form action="<%= editing ? '/admin/testimonials/edit/' + testimonial._id : '/admin/testimonials' %>" method="POST" class="admin-form">
+    <form action="<%= editing ? '/admin/testimonials/edit/' + testimonial._id : '/admin/testimonials' %>" method="POST" id="testimonialForm">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-        <div class="form-group">
-            <label for="author">Author Name <span style="color: #dc3545;">*</span></label>
-            <input type="text" id="author" name="author" value="<%= testimonial && testimonial.author ? testimonial.author : '' %>" required maxlength="100">
+        <div class="bg-gray-800 border border-gray-700 rounded-lg shadow-sm p-5 space-y-4">
+            <div>
+                <label for="author" class="block text-sm text-gray-300 mb-1">Author Name <span class="text-red-400">*</span></label>
+                <input id="author" name="author" type="text" required maxlength="100" value="<%= testimonial && testimonial.author ? testimonial.author : '' %>" class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            <div>
+                <label for="content" class="block text-sm text-gray-300 mb-1">Testimonial Content <span class="text-red-400">*</span></label>
+                <textarea id="content" name="content" rows="7" required maxlength="2000" class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"><%= testimonial && testimonial.content ? testimonial.content : '' %></textarea>
+                <p class="text-xs text-gray-400 mt-1">Max 2000 characters. Plain text only.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="company" class="block text-sm text-gray-300 mb-1">Company Name (Optional)</label>
+                    <input id="company" name="company" type="text" maxlength="100" value="<%= testimonial && testimonial.company ? testimonial.company : '' %>" class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="position" class="block text-sm text-gray-300 mb-1">Author's Position (Optional)</label>
+                    <input id="position" name="position" type="text" maxlength="100" value="<%= testimonial && testimonial.position ? testimonial.position : '' %>" class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="client" class="block text-sm text-gray-300 mb-1">Linked Client (Optional)</label>
+                    <select id="client" name="client" class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">— Select client —</option>
+                        <% if (Array.isArray(clients)) { clients.forEach(c => { %>
+                            <option value="<%= c._id %>" <%= (testimonial && testimonial.client && String(testimonial.client) === String(c._id)) ? 'selected' : '' %>><%= c.name %></option>
+                        <% }) } %>
+                    </select>
+                    <p class="text-xs text-gray-400 mt-1">Used for industry filters and to show logo/name on the public testimonials.</p>
+                </div>
+                <div>
+                    <label for="project" class="block text-sm text-gray-300 mb-1">Linked Project (Optional)</label>
+                    <select id="project" name="project" class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">— Select project —</option>
+                        <% if (Array.isArray(projects)) { projects.forEach(p => { %>
+                            <option value="<%= p._id %>" <%= (testimonial && testimonial.project && String(testimonial.project) === String(p._id)) ? 'selected' : '' %>><%= p.title %><%= p.client && p.client.name ? ' — ' + p.client.name : '' %></option>
+                        <% }) } %>
+                    </select>
+                    <p class="text-xs text-gray-400 mt-1">If set, the card can include a "Read the Case Study" link.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="rating" class="block text-sm text-gray-300 mb-1">Rating (Optional)</label>
+                    <select id="rating" name="rating" class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="" <%= (!testimonial || !testimonial.rating) ? 'selected' : '' %>>-- No Rating --</option>
+                        <% for (let i = 1; i <= 5; i++) { %>
+                            <option value="<%= i %>" <%= (testimonial && testimonial.rating == i) ? 'selected' : '' %>><%= i %> Star<%= i > 1 ? 's' : '' %></option>
+                        <% } %>
+                    </select>
+                    <p class="text-xs text-gray-400 mt-1">Select a rating from 1 to 5 stars.</p>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3">
+                        <label class="switch">
+                            <input type="checkbox" id="isFeatured" name="isFeatured" value="true" <%= (testimonial && testimonial.isFeatured) ? 'checked' : '' %>>
+                            <span class="slider"></span>
+                        </label>
+                        <label for="isFeatured" class="text-sm text-gray-300">Feature this testimonial?</label>
+                    </div>
+                    <p class="text-xs text-gray-400">Mark as featured for potential homepage display.</p>
+
+                    <div class="flex items-center gap-3">
+                        <label class="switch">
+                            <input type="checkbox" id="isVisible" name="isVisible" value="true" <%= (testimonial && testimonial.isVisible !== undefined) ? (testimonial.isVisible ? 'checked' : '') : 'checked' %>>
+                            <span class="slider"></span>
+                        </label>
+                        <label for="isVisible" class="text-sm text-gray-300">Make this testimonial visible?</label>
+                    </div>
+                    <p class="text-xs text-gray-400">Uncheck to hide from the public site without deleting.</p>
+                </div>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="content">Testimonial Content <span style="color: #dc3545;">*</span></label>
-            <textarea id="content" name="content" rows="7" required maxlength="2000"><%= testimonial && testimonial.content ? testimonial.content : '' %></textarea>
-             <small>Max 2000 characters. Plain text only.</small>
-        </div>
-
-         <div class="form-group">
-            <label for="company">Company Name (Optional)</label>
-            <input type="text" id="company" name="company" value="<%= testimonial && testimonial.company ? testimonial.company : '' %>" maxlength="100">
-        </div>
-
-         <div class="form-group">
-            <label for="position">Author's Position (Optional)</label>
-            <input type="text" id="position" name="position" value="<%= testimonial && testimonial.position ? testimonial.position : '' %>" maxlength="100">
-        </div>
-
-        <div class="form-group">
-            <label for="rating">Rating (Optional)</label>
-            <select id="rating" name="rating">
-                <option value="" <%= (!testimonial || !testimonial.rating) ? 'selected' : '' %>>-- No Rating --</option>
-                <% for(let i = 1; i <= 5; i++) { %>
-                    <option value="<%= i %>" <%= (testimonial && testimonial.rating == i) ? 'selected' : '' %>><%= i %> Star<%= i > 1 ? 's' : '' %></option>
-                <% } %>
-            </select>
-             <small>Select a rating from 1 to 5 stars.</small>
-        </div>
-
-        <div class="form-group">
-             <input type="checkbox" id="isFeatured" name="isFeatured" value="true" <%= (testimonial && testimonial.isFeatured) ? 'checked' : '' %> style="width: auto; margin-right: 10px; vertical-align: middle;">
-             <label for="isFeatured" class="checkbox-label" style="display: inline-block; margin-bottom: 0;">Feature this testimonial?</label>
-             <small style="display: block; margin-top: 4px;">Check to mark as featured (e.g., for homepage display).</small>
-        </div>
-
-        <div class="form-group">
-             <input type="checkbox" id="isVisible" name="isVisible" value="true" <%= (testimonial && testimonial.isVisible !== undefined) ? (testimonial.isVisible ? 'checked' : '') : 'checked' %> style="width: auto; margin-right: 10px; vertical-align: middle;">
-             <label for="isVisible" class="checkbox-label" style="display: inline-block; margin-bottom: 0;">Make this testimonial visible?</label>
-             <small style="display: block; margin-top: 4px;">Uncheck to hide from the public site without deleting. Checked by default for new testimonials.</small>
-        </div>
-
-        <div class="form-actions">
-            <button type="submit" class="submit-btn cta-button primary-btn">
-                 <i class="fas fa-save" style="margin-right: 8px;"></i> <%= editing ? 'Update Testimonial' : 'Save New Testimonial' %>
-            </button>
-            <a href="/admin/testimonials" class="cancel-btn" style="margin-left: 1rem; background-color: #6c757d; color: white;">Cancel</a>
-        </div>
-
+            <div class="flex items-center gap-2 mt-4">
+                <button type="submit" class="inline-flex items-center gap-2 bg-primary text-white font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                    <i class="fas fa-save"></i>
+                    <span><%= editing ? 'Update Testimonial' : 'Save New Testimonial' %></span>
+                </button>
+                <a href="/admin/testimonials" class="inline-flex items-center gap-2 border border-gray-600 text-gray-200 font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                    <i class="fas fa-times"></i>
+                    <span>Cancel</span>
+                </a>
+            </div>
     </form>
 </div>
 

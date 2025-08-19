@@ -1,101 +1,193 @@
 <%# views/admin/blog/edit.ejs %>
-<%# Form for adding or editing a blog post with TinyMCE & Cover Image Upload %>
+<%# Two-column editor layout with settings sidebar & enhanced UX %>
 
 <%- include('../partials/header', { pageTitle: editing ? 'Edit Blog Post' : 'Add New Blog Post' }) %>
 
-<div class="admin-form-container">
-    <h2 style="text-align: center; margin-bottom: 2rem;"><%= editing ? 'Edit Blog Post' : 'Add New Blog Post' %></h2>
+<style>
+  /* Two-column editor layout */
+  .editor-container { max-width: 1280px; margin: 0 auto; padding: 0 1rem 2rem; }
+  .editor-title { text-align: center; margin: 1.25rem 0 1.75rem; }
+  .editor-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.25rem; align-items: start; }
+  @media (max-width: 1024px) { .editor-grid { grid-template-columns: 1fr; } }
+  .editor-card { background: var(--card-bg, #1f1f1f); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 1rem; }
+  .editor-main .form-group { margin-bottom: 1rem; }
+  .editor-sidebar details { border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; background: rgba(255,255,255,0.02); }
+  .editor-sidebar details + details { margin-top: 0.75rem; }
+  .editor-sidebar summary { cursor: pointer; list-style: none; padding: 0.85rem 1rem; font-weight: 600; display: flex; align-items: center; justify-content: space-between; }
+  .editor-sidebar summary::-webkit-details-marker { display: none; }
+  .editor-sidebar .panel-body { padding: 0.5rem 1rem 1rem; }
+  .muted { color: var(--gray-text, #aaa); font-size: 0.9em; }
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.5rem; }
+  .toggle-label { margin-left: 0.5rem; font-size: 0.95em; }
 
-    <% if (typeof errorMessages !== 'undefined' && errorMessages && errorMessages.length > 0) { %>
-        <div class="validation-errors">
-            <p><strong>Please correct the following errors:</strong></p>
-            <ul><% errorMessages.forEach(err => { %><li><%= err.msg %> <%= err.param ? '('+err.param+')' : '' %></li><% }) %></ul>
+  /* Buttons hierarchy */
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-top: 1.25rem; }
+  .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; border-radius: 8px; text-decoration: none; border: 1px solid transparent; font-weight: 600; }
+  .btn-primary { background: #0ea5e9; color: white; border-color: #0ea5e9; }
+  .btn-secondary-outline { background: transparent; color: #cbd5e1; border-color: rgba(148,163,184,0.35); }
+  .btn-secondary-outline:hover { background: rgba(148,163,184,0.08); }
+  .btn-danger { background: rgba(239,68,68,0.1); color: #ef4444; border-color: rgba(239,68,68,0.35); padding: 0.35rem 0.6rem; font-size: 0.85em; }
+
+  /* Image preview */
+  .image-preview img { max-width: 320px; max-height: 220px; border-radius: 6px; display:block; }
+
+  /* Choices overrides moved to admin-style.css */
+</style>
+
+<div class="editor-container">
+  <h2 class="editor-title"><%= editing ? 'Edit Blog Post' : 'Add New Blog Post' %></h2>
+
+  <% if (typeof errorMessages !== 'undefined' && errorMessages && errorMessages.length > 0) { %>
+    <div class="validation-errors editor-card" role="alert" aria-live="polite">
+  <p><strong>Please correct the following errors:</strong></p>
+  <ul><% errorMessages.forEach(err => { %><li><%= err.msg %> <%= err.param ? '('+err.param+')' : '' %></li><% }) %></ul>
+    </div>
+  <% } %>
+
+  <form action="<%= editing ? '/admin/blog/edit/' + post._id : '/admin/blog' %>" method="POST" class="admin-form" id="blogPostForm">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <div class="editor-grid">
+      <!-- Left: Main Content -->
+      <div class="editor-main editor-card" aria-label="Main editor">
+        <div class="form-group">
+          <label for="title">Post Title <span style="color:#dc3545">*</span></label>
+          <input type="text" id="title" name="title" value="<%= post && post.title ? post.title : '' %>" required maxlength="200">
         </div>
-    <% } %>
-
-    <form action="<%= editing ? '/admin/blog/edit/' + post._id : '/admin/blog' %>" method="POST" class="admin-form" id="blogPostForm"> 
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
         <div class="form-group">
-            <label for="title">Post Title <span style="color: #dc3545;">*</span></label>
-            <input type="text" id="title" name="title" value="<%= post && post.title ? post.title : '' %>" required maxlength="200">
+          <label for="slug">URL Slug</label>
+          <input type="text" id="slug" name="slug" value="<%= post && post.slug ? post.slug : '' %>" maxlength="250" pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$" placeholder="auto-generated-if-blank">
+          <small class="muted">URL-friendly ID. Leave blank to auto-generate. Unique, lowercase, numbers, hyphens only.</small>
         </div>
 
         <div class="form-group">
-            <label for="slug">URL Slug</label>
-            <input type="text" id="slug" name="slug" value="<%= post && post.slug ? post.slug : '' %>" maxlength="250" pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$" placeholder="auto-generated-if-blank">
-            <small>URL-friendly ID. Leave blank to auto-generate. Unique, lowercase, numbers, hyphens only.</small>
+          <label for="blog-content-editor">Content <span style="color:#dc3545">*</span></label>
+          <textarea id="blog-content-editor" name="content" class="richtext-editor" style="visibility:hidden; min-height: 500px;" required minlength="50"><%= post && post.content ? post.content : '' %></textarea>
+          <small class="muted">Use the editor toolbar for formatting. <a href="https://github.com/johnbyers1218/fnd-automations-webapp/blob/main/AUTHORING_GUIDE.md" target="_blank" rel="noopener noreferrer">Authoring Guide</a></small>
         </div>
+      </div>
 
-        <div class="form-group">
-            <label for="authorDisplayName">Author Display Name (Public)</label>
-            <input type="text" id="authorDisplayName" name="authorDisplayName"
-                   value="<%= post && post.authorDisplayName ? post.authorDisplayName : '' %>"
-                   placeholder="Defaults to: <%= typeof currentAdminFullName !== 'undefined' ? currentAdminFullName : 'Your Name' %>"
-                   maxlength="100">
-            <small>Name shown publicly as the author. Leave blank to use: <%= typeof currentAdminFullName !== 'undefined' ? currentAdminFullName : 'your full name' %>.</small>
-        </div>
-
-        <%# ****** COVER IMAGE UPLOAD SECTION ****** %>
-        <div class="form-group">
-            <label for="coverImageFile">Upload Cover Image (for Featured Image)</label>
-            <input type="file" id="coverImageFile" name="coverImageFile" accept="image/jpeg,image/png,image/gif,image/webp">
-            <small>This will populate the 'Featured Image URL' below. Max 5MB. Overwrites existing URL if a new file is uploaded.</small>
-            <div id="coverImagePreviewContainer" style="margin-top: 10px;">
-                <% if (post && post.featuredImage) { %>
-                    <img src="<%= post.featuredImage %>" alt="Current Cover Image" style="max-width: 200px; max-height: 200px; border-radius: 4px; display: block;">
-                    <button type="button" id="removeCoverImageBtn" class="delete-btn" style="font-size: 0.8em; padding: 4px 8px; margin-top: 5px;">Remove Image</button>
-                <% } %>
+      <!-- Right: Settings Sidebar -->
+      <aside class="editor-sidebar" aria-label="Settings sidebar">
+        <details class="editor-card" open>
+          <summary>Publish</summary>
+          <div class="panel-body">
+            <div class="toggle-row">
+              <div>
+                <label class="switch">
+                  <input type="checkbox" id="isPublished" name="isPublished" value="true" <%= (post && post.isPublished) ? 'checked' : '' %>>
+                  <span class="slider"></span>
+                </label>
+                <label for="isPublished" class="toggle-label">Publish this post?</label>
+              </div>
             </div>
-            <div id="coverImageUploadStatus" style="font-size: 0.85em; margin-top: 5px;"></div>
-        </div>
+            <div class="muted" style="margin-bottom:0.5rem;">Make the post visible on the public blog.</div>
 
-        <div class="form-group">
-            <label for="featuredImage">Featured Image URL (Optional)</label>
-            <input type="url" id="featuredImage" name="featuredImage" value="<%= post && post.featuredImage ? post.featuredImage : '' %>" placeholder="Auto-populated by upload or enter URL manually">
-            <small>URL for the main post image. Can be auto-filled by "Upload Cover Image" above.</small>
-        </div>
-        <%# ****** END COVER IMAGE SECTION ****** %>
+            <div class="toggle-row">
+              <div>
+                <label class="switch">
+                  <input type="checkbox" id="isFeatured" name="isFeatured" value="true" <%= (post && post.isFeatured) ? 'checked' : '' %>>
+                  <span class="slider"></span>
+                </label>
+                <label for="isFeatured" class="toggle-label">Feature this post?</label>
+              </div>
+            </div>
+            <div class="muted" style="margin-bottom:0.75rem;">Featured posts can appear in spotlight sections.</div>
 
-        <div class="form-group">
-            <label for="blog-content-editor">Content <span style="color: #dc3545;">*</span></label>
-            <textarea id="blog-content-editor" name="content" class="richtext-editor" style="visibility: hidden; min-height: 500px;" required minlength="50"><%= post && post.content ? post.content : '' %></textarea>
-            <small>Use the editor toolbar for formatting.</small>
-        </div>
+            <div class="form-group" style="margin-top:0.5rem;">
+              <label for="authorDisplayName">Author Display Name (Public)</label>
+              <input type="text" id="authorDisplayName" name="authorDisplayName" value="<%= post && post.authorDisplayName ? post.authorDisplayName : '' %>" placeholder="Defaults to: <%= typeof currentAdminFullName !== 'undefined' ? currentAdminFullName : 'Your Name' %>" maxlength="100">
+              <small class="muted">Leave blank to use: <%= typeof currentAdminFullName !== 'undefined' ? currentAdminFullName : 'your full name' %>.</small>
+            </div>
 
-         <div class="form-group">
-            <label for="excerpt">Excerpt / Summary (Optional)</label>
-            <textarea id="excerpt" name="excerpt" rows="3" maxlength="500"><%= post && post.excerpt ? post.excerpt : '' %></textarea>
-            <small>Short summary for blog listing (max 500 chars).</small>
-        </div>
+            <% if (editing && typeof post !== 'undefined') { %>
+            <div class="form-group" style="margin-top:0.5rem;">
+              <label>View Count</label>
+              <input type="text" value="<%= typeof post.viewCount !== 'undefined' ? post.viewCount : 0 %>" readonly>
+              <small class="muted">Automatically increments on public views.</small>
+            </div>
+            <% } %>
+          </div>
+        </details>
 
-        <div class="form-group">
-            <label for="tags">Tags (Optional)</label>
-            <input type="text" id="tags" name="tags" value="<%= post && post.tags ? (Array.isArray(post.tags) ? post.tags.join(', ') : post.tags) : '' %>" placeholder="e.g., ai, automation, business">
-            <small>Comma-separated list of relevant tags (lowercase).</small>
-        </div>
+        <details class="editor-card" open>
+          <summary>Categories</summary>
+          <div class="panel-body">
+            <div class="form-group">
+              <label for="categories" class="muted" style="display:block; margin-bottom:0.25rem;">Select one or more categories</label>
+              <select id="categories" name="categories" multiple size="6">
+                <% if (typeof categories !== 'undefined' && categories && categories.length) { %>
+                  <% const selected = new Set((post && post.categories ? post.categories.map(String) : [])); %>
+                  <% categories.forEach(c => { %>
+                    <option value="<%= c._id %>" <%= selected.has(String(c._id)) ? 'selected' : '' %>><%= c.name %></option>
+                  <% }) %>
+                <% } else { %>
+                  <option disabled>No categories yet. Create in Admin > Categories.</option>
+                <% } %>
+              </select>
+              <small class="muted">Search and select; selected items appear as removable pills.</small>
+            </div>
+          </div>
+        </details>
 
-        <div class="form-group">
-            <input type="checkbox" id="isPublished" name="isPublished" value="true" <%= (post && post.isPublished) ? 'checked' : '' %> style="width: auto; margin-right: 10px; vertical-align: middle;">
-            <label for="isPublished" class="checkbox-label" style="display: inline-block; margin-bottom: 0;">Publish this post?</label>
-            <small>Check to make the post visible on the public blog.</small>
-        </div>
+        <details class="editor-card" open>
+          <summary>Featured Image</summary>
+          <div class="panel-body">
+            <div class="form-group">
+              <label for="coverImageFile">Upload Cover Image</label>
+              <input type="file" id="coverImageFile" name="coverImageFile" accept="image/jpeg,image/png,image/gif,image/webp">
+              <small class="muted">Populates the Featured Image URL below. Max 5MB.</small>
+              <div id="coverImagePreviewContainer" class="image-preview" style="margin-top:10px;">
+                <% if (post && post.featuredImage) { %>
+                  <img src="<%= post.featuredImage %>" alt="Current Cover Image">
+                  <button type="button" id="removeCoverImageBtn" class="btn btn-danger" style="margin-top:6px;">Remove Image</button>
+                <% } %>
+              </div>
+              <div id="coverImageUploadStatus" class="muted" style="margin-top:6px;"></div>
+            </div>
+            <div class="form-group">
+              <label for="featuredImage">Featured Image URL (Optional)</label>
+              <input type="url" id="featuredImage" name="featuredImage" value="<%= post && post.featuredImage ? post.featuredImage : '' %>" placeholder="Auto-populated by upload or enter URL manually">
+            </div>
+          </div>
+        </details>
 
-        <div class="form-actions">
-            <button type="submit" class="submit-btn cta-button primary-btn">
-                <i class="fas fa-save" style="margin-right: 8px;"></i> <%= editing ? 'Update Post' : 'Save New Post' %>
-            </button>
-             <% if (editing && post && post.isPublished && post.slug) { %>
-                 <a href="/blog/<%= post.slug %>" target="_blank" class="cta-button secondary-btn" style="margin-left: 1rem;">
-                     <i class="fas fa-eye" style="margin-right: 8px;"></i> View Live
-                 </a>
-             <% } %>
-            <a href="/admin/blog" class="cancel-btn" style="margin-left: 1rem; background-color: #6c757d; color: white;">Cancel</a>
-        </div>
-    </form>
+        <details class="editor-card" open>
+          <summary>Excerpt</summary>
+          <div class="panel-body">
+            <div class="form-group">
+              <label for="excerpt">Excerpt / Summary <span style="color:#dc3545">*</span></label>
+              <textarea id="excerpt" name="excerpt" rows="4" maxlength="250" required oninput="document.getElementById('excerptCounter').textContent = this.value.length + '/250'"><%= post && post.excerpt ? post.excerpt : '' %></textarea>
+              <div class="muted" style="display:flex;justify-content:space-between;">
+                <small>Short summary for blog listing (max 250 chars).</small>
+                <small id="excerptCounter"><%= post && post.excerpt ? post.excerpt.length : 0 %>/250</small>
+              </div>
+            </div>
+          </div>
+        </details>
+      </aside>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save"></i> <%= editing ? 'Update Post' : 'Save New Post' %>
+      </button>
+      <% if (editing && post && post.isPublished && post.slug) { %>
+        <a href="/blog/<%= post.slug %>" target="_blank" class="btn btn-secondary-outline">
+          <i class="fas fa-eye"></i> View Live
+        </a>
+      <% } %>
+      <a href="/admin/blog" class="btn btn-secondary-outline">Cancel</a>
+    </div>
+  </form>
 </div>
 
 <script src="https://cdn.tiny.cloud/1/<%= typeof tinymceApiKey !== 'undefined' ? tinymceApiKey : 'no-api-key' %>/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<!-- Self-hosted Choices.js CSS/JS for enhanced categories multi-select -->
+<link rel="stylesheet" href="/vendor/choices/choices.min.css" />
+<script src="/vendor/choices/choices.min.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     // --- TinyMCE Initialization ---
@@ -111,8 +203,15 @@ document.addEventListener('DOMContentLoaded', () => {
             selector: 'textarea#blog-content-editor',
             promotion: false,
             plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount codesample',
-            toolbar: 'undo redo | blocks | bold italic underline strikethrough | link image media table | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | code codesample | preview fullscreen | help',
-            content_style: 'body { font-family:Montserrat,Arial,sans-serif; font-size:16px; line-height: 1.7; color: #ccc; background-color: #2d2d2d; } a { color: #00a8e8; } code { background-color: rgba(255,255,255,0.1); padding: 0.1em 0.3em; border-radius: 3px; } pre code { background-color: transparent; padding: 0;}',
+            toolbar: 'undo redo | blocks | bold italic underline strikethrough | link image media table | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | styles | code codesample | preview fullscreen | help',
+            content_style: 'body { font-family:Montserrat,Arial,sans-serif; font-size:16px; line-height: 1.7; color: #ccc; background-color: #2d2d2d; } a { color: #00a8e8; } code { background-color: rgba(255,255,255,0.1); padding: 0.1em 0.3em; border-radius: 3px; } pre code { background-color: transparent; padding: 0;} .callout,.info,.warning,.tip{padding:1rem 1.125rem;border-radius:.5rem;margin:1rem 0;border:1px solid transparent}.callout{background:rgba(0,168,232,.08);border-color:rgba(0,168,232,.35)}.info{background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.35)}.warning{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.4)}.tip{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.4)} .callout-title{font-weight:700;margin-bottom:.25rem}',
+            style_formats: [
+                { title: 'Callout', block: 'div', classes: 'callout', wrapper: true },
+                { title: 'Info', block: 'div', classes: 'info', wrapper: true },
+                { title: 'Warning', block: 'div', classes: 'warning', wrapper: true },
+                { title: 'Tip', block: 'div', classes: 'tip', wrapper: true },
+                { title: 'Callout Title', inline: 'strong', classes: 'callout-title' }
+            ],
             height: 600,
             menubar: false,
             statusbar: true,
@@ -160,6 +259,23 @@ document.addEventListener('DOMContentLoaded', () => {
              if(editorTextarea) { editorTextarea.style.visibility = 'visible'; editorTextarea.placeholder = "Error loading Rich Text Editor."; }
         }
     }, 5000);
+
+    // --- Enhanced Categories (Choices.js) ---
+    const categoriesSelect = document.getElementById('categories');
+    if (categoriesSelect && window.Choices) {
+      try {
+        const choices = new Choices(categoriesSelect, {
+          removeItemButton: true,
+          shouldSort: false,
+          searchPlaceholderValue: 'Search categories…',
+          placeholder: true,
+          placeholderValue: 'Select categories',
+          itemSelectText: ''
+        });
+        // Keep reference if needed later
+        window.__categoriesChoices = choices;
+      } catch (e) { console.warn('Choices.js init failed:', e); }
+    }
 
     // --- Cover Image Upload Logic ---
     const coverImageFileInput = document.getElementById('coverImageFile');
@@ -225,7 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (response.ok && result.success && result.location) {
                     featuredImageInput.value = result.location;
-                    previewContainer.innerHTML = `<img src="${result.location}" alt="Cover Image Preview" style="max-width: 200px; max-height: 200px; border-radius: 4px; display: block;"> <button type="button" id="newRemoveCoverImageBtn" class="delete-btn" style="font-size: 0.8em; padding: 4px 8px; margin-top: 5px;">Remove Image</button>`;
+                    previewContainer.innerHTML = `<img src="${result.location}" alt="Cover Image Preview"> <button type="button" id="newRemoveCoverImageBtn" class="btn btn-danger" style="margin-top:6px;">Remove Image</button>`;
                     uploadStatusDiv.textContent = 'Upload successful!';
                     uploadStatusDiv.style.color = 'var(--success-color)';
                     attachRemoveListenerToNewButton(); // Attach listener for the new button
@@ -242,9 +358,13 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         if (!form) console.warn("Blog form with ID 'blogPostForm' not found for cover image uploader.");
         if (!coverImageFileInput) console.warn("File input 'coverImageFile' for blog not found.");
-        // ... add more checks if needed
+        // ...existing code...
     }
 });
+</script>
+
+<script>
+// no-op: curated tag chips removed in favor of categories
 </script>
 
 <%- include('../partials/footer') %>

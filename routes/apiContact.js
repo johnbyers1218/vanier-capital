@@ -1,12 +1,26 @@
 // routes/apiContact.js (ESM Version - UPDATED to include optional scheduling)
 
-import express from 'express';
-import { body, validationResult } from 'express-validator';
-import Contact from '../models/Contacts.js';
-import { logger } from '../config/logger.js';
-import { DateTime } from 'luxon'; // For date parsing if needed
+const express = require('express');
+const { body, validationResult } = require('express-validator');
+const Contact = require('../models/Contacts.js');
+const { logger } = require('../config/logger.js');
+const { DateTime } = require('luxon'); // For date parsing if needed
 
 const router = express.Router();
+
+// Back-compat shim: allow firstName/lastName by combining into name before validation
+router.use('/contact', (req, res, next) => {
+    try {
+        if (req.method === 'POST') {
+            const { name, firstName, lastName } = req.body || {};
+            if (!name && (firstName || lastName)) {
+                const combined = [firstName, lastName].filter(Boolean).join(' ').trim();
+                if (combined) req.body.name = combined;
+            }
+        }
+    } catch {}
+    next();
+});
 
 // Combined validation rules
 const contactAndScheduleValidationRules = [
@@ -61,4 +75,4 @@ router.post('/contact', contactAndScheduleValidationRules, async (req, res, next
     }
 });
 
-export default router;
+module.exports = router;

@@ -5,72 +5,86 @@
 <!-- ======================================== -->
 <!-- Site Footer                          -->
 <!-- ======================================== -->
-<footer>
+<footer class="bg-[#1f2937] text-gray-300 mt-16">
     <!-- Container for consistent padding and max-width -->
-    <div class="container">
-        <div class="footer-content"> <!-- Grid layout for footer sections -->
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
 
             <!-- Footer Section 1: Logo & Brand -->
-            <div class="footer-section footer-logo">
-                <div class="logo">
-                    <%# OLD Text Logo: <a href="/index" title="FND Automations Home">FND Automations</a> %>
-                    <%# NEW Image Logo: %>
-                    <a href="/" title="FND Automations Home">
-                        <img src="/images/FND_LOGO_SVG_WHITE.svg" alt="FND Automations Logo" id="header-logo">
-                    </a>
-                </div>
-                <p style="color: var(--gray-text); font-size: 0.9rem; line-height: 1.6;">
+            <div>
+                <a href="/" title="FND Automations Home" class="inline-flex items-center">
+                    <img src="/images/FND_LOGO_SVG_WHITE.svg" alt="FND Automations Logo" class="h-12 md:h-14 w-auto" />
+                </a>
+                <p class="mt-4 text-sm text-gray-400 leading-6">
                     Empowering businesses through innovative AI and process automation solutions designed for efficiency and growth.
                 </p>
                  <!-- Optional: Add mission snippet or tagline -->
             </div>
 
             <!-- Footer Section 2: Quick Links -->
-            <div class="footer-section footer-links">
-                <h3>Quick Links</h3>
-                <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/services">Services</a></li>
-                    <li><a href="/projects">Projects</a></li>
-                    <li><a href="/testimonials">Testimonials</a></li>
-                    <li><a href="/about">About Us</a></li>
-                    <li><a href="/blog">Blog</a></li>
-                    <li><a href="/contact">Contact</a></li>
-                     <li><a href="/privacy-policy">Privacy Policy</a></li>
-                     <li><a href="/terms-of-service">Terms of Service</a></li>
+            <div class="footer-col footer-col--links">
+                <h3 class="text-gray-100 font-bold tracking-wide mb-4 footer-col-title">Quick Links</h3>
+                <ul class="space-y-2 text-sm">
+                    <li><a class="text-gray-400 hover:text-white hover:underline" href="/">Home</a></li>
+                    <li><a class="text-gray-400 hover:text-white hover:underline" href="/services">Services</a></li>
+                    <li><a class="text-gray-400 hover:text-white hover:underline" href="/projects">Projects</a></li>
+                    <li><a class="text-gray-400 hover:text-white hover:underline" href="/testimonials">Testimonials</a></li>
+                    <li><a class="text-gray-400 hover:text-white hover:underline" href="/about">About</a></li>
                 </ul>
             </div>
 
-            <!-- Footer Section 3: Contact Info & Social -->
-            <div class="footer-section footer-contact">
-                <h3>Get In Touch</h3>
-                <p>
-                    <i class="fas fa-envelope fa-fw" style="color: var(--primary-color); margin-right: 8px;"></i>
-                    <a href="mailto:logan.mayfield@fndautomations.com" style="color: inherit; text-decoration: none;">logan.mayfield@fndautomations.com</a>
-                </p>
-                <p>
-                     <i class="fas fa-phone fa-fw" style="color: var(--primary-color); margin-right: 8px;"></i>
-                     <a href="tel:+11234567890" style="color: inherit; text-decoration: none;">(209) 402-0089</a> <%# Update phone # %>
-                 </p>
-                                <!-- Social Media Icons -->
-                <div class="social-icons" style="margin-top: 1.5rem;"> <!-- Added margin-top -->
-                     <!-- <a href="https://www.facebook.com/yourprofile" target="_blank" rel="noopener noreferrer" aria-label="FND Automations on Facebook" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                     <a href="https://twitter.com/yourprofile" target="_blank" rel="noopener noreferrer" aria-label="FND Automations on Twitter" title="Twitter"><i class="fab fa-twitter"></i></a> -->
-                     <a href="https://www.instagram.com/fndautomations" target="_blank" rel="noopener noreferrer" aria-label="FND Automations on Instagram" title="Instagram"><i class="fab fa-instagram"></i></a>
-                     <!-- <a href="https://www.linkedin.com/in/yourprofile" target="_blank" rel="noopener noreferrer" aria-label="FND Automations on LinkedIn" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a> -->
-                     <a href="https://www.tiktok.com/@fnd.automations?lang=en" target="_blank" rel="noopener noreferrer" aria-label="FND Automations on TikTok" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-                     <!-- Add other relevant social media links (GitHub?) -->
+            <!-- Footer Section 3: Resources -->
+            <div class="footer-col footer-col--resources">
+                <h3 class="text-gray-100 font-bold tracking-wide mb-4 footer-col-title">Resources</h3>
+                <ul class="space-y-2 text-sm">
+                    <li><a class="text-gray-400 hover:text-white hover:underline" href="/blog">Blog</a></li>
+                    <li><a class="text-gray-400 hover:text-white hover:underline" href="/contact">Contact</a></li>
+                    <li><a class="text-gray-400 hover:text-white hover:underline" href="/privacy-policy">Privacy Policy</a></li>
+                    <li><a class="text-gray-400 hover:text-white hover:underline" href="/terms-of-service">Terms of Service</a></li>
+                </ul>
+            </div>
+
+            <!-- Footer Section 4: Newsletter Signup -->
+            <div class="footer-newsletter">
+                <h3 class="text-gray-100 font-bold tracking-wide mb-2 footer-col-title">Stay Ahead</h3>
+                <p class="text-sm text-gray-400 mb-3">Get the latest in AI and automation, straight to your inbox.</p>
+                <form class="signup-form" onsubmit="return false;">
+                    <label for="footerNewsletterEmail" class="sr-only">Email address</label>
+                    <div class="footer-newsletter-row">
+                        <input id="footerNewsletterEmail" type="email" name="email" placeholder="Enter your email" required />
+                        <button type="submit" class="cta-button primary-btn">Subscribe</button>
+                    </div>
+                    <p class="form-message" aria-live="polite" hidden></p>
+                </form>
+
+                <!-- Contact & Social under newsletter for convenience -->
+                <div class="contact-block mt-8">
+                    <h4 class="text-gray-100 font-semibold mb-2 text-sm">Get In Touch</h4>
+                    <p class="text-sm flex items-center gap-2 contact-row">
+                        <i class="fas fa-envelope fa-fw contact-icon text-[var(--color-primary)]"></i>
+                        <a href="mailto:logan.mayfield@fndautomations.com" class="hover:text-white hover:underline">logan.mayfield@fndautomations.com</a>
+                    </p>
+                    <p class="text-sm mt-2 flex items-center gap-2 contact-row">
+                        <i class="fas fa-phone fa-fw contact-icon text-[var(--color-primary)]"></i>
+                        <a href="tel:+11234567890" class="hover:text-white hover:underline">(209) 402-0089</a>
+                    </p>
                 </div>
             </div>
 
         </div> <!-- /.footer-content -->
      </div> <!-- /.container -->
 
-     <!-- Footer Bottom Bar -->
-     <div class="footer-bottom">
-         <!-- Copyright text with dynamic year -->
-         <p>© <span id="current-year">2025</span> FND Automations. All rights reserved.</p>
-     </div>
+         <!-- Footer Bottom Bar (Sub-Footer) -->
+         <div class="border-t border-gray-700">
+             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+                 <p class="text-sm text-gray-400">© <span id="current-year">2025</span> FND Automations. All Rights Reserved.</p>
+                 <div class="flex items-center gap-5 text-2xl md:text-3xl footer-social">
+                        <a href="https://www.instagram.com/fndautomations" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.tiktok.com/@fnd.automations?lang=en" target="_blank" rel="noopener noreferrer" aria-label="TikTok" class="text-gray-400 hover:text-white"><i class="fa-brands fa-tiktok"></i></a>
+                        <a href="https://www.youtube.com/@fndautomations" target="_blank" rel="noopener noreferrer" aria-label="YouTube" class="text-gray-400 hover:text-white"><i class="fab fa-youtube"></i></a>
+                 </div>
+             </div>
+         </div>
  </footer>
  <!-- End Site Footer -->
 
@@ -95,19 +109,57 @@
  const navLinks = document.querySelector('.nav-links');
  const bodyForNav = document.body;
 
- if(hamburger && navLinks) {
-     if (!navLinks.id) { navLinks.id = 'nav-links-list'; } // Ensure ID for aria
+ if (hamburger && navLinks) {
+     if (!navLinks.id) navLinks.id = 'nav-links-list'; // Ensure ID for aria
      hamburger.setAttribute('aria-controls', navLinks.id);
      hamburger.setAttribute('aria-expanded', 'false');
 
+     // Ensure default mobile state is hidden
+     if (window.matchMedia('(max-width: 767px)').matches) {
+         navLinks.classList.add('hidden');
+     }
+
      hamburger.addEventListener('click', () => {
-         const isActive = navLinks.classList.toggle('active');
-         hamburger.setAttribute('aria-expanded', isActive);
-         bodyForNav.classList.toggle('nav-active', isActive);
+         const nowOpen = navLinks.classList.toggle('hidden');
+         // If hidden returned true, we just added hidden -> menu closed
+         const isOpen = !nowOpen;
+         if (isOpen) {
+             navLinks.classList.remove('hidden');
+             navLinks.classList.add('flex', 'flex-col', 'gap-4', 'mt-4');
+         } else {
+             navLinks.classList.add('hidden');
+             navLinks.classList.remove('flex', 'flex-col', 'gap-4', 'mt-4');
+         }
+         hamburger.setAttribute('aria-expanded', String(isOpen));
+         bodyForNav.classList.toggle('nav-active', isOpen);
      });
  } else {
-      console.warn('Hamburger menu elements (.hamburger, .nav-links) not found for inline script.');
+     console.warn('Hamburger menu elements (.hamburger, .nav-links) not found for inline script.');
  }
+</script>
+
+<!-- Sticky header translucency and blur on scroll -->
+<script>
+ (function(){
+     const header = document.getElementById('site-header');
+     if (!header) return;
+     const apply = () => {
+         const y = window.scrollY || document.documentElement.scrollTop;
+         if (y > 2) {
+             header.style.backgroundColor = 'rgba(255,255,255,0.85)';
+             header.style.backdropFilter = 'blur(12px)';
+             header.style.boxShadow = '0 6px 20px rgba(0,0,0,0.06)';
+             header.style.borderBottom = 'none';
+         } else {
+             header.style.backgroundColor = 'transparent';
+             header.style.backdropFilter = 'blur(0px)';
+             header.style.boxShadow = 'none';
+             header.style.borderBottom = 'none';
+         }
+     };
+     apply();
+     window.addEventListener('scroll', apply, { passive: true });
+ })();
 </script>
 
 <!-- Optional: Analytics Script (Conditional for Production) -->

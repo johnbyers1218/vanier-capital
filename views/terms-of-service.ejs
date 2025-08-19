@@ -5,18 +5,16 @@
     path: '/terms-of-service'
 }) %>
 
-<section class="page-header">
+<section class="legal-hero">
     <div class="container">
         <h1>Terms of Service</h1>
-        <div class="breadcrumbs">
-            <a href="/">Home</a> <span class="separator">/</span> <span class="current">Terms of Service</span>
-        </div>
+        <p class="legal-updated">Last Updated: <%= typeof lastUpdated !== 'undefined' ? lastUpdated : 'May 15, 2025' %></p>
     </div>
 </section>
 
 <section class="section legal-content">
-    <div class="container blog-post-content"> <%# Reuse blog content styling %>
-        <p><strong>Last Updated: May 15, 2025</strong></p>
+    <div class="container legal-doc">
+        <article class="legal-main" id="legal-main">
 
         <p>Please read these Terms of Service ("Terms", "Terms of Service") carefully before using the fndautomations.com website (the "Service") operated by FND Automations ("us", "we", or "our").</p>
         <p>Your access to and use of the Service is conditioned upon your acceptance of and compliance with these Terms. These Terms apply to all visitors, users and others who wish to access or use the Service. By accessing or using the Service you agree to be bound by these Terms. If you disagree with any part of the terms then you do not have permission to access the Service.</p>
@@ -63,12 +61,27 @@
         <p>We reserve the right to withdraw or amend our Service, and any service or material we provide via the Service, in our sole discretion without notice. We will not be liable if for any reason all or any part of the Service is unavailable at any time or for any period.</p>
         <p>We may revise and update these Terms of Service from time to time in our sole discretion. All changes are effective immediately when we post them. Your continued use of the Service following the posting of revised Terms of Service means that you accept and agree to the changes. You are expected to check this page frequently so you are aware of any changes, as they are binding on you.</p>
 
-        <h2>8. Contact Us</h2>
-        <p>If you have any questions about these Terms, please contact us:</p>
-        <ul>
-            <li>By email: logan.mayfield@fndautomations.com</li>
-            <li>By visiting this page on our website: <a href="/contact">fndautomations.com/contact</a></li>
-        </ul>
+                <section id="contact-us" class="legal-cta" aria-labelledby="legal-cta-title">
+                    <div class="cta-head">
+                        <svg class="cta-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/>
+                            <path fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" d="M9.09 9a3 3 0 1 1 4.21 2.74c-.86.4-1.3.72-1.3 1.76V14"/>
+                            <circle cx="12" cy="17" r=".9" fill="currentColor"/>
+                        </svg>
+                        <h2 id="legal-cta-title">Need Further Clarification?</h2>
+                    </div>
+                    <p>Our team is ready to provide the information you need.</p>
+                    <div class="cta-actions">
+                        <a href="/contact" class="btn-primary" aria-label="Contact our team about terms questions">Contact Our Team</a>
+                    </div>
+                </section>
+        </article>
+    <aside class="legal-toc toc-numbered" aria-label="Secondary">
+            <div class="toc-title">On this page</div>
+            <nav aria-label="Table of contents">
+                <ul id="legal-toc-list"></ul>
+            </nav>
+        </aside>
     </div>
 </section>
 

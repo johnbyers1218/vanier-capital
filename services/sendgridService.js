@@ -1,0 +1,126 @@
+// services/sendgridService.js
+const { logger } = require('../config/logger.js');
+const ejs = require('ejs');
+const path = require('path');
+
+function getEnv(name) {
+  return (process.env[name] || '').toString().trim();
+}
+
+let sgMail = null;
+async function ensureConfigured() {
+  if (sgMail) return true;
+  try {
+    sgMail = require('@sendgrid/mail');
+    const key = getEnv('SENDGRID_API_KEY');
+    if (!key) {
+      logger.warn('[SendGrid] SENDGRID_API_KEY not set; email sending disabled.');
+      return false;
+    }
+    sgMail.setApiKey(key);
+    return true;
+  } catch (err) {
+    logger.warn('[SendGrid] Failed to load @sendgrid/mail; email sending disabled.', { message: err?.message });
+    return false;
+  }
+}
+
+async function sendEmail(msg) {
+  if (process.env.NODE_ENV === 'test') {
+    logger.info('[SendGrid] Test mode: skipping actual send.', { subject: msg?.subject });
+    return { ok: true };
+  }
+  const ok = await ensureConfigured();
+  if (!ok || !sgMail) {
+    return { ok: false, error: 'SendGrid not configured' };
+  }
+  try {
+    await sgMail.send(msg);
+    return { ok: true };
+  } catch (err) {
+    logger.error('[SendGrid] send failed', { message: err?.message });
+    return { ok: false, error: err?.message };
+  }
+}
+
+async function sendTeamNotification(inquiry) {
+  const to = getEnv('CONTACT_TEAM_EMAIL') || getEnv('SENDGRID_FROM_EMAIL');
+  const from = getEnv('SENDGRID_FROM_EMAIL');
+  const fromName = getEnv('SENDGRID_FROM_NAME') || 'FND Automations';
+  if (!to || !from) {
+    const missing = [!to ? 'CONTACT_TEAM_EMAIL|SENDGRID_FROM_EMAIL' : null, !from ? 'SENDGRID_FROM_EMAIL' : null]
+      .filter(Boolean)
+      .join(', ');
+    logger.warn('[SendGrid] Missing configuration for team notification.', { missing });
+    return { ok: false, error: `Missing team or from email config (${missing})` };
+  }
+  const subject = 'New Contact Form Submission';
+  const text = `New inquiry received:\n\n`+
+    `Name: ${inquiry.name || ''}\n`+
+    `Email: ${inquiry.email || ''}\n`+
+    `Phone: ${inquiry.phone || ''}\n`+
+    `Subject: ${inquiry.subject || ''}\n`+
+    `Message:\n${inquiry.message || ''}\n`+
+    `Received At: ${new Date(inquiry.createdAt || Date.now()).toLocaleString()}`;
+  const html = text.replace(/\n/g, '<br/>');
+  return sendEmail({
+    to,
+    from: { email: from, name: fromName },
+    subject,
+    text,
+    html,
+  });
+}
+
+async function sendUserConfirmation(inquiry) {
+  const to = (inquiry && inquiry.email) ? String(inquiry.email).trim() : '';
+  const from = getEnv('SENDGRID_FROM_EMAIL');
+  const fromName = getEnv('SENDGRID_FROM_NAME') || 'FND Automations';
+  if (!to || !from) {
+    const missing = [!to ? 'recipient email' : null, !from ? 'SENDGRID_FROM_EMAIL' : null]
+      .filter(Boolean)
+      .join(', ');
+    logger.warn('[SendGrid] Missing configuration for user confirmation.', { missing });
+    return { ok: false, error: `Missing recipient or from email (${missing})` };
+  }
+  const subject = "We've received your message";
+  const text = `Hi ${inquiry.name || 'there'},\n\n`+
+    `Thanks for reaching out to FND Automations — we’ve received your message and a team member will reply soon.\n\n`+
+    `Summary:\n`+
+    `Subject: ${inquiry.subject || ''}\n`+
+    `Message: ${inquiry.message || ''}\n\n`+
+    `— FND Automations`;
+  let html = text.replace(/\n/g, '<br/>');
+  try {
+    const viewsDir = path.resolve(process.cwd(), 'views');
+    const templatePath = path.join(viewsDir, 'emails', 'contact-confirmation.ejs');
+    const siteUrl = getEnv('PUBLIC_SITE_URL') || getEnv('CORS_ORIGIN') || '';
+    const logoUrl = siteUrl ? `${siteUrl.replace(/\/$/, '')}/images/FND_LOGO_SVG_BLACK.svg` : '';
+    html = await ejs.renderFile(templatePath, {
+      name: inquiry.name || 'there',
+      email: inquiry.email || '',
+      phone: inquiry.phone || '',
+      subjectText: inquiry.subject || '',
+      messageText: inquiry.message || '',
+      siteUrl,
+      logoUrl,
+      supportEmail: from,
+      // Helpful links
+      blogUrl: siteUrl ? `${siteUrl.replace(/\/$/, '')}/blog` : '',
+      caseStudiesUrl: siteUrl ? `${siteUrl.replace(/\/$/, '')}/projects` : '',
+      servicesUrl: siteUrl ? `${siteUrl.replace(/\/$/, '')}/services` : '',
+      contactUrl: siteUrl ? `${siteUrl.replace(/\/$/, '')}/contact` : '',
+    }, { async: true });
+  } catch (tplErr) {
+    logger.warn('[SendGrid] Failed to render contact-confirmation template; using text fallback HTML.', { message: tplErr?.message });
+  }
+  return sendEmail({
+    to,
+    from: { email: from, name: fromName },
+    subject,
+    text,
+    html,
+  });
+}
+
+module.exports = { sendTeamNotification, sendUserConfirmation };
