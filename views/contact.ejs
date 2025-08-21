@@ -58,7 +58,7 @@
                                     </ul>
                                 </div>
                                 <div class="path-actions">
-                                    <a href="https://calendar.google.com/calendar/appointments/schedules/AcZssZ335AVuGBH_NJglKI3iiThB8cP6sHwnzkeg6aJjyEGEKEVJkIQuUCWFOaL1UpBPp_YbVAfTY4dI?gv=true" class="cta-button primary-btn" target="_blank" rel="noopener">Find a Time</a>
+                                    <button type="button" id="openScheduleModal" class="cta-button primary-btn">Find a Time</button>
                                 </div>
                 </div>
             </div>
@@ -113,6 +113,63 @@
         </div>
     </div>
 </section>
+
+<!-- Scheduling Modal -->
+<div id="scheduleModal" class="schedule-modal" aria-hidden="true" role="dialog" aria-labelledby="scheduleModalTitle">
+    <div class="schedule-modal__backdrop" data-close-modal></div>
+    <div class="schedule-modal__dialog" role="document">
+        <div class="schedule-modal__header">
+            <h2 id="scheduleModalTitle">Book a Consultation</h2>
+            <button type="button" class="schedule-modal__close" aria-label="Close" data-close-modal>&times;</button>
+        </div>
+        <div class="schedule-modal__body">
+            <iframe id="scheduleIframe" title="Scheduling" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+        </div>
+    </div>
+</div>
+
+<style>
+    .schedule-modal { position:fixed; inset:0; display:none; z-index:12000; }
+    .schedule-modal.is-open { display:block; }
+    .schedule-modal__backdrop { position:absolute; inset:0; background:rgba(0,0,0,.55); backdrop-filter:blur(2px); }
+    .schedule-modal__dialog { position:relative; margin:4vh auto; width:min(1100px,95%); height:88vh; background:#0f172a; border:1px solid #1e293b; border-radius:14px; box-shadow:0 10px 40px -5px rgba(0,0,0,.6); display:flex; flex-direction:column; }
+    .schedule-modal__header { padding:12px 18px; border-bottom:1px solid #1e293b; display:flex; align-items:center; justify-content:space-between; }
+    .schedule-modal__header h2 { font-size:1rem; font-weight:600; color:#f1f5f9; }
+    .schedule-modal__close { background:transparent; border:none; color:#94a3b8; font-size:1.6rem; line-height:1; cursor:pointer; padding:4px 8px; border-radius:6px; }
+    .schedule-modal__close:hover { color:#fff; background:#334155; }
+    .schedule-modal__body { flex:1; padding:0; }
+    .schedule-modal__body iframe { width:100%; height:100%; border:0; background:#fff; border-bottom-left-radius:14px; border-bottom-right-radius:14px; }
+    @media (max-width: 680px) { .schedule-modal__dialog { height:94vh; margin:2vh auto; } .schedule-modal__header h2 { font-size:.95rem; } }
+</style>
+
+<script>
+    (function(){
+        const openBtn = document.getElementById('openScheduleModal');
+        const modal = document.getElementById('scheduleModal');
+        const iframe = document.getElementById('scheduleIframe');
+        const CLOSE_ATTR = '[data-close-modal]';
+        const scheduleURL = 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ335AVuGBH_NJglKI3iiThB8cP6sHwnzkeg6aJjyEGEKEVJkIQuUCWFOaL1UpBPp_YbVAfTY4dI?gv=true&embed=true';
+        function open(){
+            if(!modal.classList.contains('is-open')){
+                iframe.src = scheduleURL;
+                modal.classList.add('is-open');
+                document.body.style.overflow='hidden';
+                prevActive = document.activeElement; 
+                modal.querySelector('.schedule-modal__close').focus();
+            }
+        }
+        function close(){
+            modal.classList.remove('is-open');
+            document.body.style.overflow='';
+            iframe.removeAttribute('src');
+            if(prevActive) try{ prevActive.focus(); }catch(_){ }
+        }
+        let prevActive=null;
+        openBtn?.addEventListener('click', open);
+        modal?.addEventListener('click', (e)=>{ if(e.target.matches(CLOSE_ATTR)) close(); });
+        window.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && modal.classList.contains('is-open')) close(); });
+    })();
+</script>
 
 <!-- Contact Information Panel -->
 <section class="section contact-info-panel">

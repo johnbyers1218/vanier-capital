@@ -87,9 +87,12 @@
             <small>Enter a comma-separated list. Example: node.js, express, mongodb</small>
         </div>
 
+        <% const __projectDateISO = (project && project.projectDate) ? new Date(project.projectDate).toISOString().split('T')[0] : ''; %>
         <div class="form-group">
-            <label for="projectDate">Completion Date</label>
-            <input type="text" id="projectDate" name="projectDate" placeholder="Select a date" value="<%= project && project.projectDate ? new Date(project.projectDate).toISOString().split('T')[0] : '' %>">
+            <label for="projectDateDisplay">Completion Date</label>
+            <input type="hidden" id="projectDate" name="projectDate" value="<%= __projectDateISO %>">
+            <input type="text" id="projectDateDisplay" placeholder="Select a date" value="<%= __projectDateISO %>" readonly style="cursor:pointer; background:#1f2937; color:#e5e7eb;">
+            <small>The date the project was substantially completed.</small>
         </div>
 
         <div class="form-group">
@@ -175,7 +178,7 @@
                     </div>
                 <% } %>
             </div>
-            <button type="button" class="cta-button secondary-btn" id="addKeyResultBtn" style="margin-top:6px;">Add Result</button>
+            <button type="button" class="admin-btn admin-btn--ghost" id="addKeyResultBtn" style="margin-top:6px;">Add Result</button>
             <small>Displayed as "Measurable Impact" on the public page.</small>
         </div>
 
@@ -203,15 +206,17 @@
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="submit-btn cta-button primary-btn">
-                <i class="fas fa-save" style="margin-right: 8px;"></i> <%= editing ? 'Update Project' : 'Save New Project' %>
-            </button>
-            <% if (editing && project && project.isPubliclyVisible && project.slug) { %>
-                 <a href="/projects/<%= project.slug %>" target="_blank" class="cta-button secondary-btn" style="margin-left: 1rem;">
-                     <i class="fas fa-eye" style="margin-right: 8px;"></i> View Live
-                 </a>
-             <% } %>
-            <a href="/admin/projects" class="cancel-btn" style="margin-left: 1rem; background-color: #6c757d; color: white;">Cancel</a>
+            <div class="admin-btn-group">
+              <button type="submit" class="admin-btn">
+                  <i class="fas fa-save"></i> <%= editing ? 'Update Project' : 'Save New Project' %>
+              </button>
+              <% if (editing && project && project.isPubliclyVisible && project.slug) { %>
+                  <a href="/projects/<%= project.slug %>" target="_blank" class="admin-btn admin-btn--ghost">
+                      <i class="fas fa-eye"></i> View Live
+                  </a>
+              <% } %>
+              <a href="/admin/projects" class="admin-btn admin-btn--ghost" style="--btn-accent:#6b7280;"><i class="fas fa-times"></i> Cancel</a>
+            </div>
         </div>
     </form>
 </div>
@@ -221,9 +226,69 @@
 <!-- Choices.js for enhanced multi-selects -->
 <link rel="stylesheet" href="/vendor/choices/choices.min.css" />
 <script src="/vendor/choices/choices.min.js"></script>
+<!-- Override Choices.js styles for higher contrast (must come AFTER vendor CSS) -->
+<style>
+    /* Base input area */
+    .choices__inner { background:#ffffff; color:#111; border:1px solid #444; min-height:42px; }
+    .choices.is-disabled .choices__inner { background:#f3f4f6; color:#666; }
+    .choices__input { color:#111 !important; }
+
+    /* Dropdown list container */
+    .choices__list--dropdown { background:#ffffff; border:1px solid #444; }
+    .choices__list--dropdown .choices__item { color:#111 !important; font-weight:500; }
+    .choices__list--dropdown .choices__item.is-highlighted { background:#e5e7eb; color:#111 !important; }
+    .choices__list--dropdown .choices__item.is-selected { background:#2563eb; color:#fff !important; }
+    .choices__list--dropdown .choices__item.is-disabled { color:#9ca3af !important; }
+
+    /* Selected pills (multi select) */
+    .choices__list--multiple .choices__item { background:#2563eb; border:1px solid #1d4ed8; color:#fff; font-weight:500; }
+    .choices__list--multiple .choices__item.is-highlighted { background:#1d4ed8; border-color:#1e40af; }
+    .choices[data-type*="select-multiple"] .choices__button { border-left-color:rgba(255,255,255,0.5); }
+
+    /* Focus ring */
+    .choices.is-focused .choices__inner, .choices:focus .choices__inner { box-shadow:0 0 0 3px rgba(37,99,235,0.35); }
+
+    /* Dark mode safeguard: force light dropdown for readability if parent has dark bg */
+    body.dark .choices__inner, body.dark .choices__list--dropdown { background:#ffffff; color:#111; }
+    body.dark .choices__list--dropdown .choices__item.is-selected { background:#2563eb; color:#fff !important; }
+
+    /* Ensure scrollbar (if any) contrasts */
+    .choices__list--dropdown::-webkit-scrollbar { width:10px; }
+    .choices__list--dropdown::-webkit-scrollbar-track { background:#f3f4f6; }
+    .choices__list--dropdown::-webkit-scrollbar-thumb { background:#9ca3af; border-radius:5px; }
+    .choices__list--dropdown::-webkit-scrollbar-thumb:hover { background:#6b7280; }
+</style>
 <!-- Flatpickr for a consistent calendar UI (progressive enhancement) -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<!-- Fallback / override Flatpickr minimal styles (in case CDN CSS fails to load) -->
+<style>
+    .flatpickr-calendar { position:absolute; visibility:hidden; opacity:0; background:#1f2937; color:#e5e7eb; border:1px solid #374151; box-shadow:0 4px 16px rgba(0,0,0,.4); border-radius:8px; padding:6px 8px 10px; width:300px; z-index:9999; font-size:13px; line-height:1.2; }
+    .flatpickr-calendar.open { visibility:visible; opacity:1; transition:opacity .15s ease; }
+    .flatpickr-months { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+    .flatpickr-months .flatpickr-prev-month, .flatpickr-months .flatpickr-next-month { cursor:pointer; padding:4px 6px; border-radius:4px; user-select:none; }
+        .flatpickr-months .flatpickr-prev-month, .flatpickr-months .flatpickr-next-month { color:#f3f4f6; }
+        .flatpickr-months .flatpickr-prev-month:hover, .flatpickr-months .flatpickr-next-month:hover { background:#374151; color:#fff; }
+        .flatpickr-current-month { flex:1; text-align:center; font-weight:600; display:flex; gap:6px; align-items:center; justify-content:center; }
+        .flatpickr-current-month .flatpickr-monthDropdown-months,
+        .flatpickr-current-month input.cur-year { background:#111827; color:#f9fafb; border:1px solid #4b5563; border-radius:4px; padding:4px 6px; font-size:13px; font-weight:600; }
+        .flatpickr-current-month .flatpickr-monthDropdown-months { appearance:none; -webkit-appearance:none; cursor:pointer; }
+        .flatpickr-current-month .flatpickr-monthDropdown-months:focus,
+        .flatpickr-current-month input.cur-year:focus { outline:2px solid #2563eb; outline-offset:2px; }
+        .flatpickr-current-month input.cur-year { width:70px; }
+        .flatpickr-weekdays { display:grid; grid-template-columns:repeat(7,1fr); gap:0; }
+        .flatpickr-weekday { text-align:center; font-size:11px; font-weight:600; padding:2px 0 4px; color:#9ca3af; }
+        .flatpickr-days { width:100%; }
+        .dayContainer { display:grid; grid-template-columns:repeat(7,1fr); grid-auto-rows:34px; width:100%; }
+        .flatpickr-day { width:100%; height:34px; line-height:34px; text-align:center; cursor:pointer; border-radius:4px; margin:0; border:1px solid transparent; box-sizing:border-box; font-size:12px; }
+    .flatpickr-day:hover { background:#374151; }
+    .flatpickr-day.today { border-color:#3b82f6; }
+    .flatpickr-day.selected { background:#2563eb; color:#fff; border-color:#1d4ed8; }
+    .flatpickr-day.disabled, .flatpickr-day.nextMonthDay, .flatpickr-day.prevMonthDay { opacity:.35; cursor:not-allowed; }
+    .flatpickr-calendar.arrowTop:before, .flatpickr-calendar.arrowTop:after { display:none; }
+    /* Ensure container relative for appendTo positioning */
+    .form-group { position:relative; }
+</style>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const checkTinyMCE = setInterval(() => {
@@ -443,19 +508,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Flatpickr for Completion Date (keeps underlying value as YYYY-MM-DD)
-        const dateInput = document.getElementById('projectDate');
-        if (dateInput && window.flatpickr) {
+        const dateHidden = document.getElementById('projectDate');
+        const dateDisplay = document.getElementById('projectDateDisplay');
+        if (dateDisplay && window.flatpickr) {
             try {
-                    const fp = flatpickr(dateInput, {
-                        dateFormat: 'Y-m-d', // submitted value
-                        altInput: true,      // pretty display
-                        altFormat: 'M j, Y',
-                        allowInput: true,
-                        clickOpens: true,
-                        disableMobile: true // ensure Flatpickr shows instead of native pickers
-                    });
-                    // Open on focus to hint users there's a calendar
-                    dateInput.addEventListener('focus', () => { try { fp.open(); } catch(_){} });
+                const fp = flatpickr(dateDisplay, {
+                    dateFormat: 'Y-m-d',
+                    defaultDate: dateHidden.value || null,
+                    allowInput: false,
+                    clickOpens: true,
+                    disableMobile: true,
+                    appendTo: document.body, // detach from form flow to avoid pushing layout
+                    prevArrow: '&larr;',
+                    nextArrow: '&rarr;',
+                    onOpen: () => { try { fp._positionElement = dateDisplay; fp.positionCalendar(); } catch(_){} },
+                    onChange: (selectedDates, dateStr) => { dateHidden.value = dateStr; }
+                });
+                dateDisplay.addEventListener('click', () => { try { fp.open(); } catch(_){} });
+                window.addEventListener('scroll', () => { if (fp.isOpen) try { fp.positionCalendar(); } catch(_){} }, true);
+                window.addEventListener('resize', () => { if (fp.isOpen) try { fp.positionCalendar(); } catch(_){} });
+                dateDisplay.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); try { fp.open(); } catch(_){} } });
             } catch (e) {
                 console.warn('Flatpickr init failed:', e);
             }

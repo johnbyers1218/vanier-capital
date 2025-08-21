@@ -124,4 +124,48 @@ async function sendUserConfirmation(inquiry) {
   });
 }
 
-export { sendTeamNotification, sendUserConfirmation };
+// Send a welcome/confirmation email to a new newsletter subscriber.
+async function sendWelcomeNewsletter(subscriber) {
+  const to = (subscriber && subscriber.email) ? String(subscriber.email).trim() : '';
+  const from = getEnv('SENDGRID_FROM_EMAIL');
+  const fromName = getEnv('SENDGRID_FROM_NAME') || 'FND Automations';
+  if (!to || !from) {
+    const missing = [!to ? 'recipient email' : null, !from ? 'SENDGRID_FROM_EMAIL' : null].filter(Boolean).join(', ');
+    logger.warn('[SendGrid] Missing configuration for newsletter welcome.', { missing });
+    return { ok: false, error: `Missing recipient or from email (${missing})` };
+  }
+  const firstName = subscriber.firstName || '';
+  const subject = firstName ? `Welcome, ${firstName}!` : 'You’re in — welcome!';
+  const siteUrl = getEnv('PUBLIC_SITE_URL') || getEnv('CORS_ORIGIN') || '';
+  const logoUrl = siteUrl ? `${siteUrl.replace(/\/$/, '')}/images/FND_LOGO_SVG_BLACK.svg` : '';
+  const text = `Welcome${firstName ? ' ' + firstName : ''}!\n\nThanks for subscribing. Your first issue will arrive soon. In the meantime you can explore:${siteUrl ? ' ' + siteUrl : ''}\n\n— FND Automations`;
+  let html = '';
+  try {
+    const viewsDir = path.resolve(process.cwd(), 'views');
+    const templatePath = path.join(viewsDir, 'emails', 'newsletter-welcome.ejs');
+    html = await ejs.renderFile(templatePath, {
+      firstName: firstName || '',
+      email: to,
+      role: subscriber.role || '',
+      companyName: subscriber.companyName || '',
+      siteUrl,
+      blogUrl: siteUrl ? `${siteUrl.replace(/\/$/, '')}/blog` : '',
+      caseStudiesUrl: siteUrl ? `${siteUrl.replace(/\/$/, '')}/projects` : '',
+      servicesUrl: siteUrl ? `${siteUrl.replace(/\/$/, '')}/services` : '',
+      contactUrl: siteUrl ? `${siteUrl.replace(/\/$/, '')}/contact` : '',
+      logoUrl
+    }, { async: true });
+  } catch (tplErr) {
+    logger.warn('[SendGrid] Failed to render newsletter-welcome template; using text fallback HTML.', { message: tplErr?.message });
+    html = text.replace(/\n/g, '<br/>');
+  }
+  return sendEmail({
+    to,
+    from: { email: from, name: fromName },
+    subject,
+    text,
+    html,
+  });
+}
+
+export { sendTeamNotification, sendUserConfirmation, sendWelcomeNewsletter };

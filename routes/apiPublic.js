@@ -11,6 +11,7 @@ import NewsletterSubscriber from '../models/NewsletterSubscriber.js';
 import { body, validationResult } from 'express-validator';
 import { addSubscriber as espAddSubscriber } from '../utils/esp.js';
 import { addSubscriber as mcAddSubscriber } from '../services/mailchimpService.js';
+import { sendWelcomeNewsletter } from '../services/sendgridService.js';
 
 const router = express.Router();
 
@@ -404,6 +405,12 @@ router.post(
                 const detail = mcErr?.response?.body || mcErr?.message || mcErr;
                 logger.error('[Newsletter] Mailchimp sync error (caught in route)', { email, error: detail });
                 return res.status(502).json({ success: false, message: 'Failed to sync with Mailchimp. Please try again later.' });
+            }
+            // Attempt to send welcome email (non-blocking failure)
+            try {
+                await sendWelcomeNewsletter({ email, firstName, lastName, role, companyName });
+            } catch (e) {
+                try { logger.warn('[Newsletter] Welcome email send failed (continuing).', { email, message: e?.message }); } catch {}
             }
             // Clear session email and redirect to thank you
             if (req.session) delete req.session.pendingSubscriberEmail;

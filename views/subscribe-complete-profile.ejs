@@ -1,26 +1,26 @@
 <!-- views/subscribe-complete-profile.ejs -->
 <%- include('partials/header', {
-  pageTitle: 'Complete Your Profile',
-  pageDescription: 'Add your name (and optionally your role and company) to complete your subscription.',
+  pageTitle: "You're Almost In!",
+  pageDescription: 'One last quick step before you get your first issue.',
   path: '/subscribe/complete-profile'
 }) %>
 
 <section class="section">
   <div class="container">
     <div class="content-card" style="max-width: 720px; margin-inline: auto; background: #f9fafb; border: 1px solid var(--color-border-subtle); border-radius: .875rem; box-shadow: 0 6px 30px rgba(0,0,0,.06); padding: clamp(2rem, 4vw, 2.5rem);">
-      <h1 class="section-title" style="text-align:center; font-size: clamp(1.6rem, 3vw, 2rem); font-weight: 800; letter-spacing: -0.01em;">Complete Your Profile</h1>
-      <p class="section-description" style="text-align:center; max-width: 60ch; margin: .375rem auto 1rem;">One more step. Add your name so we can personalize your emails. Your role and company are optional.</p>
+  <h1 class="section-title" style="text-align:center; font-size: clamp(1.6rem, 3vw, 2rem); font-weight: 800; letter-spacing: -0.01em;">You're Almost In!</h1>
+  <p class="section-description" style="text-align:center; max-width: 60ch; margin: .375rem auto 1rem;">One last step! Let us know your name for a personal touch. Your role and company are optional, but they help us send you more relevant content.</p>
 
       <form id="finalizeForm" class="signup-form" onsubmit="return false;" style="margin-top: .75rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: end;">
         <input type="hidden" id="email" value="<%= email ? email : '' %>" />
 
         <div>
-          <label for="firstName" style="display:block; font-weight: 600; margin-bottom: .4rem;">First Name <span style="font-weight:400; color: var(--color-text-muted);">(Optional)</span></label>
-          <input id="firstName" name="firstName" type="text" placeholder="Enter your first name (optional)" />
+          <label for="firstName" style="display:block; font-weight: 600; margin-bottom: .4rem;">First Name <span style="color:#dc2626">*</span></label>
+          <input id="firstName" name="firstName" type="text" placeholder="Enter your first name" required aria-required="true" autocomplete="given-name" />
         </div>
         <div>
-          <label for="lastName" style="display:block; font-weight: 600; margin-bottom: .4rem;">Last Name <span style="font-weight:400; color: var(--color-text-muted);">(Optional)</span></label>
-          <input id="lastName" name="lastName" type="text" placeholder="Enter your last name (optional)" />
+          <label for="lastName" style="display:block; font-weight: 600; margin-bottom: .4rem;">Last Name <span style="color:#dc2626">*</span></label>
+          <input id="lastName" name="lastName" type="text" placeholder="Enter your last name" required aria-required="true" autocomplete="family-name" />
         </div>
 
         <div>
@@ -41,7 +41,7 @@
         </div>
 
         <div style="grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: .75rem; margin-top: .25rem;">
-          <button id="finalizeSubmit" type="submit" class="cta-button primary-btn glow-button">Finish Signup</button>
+          <button id="finalizeSubmit" type="submit" class="cta-button primary-btn glow-button">Get My First Issue</button>
         </div>
 
         <p id="finalizeMessage" class="form-message" aria-live="polite" hidden style="grid-column: 1 / -1;"></p>
@@ -69,12 +69,15 @@
   form.addEventListener('submit', async function(e){
     e.preventDefault();
     if (!email) { window.location.href = '/'; return; }
-  // All fields optional: only send provided values
+    const firstVal = first.value.trim();
+    const lastVal = last.value.trim();
+    if (!firstVal) { showMessage('First name is required.', 'error'); first.focus(); return; }
+    if (!lastVal) { showMessage('Last name is required.', 'error'); last.focus(); return; }
     btn.disabled = true;
     try {
       const resp = await fetch('/api/subscribe/finalize', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, firstName: first.value.trim(), lastName: last.value.trim(), role: role.value || undefined, companyName: company.value.trim() || undefined })
+        body: JSON.stringify({ email, firstName: firstVal, lastName: lastVal, role: role.value || undefined, companyName: company.value.trim() || undefined })
       });
       const data = await resp.json().catch(()=>({success:false,message:'Unexpected response.'}));
       if(resp.ok && data.success){
@@ -91,5 +94,35 @@
   });
 })();
 </script>
+
+<style>
+  /* Enhanced input styling for clarity */
+  #finalizeForm input[type=text], #finalizeForm select {
+    width:100%;
+    background:#ffffff;
+    border:1px solid #cbd5e1;
+    border-radius:8px;
+    padding:.65rem .75rem;
+    font-size:.95rem;
+    line-height:1.25rem;
+    transition:border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+  }
+  #finalizeForm input[type=text]:focus, #finalizeForm select:focus {
+    outline:2px solid #2563eb;
+    outline-offset:2px;
+    border-color:#2563eb;
+    box-shadow:0 0 0 3px rgba(37,99,235,.35);
+    background:#ffffff;
+  }
+  #finalizeForm input[aria-required="true"]:invalid {
+    border-color:#dc2626;
+  }
+  #finalizeForm .error { color:#dc2626; font-weight:500; }
+  #finalizeForm .success { color:#15803d; font-weight:500; }
+  /* Funnel card styling (inherits site-wide background now) */
+  .content-card { background:#ffffff !important; }
+  #finalizeForm label { color:#1e293b; }
+  #finalizeForm input[type=text]::placeholder { color:#64748b; }
+</style>
 
 <%- include('partials/footer') %>
