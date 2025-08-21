@@ -197,13 +197,7 @@
             </div>
             <% if (__errorMap.isPubliclyVisible) { %><div class="field-error"><%= __errorMap.isPubliclyVisible[0] %></div><% } %>
         </div>
-        <div class="form-group <%= __errorMap.isFeaturedOnHomepage ? 'has-error' : '' %>">
-            <div class="checkbox-inline">
-                <input type="checkbox" id="isFeaturedOnHomepage" name="isFeaturedOnHomepage" <%= project.isFeaturedOnHomepage ? 'checked' : '' %> class="<%= __errorMap.isFeaturedOnHomepage ? 'input-error' : '' %>">
-                <label for="isFeaturedOnHomepage" class="<%= __errorMap.isFeaturedOnHomepage ? 'label-error' : '' %>">Feature on Homepage</label>
-            </div>
-            <% if (__errorMap.isFeaturedOnHomepage) { %><div class="field-error"><%= __errorMap.isFeaturedOnHomepage[0] %></div><% } %>
-        </div>
+    <!-- Removed: isFeaturedOnHomepage toggle (homepage now derives featured projects automatically) -->
 
         <div class="form-actions">
             <div class="admin-btn-group">

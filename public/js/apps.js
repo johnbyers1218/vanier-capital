@@ -266,18 +266,20 @@ function createProjectCardHtml(project, isPreview = false) {
     // Entire card is clickable; avoid nested anchors inside
     return `
     <a class="project-card" href="${projectDetailUrl}" aria-label="View case study: ${escapeHtml(project.title)}" data-industries="${escapeHtml(industryNames.join('|'))}" data-services="${escapeHtml(serviceNames.join('|'))}">
-            ${imageHtml}
-            <div class="project-content">
+        ${imageHtml}
+        <div class="project-content project-card-inner">
+            <div class="project-card-top">
                 <h3 class="project-title">${escapeHtml(project.title)}</h3>
-        <div class="project-meta">${industryChips}</div>
-        ${serviceChips ? `<div class="project-meta">${serviceChips}</div>` : ''}
+                <div class="project-meta">${industryChips}</div>
+                ${serviceChips ? `<div class="project-meta">${serviceChips}</div>` : ''}
                 <p class="project-description">${escapeHtml(excerpt)}</p>
-                <div class="project-meta project-cta">
-                    <span class="project-link">View Case Study →</span>
-                </div>
             </div>
-        </a>
-    `;
+            <div class="project-card-spacer"></div>
+            <div class="project-meta project-cta">
+                <span class="project-link">View Case Study →</span>
+            </div>
+        </div>
+    </a>`;
 }
 
 // --- Loaders --- (loadProjects will use the updated createProjectCardHtml)
@@ -367,23 +369,22 @@ function formatServiceLabel(slug) {
 // createFeaturedProjectHtml needs to be updated to use an excerpt too if its description is HTML
 function createFeaturedProjectHtml(project) {
         const projectDetailUrl = `/projects/${escapeHtml(project.slug)}`;
-    const image = project.image
-        ? `<img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:16px 0 0 16px;display:block;">`
-        : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f3f4f6;color:#9ca3af;border-radius:16px 0 0 16px"><i class="fas fa-project-diagram fa-3x"></i></div>`;
-    const categoryLabel = (Array.isArray(project.industries) && project.industries.length) ? project.industries[0].name : '';
-        // Show full excerpt (no truncation); prefer explicit excerpt if available
-        const excerpt = project.excerpt ? String(project.excerpt) : generateExcerptFromHtml(project.description, 10000);
+        const image = project.image
+                ? `<img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}" loading="lazy">`
+                : `<div class="featured-media-placeholder"><i class="fas fa-project-diagram fa-2x"></i></div>`;
+        const categoryLabel = (Array.isArray(project.industries) && project.industries.length) ? project.industries[0].name : '';
+        // Prefer explicit excerpt; fall back to generated (shorten to ~320 chars then clamp)
+        const rawExcerpt = project.excerpt ? String(project.excerpt) : generateExcerptFromHtml(project.description, 400);
+        const excerpt = rawExcerpt.length > 320 ? rawExcerpt.slice(0, 317) + '…' : rawExcerpt;
 
         return `
-            <div class="featured-card" style="display:grid;grid-template-columns:1.1fr 1fr;gap:0;align-items:stretch;max-width:1080px;margin:0 auto;padding:0;border-radius:16px;border:1px solid #e5e7eb;background:#ffffff;box-shadow:0 8px 24px rgba(0,0,0,0.08);color:#0f172a;overflow:hidden;">
-                <div class="featured-media" style="min-height:280px;height:100%;overflow:hidden;">${image}</div>
-                <div class="featured-body" style="display:flex;flex-direction:column;min-height:280px;padding:20px;">
-                    ${categoryLabel ? `<div class="featured-category" style="margin-bottom:10px;"><span class="pill" style="font-size:.9rem;padding:.35rem .6rem;border-radius:999px;background:#eff6ff;color:#1d4ed8;">${escapeHtml(categoryLabel)}</span></div>` : ''}
-                    <h3 class="featured-title" style="font-size:1.5rem;line-height:1.25;margin:0 0 10px 0;"><a href="${projectDetailUrl}" style="color:inherit;text-decoration:none;">${escapeHtml(project.title)}</a></h3>
-                    <p class="featured-excerpt" style="color:#374151;line-height:1.7;margin:0 0 14px 0;">${escapeHtml(excerpt)}</p>
-                    <div style="margin-top:auto;display:flex;gap:12px;">
-                        <a href="${projectDetailUrl}" class="cta-button primary-btn" style="align-self:flex-start;">View Case Study <span class="icon-arrow">&rarr;</span></a>
-                    </div>
+            <div class="featured-card featured-card-compact" style="max-width:1080px;margin:0 auto;">
+                <div class="featured-media">${image}</div>
+                <div class="featured-body">
+                    ${categoryLabel ? `<div class="featured-category"><span class="pill">${escapeHtml(categoryLabel)}</span></div>` : ''}
+                    <h3 class="featured-title"><a href="${projectDetailUrl}" style="text-decoration:none;color:inherit;">${escapeHtml(project.title)}</a></h3>
+                    <p class="featured-excerpt featured-excerpt--clamp">${escapeHtml(excerpt)}</p>
+                    <div class="featured-actions"><a href="${projectDetailUrl}" class="cta-button primary-btn">View Case Study <span class="icon-arrow">&rarr;</span></a></div>
                 </div>
             </div>`;
 }
