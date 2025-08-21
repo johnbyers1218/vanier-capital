@@ -703,11 +703,15 @@ function initStaticOverlayPins() {
             const anchorsForFit = anchorGeoList.map((geo, i) => ({ geo, pixel: { x: norms[i].x * w, y: norms[i].y * h } }));
             const projector = createAffineProjector(anchorsForFit, original);
             const projected = points.map(p => {
-                const [x, y] = projector.project(p.lon, p.lat);
+                let [x, y] = projector.project(p.lon, p.lat);
+                // Keep very light normalization without large offsets; only tiny vertical tweak for readability
+                const labelLower = (p.label || '').toLowerCase();
+                if (labelLower.includes('new york, ny')) { y -= 0.5; }
+                if (labelLower.includes('long island')) { y += 0.5; }
                 return { p, x, y };
             });
-            // Tighten grouping so nearby-but-distinct places (e.g., NYC vs Long Island) don't get fanned out
-            const threshold = 5; // px (was 12)
+            // Allow very close grouping so we can custom fan-out NYC vs Long Island
+            const threshold = 5; // px
             const groups = [];
             projected.forEach(item => {
                 let found = null;
@@ -720,11 +724,29 @@ function initStaticOverlayPins() {
             });
         groups.forEach(grp => {
                 const n = grp.items.length;
-                const r = n > 1 ? 9 : 0; // increased fan-out radius for clearer separation
+                // Custom compact layout for NYC + Long Island pair
+                const labels = grp.items.map(i => (i.p.label||'').toLowerCase());
+                const nycLI = labels.some(l=>l.includes('new york, ny')) && labels.some(l=>l.includes('long island')) && n <= 4;
+                const r = n > 1 ? (nycLI ? 4 : 7) : 0;
                 grp.items.forEach((item, idx) => {
-                    const angle = n > 1 ? (idx / n) * Math.PI * 2 : 0;
-                    const cx = n > 1 ? grp.x + r * Math.cos(angle) : item.x;
-                    const cy = n > 1 ? grp.y + r * Math.sin(angle) : item.y;
+                    let cx, cy;
+                    if (n > 1) {
+                        if (nycLI) {
+                            // Arrange horizontally: NYC left, Long Island right, others (if any) fanned minimally
+                            const ordered = [...grp.items].sort((a,b)=> (a.p.label||'').localeCompare(b.p.label||''));
+                            const liIndex = ordered.findIndex(o=> (o.p.label||'').toLowerCase().includes('long island'));
+                            const nycIndex = ordered.findIndex(o=> (o.p.label||'').toLowerCase().includes('new york, ny'));
+                            const baseLeft = grp.x - 2;
+                            const spacing = 4.5; // px
+                            const mapPos = ordered.indexOf(item);
+                            cx = baseLeft + mapPos * spacing;
+                            cy = grp.y + (mapPos === nycIndex ? -1 : (mapPos === liIndex ? 1 : 0));
+                        } else {
+                            const angle = (idx / n) * Math.PI * 2;
+                            cx = grp.x + r * Math.cos(angle);
+                            cy = grp.y + r * Math.sin(angle);
+                        }
+                    } else { cx = item.x; cy = item.y; }
                     const c = document.createElementNS(svgNS, 'circle');
                     c.setAttribute('cx', String(cx));
                     c.setAttribute('cy', String(cy));
