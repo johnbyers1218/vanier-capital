@@ -74,8 +74,16 @@ export default (csrfProtection) => {
                 const existingPost = await BlogPost.findOne(query).lean();
                 if (existingPost) { throw new Error('Slug is already in use.'); } return true;
             }),
-        body('excerpt', 'Excerpt is required and must be 1-250 characters.')
-            .trim().isLength({ min: 1, max: 250 }).escape(),
+        body('excerpt')
+            .trim()
+            .custom((val) => {
+                if (!val || !val.trim()) throw new Error('Excerpt is required.');
+                const len = val.trim().length;
+                if (len < 1) throw new Error('Excerpt is required.');
+                if (len > 300) throw new Error(`Excerpt cannot exceed 300 characters (currently ${len}).`);
+                return true;
+            })
+            .escape(),
         body('content', 'Blog content must be at least 50 characters.')
             .trim().isLength({ min: 50 }), // Raw HTML, sanitize later
         body('authorDisplayName', 'Author Display Name cannot exceed 100 characters.')
@@ -87,7 +95,16 @@ export default (csrfProtection) => {
             .optional({ checkFalsy: true }).trim().isURL(),
     // No legacy tags; curated categories only
         body('isPublished', 'Published status must be a boolean.')
-            .optional().isBoolean().toBoolean()
+            .optional().isBoolean().toBoolean(),
+        // Validate each submitted category id (if any). Helps surface clearer 422 errors instead of silent failure.
+        body('categories').optional({ nullable: true }).customSanitizer(value => {
+            // Ensure categories is always an array for downstream logic
+            if (Array.isArray(value)) return value.filter(v => v); // remove empties
+            if (value) return [value];
+            return [];
+        }),
+        body('categories.*', 'Each category id must be a valid Mongo ObjectId.')
+            .optional({ nullable: true, checkFalsy: true }).isMongoId()
     ];
 
     // --- Image Upload Route ---
@@ -222,7 +239,16 @@ export default (csrfProtection) => {
 
 
         if (!errors.isEmpty()) {
-            logger.warn(`[Admin Blog] Validation errors creating post by ${req.adminUser.username}:`, { errors: errors.array() });
+            const bodySummary = {
+                title: req.body.title,
+                slug: req.body.slug,
+                excerptLength: req.body.excerpt?.length,
+                contentLength: req.body.content?.length,
+                authorDisplayName: req.body.authorDisplayName,
+                categories: postDataForRender.categories,
+                isPublished: !!req.body.isPublished
+            };
+            logger.warn(`[Admin Blog] Validation errors creating post by ${req.adminUser.username}:`, { errors: errors.array(), bodySummary });
             const categories = await Category.find({ isActive: true }).sort({ name: 1 }).lean();
             return res.status(422).render('admin/blog/edit', {
                 post: postDataForRender,
@@ -358,7 +384,17 @@ export default (csrfProtection) => {
         };
 
         if (!errors.isEmpty()) {
-            logger.warn(`[Admin Blog] Validation errors updating post ID ${postId}:`, { errors: errors.array() });
+            const bodySummary = {
+                title: req.body.title,
+                slug: req.body.slug,
+                excerptLength: req.body.excerpt?.length,
+                contentLength: req.body.content?.length,
+                authorDisplayName: req.body.authorDisplayName,
+                categories: postDataForRender.categories,
+                isPublished: !!req.body.isPublished,
+                isFeatured: !!req.body.isFeatured
+            };
+            logger.warn(`[Admin Blog] Validation errors updating post ID ${postId}:`, { errors: errors.array(), bodySummary });
             // Fetch the original author's name for placeholder context if re-rendering
             const originalPost = await BlogPost.findById(postId).populate('author', 'fullName username').select('author').lean();
             const authorForPlaceholder = originalPost && originalPost.author ? (originalPost.author.fullName || originalPost.author.username) : '';
