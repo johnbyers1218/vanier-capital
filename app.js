@@ -196,28 +196,46 @@ logger.debug('[INIT] Applied httpLoggerMiddleware.');
 
 logger.debug('[INIT] Applying helmet...');
 const cspDirectives = {
-    defaultSrc: ["'self'"],
+  defaultSrc: ["'self'"],
   scriptSrc: ["'self'", "'unsafe-inline'","https://*.clerk.accounts.dev", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud", "https://www.googletagmanager.com", "https://calendar.google.com", "https://apis.google.com","https://www.gstatic.com", "https://unpkg.com", "https://cdn.jsdelivr.net"],
   styleSrc: ["'self'", "'unsafe-inline'", "https://*.clerk.accounts.dev", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud", "https://calendar.google.com","https://apis.google.com", "https://unpkg.com"],
-    fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
-    imgSrc: ["'self'", "data:", "blob:", "https://res.cloudinary.com", "https:", "https://apis.google.com", "https://*.clerk.accounts.dev","https://img.clerk.com"],
+  fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
+  imgSrc: ["'self'", "data:", "blob:", "https://res.cloudinary.com", "https:", "https://apis.google.com", "https://*.clerk.accounts.dev","https://img.clerk.com"],
   connectSrc: [
     "'self'",
     "https://*.tiny.cloud",
     "https://www.googleapis.com",
-    "https://www.google-analytics.com", // <-- ADDED FOR GA DATA SENDING
-    "https://*.googletagmanager.com",    // <-- ADDED FOR GA SCRIPT ORIGIN (good practice)
+    "https://www.google-analytics.com",
+    "https://*.googletagmanager.com",
     "https://calendar.google.com",
     "https://apis.google.com",
-    // Clerk API and instance domains
     "https://api.clerk.com",
     "https://*.clerk.accounts.dev"
   ],
-    frameSrc: ["'self'", "https://*.tiny.cloud", "https://calendar.google.com","https://accounts.google.com", "https://*.clerk.accounts.dev"],
-    scriptSrcAttr: ["'unsafe-inline'"],
-    workerSrc: ["'self'", "blob:"],
-    objectSrc: ["'none'"],
+  frameSrc: ["'self'", "https://*.tiny.cloud", "https://calendar.google.com","https://accounts.google.com", "https://*.clerk.accounts.dev"],
+  scriptSrcAttr: ["'unsafe-inline'"],
+  workerSrc: ["'self'", "blob:"],
+  objectSrc: ["'none'"],
 };
+
+// Dynamically add PUBLIC_SITE_URL (and/or CORS_ORIGIN fallback) to every CSP source array if provided.
+(() => {
+  const publicSite = (process.env.PUBLIC_SITE_URL || process.env.CORS_ORIGIN || '').trim();
+  if (!publicSite) return; // nothing to add
+  if (!/^https?:\/\//i.test(publicSite)) {
+    logger.warn(`[CSP] PUBLIC_SITE_URL/CORS_ORIGIN is not a full URL (skipping CSP injection): ${publicSite}`);
+    return;
+  }
+  const normalized = publicSite.replace(/\/$/, '');
+  const directiveKeys = Object.keys(cspDirectives);
+  directiveKeys.forEach(key => {
+    const arr = cspDirectives[key];
+    if (Array.isArray(arr) && !arr.includes(normalized)) {
+      arr.push(normalized);
+    }
+  });
+  logger.info(`[CSP] Injected site origin into CSP directives: ${normalized}`);
+})();
 if (process.env.NODE_ENV === 'production') {
     cspDirectives.upgradeInsecureRequests = []; // Enable in production
 }
