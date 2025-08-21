@@ -316,6 +316,16 @@ router.get('/projects/:slug', async (req, res, next) => {
             testimonial: relatedTestimonial,
             prevProject: prevProject,
             nextProject: nextProject,
+            // Compute/share canonical URL for template + structured data
+            shareUrl: (() => {
+                const baseEnv = process.env.PUBLIC_SITE_URL && /^https?:\/\//i.test(process.env.PUBLIC_SITE_URL)
+                    ? process.env.PUBLIC_SITE_URL.replace(/\/$/, '')
+                    : null;
+                const proto = (req.headers['x-forwarded-proto'] || req.protocol || 'https');
+                const host = req.get('host');
+                const base = baseEnv || `${proto}://${host}`;
+                return `${base}/projects/${projectDocument.slug}`;
+            })(),
             path: '/projects'
         });
 

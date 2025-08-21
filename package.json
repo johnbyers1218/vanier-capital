@@ -5,6 +5,9 @@
   "private": true,
   "description": "Web application for FND Automations, featuring public site, admin CMS, and scheduling.",
   "main": "app.js",
+  "migrate-mongo": {
+    "config": "./migrate-mongo-config.js"
+  },
   "scripts": {
     "start": "node app.js",
     "dev": "cross-env NODE_ENV=development nodemon app.js",
@@ -24,7 +27,10 @@
     "test:e2e:headed": "playwright test --headed",
     "optimize:images": "node scripts/optimize-images.cjs",
     "seed:taxonomy": "node scripts/seed-taxonomy.mjs",
-    "set:legal-dates": "node scripts/set-legal-updated.mjs"
+    "set:legal-dates": "node scripts/set-legal-updated.mjs",
+    "migrate:create": "npx migrate-mongo create",
+    "migrate:up": "npx migrate-mongo up",
+    "migrate:down": "npx migrate-mongo down"
   },
   "repository": {
     "type": "git",
