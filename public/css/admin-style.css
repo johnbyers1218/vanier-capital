@@ -1878,19 +1878,6 @@
     }
   }
 }
-
-/* --- Admin Button Styles (centralized) --- */
-.admin-btn-group { display:flex; flex-wrap:wrap; gap:.7rem; align-items:center; }
-.admin-btn { --btn-bg:var(--color-primary,#2563eb); --btn-bg-hover:var(--color-primary-hover,#1d4ed8); --btn-text:#fff; --btn-border:var(--btn-bg); position:relative; display:inline-flex; align-items:center; gap:.45rem; padding:.65rem 1.05rem; font-weight:600; font-size:.95rem; line-height:1.1; background:var(--btn-bg); color:var(--btn-text); border:1px solid var(--btn-border); border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,.25); text-decoration:none; cursor:pointer; transition:background .18s, transform .18s, box-shadow .18s; }
-.admin-btn:hover { background:var(--btn-bg-hover); text-decoration:none; }
-.admin-btn:active { transform:translateY(1px); box-shadow:0 1px 2px rgba(0,0,0,.35); }
-.admin-btn:focus-visible { outline:2px solid #60a5fa; outline-offset:2px; }
-.admin-btn i { font-size:1em; line-height:1; }
-.admin-btn--ghost { --btn-bg:rgba(255,255,255,0.06); --btn-bg-hover:rgba(255,255,255,0.14); --btn-text:#e2e8f0; --btn-border:rgba(255,255,255,0.15); box-shadow:0 1px 2px rgba(0,0,0,.25); }
-.admin-btn--danger { --btn-bg:#dc2626; --btn-bg-hover:#b91c1c; --btn-border:#b91c1c; }
-.admin-btn[disabled], .admin-btn.disabled { opacity:.55; cursor:not-allowed; filter:grayscale(.2); }
-@media (max-width:640px){ .admin-btn { flex:1 1 auto; justify-content:center; } }
-/* --- End Admin Button Styles --- */
 @layer base {
   html {
     font-family: var(--font-sans);
