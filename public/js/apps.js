@@ -734,6 +734,14 @@ function initStaticOverlayPins() {
                     c.setAttribute('fill', '#0ea5e9');
                     c.setAttribute('stroke', '#0369a1');
                     c.setAttribute('stroke-width', '1');
+                    // Native tooltip fallback for browsers (shows on hover even if custom tooltip CSS conflicts)
+                    if (item.p.label) {
+                        const titleEl = document.createElementNS(svgNS, 'title');
+                        titleEl.textContent = item.p.label;
+                        c.appendChild(titleEl);
+                        c.setAttribute('aria-label', item.p.label);
+                        c.setAttribute('role', 'img');
+                    }
             // Ensure circles themselves can capture events even if parent styles change
             c.style.pointerEvents = 'auto';
                     c.addEventListener('mouseenter', () => {
@@ -923,6 +931,8 @@ function normalizeLocationString(s) {
     x = x.replace(/\bUAE\b|\bU\.A\.E\.\b|\bU\.A\.E\b|\bEmirates\b/i, 'United Arab Emirates');
     x = x.replace(/\bSF\b/i, 'San Francisco, CA, United States');
     x = x.replace(/\bNYC\b/i, 'New York, NY, United States');
+    // Normalize full phrase "New York City" to canonical form so we never fall back to state centroid
+    x = x.replace(/\bNew York City\b/i, 'New York, NY, United States');
     return x;
 }
 
@@ -1069,6 +1079,13 @@ function getLatLonForLocation(locStr) {
         // 1) Try CITY_COORDS with full string as provided (handles entries like "New York, NY, United States")
         const maybeCityCountry = `${cityLower}, ${[region, country].filter(Boolean).join(', ').toLowerCase()}`.replace(/, $/, '');
         if (CITY_COORDS[maybeCityCountry]) return { ...CITY_COORDS[maybeCityCountry], label: s };
+
+        // Special handling for New York City variants to avoid falling back to the NY state center
+        if ((cityLower === 'new york' || cityLower === 'new york city') &&
+            (regionLower === 'new york' || regionLower === 'ny' || regionLower === '' || regionLower === 'new york city') &&
+            (!countryLower || countryLower === 'united states')) {
+            return { lat: 40.7128, lon: -74.0060, label: s };
+        }
 
         // 2) Try city + country (ignoring region) if we have a country
         if (countryLower) {

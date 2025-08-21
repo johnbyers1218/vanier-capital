@@ -2,8 +2,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Skip to main content link for accessibility -->
-    <a href="#main-content" class="skip-link" style="position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:1000;background:#fff;color:#222;padding:8px 16px;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.08);transition:left 0.2s;">Skip to main content</a>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <% 
@@ -39,10 +37,15 @@
     <link rel="canonical" href="<%= typeof canonicalPath !== 'undefined' ? (process.env.SITE_URL || 'https://www.fndautomations.com') + canonicalPath : (process.env.SITE_URL || 'https://www.fndautomations.com') + (typeof req !== 'undefined' ? req.originalUrl : '') %>">
     <meta name="author" content="FND Automations">
 
-     <!-- ========== FAVICON LINKS START ========== -->
-    <link rel="icon" href="<%= cdnUrl('/images/FND_LOGO_SVG_STRIPPED.svg') %>" sizes="any"> <!-- ICO format, any size -->
-    <!-- You might also have a manifest.json for PWAs which can define icons -->
-    <!-- <link rel="manifest" href="/manifest.json"> -->
+    <!-- ========== FAVICON LINKS START ========== -->
+    <!-- Primary scalable favicon (SVG) -->
+    <link rel="icon" type="image/svg+xml" href="<%= cdnUrl('/images/FND_LOGO_SVG_STRIPPED.svg') %>">
+    <!-- Legacy fallback (some browsers look for shortcut icon) -->
+    <link rel="shortcut icon" href="<%= cdnUrl('/images/FND_LOGO_SVG_STRIPPED.svg') %>">
+    <!-- Alternate icon relation for extra compatibility -->
+    <link rel="alternate icon" href="<%= cdnUrl('/images/FND_LOGO_SVG_STRIPPED.svg') %>">
+    <!-- If a 180x180 apple-touch-icon is added later, place it here -->
+    <!-- <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png"> -->
     <!-- ========== FAVICON LINKS END ========== -->
 
     <!-- Tailwind public bundle -->
@@ -72,8 +75,10 @@
             }
         }, null, 2) %>
         </script>
-</head>
+ </head>
 <body>
+    <!-- Skip to main content link for accessibility (must live in body for valid HTML) -->
+    <a href="#main-content" class="skip-link" style="position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:1000;background:#fff;color:#222;padding:8px 16px;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.08);transition:left 0.2s;">Skip to main content</a>
         <div class="min-h-dvh bg-white text-[#374151] font-sans">
         <header id="site-header" class="sticky top-0 z-40 transition-all" style="--header-height: 72px; backdrop-filter: blur(0px); background-color: transparent; box-shadow: none;">
                         <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 md:py-5 flex items-center justify-between">
