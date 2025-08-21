@@ -2482,7 +2482,8 @@ function initContactAndScheduleForm() {
         let dataFromApi; // To store API response for use in finally block
 
         try {
-            dataFromApi = await fetchData('/api/contact-submission', {
+            // NOTE: Public contact form now handled by /api/contact (not /api/contact-submission)
+            dataFromApi = await fetchData('/api/contact', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formObject)

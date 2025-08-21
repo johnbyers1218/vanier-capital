@@ -76,4 +76,5 @@ router.post('/contact', contactAndScheduleValidationRules, async (req, res, next
     }
 });
 
+
 export default router;
