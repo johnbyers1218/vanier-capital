@@ -2445,3 +2445,16 @@
     }
   }
 }
+
+/* --- Custom Admin Button Styles (restored & enhanced) --- */
+.admin-btn { display:inline-flex; align-items:center; gap:.55rem; background:#2563eb; color:#fff; font-weight:600; font-size:.875rem; line-height:1.25rem; padding:.625rem 1.05rem; border-radius:.55rem; border:1px solid #2563eb; text-decoration:none; cursor:pointer; transition:background .15s ease, box-shadow .15s ease, transform .15s ease; }
+.admin-btn:hover { background:#1d4ed8; box-shadow:0 4px 12px rgba(37,99,235,0.35); transform:translateY(-1px); }
+.admin-btn:active { background:#1e40af; transform:translateY(0); }
+.admin-btn:focus { outline:2px solid #1d4ed8; outline-offset:2px; }
+.admin-btn i { font-size:.85em; opacity:.9; }
+.admin-btn--ghost { background:rgba(255,255,255,0.07); color:#f1f5f9; border:1px solid #475569; }
+.admin-btn--ghost:hover { background:#334155; border-color:#64748b; }
+.admin-btn--danger { background:#dc2626; border-color:#dc2626; }
+.admin-btn--danger:hover { background:#b91c1c; }
+.admin-btn-group { display:flex; flex-wrap:wrap; gap:.85rem; align-items:center; }
+.admin-btn[disabled], .admin-btn:disabled { opacity:.55; cursor:not-allowed; box-shadow:none; transform:none; }
