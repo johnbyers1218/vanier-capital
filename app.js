@@ -123,6 +123,13 @@ app.get('/AUTHORING_GUIDE.md', (req, res) => {
 import sitemapRouter from './routes/sitemap.js';
 app.use('/sitemap.xml', sitemapRouter);
 
+// Mark admin & auth routes as noindex (prevent accidental 401 indexing attempts)
+app.use(['/admin', '/admin/*', '/auth/*'], (req, res, next) => {
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+  res.locals.robots = 'noindex,nofollow';
+  next();
+});
+
 
 app.set('trust proxy', 1);
 logger.info('[INIT] Express "trust proxy" setting configured.');

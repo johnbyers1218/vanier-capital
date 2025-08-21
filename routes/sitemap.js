@@ -11,7 +11,8 @@ router.get('/', async (req, res) => {
 			BlogPost.find({}).select('slug updatedAt'),
 			Projects.find({}).select('slug updatedAt')
 		]);
-		const domain = process.env.SITE_URL || 'https://yourdomain.com';
+		// Prefer PUBLIC_SITE_URL then SITE_URL; normalize without trailing slash
+		const domain = (process.env.PUBLIC_SITE_URL || process.env.SITE_URL || 'https://www.fndautomations.com').replace(/\/$/, '');
 		res.header('Content-Type', 'application/xml');
 		res.send(`<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

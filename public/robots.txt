@@ -19,7 +19,8 @@ User-agent: *
 Allow: /
 # Add any specific Disallow directives here if needed for standard crawlers.
 # For example, if you had an /admin/ section:
-# Disallow: /admin/
+# Disallow sensitive/admin surface to avoid 401 crawl noise
+Disallow: /admin/
 # Based on your current site structure from the CSV, there are no obvious
 # general content pages that need disallowing.
 
