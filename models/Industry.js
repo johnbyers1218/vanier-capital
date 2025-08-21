@@ -1,5 +1,5 @@
 // models/Industry.js
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const IndustrySchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true, maxlength: 80 },
@@ -8,4 +8,5 @@ const IndustrySchema = new mongoose.Schema({
 }, { timestamps: true });
 
 
-module.exports = mongoose.models.Industry || mongoose.model('Industry', IndustrySchema);
+const Industry = mongoose.models.Industry || mongoose.model('Industry', IndustrySchema);
+export default Industry;

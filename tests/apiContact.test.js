@@ -1,7 +1,8 @@
 
-const request = require('supertest');
-process.env.NODE_ENV = 'test';
 
+import request from 'supertest';
+import http from 'http';
+process.env.NODE_ENV = 'test';
 
 // Mock Contacts model with save()
 const mockContact = jest.fn(function (doc) {
@@ -10,9 +11,7 @@ const mockContact = jest.fn(function (doc) {
 });
 
 jest.mock('../models/Contacts.js', () => mockContact);
-
-const http = require('http');
-const { app } = require('../app.js');
+import { app } from '../app.js';
 let server;
 let agent;
 

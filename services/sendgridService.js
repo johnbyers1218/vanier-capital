@@ -1,7 +1,7 @@
 // services/sendgridService.js
-const { logger } = require('../config/logger.js');
-const ejs = require('ejs');
-const path = require('path');
+import { logger } from '../config/logger.js';
+import ejs from 'ejs';
+import path from 'path';
 
 function getEnv(name) {
   return (process.env[name] || '').toString().trim();
@@ -11,7 +11,8 @@ let sgMail = null;
 async function ensureConfigured() {
   if (sgMail) return true;
   try {
-    sgMail = require('@sendgrid/mail');
+    const mod = await import('@sendgrid/mail');
+    sgMail = mod.default || mod;
     const key = getEnv('SENDGRID_API_KEY');
     if (!key) {
       logger.warn('[SendGrid] SENDGRID_API_KEY not set; email sending disabled.');
@@ -123,4 +124,4 @@ async function sendUserConfirmation(inquiry) {
   });
 }
 
-module.exports = { sendTeamNotification, sendUserConfirmation };
+export { sendTeamNotification, sendUserConfirmation };

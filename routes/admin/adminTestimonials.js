@@ -1,16 +1,16 @@
 // routes/admin/adminTestimonials.js (ESM Version - Finalized)
 
-const express = require('express');
-const { body, param, validationResult } = require('express-validator');
-const Testimonial = require('../../models/Testimonials');
-const { logger } = require('../../config/logger');
-const Client = require('../../models/Client');
-const Project = require('../../models/Projects');
-const { validateMongoId, checkMongoIdValidation } = require('../../middleware/validateMongoId');
-const { logAdminAction } = require('../../utils/helpers');
+import express from 'express';
+import { body, param, validationResult } from 'express-validator';
+import Testimonial from '../../models/Testimonials.js';
+import { logger } from '../../config/logger.js';
+import Client from '../../models/Client.js';
+import Project from '../../models/Projects.js';
+import { validateMongoId, checkMongoIdValidation } from '../../middleware/validateMongoId.js';
+import { logAdminAction } from '../../utils/helpers.js';
 
 // Export a function accepting csrfProtection middleware
-module.exports = (csrfProtection) => {
+export default (csrfProtection) => {
     const router = express.Router();
 
     // --- Reusable Validation Rules ---

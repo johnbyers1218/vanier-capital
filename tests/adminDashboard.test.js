@@ -1,22 +1,22 @@
 
 process.env.NODE_ENV = 'test';
 
-const request = require('supertest');
-const http = require('http');
+
+import request from 'supertest';
+import http from 'http';
+import express from 'express';
+import * as isAdminModule from '../middleware/isAdmin.js';
+import * as adminDashboardModule from '../routes/admin/adminDashboard.js';
+import { app } from '../app.js';
 
 const mockIsAdmin = jest.fn((req, res, next) => next());
 jest.mock('../middleware/isAdmin.js', () => mockIsAdmin);
 
 jest.mock('../routes/admin/adminDashboard.js', () => () => {
-  const mockExpress = require('express');
-  const router = mockExpress.Router();
+  const router = express.Router();
   router.get('/', (req, res) => res.status(200).send('Dashboard'));
   return router;
 });
-
-
-const { app } = require('../app.js');
-const isAdmin = require('../middleware/isAdmin.js');
 
 let server;
 let agent;

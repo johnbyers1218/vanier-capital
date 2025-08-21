@@ -1,16 +1,17 @@
 // routes/admin/adminClients.js (ESM Version)
 
-const express = require('express');
-const { body, param, validationResult } = require('express-validator');
-const Client = require('../../models/Client');
-const { logger } = require('../../config/logger');
-const Industry = require('../../models/Industry');
-const { validateMongoId, checkMongoIdValidation } = require('../../middleware/validateMongoId');
-const { logAdminAction } = require('../../utils/helpers');
-const multer = require('multer');
-const cloudinary = require('cloudinary').v2;
+import express from 'express';
+import { body, param, validationResult } from 'express-validator';
+import Client from '../../models/Client.js';
+import { logger } from '../../config/logger.js';
+import Industry from '../../models/Industry.js';
+import { validateMongoId, checkMongoIdValidation } from '../../middleware/validateMongoId.js';
+import { logAdminAction } from '../../utils/helpers.js';
+import multer from 'multer';
+import cloudinaryPkg from 'cloudinary';
+const cloudinary = cloudinaryPkg.v2;
 
-module.exports = (csrfProtection) => {
+export default (csrfProtection) => {
     const router = express.Router();
 
     // Configure Cloudinary (scoped to this router)

@@ -1,27 +1,23 @@
 // routes/admin/adminBlog.js (ESM Version - COMPLETE with authorDisplayName)
 
 
-const express = require('express');
-const { body, param, validationResult } = require('express-validator');
-const BlogPost = require('../../models/BlogPost');
-const AdminUser = require('../../models/AdminUser');
-const { logger } = require('../../config/logger');
-const { validateMongoId, checkMongoIdValidation } = require('../../middleware/validateMongoId');
-const { logAdminAction } = require('../../utils/helpers');
-const { coverImageUpload, handleCoverImageUpload, handleMulterErrorForCoverImage } = require('../../utils/adminUploads');
-// Legacy tag taxonomy removed; categories are the single source of truth
-const Category = require('../../models/Category');
-
-// --- HTML Sanitizer Setup ---
-const createDOMPurify = require('dompurify');
-const { JSDOM } = require('jsdom');
+import express from 'express';
+import { body, param, validationResult } from 'express-validator';
+import BlogPost from '../../models/BlogPost.js';
+import AdminUser from '../../models/AdminUser.js';
+import { logger } from '../../config/logger.js';
+import { validateMongoId, checkMongoIdValidation } from '../../middleware/validateMongoId.js';
+import { logAdminAction } from '../../utils/helpers.js';
+import { coverImageUpload, handleCoverImageUpload, handleMulterErrorForCoverImage } from '../../utils/adminUploads.js';
+import Category from '../../models/Category.js';
+import createDOMPurify from 'dompurify';
+import { JSDOM } from 'jsdom';
 const window = new JSDOM('').window;
 const DOMPurify = createDOMPurify(window);
-
-// --- Image Upload Dependencies & Setup ---
-const multer = require('multer');
-const cloudinary = require('cloudinary').v2;
-const path = require('path');
+import multer from 'multer';
+import cloudinaryPkg from 'cloudinary';
+const cloudinary = cloudinaryPkg.v2;
+import path from 'path';
 
 
 
@@ -43,7 +39,7 @@ const upload = multer({
 });
 
 // --- Router Export ---
-module.exports = (csrfProtection) => {
+export default (csrfProtection) => {
     const router = express.Router();
 
         // --- Configure Cloudinary ---

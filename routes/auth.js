@@ -1,7 +1,7 @@
-const express = require('express');
-const { logger } = require('../config/logger.js');
-const { clerkClient } = require('@clerk/clerk-sdk-node');
-module.exports = (csrfProtection) => { 
+import express from 'express';
+import { logger } from '../config/logger.js';
+import { clerkClient } from '@clerk/clerk-sdk-node';
+export default (csrfProtection) => { 
   const router = express.Router();
 
   // Health route to quickly verify Clerk publishable key presence

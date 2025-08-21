@@ -1,8 +1,8 @@
 // services/mailchimpService.js
 // Encapsulates Mailchimp client setup and operations
-const mailchimp = require('@mailchimp/mailchimp_marketing');
-const { logger } = require('../config/logger.js');
-const crypto = require('crypto');
+import mailchimp from '@mailchimp/mailchimp_marketing';
+import { logger } from '../config/logger.js';
+import crypto from 'crypto';
 
 // Lazily read env so dotenv can load before usage
 function getEnv() {
@@ -148,4 +148,4 @@ async function deleteMembers(emails = [], opts = {}) {
   return { ok: failed === 0, processed, failed };
 }
 
-module.exports = { addSubscriber, unsubscribeMembers, deleteMembers };
+export { addSubscriber, unsubscribeMembers, deleteMembers };

@@ -1,8 +1,8 @@
-const express = require('express');
-const { body, validationResult } = require('express-validator');
-const Service = require('../../models/Service');
+import express from 'express';
+import { body, validationResult } from 'express-validator';
+import Service from '../../models/Service.js';
 
-module.exports = (csrfProtection) => {
+export default (csrfProtection) => {
   const router = express.Router();
 
   router.get('/', csrfProtection, async (req, res, next) => {

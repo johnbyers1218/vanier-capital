@@ -1,47 +1,46 @@
-// app.js (ESM Version - Merged with Robust Startup/Shutdown for Heroku & CSP Fix)
-const path = require('path');
-const dotenv = require('dotenv');
-const fs = require('fs');
-// ...existing code...
-const https = require('https');
-const express = require('express');
-const mongoose = require('mongoose');
-const helmet = require('helmet');
-const cors = require('cors');
-const rateLimit = require('express-rate-limit');
-const cookieParser = require('cookie-parser');
-const session = require('express-session');
-const flash = require('connect-flash');
-const MongoStore = require('connect-mongo');
-const csrf = require('csurf');
-// const morgan = require('morgan');
-const { logger, httpLoggerMiddleware } = require('./config/logger.js');
-const { escapeHtml } = require('./utils/helpers.js');
-const publicRoutes = require('./routes/publicRoutes.js');
-const apiPublicRoutes = require('./routes/apiPublic.js');
-const apiContactRoutes = require('./routes/apiContact.js');
-const apiInquiriesRoutes = require('./routes/apiInquiries.js');
-const adminDashboardRoutes = require('./routes/admin/adminDashboard.js');
-const adminProjectRoutes = require('./routes/admin/adminProjects.js');
-const adminClientRoutes = require('./routes/admin/adminClients.js');
-const adminTestimonialRoutes = require('./routes/admin/adminTestimonials.js');
-const adminBlogRoutes = require('./routes/admin/adminBlog.js');
-const adminNewslettersRoutes = require('./routes/admin/adminNewsletters.js');
-const adminSubscriberRoutes = require('./routes/admin/adminSubscribers.js');
-const adminSettingsRoutes = require('./routes/admin/adminSettings.js');
-const adminCategoriesRoutes = require('./routes/admin/adminCategories.js');
-const adminIndustriesRoutes = require('./routes/admin/adminIndustries.js');
-const adminServicesRoutes = require('./routes/admin/adminServices.js');
-const adminSearchRoutes = require('./routes/admin/adminSearch.js');
-const adminInquiriesRoutes = require('./routes/admin/adminInquiries.js');
-const { startNewsletterScheduler } = require('./services/newsletterScheduler.js');
-const authRoutes = require('./routes/auth.js');
-const adminAuthRoutes = require('./routes/admin/adminAuth.js');
-const isAdmin = require('./middleware/isAdmin.js');
-const requireAdminClerk = require('./middleware/requireAdminClerk.js');
-const { ClerkExpressWithAuth } = require('@clerk/clerk-sdk-node');
+// ESM imports
+import path from 'path';
+import dotenv from 'dotenv';
+import fs from 'fs';
+import https from 'https';
+import express from 'express';
+import mongoose from 'mongoose';
+import helmet from 'helmet';
+import cors from 'cors';
+import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import flash from 'connect-flash';
+import MongoStore from 'connect-mongo';
+import csrf from 'csurf';
+// import morgan from 'morgan';
+import { logger, httpLoggerMiddleware } from './config/logger.js';
+import { escapeHtml } from './utils/helpers.js';
+import publicRoutes from './routes/publicRoutes.js';
+import apiPublicRoutes from './routes/apiPublic.js';
+import apiContactRoutes from './routes/apiContact.js';
+import apiInquiriesRoutes from './routes/apiInquiries.js';
+import adminDashboardRoutes from './routes/admin/adminDashboard.js';
+import adminProjectRoutes from './routes/admin/adminProjects.js';
+import adminClientRoutes from './routes/admin/adminClients.js';
+import adminTestimonialRoutes from './routes/admin/adminTestimonials.js';
+import adminBlogRoutes from './routes/admin/adminBlog.js';
+import adminNewslettersRoutes from './routes/admin/adminNewsletters.js';
+import adminSubscriberRoutes from './routes/admin/adminSubscribers.js';
+import adminSettingsRoutes from './routes/admin/adminSettings.js';
+import adminCategoriesRoutes from './routes/admin/adminCategories.js';
+import adminIndustriesRoutes from './routes/admin/adminIndustries.js';
+import adminServicesRoutes from './routes/admin/adminServices.js';
+import adminSearchRoutes from './routes/admin/adminSearch.js';
+import adminInquiriesRoutes from './routes/admin/adminInquiries.js';
+import { startNewsletterScheduler } from './services/newsletterScheduler.js';
+import authRoutes from './routes/auth.js';
+import adminAuthRoutes from './routes/admin/adminAuth.js';
+import isAdmin from './middleware/isAdmin.js';
+import requireAdminClerk from './middleware/requireAdminClerk.js';
+import { ClerkExpressWithAuth } from '@clerk/clerk-sdk-node';
 
-// --- Global Error Handlers (Early for critical errors) ---
+
 process.on('unhandledRejection', (reason, promise) => {
   logger.error('<<<<< UNHANDLED REJECTION AT PROMISE >>>>>');
   logger.error('Reason:', reason);
@@ -55,7 +54,11 @@ process.on('uncaughtException', (err, origin) => {
   logger.error('CRITICAL: Uncaught Exception', { error: err.message, stack: err.stack, origin });
   process.exit(1);
 });
-// __dirname and __filename are available in CommonJS
+
+// ESM __dirname and __filename equivalent
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // --- Dotenv Configuration ---
 if (process.env.NODE_ENV === 'development') {
@@ -74,13 +77,16 @@ if (process.env.NODE_ENV === 'development') {
   logger.info(`[ENV] Loaded .env.development from ${devEnvPath} (logger not yet available).`);
   }
 } else if (process.env.NODE_ENV === 'production') {
+  //
     if (logger) logger.info('[ENV] Production environment. Relying on Heroku Config Vars.');
   else logger.info('[ENV] Production environment. Relying on Heroku Config Vars (logger not yet available).');
 } else {
+  //
     dotenv.config(); // Default .env load
     if (logger) logger.info('[ENV] NODE_ENV not set to "development" or "production". Attempted to load default .env file.');
   else logger.info('[ENV] NODE_ENV not set. Attempted to load default .env (logger not yet available).');
 }
+//
 
 // Log presence of key SendGrid env vars (booleans only, no secrets)
 try {
@@ -97,7 +103,8 @@ try {
 const app = express();
 
 // Enable gzip compression for all responses (after app is defined)
-const compression = require('compression');
+
+import compression from 'compression';
 app.use(compression({
   filter: (req, res) => {
     if (req.headers['x-no-compression']) return false;
@@ -111,8 +118,9 @@ app.get('/AUTHORING_GUIDE.md', (req, res) => {
   res.sendFile(path.join(__dirname, 'AUTHORING_GUIDE.md'));
 });
 
+
 // Mount dynamic sitemap route for SEO
-const sitemapRouter = require('./routes/sitemap.js');
+import sitemapRouter from './routes/sitemap.js';
 app.use('/sitemap.xml', sitemapRouter);
 
 
@@ -155,31 +163,23 @@ const allowDbInTest = process.env.USE_IN_MEMORY_DB === '1';
 
 async function connectToDatabase() {
   if ((!isTestEnv || allowDbInTest) && !isSmokeEnv) {
-    const MONGODB_URI = process.env.MONGODB_URI;
-    if (!MONGODB_URI) {
-        (logger || console).error('FATAL ERROR: MONGODB_URI environment variable is not set. Application cannot start.');
-        process.exit(1);
-    }
-    try {
-        await mongoose.connect(MONGODB_URI);
-        logger.info('MongoDB Connected successfully.');
-    } catch (err) {
-        logger.error('MongoDB initial connection error. Application will exit.', { message: err.message, stack: err.stack });
-        process.exit(1);
-    }
-    mongoose.connection.on('error', err => logger.error('MongoDB runtime connection error:', { message: err.message }));
+  const MONGODB_URI = process.env.MONGODB_URI;
+  if (!MONGODB_URI) {
+    (logger || console).error('FATAL ERROR: MONGODB_URI environment variable is not set. Application cannot start.');
+    process.exit(1);
+  }
+  logger.info(`[DB] Attempting to connect to MongoDB at URI: ${MONGODB_URI}`);
+  try {
+    await mongoose.connect(MONGODB_URI);
+    logger.info('MongoDB Connected successfully.');
+  } catch (err) {
+    logger.error('[DB] MongoDB initial connection error. Application will exit.', { message: err.message, stack: err.stack });
+    process.exit(1);
+  }
+  mongoose.connection.on('error', err => logger.error('MongoDB runtime connection error:', { message: err.message }));
   } else {
     logger.info('[TEST/SMOKE MODE] Skipping MongoDB connection.');
   }
-}
-
-
-// Start background schedulers after DB init (skip in test/smoke to avoid open handles during Jest runs)
-if (!isTestEnv && !isSmokeEnv) {
-  try { startNewsletterScheduler(); }
-  catch (e) { logger.warn('[INIT] Newsletter scheduler failed to start.', { message: e.message }); }
-} else {
-  logger.info('[TEST/SMOKE MODE] Skipping background schedulers.');
 }
 
 // --- View Engine Setup ---
@@ -501,134 +501,141 @@ app.use((err, req, res, next) => { // Global Error Handler
 logger.debug('[INIT] Error handlers setup.');
 
 
-// --- Server Startup Logic ---
-const PORT = process.env.PORT || 3000;
-const HTTPS_PORT = process.env.HTTPS_PORT || 3443;
-let serverInstance;
+// --- Refactored Startup Sequence ---
+async function startApp() {
+  try {
+    // 1. Connect to database
+    await connectToDatabase();
+    logger.info('[STARTUP] Database connected successfully');
 
-logger.info(`[INIT] Preparing to start server in ${process.env.NODE_ENV} mode.`);
+    // 2. Start server listener (move all server startup logic here)
+    const PORT = process.env.PORT || 3000;
+    const HTTPS_PORT = process.env.HTTPS_PORT || 3443;
+    let serverInstance;
+    const allowServerInTest = process.env.ALLOW_SERVER_IN_TEST === '1';
 
-// Allow opting-in to start server in test (for E2E) via ALLOW_SERVER_IN_TEST=1
-const allowServerInTest = process.env.ALLOW_SERVER_IN_TEST === '1';
-
-// Do not start a listening server in test environment unless explicitly allowed
-if (process.env.NODE_ENV === 'test' && !allowServerInTest) {
-  logger.info('[TEST MODE] Skipping HTTP/HTTPS server startup.');
-} else if (process.env.NODE_ENV === 'test' && allowServerInTest) {
-  // Simplified HTTP-only server for E2E in test env
-  serverInstance = app.listen(PORT, () => {
-    logger.info(`HTTP Test Server started: http://localhost:${PORT}`);
-  });
-  serverInstance.on('error', (httpErr) => logger.error(`[SERVER START] HTTP Test Server listen error: ${httpErr.message}.`, httpErr));
-} else if (process.env.NODE_ENV === 'development') {
-    logger.info('[SERVER START] Development mode. Attempting HTTPS and HTTP.');
-    try {
+    if (process.env.NODE_ENV === 'test' && !allowServerInTest) {
+      logger.info('[TEST MODE] Skipping HTTP/HTTPS server startup.');
+    } else if (process.env.NODE_ENV === 'test' && allowServerInTest) {
+      serverInstance = app.listen(PORT, () => {
+        logger.info(`HTTP Test Server started: http://localhost:${PORT}`);
+      });
+      serverInstance.on('error', (httpErr) => logger.error(`[SERVER START] HTTP Test Server listen error: ${httpErr.message}.`, httpErr));
+    } else if (process.env.NODE_ENV === 'development') {
+      logger.info('[SERVER START] Development mode. Attempting HTTPS and HTTP.');
+      try {
         const keyPath = path.join(__dirname, 'key.pem');
         const certPath = path.join(__dirname, 'cert.pem');
         if (!fs.existsSync(keyPath) || !fs.existsSync(certPath)) {
-            logger.warn('[SERVER START] SSL certs (key.pem/cert.pem) not found. Falling back to HTTP for dev.');
-            throw new Error('SSL files not found.');
+          logger.warn('[SERVER START] SSL certs (key.pem/cert.pem) not found. Falling back to HTTP for dev.');
+          throw new Error('SSL files not found.');
         }
         const options = { key: fs.readFileSync(keyPath), cert: fs.readFileSync(certPath) };
         serverInstance = https.createServer(options, app).listen(HTTPS_PORT, () => {
-            logger.info(`HTTPS Development Server started: https://localhost:${HTTPS_PORT}`);
+          logger.info(`HTTPS Development Server started: https://localhost:${HTTPS_PORT}`);
         });
         serverInstance.on('error', (err) => {
-            logger.error(`[SERVER START] HTTPS Dev Server listen error: ${err.message}.`, err);
-            logger.info(`[SERVER START] Attempting HTTP fallback on port ${PORT}.`);
-            serverInstance = app.listen(PORT, () => {
-                logger.info(`HTTP Development Server (fallback) started: http://localhost:${PORT}`);
-            });
-            serverInstance.on('error', (httpErr) => logger.error(`[SERVER START] HTTP Dev Server (fallback) listen error: ${httpErr.message}.`, httpErr));
+          logger.error(`[SERVER START] HTTPS Dev Server listen error: ${err.message}.`, err);
+          logger.info(`[SERVER START] Attempting HTTP fallback on port ${PORT}.`);
+          serverInstance = app.listen(PORT, () => {
+            logger.info(`HTTP Development Server (fallback) started: http://localhost:${PORT}`);
+          });
+          serverInstance.on('error', (httpErr) => logger.error(`[SERVER START] HTTP Dev Server (fallback) listen error: ${httpErr.message}.`, httpErr));
         });
 
         const convenienceHttpServer = app.listen(PORT, () => {
-           if (serverInstance && serverInstance.address() && serverInstance.address().port === HTTPS_PORT) {
-             logger.info(`HTTP Development Server (convenience) also started: http://localhost:${PORT}`);
-           }
+          if (serverInstance && serverInstance.address() && serverInstance.address().port === HTTPS_PORT) {
+            logger.info(`HTTP Development Server (convenience) also started: http://localhost:${PORT}`);
+          }
         });
         convenienceHttpServer.on('error', (err) => {
-            if (!(serverInstance && serverInstance.address() && serverInstance.address().port === parseInt(PORT))) { // Only warn if not primary
-                logger.warn(`[SERVER START] Convenience HTTP server on port ${PORT} failed: ${err.message}`);
-            }
+          if (!(serverInstance && serverInstance.address() && serverInstance.address().port === parseInt(PORT))) {
+            logger.warn(`[SERVER START] Convenience HTTP server on port ${PORT} failed: ${err.message}`);
+          }
         });
-    } catch (error) {
+      } catch (error) {
         logger.warn(`[SERVER START] Dev HTTPS setup failed: ${error.message}. Starting HTTP only.`);
         serverInstance = app.listen(PORT, () => {
           logger.info(`HTTP Development Server (catch block) started: http://localhost:${PORT}`);
         });
         serverInstance.on('error', (err) => logger.error(`[SERVER START] HTTP Dev Server (catch block) listen error: ${err.message}`, err));
-    }
-} else { // Production Environment
-    logger.info('[SERVER START] Production mode.');
-    logger.info(`[SERVER START] Attempting to bind to $PORT: ${PORT}`);
-    serverInstance = app.listen(PORT, () => {
+      }
+    } else {
+      logger.info('[SERVER START] Production mode.');
+      logger.info(`[SERVER START] Attempting to bind to $PORT: ${PORT}`);
+      serverInstance = app.listen(PORT, () => {
         logger.info(`Production Server IS LISTENING on port ${PORT}`);
-    });
-    serverInstance.on('error', (err) => {
+      });
+      serverInstance.on('error', (err) => {
         logger.error(`[SERVER START] Production Server FAILED to bind to $PORT ${PORT}: ${err.message}`, err);
         process.exit(1);
-    });
+      });
+    }
+
+    // 3. Register graceful shutdown handlers AFTER server is running
+    const gracefulShutdown = async (signal) => {
+      logger.info(`${signal} received. Initiating graceful shutdown...`);
+      let serverClosed = false;
+      let dbClosed = false;
+      const attemptExit = () => {
+        if (serverClosed && dbClosed) {
+          logger.info('Graceful shutdown complete. Exiting.');
+          process.exit(0);
+        }
+      };
+      if (serverInstance && serverInstance.listening) {
+        logger.info('Closing active HTTP/S server...');
+        serverInstance.close((err) => {
+          if (err) {
+            logger.error('Error closing HTTP/S server:', err);
+          } else {
+            logger.info('HTTP/S server closed.');
+          }
+          serverClosed = true;
+          attemptExit();
+        });
+      } else {
+        logger.warn('Server instance not found or not listening for graceful shutdown.');
+        serverClosed = true;
+      }
+      if (mongoose.connection.readyState === 1) {
+        logger.info('Closing MongoDB connection...');
+        try {
+          await mongoose.connection.close();
+          logger.info('MongoDB connection closed.');
+        } catch (dbCloseError) {
+          logger.error('Error closing MongoDB connection:', dbCloseError);
+        } finally {
+          dbClosed = true;
+          attemptExit();
+        }
+      } else {
+        logger.info('MongoDB connection already closed or not established.');
+        dbClosed = true;
+      }
+      setTimeout(() => {
+        logger.warn('Graceful shutdown timeout (10s). Forcing exit.');
+        process.exit(1);
+      }, 10000);
+    };
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+    // 4. Start background schedulers after server is running
+    if (typeof startNewsletterScheduler === 'function' && (!isTestEnv && !isSmokeEnv)) {
+      try {
+        startNewsletterScheduler();
+      } catch (e) {
+        logger.warn('[INIT] Newsletter scheduler failed to start.', { message: e.message });
+      }
+    }
+
+    logger.info('[STARTUP] Application fully initialized and ready');
+  } catch (error) {
+    logger.error('[STARTUP] Failed to start application:', error);
+    process.exit(1);
+  }
 }
 
-// --- Graceful Shutdown Handler ---
-const gracefulShutdown = async (signal) => { // Made the handler async
-  logger.info(`${signal} received. Initiating graceful shutdown...`);
-  let serverClosed = false;
-  let dbClosed = false;
-
-  const attemptExit = () => {
-    if (serverClosed && dbClosed) {
-      logger.info('Graceful shutdown complete. Exiting.');
-      process.exit(0);
-    }
-  };
-
-  // Close HTTP/S server
-  if (serverInstance && serverInstance.listening) {
-    logger.info('Closing active HTTP/S server...');
-    serverInstance.close((err) => { // server.close() still uses a callback
-      if (err) {
-        logger.error('Error closing HTTP/S server:', err);
-      } else {
-        logger.info('HTTP/S server closed.');
-      }
-      serverClosed = true;
-      attemptExit();
-    });
-  } else {
-    logger.warn('Server instance not found or not listening for graceful shutdown.');
-    serverClosed = true; // Consider it "done" for the logic
-  }
-
-  // Close Mongoose connection
-  if (mongoose.connection.readyState === 1) { // 1 === connected
-    logger.info('Closing MongoDB connection...');
-    try {
-      await mongoose.connection.close(); // Use await, no callback
-      logger.info('MongoDB connection closed.');
-    } catch (dbCloseError) {
-      logger.error('Error closing MongoDB connection:', dbCloseError);
-    } finally {
-      dbClosed = true;
-      attemptExit();
-    }
-  } else {
-    logger.info('MongoDB connection already closed or not established.');
-    dbClosed = true;
-  }
-
-  // Fallback timeout
-  setTimeout(() => {
-     logger.warn('Graceful shutdown timeout (10s). Forcing exit.');
-     process.exit(1);
-  }, 10000);
-};
-
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));
-
-module.exports = {
-  app,
-  connectToDatabase
-};
+// ESM-compatible entry point
+startApp();

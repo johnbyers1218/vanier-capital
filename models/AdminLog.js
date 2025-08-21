@@ -1,6 +1,6 @@
 // models/AdminLog.js (ESM Version)
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
@@ -54,4 +54,4 @@ AdminLogSchema.index({ adminUser: 1, createdAt: -1 });
 
 // --- Model Export ---
 const AdminLog = mongoose.models.AdminLog || mongoose.model('AdminLog', AdminLogSchema);
-module.exports = AdminLog;
+export default AdminLog;

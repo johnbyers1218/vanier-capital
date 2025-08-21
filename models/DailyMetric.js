@@ -1,5 +1,5 @@
 // models/DailyMetric.js (ESM)
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
@@ -14,4 +14,4 @@ const DailyMetricSchema = new Schema({
 DailyMetricSchema.index({ key: 1, date: 1 }, { unique: true });
 
 const DailyMetric = mongoose.models.DailyMetric || mongoose.model('DailyMetric', DailyMetricSchema);
-module.exports = DailyMetric;
+export default DailyMetric;

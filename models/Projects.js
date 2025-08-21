@@ -1,6 +1,6 @@
 // models/Projects.js (ESM Version - UPDATED)
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const Schema = mongoose.Schema;
 
@@ -120,4 +120,4 @@ ProjectSchema.pre('validate', function(next) {
 
 
 const Project = mongoose.models.Project || mongoose.model('Project', ProjectSchema);
-module.exports = Project;
+export default Project;

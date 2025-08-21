@@ -1,6 +1,6 @@
 // models/Testimonial.js (ESM Version)
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const Schema = mongoose.Schema; // Alias for mongoose.Schema
 
@@ -73,4 +73,4 @@ TestimonialSchema.index({ client: 1, createdAt: -1 });
 // Handles potential model recompilation in development environments
 const Testimonial = mongoose.models.Testimonial || mongoose.model('Testimonial', TestimonialSchema);
 
-module.exports = Testimonial;
+export default Testimonial;

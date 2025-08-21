@@ -1,9 +1,9 @@
 // utils/adminUploads.js
 
-const { v2: cloudinary } = require('cloudinary');
-const multer = require('multer');
-const { logger } = require('../config/logger.js');
-const { logAdminAction } = require('./helpers.js'); // Assuming this is where your logAdminAction is
+import { v2 as cloudinary } from 'cloudinary';
+import multer from 'multer';
+import { logger } from '../config/logger.js';
+import { logAdminAction } from './helpers.js';
 
 
 
@@ -19,7 +19,7 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-const coverImageUpload = multer({
+export const coverImageUpload = multer({
     storage: storage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
     fileFilter: fileFilter
@@ -27,7 +27,7 @@ const coverImageUpload = multer({
 
 
 // --- Reusable Cloudinary Upload Handler for Cover Images ---
-const handleCoverImageUpload = async (req, res, next, entityType = 'cover') => {
+export const handleCoverImageUpload = async (req, res, next, entityType = 'cover') => {
     if (!req.file) {
         logger.warn(`[${entityType} Cover Upload] No file object found. User: ${req.adminUser?.username}`);
         return res.status(400).json({ success: false, message: 'No image file received.' });
@@ -78,7 +78,7 @@ const handleCoverImageUpload = async (req, res, next, entityType = 'cover') => {
 };
 
 // Multer error handling middleware (can be attached after the route)
-const handleMulterErrorForCoverImage = (error, req, res, next) => {
+export const handleMulterErrorForCoverImage = (error, req, res, next) => {
     if (error instanceof multer.MulterError) {
         logger.warn(`[Cover Upload Multer Error] User: ${req.adminUser?.username}, Code: ${error.code} - ${error.message}`);
         return res.status(400).json({ success: false, message: `Cover image upload error: ${error.message}. Max 5MB.` });
@@ -89,4 +89,3 @@ const handleMulterErrorForCoverImage = (error, req, res, next) => {
     next(); // Should not be reached if error is handled
 };
 
-module.exports = { coverImageUpload, handleCoverImageUpload, handleMulterErrorForCoverImage };

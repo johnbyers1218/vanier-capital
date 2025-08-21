@@ -1,6 +1,7 @@
 
-const request = require('supertest');
-const http = require('http');
+
+import request from 'supertest';
+import http from 'http';
 process.env.NODE_ENV = 'test';
 
 // Mock Inquiry model
@@ -25,7 +26,7 @@ jest.mock('../utils/esp.js', () => ({
   getCampaignDetails: jest.fn().mockResolvedValue({ ok: true, data: {} })
 }));
 
-const { app } = require('../app.js');
+import { app } from '../app.js';
 let server;
 let agent;
 

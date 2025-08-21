@@ -1,10 +1,10 @@
-const express = require('express');
-const { body, validationResult } = require('express-validator');
-const Settings = require('../../models/Settings');
-const Client = require('../../models/Client');
-const { logger } = require('../../config/logger');
+import express from 'express';
+import { body, validationResult } from 'express-validator';
+import Settings from '../../models/Settings.js';
+import Client from '../../models/Client.js';
+import { logger } from '../../config/logger.js';
 
-module.exports = (csrfProtection) => {
+export default (csrfProtection) => {
   const router = express.Router();
 
   // GET settings hub

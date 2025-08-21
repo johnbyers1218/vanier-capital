@@ -1,8 +1,8 @@
-const cron = require('node-cron');
-const { logger } = require('../config/logger.js');
-const Newsletter = require('../models/Newsletter.js');
-const { sendExistingCampaignById } = require('../utils/esp.js');
-const { refreshNewsletterStatusesByFilter } = require('./newsletterStatusRefresher.js');
+import cron from 'node-cron';
+import { logger } from '../config/logger.js';
+import Newsletter from '../models/Newsletter.js';
+import { sendExistingCampaignById } from '../utils/esp.js';
+import { refreshNewsletterStatusesByFilter } from './newsletterStatusRefresher.js';
 
 function startNewsletterScheduler() {
   if (process.env.NEWSLETTER_SCHEDULER === 'off') {
@@ -45,4 +45,4 @@ function startNewsletterScheduler() {
   logger.info('[NewsletterScheduler] Nightly status refresh scheduled (02:10 UTC).');
 }
 
-module.exports = { startNewsletterScheduler };
+export { startNewsletterScheduler };

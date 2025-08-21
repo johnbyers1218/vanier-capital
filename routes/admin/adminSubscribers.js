@@ -1,8 +1,8 @@
-const express = require('express');
-const { logger } = require('../../config/logger');
-const NewsletterSubscriber = require('../../models/NewsletterSubscriber');
+import express from 'express';
+import { logger } from '../../config/logger.js';
+import NewsletterSubscriber from '../../models/NewsletterSubscriber.js';
 
-module.exports = (csrfProtection) => {
+export default (csrfProtection) => {
   const router = express.Router();
 
   // List subscribers with basic pagination

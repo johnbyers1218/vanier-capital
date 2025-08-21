@@ -1,18 +1,18 @@
 // routes/apiPublic.js (ESM Version)
 
-const express = require('express');
-const Project = require('../models/Projects.js');         // Default import, added .js
-const Industry = require('../models/Industry.js');
-const Service = require('../models/Service.js');
-const Testimonial = require('../models/Testimonials.js'); // Default import, added .js
-const { logger } = require('../config/logger.js');       // Named import, added .js
-const Client = require('../models/Client.js');
-const NewsletterSubscriber = require('../models/NewsletterSubscriber.js');
-const { body, validationResult } = require('express-validator');
-const { addSubscriber: espAddSubscriber } = require('../utils/esp.js');
-const { addSubscriber: mcAddSubscriber } = require('../services/mailchimpService.js');
+import express from 'express';
+import Project from '../models/Projects.js';
+import Industry from '../models/Industry.js';
+import Service from '../models/Service.js';
+import Testimonial from '../models/Testimonials.js';
+import { logger } from '../config/logger.js';
+import Client from '../models/Client.js';
+import NewsletterSubscriber from '../models/NewsletterSubscriber.js';
+import { body, validationResult } from 'express-validator';
+import { addSubscriber as espAddSubscriber } from '../utils/esp.js';
+import { addSubscriber as mcAddSubscriber } from '../services/mailchimpService.js';
 
-const router = express.Router(); // Create router instance
+const router = express.Router();
 
 /**
  * @route   GET /api/projects
@@ -457,4 +457,4 @@ router.post(
 );
 
 // Use ESM default export for the router
-module.exports = router;
+export default router;

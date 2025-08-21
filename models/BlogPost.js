@@ -1,8 +1,7 @@
 // models/BlogPost.js (ESM Version)
 
-const mongoose = require('mongoose');
-// Optional: Import slugify if you plan to use it for auto-generation
-const slugify = require('slugify'); // Run: npm install slugify
+import mongoose from 'mongoose';
+import slugify from 'slugify'; // Run: npm install slugify
 
 const Schema = mongoose.Schema;
 
@@ -128,4 +127,4 @@ BlogPostSchema.index({ viewCount: -1 });
 const BlogPost = mongoose.models.BlogPost || mongoose.model('BlogPost', BlogPostSchema);
 
 // Use ESM default export
-module.exports = BlogPost;
+export default BlogPost;

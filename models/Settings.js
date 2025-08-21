@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 // A simple key/value store for site-wide settings (e.g., KPIs shown on public pages)
 const SettingsSchema = new mongoose.Schema({
@@ -13,4 +13,4 @@ const SettingsSchema = new mongoose.Schema({
 
 
 const Settings = mongoose.models.Settings || mongoose.model('Settings', SettingsSchema);
-module.exports = Settings;
+export default Settings;

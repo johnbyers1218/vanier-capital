@@ -1,16 +1,16 @@
 // routes/publicRoutes.js (ESM Version - UPDATED with Prev/Next Logic)
 
-const express = require('express');
-const path = require('path'); // Still useful for __dirname resolution if needed elsewhere
-const { logger } = require('../config/logger.js'); // Named import, added .js
-const BlogPost = require('../models/BlogPost.js'); // Default import, added .js
-const Category = require('../models/Category.js');
-const ImportedProjectModel = require('../models/Projects.js'); // <--- ALIASED IMPORT NAME
-const Testimonial = require('../models/Testimonials.js');
-const Client = require('../models/Client.js'); // Hub & Spoke Architecture
-const DailyMetric = require('../models/DailyMetric.js');
-const Project = require('../models/Projects.js');
-const Settings = require('../models/Settings.js');
+import express from 'express';
+import path from 'path';
+import { logger } from '../config/logger.js';
+import BlogPost from '../models/BlogPost.js';
+import Category from '../models/Category.js';
+import ImportedProjectModel from '../models/Projects.js';
+import Testimonial from '../models/Testimonials.js';
+import Client from '../models/Client.js';
+import DailyMetric from '../models/DailyMetric.js';
+import Project from '../models/Projects.js';
+import Settings from '../models/Settings.js';
 // AdminUser no longer used for public contact avatars; About team used instead
 
 
@@ -810,7 +810,7 @@ router.get('/terms-of-service', async (req, res) => {
 
 
 // Use ESM default export for the router
-module.exports = router;
+export default router;
  
 // --- Dynamic Sitemap ---
 // Serves a dynamic sitemap.xml enumerating public pages, blog posts, and projects

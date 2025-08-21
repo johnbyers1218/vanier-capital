@@ -1,20 +1,18 @@
 // routes/admin/adminProjects.js (ESM Version - UPDATED for Rich Text Description & Slugs)
 
 
-const express = require('express');
-const { body, param, validationResult } = require('express-validator');
-const Project = require('../../models/Projects');
-const Industry = require('../../models/Industry');
-const Service = require('../../models/Service');
-const Client = require('../../models/Client');
-const { logger } = require('../../config/logger');
-const { validateMongoId, checkMongoIdValidation } = require('../../middleware/validateMongoId');
-const { logAdminAction } = require('../../utils/helpers');
-const { coverImageUpload, handleCoverImageUpload, handleMulterErrorForCoverImage } = require('../../utils/adminUploads');
-
-// --- HTML Sanitizer Setup (like in adminBlog.js) ---
-const createDOMPurify = require('dompurify');
-const { JSDOM } = require('jsdom');
+import express from 'express';
+import { body, param, validationResult } from 'express-validator';
+import Project from '../../models/Projects.js';
+import Industry from '../../models/Industry.js';
+import Service from '../../models/Service.js';
+import Client from '../../models/Client.js';
+import { logger } from '../../config/logger.js';
+import { validateMongoId, checkMongoIdValidation } from '../../middleware/validateMongoId.js';
+import { logAdminAction } from '../../utils/helpers.js';
+import { coverImageUpload, handleCoverImageUpload, handleMulterErrorForCoverImage } from '../../utils/adminUploads.js';
+import createDOMPurify from 'dompurify';
+import { JSDOM } from 'jsdom';
 const window = new JSDOM('').window;
 const DOMPurify = createDOMPurify(window);
 
@@ -29,8 +27,7 @@ const generateSlug = (title) => {
                 .replace(/-+$/, '') || Date.now().toString(); // Fallback
 };
 
-module.exports = (csrfProtection) => {
-    
+export default (csrfProtection) => {
     const router = express.Router();
 
     const projectValidationRules = [

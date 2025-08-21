@@ -1,9 +1,9 @@
 // utils/email.js (ESM Version)
 
 // Import necessary modules using ESM syntax
-const nodemailer = require("nodemailer");
-const { google } = require("googleapis"); // googleapis typically exports 'google' as a named export
-const { logger } = require("../config/logger.js"); // Import named export, add .js extension
+import nodemailer from "nodemailer";
+import { google } from "googleapis";
+import { logger } from "../config/logger.js";
 
 // Destructure google.auth for easier access if preferred
 const { OAuth2 } = google.auth;
@@ -14,7 +14,7 @@ const { OAuth2 } = google.auth;
  * Throws an error if configuration is missing or authentication fails.
  * @returns {Promise<nodemailer.Transporter>} A Promise resolving to the configured transporter.
  */
-const createTransporter = async () => {
+export const createTransporter = async () => {
   logger.debug("Attempting to create Nodemailer OAuth2 transporter...");
 
   // 1. Check for required environment variables
@@ -91,4 +91,4 @@ const createTransporter = async () => {
   }
 };
 
-module.exports = { createTransporter };
+export { createTransporter };

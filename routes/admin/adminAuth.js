@@ -1,15 +1,15 @@
-const express = require('express');
-const jwt = require('jsonwebtoken');
-const { body, validationResult } = require('express-validator');
-const AdminUser = require('../../models/AdminUser');
-const { logger } = require('../../config/logger');
+import express from 'express';
+import jwt from 'jsonwebtoken';
+import { body, validationResult } from 'express-validator';
+import AdminUser from '../../models/AdminUser.js';
+import { logger } from '../../config/logger.js';
 
 // Legacy session/JWT-based admin authentication routes
 // Exposes:
 //   GET  /admin/login  -> render login form
 //   POST /admin/login  -> verify credentials, set admin_token cookie, redirect
 //   POST /admin/logout -> clear cookie and redirect to login
-module.exports = (csrfProtection) => {
+export default (csrfProtection) => {
 	const router = express.Router();
 
 	// Render login form

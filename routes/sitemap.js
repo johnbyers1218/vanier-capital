@@ -1,8 +1,9 @@
-// Dynamic sitemap.xml route for SEO
-const express = require('express');
+
+// Dynamic sitemap.xml route for SEO (ESM)
+import express from 'express';
+import BlogPost from '../models/BlogPost.js';
+import Projects from '../models/Projects.js';
 const router = express.Router();
-const BlogPost = require('../models/BlogPost.js');
-const Projects = require('../models/Projects.js');
 
 router.get('/', async (req, res) => {
 	try {
@@ -39,4 +40,4 @@ router.get('/', async (req, res) => {
 	}
 });
 
-module.exports = router;
+export default router;

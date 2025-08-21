@@ -1,10 +1,10 @@
-const express = require('express');
-const Project = require('../../models/Projects');
-const BlogPost = require('../../models/BlogPost');
-const Client = require('../../models/Client');
-const { logger } = require('../../config/logger');
+import express from 'express';
+import Project from '../../models/Projects.js';
+import BlogPost from '../../models/BlogPost.js';
+import Client from '../../models/Client.js';
+import { logger } from '../../config/logger.js';
 
-module.exports = (csrfProtection) => {
+export default (csrfProtection) => {
 	const router = express.Router();
 
 	router.get('/', csrfProtection, async (req, res, next) => {

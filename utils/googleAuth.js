@@ -12,7 +12,7 @@
  * THIS FUNCTION IS CURRENTLY NOT USED AS DIRECT CALENDAR INTEGRATION IS DISABLED.
  * @returns {Promise<object>} A Promise resolving to the authorized JWT client instance.
  */
-const getGoogleAuth = async () => {
+export const getGoogleAuth = async () => {
     // logger.debug('Attempting Google API authentication (Currently Disabled for Calendar)...');
     logger.warn('[googleAuth.js] getGoogleAuth called, but Calendar integration is currently disabled. No action will be taken for Calendar API.');
     // Return a placeholder or throw an error if it were to be used unexpectedly.
@@ -86,4 +86,4 @@ const getGoogleAuth = async () => {
     }
     */
 };
-module.exports = { getGoogleAuth };
+export { getGoogleAuth };

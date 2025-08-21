@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const clientSchema = new mongoose.Schema({
   name: {
@@ -49,4 +49,4 @@ clientSchema.index({ industry: 1 });
 
 const Client = mongoose.models.Client || mongoose.model('Client', clientSchema);
 
-module.exports = Client;
+export default Client;

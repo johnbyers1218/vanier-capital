@@ -1,6 +1,6 @@
 // middleware/requireAdminClerk.js
-const { ClerkExpressRequireAuth, clerkClient } = require('@clerk/clerk-sdk-node');
-const { logger } = require('../config/logger.js');
+import { ClerkExpressRequireAuth, clerkClient } from '@clerk/clerk-sdk-node';
+import { logger } from '../config/logger.js';
 
 // Composed middleware: requires a valid Clerk session, then enforces role === 'admin'
 // ...existing code...
@@ -62,4 +62,4 @@ const requireAdminClerk = [
   }
 ];
 
-module.exports = requireAdminClerk;
+export default requireAdminClerk;

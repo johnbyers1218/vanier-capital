@@ -1,8 +1,8 @@
 // middleware/isAdmin.js (ESM Version)
 
-const jwt = require('jsonwebtoken');
-const { logger } = require('../config/logger.js'); // Use named import, add .js extension
-const AdminUser = require('../models/AdminUser.js'); // Default import from model, add .js extension
+import jwt from 'jsonwebtoken';
+import { logger } from '../config/logger.js';
+import AdminUser from '../models/AdminUser.js';
 
 /**
  * Express middleware to authenticate and authorize admin users via JWT cookie.
@@ -126,4 +126,4 @@ const isAdmin = async (req, res, next) => {
 };
 
 // Use ESM default export for the middleware function
-module.exports = isAdmin;
+export default isAdmin;

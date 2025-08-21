@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const validator = require('validator');
+import mongoose from 'mongoose';
+import validator from 'validator';
 
 const Schema = mongoose.Schema;
 
@@ -59,4 +59,4 @@ const NewsletterSubscriberSchema = new Schema(
 
 const NewsletterSubscriber = mongoose.models.NewsletterSubscriber || mongoose.model('NewsletterSubscriber', NewsletterSubscriberSchema);
 
-module.exports = NewsletterSubscriber;
+export default NewsletterSubscriber;

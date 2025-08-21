@@ -1,5 +1,5 @@
 // models/Service.js
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const ServiceSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true, maxlength: 80 },
@@ -8,4 +8,5 @@ const ServiceSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 
-module.exports = mongoose.models.Service || mongoose.model('Service', ServiceSchema);
+const Service = mongoose.models.Service || mongoose.model('Service', ServiceSchema);
+export default Service;

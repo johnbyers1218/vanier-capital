@@ -1,11 +1,11 @@
-const express = require('express');
-const { logger } = require('../../config/logger');
-const Newsletter = require('../../models/Newsletter');
-const NewsletterSubscriber = require('../../models/NewsletterSubscriber');
-const { sendExistingCampaignById, getCampaignDetails } = require('../../utils/esp');
-const { refreshNewsletterStatusesByIds } = require('../../services/newsletterStatusRefresher');
+import express from 'express';
+import { logger } from '../../config/logger.js';
+import Newsletter from '../../models/Newsletter.js';
+import NewsletterSubscriber from '../../models/NewsletterSubscriber.js';
+import { sendExistingCampaignById, getCampaignDetails } from '../../utils/esp.js';
+import { refreshNewsletterStatusesByIds } from '../../services/newsletterStatusRefresher.js';
 
-module.exports = (csrfProtection) => {
+export default (csrfProtection) => {
   const router = express.Router();
 
   router.get('/', csrfProtection, async (req, res, next) => {

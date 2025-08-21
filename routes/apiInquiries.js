@@ -1,8 +1,9 @@
-const express = require('express');
-const { body, validationResult } = require('express-validator');
-const Inquiry = require('../models/Inquiry.js');
-const { logger } = require('../config/logger.js');
-const { sendTeamNotification, sendUserConfirmation } = require('../services/sendgridService.js');
+
+import express from 'express';
+import { body, validationResult } from 'express-validator';
+import Inquiry from '../models/Inquiry.js';
+import { logger } from '../config/logger.js';
+import { sendTeamNotification, sendUserConfirmation } from '../services/sendgridService.js';
 
 const router = express.Router();
 
@@ -41,4 +42,4 @@ router.post('/contact-submission', rules, async (req, res, next) => {
   }
 });
 
-module.exports = router;
+export default router;

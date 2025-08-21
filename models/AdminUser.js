@@ -1,8 +1,8 @@
 // models/AdminUser.js (ESM Version)
 
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs'); // Use CommonJS require for bcryptjs
-const { logger } = require('../config/logger.js'); // Adjust path, add .js extension
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+import { logger } from '../config/logger.js';
 
 const Schema = mongoose.Schema;
 
@@ -132,4 +132,4 @@ AdminUserSchema.methods.isLocked = function() {
 const AdminUser = mongoose.models.AdminUser || mongoose.model('AdminUser', AdminUserSchema);
 
 // Use ESM default export
-module.exports = AdminUser;
+export default AdminUser;

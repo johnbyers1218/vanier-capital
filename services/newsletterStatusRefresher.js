@@ -1,6 +1,6 @@
-const { logger } = require('../config/logger.js');
-const Newsletter = require('../models/Newsletter.js');
-const { getCampaignDetails } = require('../utils/esp.js');
+import { logger } from '../config/logger.js';
+import Newsletter from '../models/Newsletter.js';
+import { getCampaignDetails } from '../utils/esp.js';
 
 async function runWithConcurrency(items, limit, worker) {
   let updated = 0;
@@ -53,4 +53,4 @@ async function refreshNewsletterStatusesByFilter(filter = { status: { $in: ['Dra
   return { updated, errors };
 }
 
-module.exports = { refreshNewsletterStatusesByIds, refreshNewsletterStatusesByFilter };
+export { refreshNewsletterStatusesByIds, refreshNewsletterStatusesByFilter };

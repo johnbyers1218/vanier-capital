@@ -1,22 +1,22 @@
 // routes/admin/adminDashboard.js (ESM Version - Detailed Logging)
 
-const express = require('express');
-const { logger } = require('../../config/logger');
-const Project = require('../../models/Projects');
-const Testimonial = require('../../models/Testimonials');
-const BlogPost = require('../../models/BlogPost');
-const AdminLog = require('../../models/AdminLog');
-const NewsletterSubscriber = require('../../models/NewsletterSubscriber');
-const { logAdminAction } = require('../../utils/helpers');
-const AdminUser = require('../../models/AdminUser');
-const Contact = require('../../models/Contacts');
-const Inquiry = require('../../models/Inquiry');
-const DailyMetric = require('../../models/DailyMetric');
+import express from 'express';
+import { logger } from '../../config/logger.js';
+import Project from '../../models/Projects.js';
+import Testimonial from '../../models/Testimonials.js';
+import BlogPost from '../../models/BlogPost.js';
+import AdminLog from '../../models/AdminLog.js';
+import NewsletterSubscriber from '../../models/NewsletterSubscriber.js';
+import { logAdminAction } from '../../utils/helpers.js';
+import AdminUser from '../../models/AdminUser.js';
+import Contact from '../../models/Contacts.js';
+import Inquiry from '../../models/Inquiry.js';
+import DailyMetric from '../../models/DailyMetric.js';
 
 // Export a function that accepts csrfProtection middleware
 // Although CSRF isn't strictly needed for a GET-only dashboard without forms,
 // accepting it maintains the pattern used in app.js for mounting admin routes.
-module.exports = (csrfProtection) => {
+export default (csrfProtection) => {
     const router = express.Router();
 
     // GET /admin/dashboard

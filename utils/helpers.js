@@ -1,7 +1,7 @@
 // utils/helpers.js
 // Import necessary modules (ensure these are at the top if adding to helpers.js)
-const AdminLog = require('../models/AdminLog.js');
-const { logger } = require('../config/logger.js');
+import AdminLog from '../models/AdminLog.js';
+import { logger } from '../config/logger.js';
 
 /**
  * SECURE HTML escaping utility.
@@ -13,7 +13,7 @@ const { logger } = require('../config/logger.js');
  * @param {string | number | any} unsafe The potentially unsafe input. Handles non-strings gracefully.
  * @returns {string} The HTML-escaped string.
  */
-function escapeHtml(unsafe) {
+export function escapeHtml(unsafe) {
     if (unsafe === null || unsafe === undefined) return '';
     const str = String(unsafe);
     // Ampersand must be escaped first to avoid double-escaping
@@ -30,7 +30,7 @@ function escapeHtml(unsafe) {
  * This helps when content has been double-encoded (e.g., '&amp;amp;' -> '&amp;' -> '&').
  * Safe to use on text (not HTML markup), and should still be rendered with escaping in templates.
  */
-function decodeHtmlEntities(input) {
+export function decodeHtmlEntities(input) {
     if (input === null || input === undefined) return '';
     let str = String(input);
     // Named entities
@@ -63,7 +63,7 @@ function decodeHtmlEntities(input) {
  * @param {string} [details=''] - Optional details about the action (e.g., item title/ID).
  * @param {string} [ipAddress=''] - The IP address from the request.
  */
-async function logAdminAction(userId, username, action, details = '', ipAddress = '') {
+export async function logAdminAction(userId, username, action, details = '', ipAddress = '') {
     if (!userId || !username || !action) {
         logger.error('Attempted to log admin action with missing required fields.', { userId, username, action });
         return; // Don't proceed if essential info missing
@@ -88,8 +88,5 @@ async function logAdminAction(userId, username, action, details = '', ipAddress 
     }
 }
 
-module.exports = {
-    escapeHtml,
-    decodeHtmlEntities,
-    logAdminAction
-};
+
+// Already using ESM exports above, no changes needed here

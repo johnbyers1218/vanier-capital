@@ -1,9 +1,9 @@
 // utils/esp.js - Lightweight ESP integration with safe fallbacks
 // Provider: Mailchimp (others can be added later)
 
-const { logger } = require('../config/logger.js');
+import { logger } from '../config/logger.js';
 
-function isMailchimpConfigured() {
+export function isMailchimpConfigured() {
   return !!(
     process.env.MAILCHIMP_API_KEY &&
     process.env.MAILCHIMP_SERVER_PREFIX &&
@@ -13,7 +13,7 @@ function isMailchimpConfigured() {
   );
 }
 
-async function getMailchimpClient() {
+export async function getMailchimpClient() {
   // Dynamic import so tests/dev without package installed won't fail.
   try {
     const mc = await import('@mailchimp/mailchimp_marketing');
@@ -29,7 +29,7 @@ async function getMailchimpClient() {
   }
 }
 
-async function addSubscriber(email) {
+export async function addSubscriber(email) {
   if (!email) return false;
   if (!isMailchimpConfigured()) {
     logger.info(`[ESP] addSubscriber noop (not configured): ${email}`);
@@ -56,7 +56,7 @@ async function addSubscriber(email) {
   }
 }
 
-async function createAndSendCampaign({ subject, html }) {
+export async function createAndSendCampaign({ subject, html }) {
   if (!isMailchimpConfigured()) {
     logger.info('[ESP] createAndSendCampaign noop (not configured).');
     return { ok: true, id: 'noop' };
@@ -94,7 +94,7 @@ async function createAndSendCampaign({ subject, html }) {
 
 // New: Send an already-created Mailchimp campaign by Campaign ID
 
-async function sendExistingCampaignById(campaignId) {
+export async function sendExistingCampaignById(campaignId) {
   if (!campaignId) return { ok: false, error: 'Missing campaignId' };
   if (!isMailchimpConfigured()) {
     logger.info('[ESP] sendExistingCampaignById noop (not configured).');
@@ -113,7 +113,7 @@ async function sendExistingCampaignById(campaignId) {
 }
 
 // Fetch campaign details (includes web_id and status) to validate IDs and build links
-async function getCampaignDetails(campaignId) {
+export async function getCampaignDetails(campaignId) {
   if (!campaignId) return { ok: false, error: 'Missing campaignId' };
   if (!isMailchimpConfigured()) {
     logger.info('[ESP] getCampaignDetails noop (not configured).');
@@ -129,11 +129,4 @@ async function getCampaignDetails(campaignId) {
   }
 }
 
-module.exports = {
-  isMailchimpConfigured,
-  getMailchimpClient,
-  addSubscriber,
-  createAndSendCampaign,
-  sendExistingCampaignById,
-  getCampaignDetails,
-};
+

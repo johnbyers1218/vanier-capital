@@ -1,9 +1,9 @@
 
-const express = require('express');
-const Inquiry = require('../../models/Inquiry');
-const { logger } = require('../../config/logger');
+import express from 'express';
+import Inquiry from '../../models/Inquiry.js';
+import { logger } from '../../config/logger.js';
 
-module.exports = (csrfProtection) => {
+export default (csrfProtection) => {
   const router = express.Router();
 
   // List page with optional filter ?status=New|Viewed|Responded

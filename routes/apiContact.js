@@ -1,10 +1,11 @@
 // routes/apiContact.js (ESM Version - UPDATED to include optional scheduling)
 
-const express = require('express');
-const { body, validationResult } = require('express-validator');
-const Contact = require('../models/Contacts.js');
-const { logger } = require('../config/logger.js');
-const { DateTime } = require('luxon'); // For date parsing if needed
+
+import express from 'express';
+import { body, validationResult } from 'express-validator';
+import Contact from '../models/Contacts.js';
+import { logger } from '../config/logger.js';
+import { DateTime } from 'luxon'; // For date parsing if needed
 
 const router = express.Router();
 
@@ -75,4 +76,4 @@ router.post('/contact', contactAndScheduleValidationRules, async (req, res, next
     }
 });
 
-module.exports = router;
+export default router;
