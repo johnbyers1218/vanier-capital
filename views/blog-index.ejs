@@ -212,7 +212,7 @@
                                 <div class="featured-category"><span class="pill"><%= post.categories[0].name %></span></div>
                             <% } %>
                              <%# Post Title (Link) %>
-                                                            <h3><a href="/blog/<%= post.slug %>" class="blog-post-summary-title"><%= post.title %></a></h3>
+                                                            <h3><a href="/blog/<%= post.slug %>" class="blog-post-summary-title"><%- decodeHtmlEntities(post.title) %></a></h3>
                                       <div class="blog-post-byline" style="margin:.25rem 0 .5rem 0; color: var(--color-text-muted);">
                                           <% const by = (post.authorDisplayName || (post.author ? (post.author.fullName || post.author.username) : 'FND Team')); %>
                                           By <%= by %>

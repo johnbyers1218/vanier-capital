@@ -103,6 +103,14 @@ function escapeHtml(unsafe) {
          .replace(/'/g, "'");
  }
  
+// Decode HTML entities (admin CMS content trusted)
+function decodeHtmlEntities(str) {
+    if (str == null) return '';
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = str;
+    return textarea.value;
+}
+ 
 
 /**
  * Reusable fetch function with basic error handling.
@@ -246,9 +254,10 @@ function generateExcerptFromHtml(htmlContent, maxLength = 150) {
 /** Creates HTML for a single Project card (for listing pages) */
 function createProjectCardHtml(project, isPreview = false) {
     // Prefer explicit excerpt; fallback to generating from HTML description
-    const excerpt = project.excerpt && String(project.excerpt).trim().length
+    const excerptRaw = project.excerpt && String(project.excerpt).trim().length
         ? String(project.excerpt)
         : generateExcerptFromHtml(project.description, isPreview ? 80 : 120);
+    const excerptHtml = decodeHtmlEntities(excerptRaw);
 
     const imageHtml = project.image
         ? `<img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}" loading="lazy" class="project-image">`
@@ -272,7 +281,7 @@ function createProjectCardHtml(project, isPreview = false) {
                 <h3 class="project-title">${escapeHtml(project.title)}</h3>
                 <div class="project-meta">${industryChips}</div>
                 ${serviceChips ? `<div class="project-meta">${serviceChips}</div>` : ''}
-                <p class="project-description">${escapeHtml(excerpt)}</p>
+                <div class="project-description project-description-rich">${excerptHtml}</div>
             </div>
             <div class="project-card-spacer"></div>
             <div class="project-meta project-cta">
@@ -368,25 +377,25 @@ function formatServiceLabel(slug) {
 
 // createFeaturedProjectHtml needs to be updated to use an excerpt too if its description is HTML
 function createFeaturedProjectHtml(project) {
-        const projectDetailUrl = `/projects/${escapeHtml(project.slug)}`;
-        const image = project.image
-                ? `<img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}" loading="lazy">`
-                : `<div class="featured-media-placeholder"><i class="fas fa-project-diagram fa-2x"></i></div>`;
-        const categoryLabel = (Array.isArray(project.industries) && project.industries.length) ? project.industries[0].name : '';
-        // Prefer explicit excerpt; fall back to generated (shorten to ~320 chars then clamp)
-        const rawExcerpt = project.excerpt ? String(project.excerpt) : generateExcerptFromHtml(project.description, 400);
-        const excerpt = rawExcerpt.length > 320 ? rawExcerpt.slice(0, 317) + '…' : rawExcerpt;
+    const projectDetailUrl = `/projects/${escapeHtml(project.slug)}`;
+    const image = project.image
+        ? `<img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}" loading="lazy">`
+        : `<div class="featured-media-placeholder"><i class="fas fa-project-diagram fa-2x"></i></div>`;
+    const categoryLabel = (Array.isArray(project.industries) && project.industries.length) ? project.industries[0].name : '';
+    const rawExcerpt = project.excerpt ? String(project.excerpt) : generateExcerptFromHtml(project.description, 400);
+    const truncated = rawExcerpt.length > 320 ? rawExcerpt.slice(0, 317) + '…' : rawExcerpt;
+    const excerptHtml = decodeHtmlEntities(truncated);
 
-        return `
-            <div class="featured-card featured-card-compact" style="max-width:1080px;margin:0 auto;">
-                <div class="featured-media">${image}</div>
-                <div class="featured-body">
-                    ${categoryLabel ? `<div class="featured-category"><span class="pill">${escapeHtml(categoryLabel)}</span></div>` : ''}
-                    <h3 class="featured-title"><a href="${projectDetailUrl}" style="text-decoration:none;color:inherit;">${escapeHtml(project.title)}</a></h3>
-                    <p class="featured-excerpt featured-excerpt--clamp">${escapeHtml(excerpt)}</p>
-                    <div class="featured-actions"><a href="${projectDetailUrl}" class="cta-button primary-btn">View Case Study <span class="icon-arrow">&rarr;</span></a></div>
-                </div>
-            </div>`;
+    return `
+        <div class="featured-card featured-card-compact" style="max-width:1080px;margin:0 auto;">
+            <div class="featured-media">${image}</div>
+            <div class="featured-body">
+                ${categoryLabel ? `<div class="featured-category"><span class="pill">${escapeHtml(categoryLabel)}</span></div>` : ''}
+                <h3 class="featured-title"><a href="${projectDetailUrl}" style="text-decoration:none;color:inherit;">${escapeHtml(project.title)}</a></h3>
+                <div class="featured-excerpt featured-excerpt--clamp featured-excerpt-rich">${excerptHtml}</div>
+                <div class="featured-actions"><a href="${projectDetailUrl}" class="cta-button primary-btn">View Case Study <span class="icon-arrow">&rarr;</span></a></div>
+            </div>
+        </div>`;
 }
 
 
@@ -1549,7 +1558,8 @@ function createTestimonialCardHtml(testimonial) {
         : '';
     const ratingHtml = testimonial.rating ? `<div class="rating" role="img" aria-label="Rated ${testimonial.rating} out of 5">${ratingStars}</div>` : '';
 
-    const authorTitle = `${escapeHtml(testimonial.position || '')}${testimonial.position && testimonial.company ? ', ' : ''}${escapeHtml(testimonial.company || '')}`;
+    // Decode trusted admin-entered fields so entities like &amp; display correctly
+    const authorTitle = `${decodeHtmlEntities(testimonial.position || '')}${testimonial.position && testimonial.company ? ', ' : ''}${decodeHtmlEntities(testimonial.company || '')}`;
 
     // Optional client logo/link and project link
     let clientLogoHtml = '';
@@ -1574,13 +1584,13 @@ function createTestimonialCardHtml(testimonial) {
 
     return `
     <div class="testimonial-card" data-services="${escapeHtml(services.join(','))}" data-industry="${escapeHtml(String(industry || ''))}">
-            ${industryLabel ? `<div class="testimonial-industry"><span class="eyebrow">${escapeHtml(industryLabel)}</span></div>` : ''}
+            ${industryLabel ? `<div class="testimonial-industry"><span class="eyebrow">${decodeHtmlEntities(industryLabel)}</span></div>` : ''}
             <div class="testimonial-quote">
-                <p>${escapeHtml(testimonial.content)}</p>
+                <p>${decodeHtmlEntities(testimonial.content)}</p>
             </div>
             <div class="testimonial-author-info">
                 <div>
-                    <h3>${escapeHtml(testimonial.author)}</h3>
+                    <h3>${decodeHtmlEntities(testimonial.author)}</h3>
                     ${authorTitle ? `<p>${authorTitle}</p>` : ''}
                     ${ratingHtml}
                 </div>
@@ -1599,7 +1609,7 @@ function createTestimonialSlideHtml(testimonial) {
         : '';
     const ratingHtml = testimonial.rating ? `<div class="rating" role="img" aria-label="Rated ${testimonial.rating} out of 5">${ratingStars}</div>` : '';
 
-    const authorTitle = `${escapeHtml(testimonial.position || '')}${testimonial.position && testimonial.company ? ', ' : ''}${escapeHtml(testimonial.company || '')}`;
+    const authorTitle = `${decodeHtmlEntities(testimonial.position || '')}${testimonial.position && testimonial.company ? ', ' : ''}${decodeHtmlEntities(testimonial.company || '')}`;
 
     // Optional client logo and link (if testimonial is linked to a project with a client)
     let clientLogoHtml = '';
@@ -1617,11 +1627,11 @@ function createTestimonialSlideHtml(testimonial) {
     return `
         <div class="testimonial-slide">
             <div class="quote-content">
-                <p class="quote-text">${escapeHtml(testimonial.content)}</p>
+                <p class="quote-text">${decodeHtmlEntities(testimonial.content)}</p>
             </div>
             <div class="author-info">
                 <div>
-                    <div class="author-name">${escapeHtml(testimonial.author)}</div>
+                    <div class="author-name">${decodeHtmlEntities(testimonial.author)}</div>
                     ${authorTitle ? `<div class="author-title">${authorTitle}</div>` : ''}
                     ${ratingHtml}
                 </div>
@@ -2563,18 +2573,18 @@ function createFeaturedTestimonialHtml(testimonial) {
      }
      const ratingStars = testimonial.rating ? '<span class="star">★</span>'.repeat(testimonial.rating) + '<span class="star" style="color: #555;">★</span>'.repeat(5 - testimonial.rating) : '';
      const ratingHtml = testimonial.rating ? `<div class="rating">${ratingStars}</div>` : '';
-     const authorTitle = `${escapeHtml(testimonial.position || '')}${testimonial.position && testimonial.company ? ', ' : ''}${escapeHtml(testimonial.company || '')}`;
+    const authorTitle = `${decodeHtmlEntities(testimonial.position || '')}${testimonial.position && testimonial.company ? ', ' : ''}${decodeHtmlEntities(testimonial.company || '')}`;
 
      return `
          <div class="featured-testimonial" style="background-color: var(--card-hover-bg); padding: 2.5rem; border-radius: var(--border-radius); border: 1px solid var(--primary-color); max-width: 900px; margin: 0 auto;">
               <div class="testimonial-quote">
                   <span class="quote-mark">"</span>
-                  <p>${escapeHtml(testimonial.content)}</p>
+                  <p>${decodeHtmlEntities(testimonial.content)}</p>
                   <span class="quote-mark closing">"</span>
               </div>
                <div class="testimonial-author-info">
                   <div>
-                      <h3>${escapeHtml(testimonial.author)}</h3>
+                      <h3>${decodeHtmlEntities(testimonial.author)}</h3>
                       ${authorTitle ? `<p>${authorTitle}</p>` : ''}
                       ${ratingHtml}
                   </div>

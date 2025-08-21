@@ -34,7 +34,7 @@
                 <% if (primaryTag) { %>
                     <a class="pill category-pill" href="/blog?tag=<%= primaryTag %>"><%= typeof primaryTagLabel !== 'undefined' && primaryTagLabel ? primaryTagLabel : primaryTag %></a>
                 <% } %>
-                <h1 class="article-title"><%= post.title %></h1>
+                <h1 class="article-title"><%- decodeHtmlEntities(post.title) %></h1>
                 <div class="article-meta">
                     <% if (post.publishedDate) { %>
                         <span><%= post.publishedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></span>

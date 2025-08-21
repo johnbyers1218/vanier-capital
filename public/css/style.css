@@ -4088,20 +4088,20 @@
     }
   }
   .featured-card-compact .featured-media {
-    min-height: 320px;
-    height: 320px;
+    min-height: 340px;
+    height: 340px;
   }
   @media (min-width: 900px) {
     .featured-card-compact .featured-media {
-      min-height: 360px;
-      height: 360px;
+      min-height: 380px;
+      height: 380px;
     }
   }
   .featured-card-compact .featured-media img {
     object-position: center center;
   }
   .featured-card-compact .featured-body {
-    padding: 0.85rem 1.25rem 1rem;
+    padding: 2.25rem 1.25rem 1.5rem;
   }
   .featured-card-compact .featured-title {
     font-size: 1.3rem;
@@ -4145,6 +4145,14 @@
   }
   .featured-card-compact .featured-actions {
     margin-top: .25rem;
+  }
+  .project-description-rich p {
+    margin: 0 0 .6rem 0;
+    line-height: 1.55;
+  }
+  .featured-excerpt-rich p {
+    margin: 0 0 .6rem 0;
+    line-height: 1.55;
   }
   .featured-card-compact .featured-actions {
     margin-top: auto;

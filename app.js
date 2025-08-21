@@ -15,7 +15,7 @@ import MongoStore from 'connect-mongo';
 import csrf from 'csurf';
 // import morgan from 'morgan';
 import { logger, httpLoggerMiddleware } from './config/logger.js';
-import { escapeHtml } from './utils/helpers.js';
+import { escapeHtml, decodeHtmlEntities } from './utils/helpers.js';
 import publicRoutes from './routes/publicRoutes.js';
 import apiPublicRoutes from './routes/apiPublic.js';
 import apiContactRoutes from './routes/apiContact.js';
@@ -130,6 +130,7 @@ logger.info('[INIT] Express "trust proxy" setting configured.');
 
 // --- Make Utilities Available to EJS Templates ---
 app.locals.escapeHtml = escapeHtml;
+app.locals.decodeHtmlEntities = decodeHtmlEntities; // Allow decoding trusted admin-entered content for display
 app.locals.formatDate = (date) => { // Simplified
     try {
         if (!date) return '';
