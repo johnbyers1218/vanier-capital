@@ -1700,7 +1700,7 @@ function buildTestimonialFilters(testimonials) {
     if (!wrap) return;
     const industries = new Map();
     testimonials.forEach(t => {
-    const ind = String(t._resolvedIndustry || t.project?.industry || t.project?.client?.industry || 'unspecified').toLowerCase();
+        const ind = String(t._resolvedIndustry || t.project?.industry || t.project?.client?.industry || 'unspecified').toLowerCase();
         industries.set(ind, (industries.get(ind) || 0) + 1);
     });
     const indItems = Array.from(industries.entries()).sort((a,b) => b[1]-a[1] || a[0].localeCompare(b[0]));
@@ -1781,22 +1781,22 @@ function updateTestimonialFilterCounts() {
     const counts = {};
     let total = 0;
     cards.forEach(card => {
-        const industry = card.dataset.industry || 'unspecified';
-        counts[industry] = (counts[industry] || 0) + 1;
+    const industry = (card.dataset.industry || 'unspecified').toLowerCase();
+    counts[industry] = (counts[industry] || 0) + 1;
         total++;
     });
     buttons.forEach(btn => {
         const val = btn.getAttribute('data-filter');
         const el = btn.querySelector('.filter-count');
         if (!el) return;
-        if (val === 'all') el.textContent = total; else el.textContent = counts[val] || 0;
+    if (val === 'all') el.textContent = total; else el.textContent = counts[val] || 0;
     });
 }
 
 function filterTestimonialsByIndustry(industryFilter = 'all') {
     const cards = document.querySelectorAll('#testimonials-grid-container .testimonial-card');
     cards.forEach((card, idx) => {
-        const industry = (card.dataset.industry || '').toLowerCase();
+    const industry = (card.dataset.industry || 'unspecified').toLowerCase();
         const show = (industryFilter === 'all' || industry === industryFilter);
         if (show) {
             card.style.display = 'block';
