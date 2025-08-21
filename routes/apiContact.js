@@ -4,7 +4,9 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
 import Contact from '../models/Contacts.js';
+import Inquiry from '../models/Inquiry.js';
 import { logger } from '../config/logger.js';
+import { sendTeamNotification, sendUserConfirmation } from '../services/sendgridService.js';
 import { DateTime } from 'luxon'; // For date parsing if needed
 
 const router = express.Router();
@@ -57,22 +59,40 @@ router.post('/contact', contactAndScheduleValidationRules, async (req, res, next
             ipAddress: req.ip, status: 'New'
         };
 
-
-        const newContactEntry = new Contact(contactData);
-        await newContactEntry.save();
+        // Save to Contacts collection
+        const newContactEntry = await Contact.create(contactData);
         logger.info(`Contact form submission SAVED TO DB: ID=${newContactEntry._id}, Email=${email}`);
 
+        // Mirror into Inquiry collection so it appears in /admin/inquiries (legacy dashboard expects Inquiry model)
+        let inquiryEntry = null;
+        try {
+            inquiryEntry = await Inquiry.create({ name, email, phone: phone || '', subject, message, status: 'New' });
+            logger.info('[Contact->Inquiry Mirror] Created inquiry record', { inquiryId: inquiryEntry._id });
+        } catch (mirrorErr) {
+            logger.warn('[Contact->Inquiry Mirror] Failed to create inquiry record', { error: mirrorErr.message });
+        }
 
-        let successMessage = 'Thank you for your message! We have received it and will get back to you soon.';
+        // Send emails (team + user). Use whichever object succeeded (prefer inquiry shape if available)
+        const payload = inquiryEntry ? (inquiryEntry.toObject ? inquiryEntry.toObject() : inquiryEntry) : (newContactEntry.toObject ? newContactEntry.toObject() : newContactEntry);
+        let teamResult, userResult;
+        try {
+            [teamResult, userResult] = await Promise.all([
+                sendTeamNotification(payload),
+                sendUserConfirmation(payload)
+            ]);
+        } catch (emailErr) {
+            logger.error('[Contact] Unexpected error during email sending', { error: emailErr.message, stack: emailErr.stack });
+        }
+        if (teamResult && !teamResult.ok) logger.warn('[Contact] Team notification failed', { error: teamResult.error });
+        if (userResult && !userResult.ok) logger.warn('[Contact] User confirmation failed', { error: userResult.error });
+        if (teamResult?.ok) logger.info('[Contact] Team notification sent');
+        if (userResult?.ok) logger.info('[Contact] User confirmation sent');
 
-        res.status(200).json({
-             success: true,
-             message: successMessage
-        });
-
+        const successMessage = 'Thank you for your message! We have received it and will get back to you soon.';
+        return res.status(200).json({ success: true, message: successMessage });
     } catch (error) {
-        logger.error('Error processing combined contact form submission (DB save):', { error: error.message, stack: error.stack });
-        next(error);
+        logger.error('Error processing combined contact form submission (DB save/email):', { error: error.message, stack: error.stack });
+        return next(error);
     }
 });
 
