@@ -448,7 +448,8 @@ function initStaticOverlayPins() {
     // Crop view: show all continents while removing Antarctica only (bottom crop only)
     // Slightly crop the left to improve framing; bottom ~18% trims Antarctica but preserves Australia and southern tips
     // Then scale/translate so the visible window fills the wrapper with no inner padding
-    const crop = { top: 0, right: 0, bottom: 18, left: 10 }; // percentages of full image
+    // Restore original cropped framing (removes Antarctica & excess left margin) for static card preview
+    const crop = { top: 0, right: 0, bottom: 18, left: 10 }; // percentages
     const clipPathCss = `inset(${crop.top}% ${crop.right}% ${crop.bottom}% ${crop.left}%)`;
     // IMPORTANT: do NOT apply clip/transform to the overlay SVG; only to the image.
     // Applying transforms to both causes double-scaling and pin drift. We'll compute
@@ -672,29 +673,39 @@ function initStaticOverlayPins() {
                 };
             }
 
-            // Direct projection approach: project lon/lat to original (Robinson), normalize, then account for cropping window
-            function projectDirect(lon, lat) {
-                const [px, py] = robinsonProject(lon, lat, original.width, original.height);
-                const nx = px / original.width; // 0..1
-                const ny = py / original.height; // 0..1
-                const cropLeft = crop.left / 100;
-                const cropRight = crop.right / 100;
-                const cropTop = crop.top / 100;
-                const cropBottom = crop.bottom / 100;
-                const visibleW = 1 - (cropLeft + cropRight);
-                const visibleH = 1 - (cropTop + cropBottom);
-                // Skip points outside visible (before applying scale) just in case
-                if (nx < cropLeft || nx > 1 - cropRight || ny < cropTop || ny > 1 - cropBottom) {
-                    return [Number.NaN, Number.NaN];
-                }
-                const vx = (nx - cropLeft) / visibleW; // 0..1 in wrapper
-                const vy = (ny - cropTop) / visibleH; // 0..1 in wrapper
-                return [vx * w, vy * h];
+            // --- Anchor-based affine "triangulation" approach (robust against aspect scaling & cropping) ---
+            const anchorGeoList = [
+                { lon: -74.0060, lat: 40.7128 }, // NYC
+                { lon: -80.1918, lat: 25.7617 }, // Miami
+                { lon:  13.3615, lat: 38.1157 }, // Palermo
+                { lon: -70.1823, lat: 42.0584 }, // Provincetown
+                { lon:   8.9463, lat: 44.4056 }, // Genoa
+                { lon:   2.3768, lat: 51.0344 }  // Dunkirk
+            ];
+            const anchorPixelsProvided = [
+                { x: 289, y: 202 }, // NYC
+                { x: 251, y: 272 }, // Miami
+                { x: 590, y: 209 }, // Palermo
+                { x: 303, y: 197 }, // Provincetown
+                { x: 569, y: 187 }, // Genoa
+                { x: 547, y: 157 }  // Dunkirk
+            ];
+
+            // Cache normalized anchor pixel ratios for responsiveness
+            let norms = null;
+            if (wrap.dataset.anchorNorms) {
+                try { norms = JSON.parse(wrap.dataset.anchorNorms); } catch (_) { norms = null; }
             }
+            if (!norms || norms.length !== anchorPixelsProvided.length) {
+                norms = anchorPixelsProvided.map(p => ({ x: p.x / w, y: p.y / h }));
+                wrap.dataset.anchorNorms = JSON.stringify(norms);
+            }
+            const anchorsForFit = anchorGeoList.map((geo, i) => ({ geo, pixel: { x: norms[i].x * w, y: norms[i].y * h } }));
+            const projector = createAffineProjector(anchorsForFit, original);
             const projected = points.map(p => {
-                const [x, y] = projectDirect(p.lon, p.lat);
+                const [x, y] = projector.project(p.lon, p.lat);
                 return { p, x, y };
-            }).filter(o => !Number.isNaN(o.x) && !Number.isNaN(o.y));
+            });
             // Tighten grouping so nearby-but-distinct places (e.g., NYC vs Long Island) don't get fanned out
             const threshold = 5; // px (was 12)
             const groups = [];
@@ -723,9 +734,7 @@ function initStaticOverlayPins() {
                     c.setAttribute('stroke-width', '1');
                     // Native tooltip fallback for browsers (shows on hover even if custom tooltip CSS conflicts)
                     if (item.p.label) {
-                        const titleEl = document.createElementNS(svgNS, 'title');
-                        titleEl.textContent = item.p.label;
-                        c.appendChild(titleEl);
+                        // Single custom tooltip system handles display; keep accessibility label only
                         c.setAttribute('aria-label', item.p.label);
                         c.setAttribute('role', 'img');
                     }

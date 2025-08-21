@@ -65,10 +65,10 @@
         </div>
 
         <% if (visibleClients && visibleClients.length) { %>
-        <div class="client-logos" style="margin-top: 1.5rem; display: grid; grid-template-columns: repeat( auto-fit, minmax(120px, 1fr) ); gap: 1rem; align-items: center;">
+    <div class="client-logos about-page-client-logos" style="margin-top: 1.5rem; display: grid; grid-template-columns: repeat( auto-fit, minmax(120px, 1fr) ); gap: 1.25rem; align-items: center;">
             <% visibleClients.forEach(cl => { %>
-                <div class="client-logo" style="background: #fff; border-radius: 6px; padding: 8px; display:flex; align-items:center; justify-content:center; height: 72px;">
-                    <img src="<%= cl.logoUrl %>" alt="<%= cl.name %> logo" style="max-height: 56px; max-width: 100%; object-fit: contain;" onerror="this.onerror=null;this.src='/images/FND_LOGO_SVG_BLACK.svg';">
+        <div class="client-logo" style="background:#fff;border-radius:8px;padding:10px;display:flex;align-items:center;justify-content:center;">
+            <img src="<%= cl.logoUrl %>" alt="<%= cl.name %> logo" style="max-height:100%;max-width:100%;object-fit:contain;" onerror="this.onerror=null;this.src='/images/FND_LOGO_SVG_BLACK.svg';">
                 </div>
             <% }) %>
         </div>
