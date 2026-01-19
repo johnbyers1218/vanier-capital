@@ -44,7 +44,7 @@ export const handleCoverImageUpload = async (req, res, next, entityType = 'cover
     try {
         const uploadPromise = new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
-                { folder: `fnd_automations_${entityType}_covers`, resource_type: "image" }, // e.g., fnd_automations_blog_covers
+                { folder: `vanier_capital_${entityType}_covers`, resource_type: "image" }, // e.g., vanier_capital_blog_covers
                 (error, result) => {
                     if (error || !result?.secure_url) {
                         logger.error(`[${entityType} Cover Upload] Cloudinary Upload Error:`, error || 'Missing secure_url');
@@ -87,5 +87,29 @@ export const handleMulterErrorForCoverImage = (error, req, res, next) => {
         return res.status(400).json({ success: false, message: error.message || 'Invalid file type for cover image.' });
     }
     next(); // Should not be reached if error is handled
+};
+
+export const projectImagesUpload = multer({
+    storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit per file
+    fileFilter: fileFilter
+}).fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'galleryImages', maxCount: 10 }
+]);
+
+export const uploadToCloudinary = (buffer, folder) => {
+    return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+            { folder: folder, resource_type: "image" },
+            (error, result) => {
+                if (error || !result?.secure_url) {
+                    return reject(error || new Error('Cloudinary upload failed.'));
+                }
+                resolve(result.secure_url);
+            }
+        );
+        uploadStream.end(buffer);
+    });
 };
 

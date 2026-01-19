@@ -1,9 +1,9 @@
 <!-- views/services.ejs -->
-<%# Services Page for FND Automations %>
+<%# Services Page for Vanier Capital %>
 
 <%- include('partials/header', {
-    pageTitle: 'Our Services - AI & Automation Solutions',
-    pageDescription: 'Explore the comprehensive suite of AI and process automation services offered by FND Automations, including custom solutions, integration, and data analytics.',
+    pageTitle: 'Our Services - Investment & Property Operations',
+    pageDescription: 'Explore the comprehensive suite of investment and property services offered by Vanier Capital, including acquisition support, underwriting, and asset operations.',
     path: '/services' /* Pass path for active nav highlighting */
 }) %>
 
@@ -12,21 +12,21 @@
 <%- JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Service",
-    "name": "AI and Process Automation Services",
+    "name": "Investment and Property Services",
     "provider": {
         "@type": "Organization",
-        "name": "FND Automations",
-        "url": "https://www.fndautomations.com/",
-        "logo": "https://www.fndautomations.com/images/FND_LOGO_SVG_BLACK.svg"
+        "name": "Vanier Capital",
+        "url": "https://www.vaniercapital.com/",
+        "logo": "https://www.vaniercapital.com/images/logo.svg"
     },
     "areaServed": "Global",
     "serviceType": [
-        "Process Automation",
-        "AI Integration",
-        "Custom Software",
+        "Acquisition Strategy",
+        "Underwriting & Diligence",
+        "Portfolio Management",
         "Data Analytics",
-        "Security Automation",
-        "Automation Consulting"
+        "Risk Management",
+        "Operations Consulting"
     ]
 }, null, 2) %>
 </script>
@@ -39,15 +39,15 @@
             <div class="services-hero-copy">
                 <p class="eyebrow">Our Services</p>
                 <h1 class="hero-title-text">Empowering Your Business</h1>
-                <p class="hero-sub-text">We craft automation and AI solutions that streamline operations, reduce manual work, and unlock measurable growth—tailored precisely to your goals and stack.</p>
+                <p class="hero-sub-text">We provide disciplined investment and property operations that protect capital, drive cash flow, and compound long‑term value.</p>
                 <div class="hero-actions">
                     <a href="#services-grid-details" class="cta-button primary-btn glow-button">Explore Core Services</a>
                     <a href="/contact" class="cta-button secondary-btn">Talk to an Expert</a>
                 </div>
             </div>
             <!-- Right: Abstract Visual (decorative) -->
-            <div class="automation-visual" aria-hidden="true">
-                <svg class="automation-visual-svg" viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg" role="img">
+            <div class="services-visual" aria-hidden="true">
+                <svg class="services-visual-svg" viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg" role="img">
                     <defs>
                         <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
                             <stop offset="0%" stop-color="#00a8e8" stop-opacity="0.95"/>
@@ -86,88 +86,62 @@
 <section id="services-grid-details" class="section">
     <div class="container">
          <div class="section-header" style="margin-bottom: 1.75rem;">
-             <h2 class="section-title">Core Automation & AI Services</h2>
-             <p class="section-description">Our core capabilities are the foundation for faster delivery, lower risk, and scalable results.</p>
+             <h2 class="section-title">Core Real Estate Services</h2>
+             <p class="section-description">We deliver disciplined execution across the full investment lifecycle.</p>
          </div>
         <div class="grid-container grid-3-col services-grid">
 
-            <!-- Service Card 1: Process Automation -->
-            <div id="process-automation" class="content-card service-card core-service">
-                <div class="card-icon icon-wrap"><i class="fas fa-cogs fa-fw"></i></div>
-                <h3 class="service-title">Process Automation</h3>
-                <p class="service-summary">Eliminate bottlenecks and manual work with intelligent workflows. We connect platforms like Make.com and n8n to orchestrate processes and boost productivity.</p>
+            <!-- Service Card 1: Acquisitions -->
+            <div id="acquisitions" class="content-card service-card core-service">
+                <div class="card-icon icon-wrap"><i class="fas fa-building fa-fw"></i></div>
+                <h3 class="service-title">Acquisitions</h3>
+                <p class="service-summary">Targeted sourcing, underwriting, and negotiation to secure high‑quality assets in growth markets.</p>
                 <ul class="service-list">
-                    <li><i class="fas fa-check-circle"></i> Workflow Optimization</li>
-                    <li><i class="fas fa-check-circle"></i> Repetitive Task Handling</li>
-                    <li><i class="fas fa-check-circle"></i> Error Rate Reduction</li>
+                    <li><i class="fas fa-check-circle"></i> Deal Sourcing</li>
+                    <li><i class="fas fa-check-circle"></i> Underwriting & Diligence</li>
+                    <li><i class="fas fa-check-circle"></i> Capital Structuring</li>
                 </ul>
-                <a href="/contact?subject=Process%20Automation%20Inquiry" class="card-link learn-more">Learn More →</a>
+                <a href="/contact?subject=Acquisitions%20Inquiry" class="card-link learn-more">Learn More →</a>
             </div>
 
-            <!-- Service Card 2: AI Integration & Solutions -->
-             <div id="ai-integration" class="content-card service-card core-service">
-                 <div class="card-icon icon-wrap"><i class="fas fa-brain fa-fw"></i></div>
-                 <h3 class="service-title">AI Integration Solutions</h3>
-                 <p class="service-summary">Leverage GPT, Claude, and vector search for intelligent document processing, customer support, and decision support.</p>
-                 <ul class="service-list">
-                    <li><i class="fas fa-check-circle"></i> Intelligent Document Processing</li>
-                    <li><i class="fas fa-check-circle"></i> Custom AI Chatbots</li>
-                    <li><i class="fas fa-check-circle"></i> Data‑driven Insights</li>
-                </ul>
-                 <a href="/contact?subject=AI%20Integration%20Inquiry" class="card-link learn-more">Learn More →</a>
-             </div>
-
-            <!-- Service Card 3: Custom Software & Integration -->
-             <div id="custom-solutions" class="content-card service-card core-service">
-                 <div class="card-icon icon-wrap"><i class="fas fa-laptop-code fa-fw"></i></div>
-                 <h3 class="service-title">Custom Software</h3>
-                 <p class="service-summary">Bespoke applications and robust integrations that connect CRMs, ERPs, and data platforms into seamless workflows.</p>
-                 <ul class="service-list">
-                    <li><i class="fas fa-check-circle"></i> Tailored Application Development</li>
-                    <li><i class="fas fa-check-circle"></i> API Integration & Development</li>
-                    <li><i class="fas fa-check-circle"></i> Database Design (Airtable, etc.)</li>
-                </ul>
-                <a href="/contact?subject=Custom%20Solution%20Inquiry" class="card-link learn-more">Learn More →</a>
-             </div>
-
-            <!-- Service Card 4: Data Analytics & Reporting -->
-            <div class="content-card service-card">
-                <div class="card-icon icon-wrap alt"><i class="fas fa-chart-pie fa-fw"></i></div>
-                <h3 class="service-title">Data Analytics Solutions</h3>
-                <p class="service-summary">Turn raw data into clear dashboards and decision-ready insights with automated reporting.</p>
-                 <ul class="service-list">
-                    <li><i class="fas fa-check-circle"></i> Automated Dashboards</li>
-                    <li><i class="fas fa-check-circle"></i> Performance Tracking (KPIs)</li>
-                    <li><i class="fas fa-check-circle"></i> Trend Analysis & Forecasting</li>
-                </ul>
-                <a href="/contact?subject=Data%20Analytics%20Inquiry" class="card-link learn-more">Learn More →</a>
-            </div>
-
-            <!-- Service Card 5: Cybersecurity Automation (Optional - Keep if offered) -->
-            <div class="content-card service-card">
-                <div class="card-icon icon-wrap alt"><i class="fas fa-shield-alt fa-fw"></i></div>
-                <h3 class="service-title">Security Automation</h3>
-                <p class="service-summary">Automate compliance checks, access reviews, and alert routing to elevate your security posture.</p>
+            <!-- Service Card 2: Asset Management -->
+            <div id="asset-management" class="content-card service-card core-service">
+                <div class="card-icon icon-wrap"><i class="fas fa-chart-line fa-fw"></i></div>
+                <h3 class="service-title">Asset Management</h3>
+                <p class="service-summary">Performance oversight focused on NOI growth, tenant satisfaction, and long‑term value creation.</p>
                 <ul class="service-list">
-                    <li><i class="fas fa-check-circle"></i> Compliance Automation</li>
-                    <li><i class="fas fa-check-circle"></i> Security Workflow Orchestration</li>
-                    <li><i class="fas fa-check-circle"></i> Automated Alerting</li>
+                    <li><i class="fas fa-check-circle"></i> Portfolio Reporting</li>
+                    <li><i class="fas fa-check-circle"></i> Capital Planning</li>
+                    <li><i class="fas fa-check-circle"></i> Revenue Optimization</li>
                 </ul>
-                <a href="/contact?subject=Security%20Automation%20Inquiry" class="card-link learn-more">Learn More →</a>
+                <a href="/contact?subject=Asset%20Management%20Inquiry" class="card-link learn-more">Learn More →</a>
             </div>
 
-            <!-- Service Card 6: Automation Consulting -->
-             <div class="content-card service-card">
-                 <div class="card-icon icon-wrap alt"><i class="fas fa-comments fa-fw"></i></div>
-                 <h3 class="service-title">Automation Consulting</h3>
-                 <p class="service-summary">Pinpoint high‑ROI opportunities and plan phased rollouts with clear milestones and success metrics.</p>
-                 <ul class="service-list">
-                    <li><i class="fas fa-check-circle"></i> Opportunity Assessment</li>
-                    <li><i class="fas fa-check-circle"></i> Technology Stack Evaluation</li>
-                    <li><i class="fas fa-check-circle"></i> Phased Rollout Planning</li>
+            <!-- Service Card 3: Development -->
+            <div id="development" class="content-card service-card core-service">
+                <div class="card-icon icon-wrap"><i class="fas fa-hard-hat fa-fw"></i></div>
+                <h3 class="service-title">Development</h3>
+                <p class="service-summary">Disciplined planning, entitlement coordination, and execution to bring projects from concept to completion.</p>
+                <ul class="service-list">
+                    <li><i class="fas fa-check-circle"></i> Entitlements & Design</li>
+                    <li><i class="fas fa-check-circle"></i> Construction Oversight</li>
+                    <li><i class="fas fa-check-circle"></i> Delivery & Lease‑Up</li>
                 </ul>
-                <a href="/contact?subject=Automation%20Consulting%20Inquiry" class="card-link learn-more">Learn More →</a>
-             </div>
+                <a href="/contact?subject=Development%20Inquiry" class="card-link learn-more">Learn More →</a>
+            </div>
+
+            <!-- Service Card 4: Property Management -->
+            <div id="property-management" class="content-card service-card">
+                <div class="card-icon icon-wrap alt"><i class="fas fa-key fa-fw"></i></div>
+                <h3 class="service-title">Property Management</h3>
+                <p class="service-summary">Resident‑focused operations with proactive maintenance and lease management.</p>
+                <ul class="service-list">
+                    <li><i class="fas fa-check-circle"></i> Leasing & Renewals</li>
+                    <li><i class="fas fa-check-circle"></i> Maintenance Coordination</li>
+                    <li><i class="fas fa-check-circle"></i> Vendor Oversight</li>
+                </ul>
+                <a href="/contact?subject=Property%20Management%20Inquiry" class="card-link learn-more">Learn More →</a>
+            </div>
 
         </div> <!-- /.grid-container -->
     </div> <!-- /.container -->
@@ -190,7 +164,7 @@
                  <div class="process-step">
                      <div class="step-number">2</div>
                      <h3>Strategy & Design</h3>
-                     <p>Identify key automation opportunities, select tools, and design the optimal solution architecture.</p>
+                     <p>Identify key operational opportunities, select tools, and design the optimal solution architecture.</p>
                  </div>
                 <div class="process-step">
                      <div class="step-number">3</div>
@@ -211,59 +185,22 @@
     </div>
 </section>
 
-<!-- Industries Served Section (Could be simplified or removed if redundant) -->
-<!-- Kept for now -->
-<section id="industries-served" class="section">
-    <div class="container">
-        <div class="section-header">
-            <h2 class="section-title">Industries We Empower</h2>
-             <p class="section-description">While adaptable to any sector, we bring deep experience to these industries:</p>
-        </div>
-        <div class="industries-grid grid-container industries-grid-services">
-            <a class="industry-item content-card" href="/projects?industry=Manufacturing" aria-label="Manufacturing case studies">
-                <div class="card-icon xl"><i class="fas fa-industry fa-fw"></i></div>
-                <h4>Manufacturing</h4>
-            </a>
-            <a class="industry-item content-card" href="/projects?industry=Retail%20%26%20E-commerce" aria-label="Retail and E-commerce case studies">
-                <div class="card-icon xl"><i class="fas fa-cash-register fa-fw"></i></div>
-                <h4>Retail & E-commerce</h4>
-            </a>
-            <a class="industry-item content-card" href="/projects?industry=Healthcare" aria-label="Healthcare case studies">
-                <div class="card-icon xl"><i class="fas fa-heartbeat fa-fw"></i></div>
-                <h4>Healthcare</h4>
-            </a>
-            <a class="industry-item content-card" href="/projects?industry=Finance" aria-label="Finance case studies">
-                <div class="card-icon xl"><i class="fas fa-university fa-fw"></i></div>
-                <h4>Finance</h4>
-            </a>
-            <a class="industry-item content-card" href="/projects?industry=Professional%20Services" aria-label="Professional Services case studies">
-                 <div class="card-icon xl"><i class="fas fa-users fa-fw"></i></div>
-                 <h4>Professional Services</h4>
-            </a>
-            <a class="industry-item content-card" href="/projects?industry=Logistics" aria-label="Logistics case studies">
-                <div class="card-icon xl"><i class="fas fa-truck fa-fw"></i></div>
-                <h4>Logistics</h4>
-            </a>
-        </div>
-    </div>
-</section>
-
 <!-- Final CTA Section -->
 <section id="cta" class="cta-section cta-strong full-bleed">
      <div class="container">
          <div class="cta-strong-grid">
             <div class="cta-strong-copy">
-                <h2 class="cta-strong-title">Let's Design Your Automation Roadmap</h2>
-                <p class="cta-strong-description">See how intelligent automation can streamline your operations and compound results month after month.</p>
+                <h2 class="cta-strong-title">Let's Design Your Growth Roadmap</h2>
+                <p class="cta-strong-description">See how disciplined operations can streamline execution and compound results month after month.</p>
                 <div class="cta-actions">
                     <a href="/contact" class="cta-button primary-btn glow-button">Schedule Your Free Consultation</a>
-                    <a href="/projects" class="cta-button secondary-btn">View Case Studies</a>
+                    <a href="/portfolio" class="cta-button secondary-btn">View Case Studies</a>
                 </div>
             </div>
             <div class="cta-social-proof">
                 <div class="quote-mark" aria-hidden="true">“</div>
                 <blockquote class="testimonial-quote">
-                    <p><%= servicesTestimonial && servicesTestimonial.quote ? servicesTestimonial.quote : 'FND Automations delivered results beyond our expectations. The impact was immediate and measurable.' %></p>
+                    <p><%= servicesTestimonial && servicesTestimonial.quote ? servicesTestimonial.quote : 'Vanier Capital delivered results beyond our expectations. The impact was immediate and measurable.' %></p>
                 </blockquote>
                 <div class="testimonial-signature">
                     <% if (servicesTestimonial && servicesTestimonial.clientLogoUrl) { %>

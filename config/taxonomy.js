@@ -2,14 +2,13 @@
 // Centralized taxonomy for blog tags: canonical slugs, human labels, and synonyms
 
 export const BLOG_TAGS = [
-  { slug: 'automation', label: 'Automation', aliases: [] },
-  { slug: 'ai-ml', label: 'AI & Machine Learning', aliases: ['ai', 'ml', 'machine-learning'] },
-  { slug: 'business-strategy', label: 'Business Strategy', aliases: ['business'] },
-  { slug: 'technology', label: 'Technology', aliases: ['tech'] },
-  { slug: 'case-studies', label: 'Case Studies', aliases: ['case-study', 'case'] },
-  { slug: 'data-engineering', label: 'Data Engineering', aliases: ['data'] },
-  { slug: 'marketing-ops', label: 'Marketing Ops', aliases: ['marketing', 'marketing-automation'] },
-  { slug: 'sales-ops', label: 'Sales Ops', aliases: ['sales', 'sales-automation'] }
+  { slug: 'market-trends', label: 'Market Trends', aliases: ['market', 'trends', 'real-estate-market'] },
+  { slug: 'investment-strategy', label: 'Investment Strategy', aliases: ['investing', 'strategy', 'finance'] },
+  { slug: 'property-management', label: 'Property Management', aliases: ['management', 'operations'] },
+  { slug: 'renovation', label: 'Renovation & Value-Add', aliases: ['construction', 'rehab', 'value-add'] },
+  { slug: 'case-studies', label: 'Case Studies', aliases: ['case-study', 'success-stories'] },
+  { slug: 'finance', label: 'Finance & Lending', aliases: ['loans', 'mortgage', 'capital'] },
+  { slug: 'columbus-ga', label: 'Columbus, GA', aliases: ['columbus', 'local-market'] }
 ];
 
 export const TAG_LABEL_MAP = BLOG_TAGS.reduce((acc, t) => {

@@ -1,4 +1,5 @@
-const isAdmin = require('../middleware/isAdmin.js');
+const isAdminModule = require('../middleware/isAdmin.js');
+const isAdmin = isAdminModule.default || isAdminModule;
 const jwt = require('jsonwebtoken');
 
 jest.mock('jsonwebtoken');

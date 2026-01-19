@@ -51,9 +51,9 @@ const TestimonialSchema = new Schema(
             default: true, // Defaults to visible unless explicitly hidden
             required: true // Ensure this field is always present for filtering
         },
-    // Optional: Link to a related project and client (either or both)
-    project: { type: Schema.Types.ObjectId, ref: 'Project' },
-    client: { type: Schema.Types.ObjectId, ref: 'Client' },
+        // Optional: Link to a related property
+        property: { type: Schema.Types.ObjectId, ref: 'Property' },
+        // client: { type: Schema.Types.ObjectId, ref: 'Client' }, // Deprecated
         // authorImage: { type: String, trim: true, match: [/^https?:\/\/.+\..+/, 'Invalid URL.'] }
     },
     {

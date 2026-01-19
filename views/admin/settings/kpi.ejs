@@ -1,29 +1,13 @@
 <%- include('../partials/header', { pageTitle: 'KPI Manager' }) %>
 
 <div class="max-w-3xl mx-auto">
-  <div class="bg-gray-700/70 rounded-xl shadow-lg border border-gray-600">
-    <div class="px-6 py-5 border-b border-gray-600">
+  <div class="bg-neutral-700/70 rounded-xl shadow-lg border border-neutral-600">
+    <div class="px-6 py-5 border-b border-neutral-600">
       <h2 class="text-2xl font-bold text-gray-100">KPI Manager</h2>
       <p class="text-gray-300 mt-1">Manage public KPIs and other site-wide values.</p>
     </div>
 
     <div class="p-6 space-y-6">
-      <% if (typeof totals !== 'undefined') { %>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div class="bg-gray-800/70 rounded-lg border border-gray-600 p-4">
-            <div class="text-xs uppercase tracking-wide text-gray-400">Valued Partners</div>
-            <div class="mt-1 text-2xl font-bold text-gray-100"><%= totals.valuedPartners || 0 %><span class="text-gray-400">+</span></div>
-          </div>
-          <div class="bg-gray-800/70 rounded-lg border border-gray-600 p-4">
-            <div class="text-xs uppercase tracking-wide text-gray-400">Combined Valuation</div>
-            <div class="mt-1 text-2xl font-bold text-gray-100">$<%= Math.max(0, Math.round((totals.totalValuation || 0) / 1_000_000)) %><span class="text-gray-400">M+</span></div>
-          </div>
-          <div class="bg-gray-800/70 rounded-lg border border-gray-600 p-4">
-            <div class="text-xs uppercase tracking-wide text-gray-400">Combined Revenue</div>
-            <div class="mt-1 text-2xl font-bold text-gray-100">$<%= Math.max(0, Math.round((totals.totalRevenue || 0) / 1_000_000)) %><span class="text-gray-400">M+</span></div>
-          </div>
-        </div>
-      <% } %>
 
       <% if (Array.isArray(errorMessages) && errorMessages.length) { %>
         <div class="rounded-md border-l-4 border-red-500 bg-red-900/30 text-red-200 px-4 py-3">
@@ -45,27 +29,27 @@
       <form method="POST" action="/admin/settings/kpi/save" class="space-y-6">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-        <!-- Projects Completed -->
+        <!-- Occupancy Rate -->
         <div>
-          <label for="projectsCompleted" class="block text-sm font-semibold text-gray-100">Projects Completed</label>
-          <input type="number" id="projectsCompleted" name="projectsCompleted" min="0" step="1" value="<%= settings && settings.projectsCompleted !== undefined ? settings.projectsCompleted : '' %>" class="mt-1 block w-full max-w-xs rounded-md border border-gray-600 bg-gray-800 text-gray-100 placeholder-gray-500 focus:border-primary focus:ring-primary px-3 py-2">
-          <p class="text-sm text-gray-300 mt-1">Single authoritative number displayed on Home, About, and Testimonials.</p>
-          <hr class="mt-4 border-t border-gray-600/60">
+          <label for="occupancyRate" class="block text-sm font-semibold text-gray-100">Occupancy Rate</label>
+          <input type="text" id="occupancyRate" name="occupancyRate" value="<%= settings && settings.occupancyRate !== undefined ? settings.occupancyRate : '' %>" placeholder="e.g. 98%" style="color: #000000 !important; background-color: #ffffff !important;" class="mt-1 block w-full max-w-xs rounded-md border border-neutral-600 bg-white text-black placeholder-gray-500 font-medium focus:border-primary focus:ring-primary px-3 py-2">
+          <p class="text-sm text-gray-300 mt-1">Portfolio-wide occupancy rate.</p>
+          <hr class="mt-4 border-t border-neutral-600/60">
         </div>
 
-        <!-- Years Combined Expertise -->
+        <!-- Portfolio Cap Rate -->
         <div>
-          <label for="yearsCombinedExpertise" class="block text-sm font-semibold text-gray-100">Years Combined Expertise</label>
-          <input type="number" id="yearsCombinedExpertise" name="yearsCombinedExpertise" min="0" step="1" value="<%= settings && settings.yearsCombinedExpertise !== undefined ? settings.yearsCombinedExpertise : '' %>" class="mt-1 block w-full max-w-xs rounded-md border border-gray-600 bg-gray-800 text-gray-100 placeholder-gray-500 focus:border-primary focus:ring-primary px-3 py-2">
-          <p class="text-sm text-gray-300 mt-1">Displayed with a + (e.g., enter 30 to display 30+).</p>
-          <hr class="mt-4 border-t border-gray-600/60">
+          <label for="capRate" class="block text-sm font-semibold text-gray-100">Portfolio Cap Rate</label>
+          <input type="text" id="capRate" name="capRate" value="<%= settings && settings.capRate !== undefined ? settings.capRate : '' %>" placeholder="e.g. 7.5%" style="color: #000000 !important; background-color: #ffffff !important;" class="mt-1 block w-full max-w-xs rounded-md border border-neutral-600 bg-white text-black placeholder-gray-500 font-medium focus:border-primary focus:ring-primary px-3 py-2">
+          <p class="text-sm text-gray-300 mt-1">Average or target cap rate for the portfolio.</p>
+          <hr class="mt-4 border-t border-neutral-600/60">
         </div>
 
-        <!-- Manual Hours Automated -->
+        <!-- Assets Under Management (AUM) -->
         <div>
-          <label for="manualHoursAutomated" class="block text-sm font-semibold text-gray-100">Manual Hours Automated</label>
-          <input type="number" id="manualHoursAutomated" name="manualHoursAutomated" min="0" step="1" value="<%= settings && settings.manualHoursAutomated !== undefined ? settings.manualHoursAutomated : '' %>" class="mt-1 block w-full max-w-xs rounded-md border border-gray-600 bg-gray-800 text-gray-100 placeholder-gray-500 focus:border-primary focus:ring-primary px-3 py-2">
-          <p class="text-sm text-gray-300 mt-1">Total hours saved across clients. Displayed on Home and Testimonials.</p>
+          <label for="aum" class="block text-sm font-semibold text-gray-100">Assets Under Management (AUM)</label>
+          <input type="text" id="aum" name="aum" value="<%= settings && settings.aum !== undefined ? settings.aum : '' %>" placeholder="e.g. $50M+" style="color: #000000 !important; background-color: #ffffff !important;" class="mt-1 block w-full max-w-xs rounded-md border border-neutral-600 bg-white text-black placeholder-gray-500 font-medium focus:border-primary focus:ring-primary px-3 py-2">
+          <p class="text-sm text-gray-300 mt-1">Total value of assets under management.</p>
         </div>
 
         <div class="pt-2 flex items-center gap-3 justify-end">
@@ -73,7 +57,7 @@
             <i class="fas fa-save"></i>
             Save
           </button>
-          <a href="/admin/settings" class="inline-flex items-center gap-2 bg-transparent text-gray-100 font-semibold py-2.5 px-5 rounded-md border border-gray-500 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+          <a href="/admin/settings" class="inline-flex items-center gap-2 bg-transparent text-gray-100 font-semibold py-2.5 px-5 rounded-md border border-gray-500 hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
             <i class="fas fa-arrow-left"></i>
             Back to Settings
           </a>

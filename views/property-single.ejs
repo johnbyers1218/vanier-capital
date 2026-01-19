@@ -1,0 +1,169 @@
+<%# views/project-single.ejs — Enterprise-grade case study layout %>
+
+<%- include('partials/header', { pageTitle: pageTitle, pageDescription: pageDescription }) %>
+
+<!-- Structured Data: Project/Case Study -->
+<script type="application/ld+json">
+<%- JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Project",
+    "name": property.title,
+    "description": pageDescription,
+    "image": property.image || undefined,
+    "service": (property.serviceTypes && property.serviceTypes.length) ? property.serviceTypes.map(s => s.name) : undefined,
+    "url": shareUrl || (process.env.SITE_URL ? process.env.SITE_URL + req.originalUrl : undefined),
+    "identifier": property._id || undefined,
+    "creator": {
+        "@type": "Organization",
+        "name": "Vanier Capital",
+        "url": "https://www.vaniercapital.com/"
+    }
+}, null, 2) %>
+</script>
+
+<main class="pb-12">
+    <% /* Precompute friendly values */ %>
+
+    <!-- Centered, high-impact header -->
+    <section class="pt-10 pb-6">
+        <div class="container mx-auto px-4">
+            <div class="text-center max-w-3xl mx-auto">
+                <h1 class="text-3xl md:text-5xl font-bold tracking-tight text-[var(--color-text-headings)]"><%- decodeHtmlEntities(property.title) %></h1>
+            </div>
+        </div>
+    </section>
+
+    <!-- Elevated main image -->
+    <% if (property.image) { %>
+        <section class="pb-6">
+            <div class="container mx-auto px-4">
+                <figure>
+                    <img src="<%= property.image %>" alt="<%= property.title %> — Case Study Image" class="w-full rounded-xl shadow-lg object-cover" style="max-height: 560px;">
+                </figure>
+            </div>
+        </section>
+    <% } %>
+
+    <!-- Project Snapshot -->
+    <section class="py-6 border-t border-[var(--color-border-subtle)]">
+        <div class="container mx-auto px-4">
+            <div class="rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-surface)] p-6">
+                <h2 class="text-xl font-semibold text-[var(--color-text-headings)] mb-4">Project Snapshot</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                        <% /* Services (optional if available) */ %>
+                                        <% if ((property.serviceTypes && property.serviceTypes.length) || (property.services && property.services.length)) { %>
+                    <div class="rounded-lg bg-white border border-[var(--color-border-subtle)] p-4">
+                        <div class="text-xs uppercase tracking-wide text-[var(--color-text-muted)]">Services</div>
+                                                <div class="mt-1 text-[var(--color-text-headings)] font-medium">
+                                                    <% if (property.serviceTypes && property.serviceTypes.length) { %>
+                                                        <div class="flex flex-wrap gap-2">
+                                                            <% property.serviceTypes.forEach(function(svc){ %>
+                                                                <span class="inline-flex items-center rounded-full border border-[var(--color-border-subtle)] bg-[var(--color-surface)] px-3 py-1 text-xs font-medium"><%= svc.name %></span>
+                                                            <% }) %>
+                                                        </div>
+                                                    <% } %>
+                                                    <% if ((!property.serviceTypes || !property.serviceTypes.length) && property.services && property.services.length) { %>
+                                                        <%= property.services.join(', ') %>
+                                                    <% } %>
+                                                </div>
+                    </div>
+                    <% } %>
+                    <% /* Completion Date */ %>
+                    <% if (completed) { %>
+                    <div class="rounded-lg bg-white border border-[var(--color-border-subtle)] p-4">
+                        <div class="text-xs uppercase tracking-wide text-[var(--color-text-muted)]">Completion Date</div>
+                        <div class="mt-1 text-[var(--color-text-headings)] font-medium"><%= completed %></div>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Two-column narrative + sidebar -->
+    <section class="py-8 border-t border-[var(--color-border-subtle)]">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+                <!-- Narrative -->
+                <article class="md:col-span-8">
+                    <div class="prose prose-slate max-w-none">
+                        <% /* Optional headings if content doesn’t already include them */ %>
+                        <% /*
+                        <h2>The Challenge</h2>
+                        <p>...</p>
+                        <h2>The Solution</h2>
+                        <p>...</p>
+                        */ %>
+                        <%- property.description %>
+                    </div>
+                </article>
+
+                <aside class="md:col-span-4">
+                    <% if (property.link) { %>
+                        <div class="mt-4 text-center">
+                            <a href="<%= property.link %>" target="_blank" rel="noopener noreferrer" class="cta-button primary-btn">View Live Project</a>
+                        </div>
+                    <% } %>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Results (optional) -->
+    <% if (property.keyResults && property.keyResults.length) { %>
+    <section class="py-10 border-t border-[var(--color-border-subtle)]">
+        <div class="container mx-auto px-4">
+            <h2 class="text-2xl font-bold text-[var(--color-text-headings)] mb-6 text-center">Measurable Impact</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <% property.keyResults.forEach(result => { %>
+                    <div class="rounded-xl border border-[var(--color-border-subtle)] bg-white p-6 text-center shadow-sm">
+                        <div class="text-3xl font-extrabold text-[var(--color-text-headings)]"><%= result.value %></div>
+                        <div class="mt-2 text-[var(--color-text-muted)]"><%= result.label %></div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    </section>
+    <% } %>
+
+    <!-- Testimonial (optional) -->
+    <% if (typeof testimonial !== 'undefined' && testimonial && testimonial.content) { %>
+    <section class="py-10 border-t border-[var(--color-border-subtle)]">
+        <div class="container mx-auto px-4">
+            <blockquote class="relative rounded-xl border border-[var(--color-border-subtle)] bg-white p-8 shadow-sm">
+                <div class="absolute -top-5 left-6 text-5xl text-[var(--color-primary)]">“</div>
+                <p class="mt-4 text-lg text-[var(--color-text-headings)]"><%= testimonial.content %></p>
+                <footer class="mt-4 text-[var(--color-text-muted)]">
+                    — <strong><%= testimonial.author %></strong><% if (testimonial.position) { %>, <%= testimonial.position %><% } %><% if (testimonial.company) { %>, <%= testimonial.company %><% } %>
+                </footer>
+            </blockquote>
+        </div>
+    </section>
+    <% } %>
+
+    <!-- Final navigation: prev/next and back to projects -->
+    <section class="pt-6 border-t border-[var(--color-border-subtle)]">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col items-center gap-4">
+                <div class="flex items-center justify-between w-full max-w-4xl">
+                    <div>
+                        <% if (typeof prevProject !== 'undefined' && prevProject) { %>
+                            <a class="cta-button secondary-btn" href="/portfolio/<%= prevProject.slug %>">← Previous Property</a>
+                        <% } %>
+                    </div>
+                    <div>
+                        <% if (typeof nextProject !== 'undefined' && nextProject) { %>
+                            <a class="cta-button secondary-btn" href="/portfolio/<%= nextProject.slug %>">Next Property →</a>
+                        <% } %>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <a href="/portfolio" class="cta-button secondary-btn">Explore More Properties</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<%- include('partials/footer') %>

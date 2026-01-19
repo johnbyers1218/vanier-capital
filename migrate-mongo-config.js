@@ -6,7 +6,7 @@ dotenv.config();
 // If you want a separate migrations database / collection, customize here.
 export default {
   mongodb: {
-    url: process.env.MONGODB_URI || 'mongodb://localhost:27017/fndautomations_dev',
+    url: process.env.MONGODB_URI || 'mongodb://localhost:27017/vaniercapital_dev',
     databaseName: undefined, // use database embedded in URI
     options: {
       useNewUrlParser: true,

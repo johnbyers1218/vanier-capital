@@ -9,10 +9,10 @@
     </div>
   </div>
 
-  <div class="rounded-lg border border-gray-700 bg-gray-800 p-4 overflow-x-auto">
+  <div class="rounded-lg border border-neutral-700 bg-[#1a1a1a] p-4 overflow-x-auto">
     <input type="hidden" id="_csrf" value="<%= csrfToken %>">
     <div class="flex items-center justify-end mb-3">
-      <button id="btnRefreshAll" class="bg-gray-700 text-white px-3 py-2 rounded text-sm">Refresh MC Status</button>
+      <button id="btnRefreshAll" class="bg-neutral-700 text-white px-3 py-2 rounded text-sm">Refresh MC Status</button>
       <span id="refreshMsg" class="ml-3 text-sm"></span>
     </div>
     <table class="min-w-full text-sm">
@@ -26,12 +26,12 @@
           <th class="px-3 py-2">Actions</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-gray-700">
+      <tbody class="divide-y divide-neutral-700">
         <% if (newsletters && newsletters.length) { %>
           <% newsletters.forEach(n => { %>
             <tr>
               <td class="px-3 py-2"><%= n.subject %></td>
-              <td class="px-3 py-2"><span class="inline-block px-2 py-0.5 rounded bg-gray-700 text-gray-200"><%= n.status %></span></td>
+              <td class="px-3 py-2"><span class="inline-block px-2 py-0.5 rounded bg-neutral-700 text-gray-200"><%= n.status %></span></td>
               <td class="px-3 py-2">
                 <% if (n.status === 'Scheduled' && n.scheduledFor) { %>
                   <%= new Date(n.scheduledFor).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) %>
@@ -51,7 +51,7 @@
               <td class="px-3 py-2">
                 <% if (n.mailchimpStatus) { %>
                   <% const s = n.mailchimpStatus; %>
-                  <span class="inline-block px-2 py-0.5 rounded border text-xs <%= s==='save' ? 'bg-green-900 text-green-200 border-green-700' : 'bg-gray-800 text-gray-300 border-gray-700' %>"><%= s %></span>
+                  <span class="inline-block px-2 py-0.5 rounded border text-xs <%= s==='save' ? 'bg-green-900 text-green-200 border-green-700' : 'bg-[#1a1a1a] text-gray-300 border-neutral-700' %>"><%= s %></span>
                 <% } else { %>-<% } %>
               </td>
               <td class="px-3 py-2 space-x-3">

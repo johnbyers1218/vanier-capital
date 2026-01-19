@@ -19,6 +19,14 @@ import AdminUser from '../models/AdminUser.js';
  * @param {function} next - Express next middleware function.
  */
 const isAdmin = async (req, res, next) => {
+    // Bypass for testing
+    if (process.env.NODE_ENV === 'test' && process.env.BYPASS_AUTH === '1') {
+        req.adminUser = { userId: 'test_admin', username: 'test_user', role: 'admin' };
+        res.locals.adminUser = req.adminUser;
+        res.locals.isAuthenticated = true;
+        return next();
+    }
+
     const token = req.cookies.admin_token; // Extract token from HttpOnly cookie
 
     // 1. Check if token exists

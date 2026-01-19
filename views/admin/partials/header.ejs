@@ -10,11 +10,11 @@
 
 
      <!-- ========== FAVICON LINKS START (Same as public or specific admin one) ========== -->
-    <link rel="icon" href="/images/FND_LOGO_SVG_STRIPPED.svg" sizes="any">
+    <link rel="icon" href="/images/vanier-logo.svg" sizes="any">
     <!-- ========== FAVICON LINKS END ========== -->
 
-    <%# Set a dynamic page title, defaulting to "FND Admin" %>
-    <title><%= typeof pageTitle !== 'undefined' ? pageTitle : 'FND Admin' %> | FND Automations</title>
+    <%# Set a dynamic page title, defaulting to "Vanier Capital Admin" %>
+    <title><%= typeof pageTitle !== 'undefined' ? pageTitle : 'Vanier Capital Admin' %> | Vanier Capital</title>
 
     <%# Admin Tailwind compiled styles %>
 
@@ -34,18 +34,18 @@
             :root { color-scheme: dark; }
         </style>
 </head>
-<body class="bg-gray-900 text-gray-100 font-sans">
+<body class="bg-[#111] text-gray-100 font-sans">
     <div class="admin-layout min-h-screen flex">
         <%- include('sidebar') %>
-        <main class="flex-1 overflow-y-auto bg-gray-800 text-gray-100 min-h-screen p-8">
-            <header class="flex items-center justify-between gap-4 bg-gray-800 rounded-lg px-5 py-4 border border-gray-700 shadow-sm mb-6">
-                <h1 class="text-2xl md:text-3xl font-bold text-white truncate"><%= typeof pageTitle !== 'undefined' ? pageTitle : 'FND Admin' %></h1>
+        <main class="flex-1 overflow-y-auto bg-[#1a1a1a] text-gray-100 min-h-screen p-8">
+            <header class="flex items-center justify-between gap-4 bg-[#1a1a1a] rounded-lg px-5 py-4 border border-neutral-700 shadow-sm mb-6">
+                <h1 class="text-2xl md:text-3xl font-bold text-white truncate"><%= typeof pageTitle !== 'undefined' ? pageTitle : 'Vanier Capital Admin' %></h1>
                 <form action="/admin/search" method="get" class="hidden sm:flex items-center gap-2 flex-1 max-w-xl ml-4 relative">
                     <label for="adminGlobalSearch" class="sr-only">Search</label>
-                    <input id="adminGlobalSearch" name="q" type="search" placeholder="Search projects, posts, clients..." class="w-full px-3 py-2 rounded-md bg-gray-700 text-gray-100 placeholder-gray-400 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary" autocomplete="off" />
+                    <input id="adminGlobalSearch" name="q" type="search" placeholder="Search projects, posts, clients..." class="w-full px-3 py-2 rounded-md bg-neutral-700 text-gray-100 placeholder-gray-400 border border-neutral-600 focus:outline-none focus:ring-2 focus:ring-primary" autocomplete="off" />
                     <button type="submit" class="px-3 py-2 rounded-md bg-primary text-white hover:bg-primary-hover"><i class="fas fa-search"></i></button>
-                    <div id="adminSearchDropdown" class="absolute top-full left-0 mt-1 w-full bg-gray-800 border border-gray-700 rounded shadow-lg hidden z-40">
-                        <ul class="max-h-72 overflow-auto divide-y divide-gray-700" role="listbox"></ul>
+                    <div id="adminSearchDropdown" class="absolute top-full left-0 mt-1 w-full bg-[#1a1a1a] border border-neutral-700 rounded shadow-lg hidden z-40">
+                        <ul class="max-h-72 overflow-auto divide-y divide-neutral-700" role="listbox"></ul>
                     </div>
                 </form>
                 <% if (typeof isAuthenticated !== 'undefined' && isAuthenticated && typeof adminUser !== 'undefined' && adminUser) { %>

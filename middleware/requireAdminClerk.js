@@ -6,8 +6,19 @@ import { logger } from '../config/logger.js';
 // ...existing code...
 
 const requireAdminClerk = [
-  ClerkExpressRequireAuth(),
+  (req, res, next) => {
+    console.log('requireAdminClerk check:', process.env.NODE_ENV, process.env.BYPASS_AUTH);
+    if (process.env.NODE_ENV === 'test' && process.env.BYPASS_AUTH === '1') {
+      req.auth = { userId: 'test_admin', sessionId: 'test_session' };
+      return next();
+    }
+    return ClerkExpressRequireAuth()(req, res, next);
+  },
   async (req, res, next) => {
+    if (process.env.NODE_ENV === 'test' && process.env.BYPASS_AUTH === '1') {
+      res.locals.currentUser = { role: 'admin', fullName: 'Test Admin' };
+      return next();
+    }
     try {
       // Step 1: Debug logging to diagnose redirect loop
       const authInfo = {

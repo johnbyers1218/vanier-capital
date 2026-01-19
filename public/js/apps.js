@@ -1,5 +1,5 @@
 /**
- * FND Automations - Frontend JavaScript (apps.js)
+ * Vanier Capital - Frontend JavaScript (apps.js)
  *
  * Responsibilities:
  * - Initialize UI components on DOM load.
@@ -24,8 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCopyrightYear();
 
     // Initialize dynamic content loading based on page elements
-    if (document.getElementById('projects-grid-container')) {
-        loadProjects(); // Load all projects on the /projects page
+    if (document.getElementById('properties-grid-container')) {
+        loadProperties(); // Load all projects on the /projects page
         initProjectFilters(); // Activate filter buttons if present
     }
     if (document.querySelector('.blog-filter-navigation')) {
@@ -47,16 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('contact-form')) {
         initContactAndScheduleForm();
     }
-    // Vector world map disabled per request; keep the static SVG + overlay only
-    (function ensureVectorMap() {
-        const staticWrap = document.getElementById('world-map-static-wrap');
-        if (staticWrap) staticWrap.style.display = '';
-        // Remove the legacy vector container to avoid reserved whitespace
-        const vector = document.getElementById('world-map');
-        if (vector && vector.parentNode) {
-            try { vector.parentNode.removeChild(vector); } catch (_) { vector.style.display = 'none'; }
-        }
-    })();
+    
     // Schedule form is initialized dynamically after contact form success
 
     // Initialize newsletter form feedback if present
@@ -252,50 +243,49 @@ function generateExcerptFromHtml(htmlContent, maxLength = 150) {
 
 
 /** Creates HTML for a single Project card (for listing pages) */
-function createProjectCardHtml(project, isPreview = false) {
+function createPropertyCardHtml(property, isPreview = false) {
     // Prefer explicit excerpt; fallback to generating from HTML description
-    const excerptRaw = project.excerpt && String(project.excerpt).trim().length
-        ? String(project.excerpt)
-        : generateExcerptFromHtml(project.description, isPreview ? 80 : 120);
+    const excerptRaw = property.excerpt && String(property.excerpt).trim().length
+        ? String(property.excerpt)
+        : generateExcerptFromHtml(property.description, isPreview ? 80 : 120);
     const excerptHtml = decodeHtmlEntities(excerptRaw);
 
-    const imageHtml = project.image
-        ? `<img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}" loading="lazy" class="project-image">`
+    const imageHtml = property.image
+        ? `<img src="${escapeHtml(property.image)}" alt="${escapeHtml(property.title)}" loading="lazy" class="project-image">`
         : `<div class="project-image-placeholder">
-             <i class="fas fa-project-diagram"></i>
+             <i class="fas fa-building"></i>
            </div>`;
 
-    // Link to the single project page using its slug
-    const projectDetailUrl = `/projects/${escapeHtml(project.slug || 'no-slug-found')}`;
-    const industryNames = Array.isArray(project.industries) && project.industries.length ? project.industries.map(i => i.name) : [];
-    const serviceNames = Array.isArray(project.serviceTypes) && project.serviceTypes.length ? project.serviceTypes.map(s => s.name) : [];
-    const industryChips = industryNames.map(n => `<span class="chip">${escapeHtml(n)}</span>`).join('');
-    const serviceChips = serviceNames.map(n => `<span class=\"chip chip-muted\">${escapeHtml(n)}</span>`).join('');
+    // Link to the single property page using its slug
+    const propertyDetailUrl = `/property/${escapeHtml(property.slug || 'no-slug-found')}`;
+    // Properties might use propertyTypes or serviceTypes depending on API/Model evolution, check both or standardized 'serviceTypes'
+    const tags = Array.isArray(property.serviceTypes) ? property.serviceTypes.map(s => s.name) : (property.category ? [property.category] : []);
+    const tagChips = tags.map(n => `<span class="chip chip-muted">${escapeHtml(n)}</span>`).join('');
 
-    // Entire card is clickable; avoid nested anchors inside
+    // Entire card is clickable
+    /** @todo Update CSS class 'project-card' to 'property-card' in stylesheet later */
     return `
-    <a class="project-card" href="${projectDetailUrl}" aria-label="View case study: ${escapeHtml(project.title)}" data-industries="${escapeHtml(industryNames.join('|'))}" data-services="${escapeHtml(serviceNames.join('|'))}">
+    <a class="project-card" href="${propertyDetailUrl}" aria-label="View property: ${escapeHtml(property.title)}">
         ${imageHtml}
         <div class="project-content project-card-inner">
             <div class="project-card-top">
-                <h3 class="project-title">${escapeHtml(project.title)}</h3>
-                <div class="project-meta">${industryChips}</div>
-                ${serviceChips ? `<div class="project-meta">${serviceChips}</div>` : ''}
+                <h3 class="project-title">${escapeHtml(property.title)}</h3>
+                ${tagChips ? `<div class="project-meta">${tagChips}</div>` : ''}
                 <div class="project-description project-description-rich">${excerptHtml}</div>
             </div>
             <div class="project-card-spacer"></div>
             <div class="project-meta project-cta">
-                <span class="project-link">View Case Study →</span>
+                <span class="link-text">View Details <i class="fas fa-arrow-right"></i></span>
             </div>
         </div>
     </a>`;
 }
 
-// --- Loaders --- (loadProjects will use the updated createProjectCardHtml)
-async function loadProjects(page = 1, activeIndustryIds = [], activeServiceIds = []) {
-    const container = document.getElementById('projects-grid-container');
+// --- Loaders --- (loadProperties uses the updated createPropertyCardHtml)
+async function loadProperties(page = 1, activeServiceIds = []) {
+    const container = document.getElementById('properties-grid-container');
     if (!container) {
-        console.warn('projects container not found on this page.');
+        console.warn('properties-grid-container not found on this page.');
         return;
     }
     
@@ -305,32 +295,36 @@ async function loadProjects(page = 1, activeIndustryIds = [], activeServiceIds =
         const params = new URLSearchParams();
         params.set('page', String(page));
         params.set('perPage', '9');
-        (activeIndustryIds || []).forEach(id => params.append('industries', id));
         (activeServiceIds || []).forEach(id => params.append('services', id));
-        const data = await fetchData(`/api/projects?${params.toString()}`);
-        if (data.projects && data.projects.length > 0) {
+        
+        // Updated API Endpoint
+        const data = await fetchData(`/api/properties?${params.toString()}`);
+        
+        if (data.properties && data.properties.length > 0) {
             container.innerHTML = ''; // Clear loading
-            data.projects.forEach(project => {
-                container.insertAdjacentHTML('beforeend', createProjectCardHtml(project));
+            data.properties.forEach(property => {
+                container.insertAdjacentHTML('beforeend', createPropertyCardHtml(property));
             });
 
             // Build curated dual filters (preloaded full lists from server)
-            buildDualProjectFiltersFromServer(data.filters);
-            try { document.dispatchEvent(new CustomEvent('projectFiltersUpdated')); } catch(_) {}
-            updateDualFilterCounts(data.filters);
-            renderProjectsPagination(data.pagination);
-        } else {
-            renderNoDataMessage(container, 'projects');
-            // Still render filters even if no projects on this page
-            if (data && data.filters) {
+            if (typeof buildDualProjectFiltersFromServer === 'function') {
                 buildDualProjectFiltersFromServer(data.filters);
-                updateDualFilterCounts(data.filters);
+            }
+            try { document.dispatchEvent(new CustomEvent('propertyFiltersUpdated')); } catch(_) {}
+            
+            if (typeof renderProjectsPagination === 'function') {
                 renderProjectsPagination(data.pagination);
-                try { document.dispatchEvent(new CustomEvent('projectFiltersUpdated')); } catch(_) {}
+            }
+        } else {
+            renderNoDataMessage(container, 'properties');
+            // Still render filters even if no properties on this page
+            if (data && data.filters && typeof buildDualProjectFiltersFromServer === 'function') {
+                buildDualProjectFiltersFromServer(data.filters);
+                if (typeof renderProjectsPagination === 'function') renderProjectsPagination(data.pagination);
             }
         }
     } catch (error) {
-        renderErrorMessage(container, `Could not load projects. ${error.message}`);
+        renderErrorMessage(container, `Could not load properties. ${error.message}`);
     }
 }
 
@@ -381,7 +375,6 @@ function createFeaturedProjectHtml(project) {
     const image = project.image
         ? `<img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}" loading="lazy">`
         : `<div class="featured-media-placeholder"><i class="fas fa-project-diagram fa-2x"></i></div>`;
-    const categoryLabel = (Array.isArray(project.industries) && project.industries.length) ? project.industries[0].name : '';
     const rawExcerpt = project.excerpt ? String(project.excerpt) : generateExcerptFromHtml(project.description, 400);
     const truncated = rawExcerpt.length > 320 ? rawExcerpt.slice(0, 317) + '…' : rawExcerpt;
     const excerptHtml = decodeHtmlEntities(truncated);
@@ -407,8 +400,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initFAQAccordion();
     updateCopyrightYear();
 
-    if (document.getElementById('projects-grid-container')) {
-        loadProjects();
+    if (document.getElementById('properties-grid-container')) {
+        loadProperties();
         initProjectFilters();
     }
     if (document.getElementById('testimonials-grid-container')) {
@@ -1613,13 +1606,10 @@ function createTestimonialCardHtml(testimonial) {
         }
     } catch(_) { /* no-op */ }
 
-    const industry = testimonial._resolvedIndustry || testimonial.project?.industry || testimonial.project?.client?.industry || '';
     const services = Array.isArray(testimonial.project?.services) ? testimonial.project.services : [];
-    const industryLabel = industry ? formatCategoryLabel(String(industry)) : '';
 
     return `
-    <div class="testimonial-card" data-services="${escapeHtml(services.join(','))}" data-industry="${escapeHtml(String(industry || ''))}">
-            ${industryLabel ? `<div class="testimonial-industry"><span class="eyebrow">${decodeHtmlEntities(industryLabel)}</span></div>` : ''}
+    <div class="testimonial-card" data-services="${escapeHtml(services.join(','))}">
             <div class="testimonial-quote">
                 <p>${decodeHtmlEntities(testimonial.content)}</p>
             </div>
@@ -1733,114 +1723,21 @@ async function loadTestimonialsGrid() {
 function buildTestimonialFilters(testimonials) {
     const wrap = document.getElementById('testimonial-filters');
     if (!wrap) return;
-    const industries = new Map();
-    testimonials.forEach(t => {
-        const ind = String(t._resolvedIndustry || t.project?.industry || t.project?.client?.industry || 'unspecified').toLowerCase();
-        industries.set(ind, (industries.get(ind) || 0) + 1);
-    });
-    const indItems = Array.from(industries.entries()).sort((a,b) => b[1]-a[1] || a[0].localeCompare(b[0]));
-    const total = testimonials.length;
-    let html = '<div class="filter-navigation">';
-    html += '<div class="filter-group" role="tablist" aria-label="Filter by Industry">';
-    html += `
-        <button class="filter-btn active" data-filter="all" data-scope="industry" aria-pressed="true">
-            <span class="filter-label">All Industries</span>
-            <span class="filter-count" data-count="all">${total}</span>
-        </button>`;
-    indItems.forEach(([ind, count]) => {
-        const label = formatCategoryLabel(ind);
-        html += `
-        <button class="filter-btn" data-filter="${ind}" data-scope="industry" aria-pressed="false">
-            <span class="filter-label">${label}</span>
-            <span class="filter-count" data-count="${ind}">${count}</span>
-        </button>`;
-    });
-    html += '</div>';
-    html += '</div>';
-    wrap.innerHTML = html;
+    wrap.innerHTML = '';
 }
 
 function initTestimonialFilters() {
     const wrap = document.getElementById('testimonial-filters');
     const grid = document.getElementById('testimonials-grid-container');
     if (!wrap || !grid) return;
-    const groups = wrap.querySelectorAll('.filter-group');
-    if (!groups.length) return;
-    const summary = document.getElementById('testimonial-active-summary');
-    const renderSummary = () => {
-        if (!summary) return;
-        const activeInd = wrap.querySelector('.filter-group [data-scope="industry"] .filter-btn.active')?.getAttribute('data-filter') || 'all';
-        const chips = [];
-        if (activeInd !== 'all') {
-            const label = formatCategoryLabel(activeInd);
-            chips.push(`<span class="active-chip chip-industry" data-scope="industry" data-value="${escapeHtml(activeInd)}">${escapeHtml(label)} <button class="remove-chip" aria-label="Remove industry filter ${escapeHtml(label)}">×</button></span>`);
-        }
-        summary.innerHTML = chips.join('');
-        summary.querySelectorAll('.remove-chip').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const chip = e.currentTarget.closest('.active-chip');
-                if (!chip) return;
-                const scope = chip.getAttribute('data-scope');
-                // Reset the corresponding group to 'all'
-                const group = wrap.querySelector(`.filter-group [data-scope="${scope}"]`)?.closest('.filter-group');
-                if (!group) return;
-                group.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed','false'); });
-                const allBtn = group.querySelector('.filter-btn[data-filter="all"][data-scope]') || group.querySelector('.filter-btn[data-filter="all"]');
-                if (allBtn) { allBtn.classList.add('active'); allBtn.setAttribute('aria-pressed','true'); }
-                const newInd = wrap.querySelector('.filter-group [data-scope="industry"] .filter-btn.active')?.getAttribute('data-filter') || 'all';
-                filterTestimonialsByIndustry(newInd);
-                renderSummary();
-            });
-        });
-    };
-    groups.forEach(group => {
-        group.addEventListener('click', (e) => {
-            const btn = e.target.closest('.filter-btn');
-            if (!btn) return;
-            e.preventDefault();
-            const scope = btn.getAttribute('data-scope');
-            group.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed','false'); });
-            btn.classList.add('active');
-            btn.setAttribute('aria-pressed','true');
-            const activeInd = wrap.querySelector('.filter-group [data-scope="industry"] .filter-btn.active')?.getAttribute('data-filter') || 'all';
-            filterTestimonialsByIndustry(activeInd);
-            renderSummary();
-        });
-    });
-    renderSummary();
 }
 
 function updateTestimonialFilterCounts() {
-    const cards = document.querySelectorAll('#testimonials-grid-container .testimonial-card');
-    const buttons = document.querySelectorAll('#testimonial-filters .filter-btn');
-    const counts = {};
-    let total = 0;
-    cards.forEach(card => {
-    const industry = (card.dataset.industry || 'unspecified').toLowerCase();
-    counts[industry] = (counts[industry] || 0) + 1;
-        total++;
-    });
-    buttons.forEach(btn => {
-        const val = btn.getAttribute('data-filter');
-        const el = btn.querySelector('.filter-count');
-        if (!el) return;
-    if (val === 'all') el.textContent = total; else el.textContent = counts[val] || 0;
-    });
+    return;
 }
 
 function filterTestimonialsByIndustry(industryFilter = 'all') {
-    const cards = document.querySelectorAll('#testimonials-grid-container .testimonial-card');
-    cards.forEach((card, idx) => {
-    const industry = (card.dataset.industry || 'unspecified').toLowerCase();
-        const show = (industryFilter === 'all' || industry === industryFilter);
-        if (show) {
-            card.style.display = 'block';
-            card.style.animation = `fadeInUp 0.6s ease forwards ${idx * 0.06}s`;
-        } else {
-            card.style.animation = 'fadeOut 0.25s ease forwards';
-            setTimeout(() => { if (!show) card.style.display = 'none'; }, 250);
-        }
-    });
+    return;
 }
 
 // --- Testimonials Carousel Functions ---
@@ -2074,7 +1971,17 @@ function initStatsCounter() {
             if (entry.isIntersecting) {
                 const target = entry.target;
                 if (target.dataset.animated === 'true') { return; }
-                const finalValue = parseInt(target.getAttribute('data-count')) || 0;
+                
+                // Only animate if data-count is provided
+                const countAttr = target.getAttribute('data-count');
+                if (!countAttr) {
+                    // If no data-count, just mark as animated so we don't check again, but don't change text
+                    target.dataset.animated = 'true';
+                    observer.unobserve(target);
+                    return;
+                }
+
+                const finalValue = parseInt(countAttr) || 0;
                 animateCounter(target, 0, finalValue, 2000);
                 target.dataset.animated = 'true';
                 observer.unobserve(target);
@@ -2106,15 +2013,12 @@ function animateCounter(element, start, end, duration) {
 // --- Project Filtering ---
 
 function initProjectFilters() {
-    const projectGrid = document.getElementById('projects-grid-container');
+    const projectGrid = document.getElementById('properties-grid-container');
     if (!projectGrid) return;
-    const industryWrap = document.getElementById('industry-filters');
     const serviceWrap = document.getElementById('service-filters');
     const pager = document.getElementById('projects-pagination');
     // Collapsible & search controls
-    const indToggle = document.getElementById('industryToggle');
     const svcToggle = document.getElementById('serviceToggle');
-    const indSearch = document.getElementById('industryFilterSearch');
     const svcSearch = document.getElementById('serviceFilterSearch');
 
     function setCollapsed(el, toggle, collapsed){
@@ -2124,7 +2028,6 @@ function initProjectFilters() {
         toggle.textContent = collapsed ? 'Show more…' : 'Show less';
         el.style.maxHeight = collapsed ? '84px' : '9999px';
     }
-    if (indToggle && industryWrap) indToggle.addEventListener('click', ()=> setCollapsed(industryWrap, indToggle, industryWrap.dataset.collapsed !== 'false'));
     if (svcToggle && serviceWrap) svcToggle.addEventListener('click', ()=> setCollapsed(serviceWrap, svcToggle, serviceWrap.dataset.collapsed !== 'false'));
 
     function wireLiveSearch(input, container){
@@ -2138,17 +2041,10 @@ function initProjectFilters() {
             });
         });
     }
-    wireLiveSearch(indSearch, industryWrap);
     wireLiveSearch(svcSearch, serviceWrap);
 
     function adjustToggleVisibility(){
         const threshold = 84; // px; ~two rows
-        if (industryWrap && indToggle) {
-            const needs = industryWrap.scrollHeight > threshold + 4; // small fudge
-            indToggle.style.display = needs ? 'inline-block' : 'none';
-            // If not needed, ensure it's expanded enough to show all
-            if (!needs) setCollapsed(industryWrap, indToggle, false);
-        }
         if (serviceWrap && svcToggle) {
             const needs = serviceWrap.scrollHeight > threshold + 4;
             svcToggle.style.display = needs ? 'inline-block' : 'none';
@@ -2157,17 +2053,15 @@ function initProjectFilters() {
     }
     document.addEventListener('projectFiltersUpdated', adjustToggleVisibility);
 
-    // Curated dual-filter mode if both wrappers exist
-    if (industryWrap && serviceWrap) {
+    if (serviceWrap) {
         // Parse initial state from URL (deep-linking)
         const url = new URL(window.location.href);
         const pageQ = parseInt(url.searchParams.get('page') || '1', 10) || 1;
-        const indsQ = url.searchParams.getAll('industries');
         const svcsQ = url.searchParams.getAll('services');
-        window.__projFilterState = window.__projFilterState || { industries: new Set(indsQ), services: new Set(svcsQ), page: pageQ };
+        window.__projFilterState = window.__projFilterState || { services: new Set(svcsQ), page: pageQ };
         const state = window.__projFilterState;
 
-        function handleClick(e, type) {
+        function handleClick(e) {
             const btn = e.target.closest('.filter-btn');
             if (!btn) return;
             e.preventDefault();
@@ -2175,21 +2069,20 @@ function initProjectFilters() {
             if (!id) return;
             if (btn.classList.contains('active')) {
                 btn.classList.remove('active');
-                state[type].delete(id);
+                state.services.delete(id);
                 btn.setAttribute('aria-pressed', 'false');
             } else {
                 btn.classList.add('active');
-                state[type].add(id);
+                state.services.add(id);
                 btn.setAttribute('aria-pressed', 'true');
             }
             state.page = 1;
             // Sync URL (deep-linking)
             syncProjectsUrl(state);
-            loadProjects(state.page, Array.from(state.industries), Array.from(state.services));
+            loadProperties(state.page, Array.from(state.services));
         }
 
-        industryWrap.addEventListener('click', (e) => handleClick(e, 'industries'));
-        serviceWrap.addEventListener('click', (e) => handleClick(e, 'services'));
+        serviceWrap.addEventListener('click', handleClick);
 
         if (pager) {
             pager.addEventListener('click', (e) => {
@@ -2200,7 +2093,7 @@ function initProjectFilters() {
                 if (a.classList.contains('disabled') || nextPage === state.page) return;
                 state.page = nextPage;
                 syncProjectsUrl(state);
-                loadProjects(state.page, Array.from(state.industries), Array.from(state.services));
+                loadProperties(state.page, Array.from(state.services));
                 // Scroll to grid top for better UX
                 try { projectGrid.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch(_) { /* ignore */ }
             });
@@ -2208,7 +2101,7 @@ function initProjectFilters() {
         // Initial load honors deep-linked state
         setTimeout(() => {
             markActiveButtonsFromState(state);
-            loadProjects(state.page, Array.from(state.industries), Array.from(state.services));
+            loadProjects(state.page, Array.from(state.services));
         }, 0);
         return; // done wiring curated mode
     }
@@ -2652,8 +2545,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Initialize dynamic LIST content loading (prevent double loading if preview exists)
-    if (document.getElementById('projects-grid-container') && !document.getElementById('projects-preview-grid')) {
-        loadProjects();
+    if (document.getElementById('properties-grid-container') && !document.getElementById('projects-preview-grid')) {
+        loadProperties();
         initProjectFilters();
     }
     if (document.getElementById('testimonials-grid-container') && !document.getElementById('featured-testimonial-container')) {
@@ -3048,56 +2941,29 @@ function initNewsletterForm() {
 
 // Curated dual filters helpers
 function buildDualProjectFilters(projects) {
-    const industryWrap = document.getElementById('industry-filters');
     const serviceWrap = document.getElementById('service-filters');
-    if (!industryWrap || !serviceWrap) return; // no-op
+    if (!serviceWrap) return; // no-op
     // Build only once per page load to preserve active selections
-    if (industryWrap.childElementCount > 0 || serviceWrap.childElementCount > 0) return;
-    const indMap = new Map();
+    if (serviceWrap.childElementCount > 0) return;
     const svcMap = new Map();
     projects.forEach(p => {
-        (p.industries || []).forEach(i => {
-            const id = String(i && (i._id || i.id || i));
-            const name = String(i && (i.name || i));
-            if (id && name) indMap.set(id, name);
-        });
         (p.serviceTypes || []).forEach(s => {
             const id = String(s && (s._id || s.id || s));
             const name = String(s && (s.name || s));
             if (id && name) svcMap.set(id, name);
         });
     });
-    const indHtml = Array.from(indMap.entries())
-        .sort((a,b) => a[1].localeCompare(b[1]))
-        .map(([id, name]) => `<button class="filter-btn" data-id="${escapeHtml(id)}" aria-pressed="false"><span class="filter-label">${escapeHtml(name)}</span></button>`)
-        .join('');
     const svcHtml = Array.from(svcMap.entries())
         .sort((a,b) => a[1].localeCompare(b[1]))
         .map(([id, name]) => `<button class="filter-btn" data-id="${escapeHtml(id)}" aria-pressed="false"><span class="filter-label">${escapeHtml(name)}</span></button>`)
         .join('');
-    industryWrap.innerHTML = indHtml;
     serviceWrap.innerHTML = svcHtml;
 }
 
 function updateDualFilterCounts(filters) {
     // Server-driven counts when provided
-    if (filters && filters.industries && filters.services) {
-        const indWrap = document.getElementById('industry-filters');
+    if (filters && filters.services) {
         const svcWrap = document.getElementById('service-filters');
-        if (indWrap) {
-            const counts = new Map(filters.industries.map(f => [String(f._id), Number(f.count || 0)]));
-            indWrap.querySelectorAll('.filter-btn').forEach(btn => {
-                const id = btn.getAttribute('data-id');
-                const count = counts.get(String(id)) || 0;
-                let countEl = btn.querySelector('.filter-count');
-                if (!countEl) {
-                    countEl = document.createElement('span');
-                    countEl.className = 'filter-count';
-                    btn.appendChild(countEl);
-                }
-                countEl.textContent = String(count);
-            });
-        }
         if (svcWrap) {
             const counts = new Map(filters.services.map(f => [String(f._id), Number(f.count || 0)]));
             svcWrap.querySelectorAll('.filter-btn').forEach(btn => {
@@ -3131,18 +2997,12 @@ function renderProjectsPagination(pagination) {
 
 // Build filters using server-provided full list (preload stable bar)
 function buildDualProjectFiltersFromServer(filters) {
-    const industryWrap = document.getElementById('industry-filters');
     const serviceWrap = document.getElementById('service-filters');
-    if (!industryWrap || !serviceWrap || !filters) return;
-    const indHtml = (filters.industries || [])
-        .slice().sort((a,b) => String(a.name).localeCompare(String(b.name)))
-        .map(f => `<button class="filter-btn" data-id="${escapeHtml(String(f._id))}" aria-pressed="false"><span class="filter-label">${escapeHtml(String(f.name))}</span><span class="filter-count">${Number(f.count||0)}</span></button>`)
-        .join('');
+    if (!serviceWrap || !filters) return;
     const svcHtml = (filters.services || [])
         .slice().sort((a,b) => String(a.name).localeCompare(String(b.name)))
         .map(f => `<button class="filter-btn" data-id="${escapeHtml(String(f._id))}" aria-pressed="false"><span class="filter-label">${escapeHtml(String(f.name))}</span><span class="filter-count">${Number(f.count||0)}</span></button>`)
         .join('');
-    industryWrap.innerHTML = indHtml;
     serviceWrap.innerHTML = svcHtml;
     // Apply active classes from deep-linked state, if any
     if (window.__projFilterState) markActiveButtonsFromState(window.__projFilterState);
@@ -3150,14 +3010,7 @@ function buildDualProjectFiltersFromServer(filters) {
 
 function markActiveButtonsFromState(state) {
     try {
-        const indWrap = document.getElementById('industry-filters');
         const svcWrap = document.getElementById('service-filters');
-        if (indWrap) indWrap.querySelectorAll('.filter-btn').forEach(btn => {
-            const id = btn.getAttribute('data-id');
-            const active = state.industries.has(id);
-            btn.classList.toggle('active', active);
-            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
-        });
         if (svcWrap) svcWrap.querySelectorAll('.filter-btn').forEach(btn => {
             const id = btn.getAttribute('data-id');
             const active = state.services.has(id);
@@ -3172,8 +3025,7 @@ function syncProjectsUrl(state) {
         const url = new URL(window.location.href);
         url.searchParams.set('page', String(state.page || 1));
         // Clear existing multi params before appending new
-        ['industries','services'].forEach(k => url.searchParams.delete(k));
-        Array.from(state.industries).forEach(id => url.searchParams.append('industries', id));
+        ['services'].forEach(k => url.searchParams.delete(k));
         Array.from(state.services).forEach(id => url.searchParams.append('services', id));
         window.history.replaceState(null, '', url.toString());
     } catch(_) { /* ignore */ }

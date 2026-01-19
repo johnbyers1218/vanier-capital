@@ -2,7 +2,7 @@
 
 import express from 'express';
 import { logger } from '../../config/logger.js';
-import Project from '../../models/Projects.js';
+import Property from '../../models/Property.js';
 import Testimonial from '../../models/Testimonials.js';
 import BlogPost from '../../models/BlogPost.js';
 import AdminLog from '../../models/AdminLog.js';
@@ -46,7 +46,7 @@ export default (csrfProtection) => {
                 postsMissingFeatured,
                 staleDraftsCount
             ] = await Promise.all([
-                Project.countDocuments().exec().catch(err => { logger.warn('Failed to count projects', err); return null; }),
+                Property.countDocuments().exec().catch(err => { logger.warn('Failed to count properties', err); return null; }),
                 Testimonial.countDocuments({ isVisible: true }).exec().catch(err => { logger.warn('Failed to count testimonials', err); return null; }),
                 BlogPost.countDocuments({ isPublished: true }).exec().catch(err => { logger.warn('Failed to count published posts', err); return null; }),
                 BlogPost.countDocuments({ isPublished: false }).exec().catch(err => { logger.warn('Failed to count draft posts', err); return null; }),
@@ -104,7 +104,7 @@ export default (csrfProtection) => {
     router.get('/api/stats', async (req, res) => {
         try {
             const [projectCount, published, drafts, subs, testimonials] = await Promise.all([
-                Project.countDocuments().exec(),
+                Property.countDocuments().exec(),
                 BlogPost.countDocuments({ isPublished: true }).exec(),
                 BlogPost.countDocuments({ isPublished: false }).exec(),
                 NewsletterSubscriber.countDocuments({ status: 'Subscribed' }).exec(),

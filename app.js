@@ -21,19 +21,17 @@ import apiPublicRoutes from './routes/apiPublic.js';
 import apiContactRoutes from './routes/apiContact.js';
 import apiInquiriesRoutes from './routes/apiInquiries.js';
 import adminDashboardRoutes from './routes/admin/adminDashboard.js';
-import adminProjectRoutes from './routes/admin/adminProjects.js';
-import adminClientRoutes from './routes/admin/adminClients.js';
+import adminPropertyRoutes from './routes/admin/adminProperties.js';
 import adminTestimonialRoutes from './routes/admin/adminTestimonials.js';
 import adminBlogRoutes from './routes/admin/adminBlog.js';
-import adminNewslettersRoutes from './routes/admin/adminNewsletters.js';
-import adminSubscriberRoutes from './routes/admin/adminSubscribers.js';
+// import adminNewslettersRoutes from './routes/admin/adminNewsletters.js';
+// import adminSubscriberRoutes from './routes/admin/adminSubscribers.js';
 import adminSettingsRoutes from './routes/admin/adminSettings.js';
 import adminCategoriesRoutes from './routes/admin/adminCategories.js';
-import adminIndustriesRoutes from './routes/admin/adminIndustries.js';
-import adminServicesRoutes from './routes/admin/adminServices.js';
+import adminMarketsRoutes from './routes/admin/adminMarkets.js';
 import adminSearchRoutes from './routes/admin/adminSearch.js';
 import adminInquiriesRoutes from './routes/admin/adminInquiries.js';
-import { startNewsletterScheduler } from './services/newsletterScheduler.js';
+// import { startNewsletterScheduler } from './services/newsletterScheduler.js';
 import authRoutes from './routes/auth.js';
 import adminAuthRoutes from './routes/admin/adminAuth.js';
 import isAdmin from './middleware/isAdmin.js';
@@ -57,12 +55,12 @@ process.on('uncaughtException', (err, origin) => {
 
 // ESM __dirname and __filename equivalent
 import { fileURLToPath } from 'url';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const currentFilename = fileURLToPath(import.meta.url);
+const currentDirname = path.dirname(currentFilename);
 
 // --- Dotenv Configuration ---
 if (process.env.NODE_ENV === 'development') {
-  const devEnvPath = path.resolve(__dirname, '.env.development');
+  const devEnvPath = path.resolve(currentDirname, '.env.development');
   // Load base .env first, then override with .env.development so missing keys in the latter are filled by the former.
   const base = dotenv.config();
   if (!base.error) {
@@ -115,7 +113,7 @@ app.use(compression({
 
 // Serve authoring guide (raw markdown)
 app.get('/AUTHORING_GUIDE.md', (req, res) => {
-  res.sendFile(path.join(__dirname, 'AUTHORING_GUIDE.md'));
+  res.sendFile(path.join(currentDirname, 'AUTHORING_GUIDE.md'));
 });
 
 
@@ -192,9 +190,9 @@ async function connectToDatabase() {
 
 // --- View Engine Setup ---
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
-app.locals.basedir = __dirname;
-logger.debug(`[INIT] View engine setup complete. Views path set to: ${path.join(__dirname, 'views')}`);
+app.set('views', path.join(currentDirname, 'views'));
+app.locals.basedir = currentDirname;
+logger.debug(`[INIT] View engine setup complete. Views path set to: ${path.join(currentDirname, 'views')}`);
 
 // --- Core Middleware Pipeline ---
 logger.debug('[INIT] Applying httpLoggerMiddleware...');
@@ -454,16 +452,16 @@ app.use('/api', apiPublicRoutes);
 app.use('/api', apiContactRoutes);
 app.use('/api', apiInquiriesRoutes);
 app.use('/admin/dashboard', adminGuard, adminDashboardRoutes(csrfProtection));
-app.use('/admin/projects', adminGuard, adminProjectRoutes(csrfProtection));
-app.use('/admin/clients', adminGuard, adminClientRoutes(csrfProtection));
+app.use('/admin/properties', adminGuard, adminPropertyRoutes(csrfProtection));
+// app.use('/admin/clients', adminGuard, adminClientRoutes(csrfProtection));
 app.use('/admin/testimonials', adminGuard, adminTestimonialRoutes(csrfProtection));
 app.use('/admin/blog', adminGuard, adminBlogRoutes(csrfProtection));
 app.use('/admin/categories', adminGuard, adminCategoriesRoutes(csrfProtection));
-app.use('/admin/industries', adminGuard, adminIndustriesRoutes(csrfProtection));
-app.use('/admin/services', adminGuard, adminServicesRoutes(csrfProtection));
+app.use('/admin/markets', adminGuard, adminMarketsRoutes(csrfProtection));
+// app.use('/admin/services', adminGuard, adminServicesRoutes(csrfProtection));
 app.use('/admin/inquiries', adminGuard, adminInquiriesRoutes(csrfProtection));
-app.use('/admin/newsletters', adminGuard, adminNewslettersRoutes(csrfProtection));
-app.use('/admin/subscribers', adminGuard, adminSubscriberRoutes(csrfProtection));
+// app.use('/admin/newsletters', adminGuard, adminNewslettersRoutes(csrfProtection));
+// app.use('/admin/subscribers', adminGuard, adminSubscriberRoutes(csrfProtection));
 app.use('/admin/settings', adminGuard, adminSettingsRoutes(csrfProtection));
 app.use('/admin/search', adminGuard, adminSearchRoutes(csrfProtection));
 app.use('/auth', authRoutes(csrfProtection));
@@ -471,7 +469,7 @@ logger.debug('[INIT] Routers mounted.');
 
 logger.debug('[INIT] Applying static file serving...');
 // Serve static files (including favicon) after routes so /sitemap.xml dynamic route wins over any static file
-app.use(express.static(path.join(__dirname, 'public'), {
+app.use(express.static(path.join(currentDirname, 'public'), {
   setHeaders: (res, filePath) => {
     // Cache all except HTML for 30 days
     if (/\.html$/i.test(filePath)) {
@@ -528,6 +526,9 @@ logger.debug('[INIT] Error handlers setup.');
 
 
 // --- Refactored Startup Sequence ---
+// Export the Express app instance so tests (CommonJS style via babel-jest) can require('../app.js') and access { app }
+// This must appear before invoking startApp() so named export is established immediately.
+export { app };
 async function startApp() {
   try {
     // 1. Connect to database
@@ -550,8 +551,8 @@ async function startApp() {
     } else if (process.env.NODE_ENV === 'development') {
       logger.info('[SERVER START] Development mode. Attempting HTTPS and HTTP.');
       try {
-        const keyPath = path.join(__dirname, 'key.pem');
-        const certPath = path.join(__dirname, 'cert.pem');
+        const keyPath = path.join(currentDirname, 'key.pem');
+        const certPath = path.join(currentDirname, 'cert.pem');
         if (!fs.existsSync(keyPath) || !fs.existsSync(certPath)) {
           logger.warn('[SERVER START] SSL certs (key.pem/cert.pem) not found. Falling back to HTTP for dev.');
           throw new Error('SSL files not found.');
@@ -648,6 +649,7 @@ async function startApp() {
     process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
     // 4. Start background schedulers after server is running
+    /*
     if (typeof startNewsletterScheduler === 'function' && (!isTestEnv && !isSmokeEnv)) {
       try {
         startNewsletterScheduler();
@@ -655,6 +657,7 @@ async function startApp() {
         logger.warn('[INIT] Newsletter scheduler failed to start.', { message: e.message });
       }
     }
+    */
 
     logger.info('[STARTUP] Application fully initialized and ready');
   } catch (error) {

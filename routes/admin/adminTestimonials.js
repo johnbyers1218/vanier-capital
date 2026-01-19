@@ -4,8 +4,7 @@ import express from 'express';
 import { body, param, validationResult } from 'express-validator';
 import Testimonial from '../../models/Testimonials.js';
 import { logger } from '../../config/logger.js';
-import Client from '../../models/Client.js';
-import Project from '../../models/Projects.js';
+import Property from '../../models/Property.js';
 import { validateMongoId, checkMongoIdValidation } from '../../middleware/validateMongoId.js';
 import { logAdminAction } from '../../utils/helpers.js';
 
@@ -30,22 +29,13 @@ export default (csrfProtection) => {
         body('isVisible', 'Visibility status must be a boolean.')
             .optional().isBoolean().toBoolean(),
         // Optional relational links
-        body('client')
+        body('property')
             .optional({ checkFalsy: true })
             .custom(async (value) => {
                 if (!value) return true;
-                if (!/^[0-9a-fA-F]{24}$/.test(value)) throw new Error('Invalid client id.');
-                const exists = await Client.exists({ _id: value });
-                if (!exists) throw new Error('Selected client not found.');
-                return true;
-            }),
-        body('project')
-            .optional({ checkFalsy: true })
-            .custom(async (value) => {
-                if (!value) return true;
-                if (!/^[0-9a-fA-F]{24}$/.test(value)) throw new Error('Invalid project id.');
-                const exists = await Project.exists({ _id: value });
-                if (!exists) throw new Error('Selected project not found.');
+                if (!/^[0-9a-fA-F]{24}$/.test(value)) throw new Error('Invalid property id.');
+                const exists = await Property.exists({ _id: value });
+                if (!exists) throw new Error('Selected property not found.');
                 return true;
             })
     ];
@@ -86,13 +76,10 @@ export default (csrfProtection) => {
     router.get('/new', csrfProtection, async (req, res, next) => {
         logger.debug(`[Admin Testimonials] GET /new - Request received from user: ${req.adminUser.username}, IP: ${req.ip}`);
         try {
-            const [clients, projects] = await Promise.all([
-                Client.find({}).sort({ name: 1 }).lean(),
-                Project.find({}).sort({ createdAt: -1 }).select('_id title client').populate('client','name').lean()
-            ]);
+            const properties = await Property.find({}).sort({ createdAt: -1 }).select('_id title').lean();
             res.render('admin/testimonials/edit', {
                 testimonial: { isVisible: true }, // Default new testimonial to visible
-                clients, projects,
+                properties,
                 editing: false, pageTitle: 'Add New Testimonial', path: '/admin/testimonials',
                 csrfToken: req.csrfToken(), errorMessages: []
             });
@@ -110,8 +97,7 @@ export default (csrfProtection) => {
             isFeatured: !!req.body.isFeatured, // Ensure boolean
             // isVisible: !!req.body.isVisible // Incorrect - unchecked is false
             isVisible: req.body.isVisible === 'true' || req.body.isVisible === true, // checkbox
-            client: req.body.client || undefined,
-            project: req.body.project || undefined
+            property: req.body.property || undefined
         };
          // Handle case where 'isVisible' checkbox might not be sent if unchecked
          if (req.body.isVisible === undefined) {
@@ -121,24 +107,14 @@ export default (csrfProtection) => {
 
         if (!errors.isEmpty()) {
             logger.warn(`[Admin Testimonials] Validation errors creating testimonial by ${req.adminUser.username}:`, { errors: errors.array(), formData: testimonialData });
-            const [clients, projects] = await Promise.all([
-                Client.find({}).sort({ name: 1 }).lean(),
-                Project.find({}).sort({ createdAt: -1 }).select('_id title client').populate('client','name').lean()
-            ]);
+            const properties = await Property.find({}).sort({ createdAt: -1 }).select('_id title').lean();
             return res.status(422).render('admin/testimonials/edit', {
                 testimonial: testimonialData, editing: false, pageTitle: 'Add New Testimonial (Errors)',
-                path: '/admin/testimonials', csrfToken: req.csrfToken(), errorMessages: errors.array(), clients, projects
+                path: '/admin/testimonials', csrfToken: req.csrfToken(), errorMessages: errors.array(), properties
             });
         }
 
         try {
-            // If project selected but client not provided, derive from project's client
-            if (!testimonialData.client && testimonialData.project) {
-                try {
-                    const proj = await Project.findById(testimonialData.project).select('client').lean();
-                    if (proj && proj.client) testimonialData.client = proj.client;
-                } catch (_) {}
-            }
             const newTestimonial = new Testimonial(testimonialData);
             await newTestimonial.save();
             // Log Action
@@ -157,10 +133,9 @@ export default (csrfProtection) => {
         const testimonialId = req.params.id;
         logger.debug(`[Admin Testimonials] GET /edit/:id - Request for ID: ${testimonialId} from user: ${req.adminUser.username}, IP: ${req.ip}`);
         try {
-            const [testimonial, clients, projects] = await Promise.all([
+            const [testimonial, properties] = await Promise.all([
                 Testimonial.findById(testimonialId).lean(),
-                Client.find({}).sort({ name: 1 }).lean(),
-                Project.find({}).sort({ createdAt: -1 }).select('_id title client').populate('client','name').lean()
+                Property.find({}).sort({ createdAt: -1 }).select('_id title').lean()
             ]);
             if (!testimonial) {
                 logger.warn(`[Admin Testimonials] Testimonial ID ${testimonialId} not found for edit by ${req.adminUser.username}.`);
@@ -168,7 +143,7 @@ export default (csrfProtection) => {
                 return res.redirect('/admin/testimonials');
             }
             res.render('admin/testimonials/edit', {
-                testimonial: testimonial, clients, projects, editing: true, pageTitle: 'Edit Testimonial',
+                testimonial: testimonial, properties, editing: true, pageTitle: 'Edit Testimonial',
                 path: '/admin/testimonials', csrfToken: req.csrfToken(), errorMessages: []
             });
         } catch (err) {
@@ -182,13 +157,12 @@ export default (csrfProtection) => {
         const testimonialId = req.params.id;
         logger.debug(`[Admin Testimonials] POST /edit/:id - Request for ID: ${testimonialId} from user: ${req.adminUser.username}, IP: ${req.ip}`);
         const errors = validationResult(req);
-    const updateData = {
+        const updateData = {
              author: req.body.author, content: req.body.content, company: req.body.company,
              position: req.body.position, rating: req.body.rating || null,
              isFeatured: !!req.body.isFeatured, // Ensure boolean (false if missing/unchecked)
-         isVisible: !!req.body.isVisible,  // Ensure boolean (false if missing/unchecked)
-         client: req.body.client || undefined,
-         project: req.body.project || undefined
+             isVisible: !!req.body.isVisible,  // Ensure boolean (false if missing/unchecked)
+             property: req.body.property || undefined
         };
 
         if (!errors.isEmpty()) {
@@ -196,24 +170,14 @@ export default (csrfProtection) => {
              if (idError) { req.flash('error', idError.msg); return res.redirect('/admin/testimonials'); }
              logger.warn(`[Admin Testimonials] Validation errors updating testimonial ID ${testimonialId} by ${req.adminUser.username}:`, { errors: errors.array(), formData: updateData });
              updateData._id = testimonialId; // Add ID back for form action
-             const [clients, projects] = await Promise.all([
-                Client.find({}).sort({ name: 1 }).lean(),
-                Project.find({}).sort({ createdAt: -1 }).select('_id title client').populate('client','name').lean()
-             ]);
+             const properties = await Property.find({}).sort({ createdAt: -1 }).select('_id title').lean();
              return res.status(422).render('admin/testimonials/edit', {
-                 testimonial: updateData, clients, projects, editing: true, pageTitle: 'Edit Testimonial (Errors)',
+                 testimonial: updateData, properties, editing: true, pageTitle: 'Edit Testimonial (Errors)',
                  path: '/admin/testimonials', csrfToken: req.csrfToken(), errorMessages: errors.array()
              });
         }
 
         try {
-            // If project selected but client not provided, derive from project's client
-            if (!updateData.client && updateData.project) {
-                try {
-                    const proj = await Project.findById(updateData.project).select('client').lean();
-                    if (proj && proj.client) updateData.client = proj.client;
-                } catch (_) {}
-            }
             const updatedTestimonial = await Testimonial.findByIdAndUpdate(testimonialId, updateData, { new: true, runValidators: true });
             if (!updatedTestimonial) {
                 logger.warn(`[Admin Testimonials] Testimonial ID ${testimonialId} not found during update by ${req.adminUser.username}.`);
@@ -229,9 +193,7 @@ export default (csrfProtection) => {
              logger.error(`[Admin Testimonials] Error updating testimonial ID ${testimonialId} by ${req.adminUser.username}:`, err);
              next(err);
         }
-    });
-
-    // POST /admin/testimonials/delete/:id - Delete Testimonial
+    });    // POST /admin/testimonials/delete/:id - Delete Testimonial
     router.post('/delete/:id', validateMongoId, checkMongoIdValidation, csrfProtection, async (req, res, next) => {
         const testimonialId = req.params.id;
         logger.debug(`[Admin Testimonials] POST /delete/:id - Request for ID: ${testimonialId} from user: ${req.adminUser.username}, IP: ${req.ip}`);

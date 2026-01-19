@@ -11,13 +11,13 @@
 
     <div>
       <label class="block text-gray-300 mb-1">Internal Subject</label>
-      <input type="text" name="subject" value="<%= newsletter.subject || '' %>" required class="w-full rounded bg-gray-900 border border-gray-700 px-3 py-2" />
+      <input type="text" name="subject" value="<%= newsletter.subject || '' %>" required class="w-full rounded bg-[#111] border border-neutral-700 px-3 py-2" />
     </div>
 
     <div>
       <label class="block text-gray-300 mb-1">Mailchimp Campaign ID</label>
       <div class="flex gap-2 items-center">
-        <input type="text" name="mailchimpCampaignId" value="<%= newsletter.mailchimpCampaignId || '' %>" required class="flex-1 rounded bg-gray-900 border border-gray-700 px-3 py-2" />
+        <input type="text" name="mailchimpCampaignId" value="<%= newsletter.mailchimpCampaignId || '' %>" required class="flex-1 rounded bg-[#111] border border-neutral-700 px-3 py-2" />
         <button type="button" id="btnValidate" class="bg-blue-600 text-white px-3 py-2 rounded">Validate ID</button>
       </div>
       <div class="mt-2 flex items-center gap-2 text-xs">
@@ -33,7 +33,7 @@
   <button name="intent" value="draft" class="bg-gray-600 text-white px-4 py-2 rounded">Save Draft</button>
       <button name="intent" value="send" class="bg-primary text-white px-4 py-2 rounded">Send Now</button>
       <div class="flex items-center gap-2">
-        <input type="datetime-local" name="scheduledFor" id="scheduledFor" class="rounded bg-gray-900 border border-gray-700 px-3 py-2 hidden" />
+        <input type="datetime-local" name="scheduledFor" id="scheduledFor" class="rounded bg-[#111] border border-neutral-700 px-3 py-2 hidden" />
         <button type="button" id="btnShowSchedule" class="bg-amber-700 text-white px-4 py-2 rounded">Schedule for Later...</button>
         <button name="intent" value="schedule" id="btnSchedule" class="bg-amber-600 text-white px-4 py-2 rounded hidden">Schedule Campaign</button>
       </div>

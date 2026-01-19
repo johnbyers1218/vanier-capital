@@ -1,12 +1,12 @@
 <%- include('../partials/header', { pageTitle }) %>
-<section class="max-w-3xl mx-auto bg-gray-700/40 border border-gray-700 rounded-lg shadow-sm p-6">
+<section class="max-w-3xl mx-auto bg-neutral-700/40 border border-neutral-700 rounded-lg shadow-sm p-6">
   <h2 class="text-2xl font-semibold mb-4"><%= pageTitle %></h2>
 
-  <!-- Info box for Industries/Services guidance -->
+  <!-- Info box for Markets/Property Types guidance -->
   <div class="mb-4 rounded-md border border-blue-800/60 bg-blue-900/20 text-blue-200 p-4 flex gap-3">
     <i class="fa-solid fa-circle-info mt-0.5"></i>
     <p class="text-sm leading-6">
-      These curated <%= entity === 'industry' ? 'Industries' : 'Services' %> power the public filters and badges on Projects.
+  These curated <%= entity === 'industry' ? 'Markets' : 'Property Types' %> power the public filters and badges on Properties.
       Keep names concise and use a clear, lowercase hyphenated slug.
     </p>
   </div>
@@ -27,12 +27,12 @@
 
     <div>
       <label for="name" class="block text-sm mb-1">Name</label>
-      <input type="text" id="name" name="name" value="<%= item && item.name ? item.name : '' %>" required maxlength="80" class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+      <input type="text" id="name" name="name" value="<%= item && item.name ? item.name : '' %>" required maxlength="80" class="w-full bg-[#111] border border-neutral-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
     </div>
 
     <div>
       <label for="slug" class="block text-sm mb-1">Slug</label>
-      <input type="text" id="slug" name="slug" value="<%= item && item.slug ? item.slug : '' %>" required maxlength="120" pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$" class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="auto-generated from name">
+      <input type="text" id="slug" name="slug" value="<%= item && item.slug ? item.slug : '' %>" required maxlength="120" pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$" class="w-full bg-[#111] border border-neutral-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="auto-generated from name">
       <p class="text-xs text-gray-400 mt-1">Lowercase, hyphen-separated. Example: real-estate, workflow-automation</p>
     </div>
 
@@ -40,7 +40,7 @@
       <label class="block text-sm mb-1">Active</label>
       <div class="flex items-center gap-3">
         <input type="checkbox" id="isActive" name="isActive" class="sr-only" <%= item && item.isActive ? 'checked' : '' %>>
-        <button type="button" id="isActiveToggle" class="inline-flex items-center w-12 h-6 rounded-full border border-gray-600 <%= item && item.isActive ? 'bg-blue-600' : 'bg-gray-600' %>" aria-pressed="<%= item && item.isActive ? 'true' : 'false' %>" aria-label="Toggle Active">
+        <button type="button" id="isActiveToggle" class="inline-flex items-center w-12 h-6 rounded-full border border-neutral-600 <%= item && item.isActive ? 'bg-blue-600' : 'bg-gray-600' %>" aria-pressed="<%= item && item.isActive ? 'true' : 'false' %>" aria-label="Toggle Active">
           <span id="isActiveKnob" class="block h-5 w-5 bg-white rounded-full shadow"></span>
         </button>
         <label for="isActive" class="text-sm select-none"><%= (item && item.isActive) ? 'Active' : 'Hidden' %></label>

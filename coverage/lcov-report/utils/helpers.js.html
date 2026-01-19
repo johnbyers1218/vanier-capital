@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">96.15% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>25/26</span>
+                <span class='fraction'>23/23</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">95.83% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>23/24</span>
+                <span class='fraction'>21/21</span>
             </div>
         
             
@@ -154,13 +154,10 @@
 <a name='L89'></a><a href='#L89'>89</a>
 <a name='L90'></a><a href='#L90'>90</a>
 <a name='L91'></a><a href='#L91'>91</a>
-<a name='L92'></a><a href='#L92'>92</a>
-<a name='L93'></a><a href='#L93'>93</a>
-<a name='L94'></a><a href='#L94'>94</a>
-<a name='L95'></a><a href='#L95'>95</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L92'></a><a href='#L92'>92</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -223,38 +220,35 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// utils/helpers.js
 // Import necessary modules (ensure these are at the top if adding to helpers.js)
-const AdminLog = require('../models/AdminLog.js');
-const { logger } = require('../config/logger.js');
+import AdminLog from '../models/AdminLog.js';
+import { logger } from '../config/logger.js';
 &nbsp;
 /**
  * SECURE HTML escaping utility.
@@ -266,7 +260,7 @@ const { logger } = require('../config/logger.js');
  * @param {string | number | any} unsafe The potentially unsafe input. Handles non-strings gracefully.
  * @returns {string} The HTML-escaped string.
  */
-function escapeHtml(unsafe) {
+export function escapeHtml(unsafe) {
     if (unsafe === null || unsafe === undefined) return '';
     const str = String(unsafe);
     // Ampersand must be escaped first to avoid double-escaping
@@ -283,7 +277,7 @@ function escapeHtml(unsafe) {
  * This helps when content has been double-encoded (e.g., '&amp;amp;amp;' -&gt; '&amp;amp;' -&gt; '&amp;').
  * Safe to use on text (not HTML markup), and should still be rendered with escaping in templates.
  */
-function decodeHtmlEntities(input) {
+export function decodeHtmlEntities(input) {
     if (input === null || input === undefined) return '';
     let str = String(input);
     // Named entities
@@ -316,7 +310,7 @@ function decodeHtmlEntities(input) {
  * @param {string} [details=''] - Optional details about the action (e.g., item title/ID).
  * @param {string} [ipAddress=''] - The IP address from the request.
  */
-async function logAdminAction(userId, username, action, details = '', ipAddress = '') {
+export async function logAdminAction(userId, username, action, details = '', ipAddress = '') {
     if (!userId || !username || !action) {
         logger.error('Attempted to log admin action with missing required fields.', { userId, username, action });
         return; // Don't proceed if essential info missing
@@ -333,7 +327,7 @@ async function logAdminAction(userId, username, action, details = '', ipAddress 
         logger.debug(`Admin action logged: User=${username}, Action=${action}, Details=${details}`);
     } catch (error) {
         // Log the failure to create the audit log entry, but don't crash the app
-<span class="cstat-no" title="statement not covered" >        logger.error('CRITICAL: Failed to save admin action log entry to database.', {</span>
+        logger.error('CRITICAL: Failed to save admin action log entry to database.', {
             userId, username, action, details, ipAddress,
             errorMessage: error.message,
             // stack: error.stack // Maybe too verbose for routine logging failure
@@ -341,18 +335,15 @@ async function logAdminAction(userId, username, action, details = '', ipAddress 
     }
 }
 &nbsp;
-module.exports = {
-    escapeHtml,
-    decodeHtmlEntities,
-    logAdminAction
-};</pre></td></tr></table></pre>
+&nbsp;
+// Already using ESM exports above, no changes needed here</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-08-19T07:05:58.351Z
+                at 2025-12-13T19:06:55.107Z
             </div>
         <script src="../prettify.js"></script>
         <script>

@@ -1,0 +1,66 @@
+<script src="https://cdn.tiny.cloud/1/<%= typeof apiKey !== 'undefined' ? apiKey : 'no-api-key' %>/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const checkTinyMCE = setInterval(() => {
+        if (typeof tinymce !== 'undefined') {
+            clearInterval(checkTinyMCE);
+            initializeTinyMCE();
+        }
+    }, 100);
+
+    function initializeTinyMCE() {
+        tinymce.init({
+            selector: '<%= selector %>',
+            promotion: false,
+            plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount codesample',
+            toolbar: 'undo redo | blocks | bold italic underline strikethrough | link image media table | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | styles | code codesample | preview fullscreen | help',
+            content_style: 'body { font-family:Montserrat,Arial,sans-serif; font-size:16px; line-height: 1.7; color: #ccc; background-color: #2d2d2d; } a { color: #00a8e8; } code { background-color: rgba(255,255,255,0.1); padding: 0.1em 0.3em; border-radius: 3px; } pre code { background-color: transparent; padding: 0;} .callout,.info,.warning,.tip{padding:1rem 1.125rem;border-radius:.5rem;margin:1rem 0;border:1px solid transparent}.callout{background:rgba(0,168,232,.08);border-color:rgba(0,168,232,.35)}.info{background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.35)}.warning{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.4)}.tip{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.4)} .callout-title{font-weight:700;margin-bottom:.25rem}',
+            style_formats: [
+                { title: 'Callout', block: 'div', classes: 'callout', wrapper: true },
+                { title: 'Info', block: 'div', classes: 'info', wrapper: true },
+                { title: 'Warning', block: 'div', classes: 'warning', wrapper: true },
+                { title: 'Tip', block: 'div', classes: 'tip', wrapper: true },
+                { title: 'Callout Title', inline: 'strong', classes: 'callout-title' }
+            ],
+            height: 600,
+            menubar: false,
+            statusbar: true,
+            skin: (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'oxide-dark' : 'oxide',
+            content_css: (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'default',
+            images_upload_url: '/admin/blog/upload-image', 
+            images_upload_credentials: true,
+            automatic_uploads: true,
+            file_picker_types: 'image',
+            file_picker_callback: function (cb, value, meta) {
+                 if (meta.filetype === 'image') {
+                    var input = document.createElement('input');
+                    input.setAttribute('type', 'file');
+                    input.setAttribute('accept', 'image/jpeg,image/png,image/gif,image/webp');
+                    input.onchange = function () {
+                        var file = this.files[0];
+                        const maxSize = 5 * 1024 * 1024;
+                        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                        if (!allowedTypes.includes(file.type)) { tinymce.activeEditor.notificationManager.open({ text: 'Invalid file type.', type: 'error' }); return; }
+                        if (file.size > maxSize) { tinymce.activeEditor.notificationManager.open({ text: `Image too large (Max ${maxSize / 1024 / 1024}MB).`, type: 'error'}); return; }
+                        var reader = new FileReader();
+                        reader.onload = function () {
+                            var id = 'blobid' + (new Date()).getTime();
+                            var blobCache = tinymce.activeEditor.editorUpload.blobCache;
+                            var base64 = reader.result.split(',')[1];
+                            var blobInfo = blobCache.create(id, file, base64);
+                            blobCache.add(blobInfo);
+                            cb(blobInfo.blobUri(), { title: file.name });
+                        };
+                        reader.readAsDataURL(file);
+                    };
+                    input.click();
+                }
+            },
+            setup: function (editor) {
+                editor.on('init', function () { editor.getContainer().style.visibility = 'visible'; });
+                editor.on('change', function () { editor.save(); });
+            }
+        });
+    }
+});
+</script>

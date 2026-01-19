@@ -21,12 +21,12 @@
         </p>
 
     <!-- Quick Action Links Section (smaller buttons; removed Quick Start card) -->
-    <section id="widget-quick-actions" class="rounded-lg border border-gray-700 bg-gray-800 p-6 shadow-md">
+    <section id="widget-quick-actions" class="rounded-lg border border-neutral-700 bg-[#1a1a1a] p-6 shadow-md">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-xl font-semibold text-gray-100">Quick Actions</h2>
                 <button id="dashCustomizeBtn" type="button" class="text-sm text-gray-300 hover:text-white">Customize</button>
             </div>
-            <div id="dashCustomizePanel" class="hidden mb-4 border border-gray-700 rounded p-3 bg-gray-900/50">
+            <div id="dashCustomizePanel" class="hidden mb-4 border border-neutral-700 rounded p-3 bg-[#111]/50">
                 <div class="text-xs text-gray-400 mb-2">Show/Hide widgets</div>
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 text-sm" id="dashCustomizeList">
                     <!-- checkboxes injected by script -->
@@ -35,18 +35,18 @@
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                 <a id="widget-quick-newpost" href="/admin/blog/new" class="inline-flex items-center justify-center gap-2 bg-primary text-white font-medium py-2 px-3 rounded-md shadow-sm hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition text-sm">
                     <i class="fas fa-plus-circle"></i>
-                    <span>New Blog Post</span>
+                    <span>New Article</span>
                 </a>
-                <a id="widget-quick-newproject" href="/admin/projects/new" class="inline-flex items-center justify-center gap-2 bg-primary text-white font-medium py-2 px-3 rounded-md shadow-sm hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition text-sm">
+                <a id="widget-quick-newproperty" href="/admin/properties/new" class="inline-flex items-center justify-center gap-2 bg-primary text-white font-medium py-2 px-3 rounded-md shadow-sm hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition text-sm">
                     <i class="fas fa-plus-circle"></i>
                     <span>New Project</span>
                 </a>
                 <a id="widget-quick-newtestimonial" href="/admin/testimonials/new" class="inline-flex items-center justify-center gap-2 bg-primary text-white font-medium py-2 px-3 rounded-md shadow-sm hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition text-sm">
                     <i class="fas fa-plus-circle"></i>
-                    <span>New Testimonial</span>
+                    <span>New Review</span>
                 </a>
                 <% const hasDrafts = typeof draftPostCount === 'number' && draftPostCount > 0; %>
-                <a id="widget-quick-viewdrafts" href="<%= hasDrafts ? '/admin/blog?status=draft' : 'javascript:void(0)' %>" class="inline-flex items-center justify-center gap-2 font-medium py-2 px-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition text-sm <%= hasDrafts ? 'bg-secondary text-white hover:bg-gray-600 focus:ring-primary' : 'bg-gray-700 text-gray-400 cursor-not-allowed opacity-70' %>" aria-disabled="<%= hasDrafts ? 'false' : 'true' %>">
+                <a id="widget-quick-viewdrafts" href="<%= hasDrafts ? '/admin/blog?status=draft' : 'javascript:void(0)' %>" class="inline-flex items-center justify-center gap-2 font-medium py-2 px-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition text-sm <%= hasDrafts ? 'bg-secondary text-white hover:bg-neutral-600 focus:ring-primary' : 'bg-neutral-700 text-gray-400 cursor-not-allowed opacity-70' %>" aria-disabled="<%= hasDrafts ? 'false' : 'true' %>">
                     <i class="fas fa-pencil-alt"></i>
                     <span>View Drafts</span>
                 </a>
@@ -54,30 +54,27 @@
         </section>
 
     <!-- Content Overview / Stats Section -->
-                <section id="widget-stats" class="rounded-lg border border-gray-700 bg-gray-800 p-6 shadow-md">
+                <section id="widget-stats" class="rounded-lg border border-neutral-700 bg-[#1a1a1a] p-6 shadow-md">
             <h2 class="text-xl font-semibold text-gray-100 mb-4">Content Overview</h2>
                         <div id="stats" class="grid grid-cols-2 md:grid-cols-5 gap-4">
-                                <a href="/admin/projects" class="rounded-md border border-gray-700 bg-gray-800/50 p-4 text-center hover:bg-gray-700/40 transition">
-                    <h4 class="text-gray-300 text-sm uppercase tracking-wide mb-2">Total Projects</h4>
+                                <a href="/admin/properties" class="rounded-md border border-neutral-700 bg-[#1a1a1a]/50 p-4 text-center hover:bg-neutral-700/40 transition">
+                    <h4 class="text-gray-300 text-sm uppercase tracking-wide mb-2">Total Properties</h4>
                                         <span class="block text-3xl font-semibold text-primary" data-stat="projectCount"><%= (typeof projectCount === 'number') ? projectCount : '--' %></span>
                                 </a>
-                                <a href="/admin/blog?status=published" class="rounded-md border border-gray-700 bg-gray-800/50 p-4 text-center hover:bg-gray-700/40 transition">
-                    <h4 class="text-gray-300 text-sm uppercase tracking-wide mb-2">Published Posts</h4>
+                                <a href="/admin/blog?status=published" class="rounded-md border border-neutral-700 bg-[#1a1a1a]/50 p-4 text-center hover:bg-neutral-700/40 transition">
+                    <h4 class="text-gray-300 text-sm uppercase tracking-wide mb-2">Published Articles</h4>
                                         <span class="block text-3xl font-semibold text-primary" data-stat="blogPostCount"><%= (typeof blogPostCount === 'number') ? blogPostCount : '--' %></span>
                                 </a>
-                                <div class="rounded-md border border-gray-700 bg-gray-800/50 p-4 text-center">
-                    <h4 class="text-gray-300 text-sm uppercase tracking-wide mb-2">Visible Testimonials</h4>
+                                <div class="rounded-md border border-neutral-700 bg-[#1a1a1a]/50 p-4 text-center">
+                    <h4 class="text-gray-300 text-sm uppercase tracking-wide mb-2">Visible Reviews</h4>
                                         <span class="block text-3xl font-semibold text-primary" data-stat="testimonialCount"><%= (typeof testimonialCount === 'number') ? testimonialCount : '--' %></span>
                 </div>
-                                <a href="/admin/blog?status=draft" class="rounded-md border border-gray-700 bg-gray-800/50 p-4 text-center hover:bg-gray-700/40 transition">
-                    <h4 class="text-gray-300 text-sm uppercase tracking-wide mb-2">Draft Posts</h4>
+                                <a href="/admin/blog?status=draft" class="rounded-md border border-neutral-700 bg-[#1a1a1a]/50 p-4 text-center hover:bg-neutral-700/40 transition">
+                    <h4 class="text-gray-300 text-sm uppercase tracking-wide mb-2">Draft Articles</h4>
                                         <span class="block text-3xl font-semibold text-primary" data-stat="draftPostCount"><%= (typeof draftPostCount === 'number') ? draftPostCount : '--' %></span>
                                 </a>
-                <a href="/admin/subscribers" class="rounded-md border border-gray-700 bg-gray-800/50 p-4 text-center hover:bg-gray-700/40 transition">
-                    <h4 class="text-gray-300 text-sm uppercase tracking-wide mb-2">Total Subscribers</h4>
-                                        <span class="block text-3xl font-semibold text-primary" data-stat="totalSubscribers"><%= (typeof totalSubscribers === 'number') ? totalSubscribers : '0' %></span>
-                                </a>
-                <a href="/admin/inquiries?status=New" class="rounded-md border border-gray-700 bg-gray-800/50 p-4 text-center hover:bg-gray-700/40 transition">
+
+                <a href="/admin/inquiries?status=New" class="rounded-md border border-neutral-700 bg-[#1a1a1a]/50 p-4 text-center hover:bg-neutral-700/40 transition">
             <h4 class="text-gray-300 text-sm uppercase tracking-wide mb-2">New Inquiries</h4>
                     <span class="block text-3xl font-semibold text-primary" data-stat="newInquiries">--</span>
                 </a>
@@ -86,21 +83,13 @@
 
         <!-- Charts Row: compact cards -->
         <section class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            <!-- Subscriber Growth Chart (smaller) -->
-            <div id="widget-chart-subs" class="rounded-lg border border-gray-700 bg-gray-800 p-4 shadow-md">
-                <h2 class="text-lg font-semibold text-gray-100 mb-2">New Subscribers (30d)</h2>
-                <div id="subsSummary" class="text-xs text-gray-300 mb-2"></div>
-                <div class="h-40 flex items-center justify-center" id="subs-skeleton">
-                    <div class="w-full h-32 bg-gray-700/40 animate-pulse rounded"></div>
-                </div>
-                <canvas id="subsChart" class="hidden" height="120"></canvas>
-            </div>
+
 
             <!-- Content Pipeline Chart (smaller donut) -->
-            <div id="widget-chart-pipeline" class="rounded-lg border border-gray-700 bg-gray-800 p-4 shadow-md">
+            <div id="widget-chart-pipeline" class="rounded-lg border border-neutral-700 bg-[#1a1a1a] p-4 shadow-md">
                 <h2 class="text-lg font-semibold text-gray-100 mb-2">Content Pipeline</h2>
                 <div class="h-40 flex items-center justify-center" id="pipeline-skeleton">
-                    <div class="w-28 h-28 bg-gray-700/40 animate-pulse rounded-full"></div>
+                    <div class="w-28 h-28 bg-neutral-700/40 animate-pulse rounded-full"></div>
                 </div>
                 <div class="relative max-w-[220px] mx-auto">
                     <div id="pipelineTotal" class="absolute inset-0 flex items-center justify-center text-2xl font-bold text-gray-100 pointer-events-none hidden">0</div>
@@ -109,10 +98,10 @@
             </div>
 
             <!-- Blog Views (30d) -->
-            <div id="widget-chart-views" class="rounded-lg border border-gray-700 bg-gray-800 p-4 shadow-md">
-                <h2 class="text-lg font-semibold text-gray-100 mb-2">Blog Views (30d)</h2>
+            <div id="widget-chart-views" class="rounded-lg border border-neutral-700 bg-[#1a1a1a] p-4 shadow-md">
+                <h2 class="text-lg font-semibold text-gray-100 mb-2">Article Views (30d)</h2>
                 <div class="h-40 flex items-center justify-center" id="views-skeleton">
-                    <div class="w-full h-32 bg-gray-700/40 animate-pulse rounded"></div>
+                    <div class="w-full h-32 bg-neutral-700/40 animate-pulse rounded"></div>
                 </div>
                 <canvas id="viewsChart" class="hidden" height="120"></canvas>
             </div>
@@ -120,10 +109,10 @@
 
         <!-- Second charts row: Contact forms (30d) only when space allows -->
         <section class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            <div id="widget-chart-contacts" class="rounded-lg border border-gray-700 bg-gray-800 p-4 shadow-md xl:col-span-1">
+            <div id="widget-chart-contacts" class="rounded-lg border border-neutral-700 bg-[#1a1a1a] p-4 shadow-md xl:col-span-1">
                 <h2 class="text-lg font-semibold text-gray-100 mb-2">Contact Forms (30d)</h2>
                 <div class="h-40 flex items-center justify-center" id="contacts-skeleton">
-                    <div class="w-full h-32 bg-gray-700/40 animate-pulse rounded"></div>
+                    <div class="w-full h-32 bg-neutral-700/40 animate-pulse rounded"></div>
                 </div>
                 <canvas id="contactsChart" class="hidden" height="120"></canvas>
             </div>
@@ -132,11 +121,11 @@
         <!-- Content Health + Team -->
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Content Health -->
-            <div id="widget-health" class="rounded-lg border border-gray-700 bg-gray-800 p-6 shadow-md">
+            <div id="widget-health" class="rounded-lg border border-neutral-700 bg-[#1a1a1a] p-6 shadow-md">
                 <h2 class="text-xl font-semibold text-gray-100 mb-4">Content Health</h2>
                 <ul class="space-y-3">
                     <li class="flex items-center justify-between">
-                        <span class="text-gray-200">Posts Missing Featured Image</span>
+                        <span class="text-gray-200">Articles Missing Featured Image</span>
                         <a href="/admin/blog?status=published" class="text-primary font-semibold hover:underline"><%= (contentHealth && typeof contentHealth.postsMissingFeatured === 'number') ? contentHealth.postsMissingFeatured : 0 %></a>
                     </li>
                     <li class="flex items-center justify-between">
@@ -147,7 +136,7 @@
             </div>
 
             <!-- User Roles -->
-            <div id="widget-team" class="rounded-lg border border-gray-700 bg-gray-800 p-6 shadow-md">
+            <div id="widget-team" class="rounded-lg border border-neutral-700 bg-[#1a1a1a] p-6 shadow-md">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-xl font-semibold text-gray-100">Team</h2>
                       <a href="/admin/settings/team" class="text-sm text-primary hover:underline">Manage Team</a>
@@ -159,8 +148,8 @@
                             avatarSrc = '/images/' + avatarSrc;
                         }
                     %>
-                        <div class="flex items-center gap-3 p-3 rounded-md border border-gray-700 bg-gray-800/40">
-                            <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-700 flex items-center justify-center text-gray-300">
+                        <div class="flex items-center gap-3 p-3 rounded-md border border-neutral-700 bg-[#1a1a1a]/40">
+                            <div class="w-10 h-10 rounded-full overflow-hidden bg-neutral-700 flex items-center justify-center text-gray-300">
                                 <% if (avatarSrc) { %>
                                     <img src="<%= avatarSrc %>" alt="<%= u.fullName || u.username %>" class="w-full h-full object-cover" />
                                 <% } else { %>
@@ -181,19 +170,19 @@
         </section>
 
         <!-- Recent Admin Activity -->
-        <section id="widget-activity" class="rounded-lg border border-gray-700 bg-gray-800 p-6 shadow-md">
+        <section id="widget-activity" class="rounded-lg border border-neutral-700 bg-[#1a1a1a] p-6 shadow-md">
             <div class="flex items-center justify-between mb-3">
                 <h2 class="text-xl font-semibold text-gray-100">Recent Admin Activity</h2>
                 <div>
-                    <div class="inline-flex rounded-md bg-gray-800/60 border border-gray-700 p-1 text-sm" id="activityFilter">
-                        <button data-filter="all" class="px-3 py-1.5 rounded-md bg-gray-700 text-white">All Activity</button>
+                    <div class="inline-flex rounded-md bg-[#1a1a1a]/60 border border-neutral-700 p-1 text-sm" id="activityFilter">
+                        <button data-filter="all" class="px-3 py-1.5 rounded-md bg-neutral-700 text-white">All Activity</button>
                         <button data-filter="mine" class="px-3 py-1.5 rounded-md text-gray-300 hover:text-white">My Activity</button>
                     </div>
                 </div>
             </div>
-            <div class="border border-gray-700 rounded-md bg-gray-800/30 overflow-hidden">
+            <div class="border border-neutral-700 rounded-md bg-[#1a1a1a]/30 overflow-hidden">
                 <% if (typeof recentLogs !== 'undefined' && recentLogs && recentLogs.length > 0) { %>
-                    <ul class="divide-y divide-gray-800 max-h-[450px] overflow-y-auto" id="activityList">
+                    <ul class="divide-y divide-neutral-800 max-h-[450px] overflow-y-auto" id="activityList">
                         <% recentLogs.forEach(function(log){
                             var actor = log.adminUser || {};
                             var name = actor.fullName || actor.username || 'System';
@@ -209,14 +198,14 @@
                             }
                             if (/create_project|update_project|delete_project/.test(log.action)) {
                                 var pm = detail.match(/ID:\s*([0-9a-fA-F]{24})/);
-                                if (pm) editHref = '/admin/projects/edit/' + pm[1];
+                                if (pm) editHref = '/admin/properties/edit/' + pm[1];
                             }
                             // Try to find "Title: ..."
                             var titleMatch = detail.match(/Title:\s*([^,]+)/);
                             var title = titleMatch ? titleMatch[1].trim() : detail || log.action;
                         %>
                         <li class="flex items-start gap-4 px-4 py-3 text-sm" data-actor="<%= actor.username || '' %>">
-                            <div class="w-9 h-9 rounded-full overflow-hidden bg-gray-700 flex items-center justify-center shrink-0">
+                            <div class="w-9 h-9 rounded-full overflow-hidden bg-neutral-700 flex items-center justify-center shrink-0">
                                 <% if (avatar) { %>
                                     <img src="<%= avatar %>" alt="<%= name %>" class="w-full h-full object-cover" />
                                 <% } else { %>
@@ -285,8 +274,8 @@
             filterWrap.addEventListener('click', (e)=>{
                 const btn = e.target.closest('button[data-filter]');
                 if (!btn) return;
-                qsa('button', filterWrap).forEach(b=>b.classList.remove('bg-gray-700','text-white'));
-                btn.classList.add('bg-gray-700','text-white');
+                qsa('button', filterWrap).forEach(b=>b.classList.remove('bg-neutral-700','text-white'));
+                btn.classList.add('bg-neutral-700','text-white');
                 const mode = btn.getAttribute('data-filter');
             const me = `<%= adminUser ? (adminUser.username) : '' %>`;
                 qsa('li[data-actor]', list).forEach(li=>{
@@ -433,7 +422,7 @@
                 if (!target) return; // skip missing widget
                 const label = id.replace('widget-','').replace(/-/g,' ');
                 const wrap = document.createElement('label');
-                wrap.className = 'flex items-center gap-2 p-2 rounded hover:bg-gray-800/60 cursor-pointer';
+                wrap.className = 'flex items-center gap-2 p-2 rounded hover:bg-[#1a1a1a]/60 cursor-pointer';
                 const cb = document.createElement('input');
                 cb.type = 'checkbox';
                 cb.className = 'accent-blue-600';

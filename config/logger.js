@@ -7,9 +7,10 @@ import morgan from 'morgan';
 
 // --- ESM __dirname and __filename equivalent ---
 // Needed for constructing file paths if using file transport
-import { fileURLToPath } from 'url';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Avoid import.meta for Jest CommonJS transform: derive project root from process.cwd()
+// (Assumes tests run from project root; acceptable for this setup.)
+const projectRoot = process.cwd();
+const __dirname = path.join(projectRoot, 'config');
 
 // --- Winston Configuration ---
 
@@ -75,7 +76,7 @@ const logTransports = [
   
   new winston.transports.File({
     level: 'error', // Log only errors to this file
-    filename: path.join(__dirname, '..', 'logs', 'error.log'), // Place logs in a root 'logs' directory
+  filename: path.join(projectRoot, 'logs', 'error.log'), // Place logs in a root 'logs' directory
     format: jsonFormat, // Use JSON format for files
     maxsize: 5 * 1024 * 1024, // 5MB max file size before rotation
     maxFiles: 3, // Keep up to 3 rotated log files
@@ -84,7 +85,7 @@ const logTransports = [
     tailable: true,
   }),
   new winston.transports.File({
-    filename: path.join(__dirname, '..', 'logs', 'combined.log'), // Log all levels (down to 'info'/'debug')
+  filename: path.join(projectRoot, 'logs', 'combined.log'), // Log all levels (down to 'info'/'debug')
     format: jsonFormat,
     maxsize: 5 * 1024 * 1024,
     maxFiles: 5,

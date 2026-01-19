@@ -1,0 +1,218 @@
+<%# views/blog-post.ejs - Redesigned immersive single post %>
+<%- include('partials/header', { pageTitle: pageTitle, pageDescription: pageDescription }) %>
+
+<!-- Structured Data: Article -->
+<script type="application/ld+json">
+<%- JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": post.title,
+    "description": pageDescription,
+    "datePublished": post.publishedDate || undefined,
+    "dateModified": post.updatedAt || post.publishedDate || undefined,
+    "author": post.authorDisplayName || (post.author && (post.author.fullName || post.author.username)) || 'Vanier Capital',
+    "image": post.featuredImage || undefined,
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": shareUrl
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "Vanier Capital",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://www.vaniercapital.com/images/vanier-logo.svg"
+        }
+    }
+}, null, 2) %>
+</script>
+
+<main class="single-post">
+    <section class="article-hero">
+        <div class="container">
+            <header class="article-header">
+                <% if (primaryTag) { %>
+                    <a class="pill category-pill" href="/blog?tag=<%= primaryTag %>"><%= typeof primaryTagLabel !== 'undefined' && primaryTagLabel ? primaryTagLabel : primaryTag %></a>
+                <% } %>
+                <h1 class="article-title"><%- decodeHtmlEntities(post.title) %></h1>
+                <div class="article-meta">
+                    <% if (post.publishedDate) { %>
+                        <span><%= post.publishedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+                    <% } %>
+                    <% if (typeof readTimeMinutes === 'number') { %>
+                        <span>• <%= readTimeMinutes %> min read</span>
+                    <% } %>
+                    <% if (post.authorDisplayName || (post.author && (post.author.fullName || post.author.username))) { %>
+                        <span>• By <%= post.authorDisplayName || post.author.fullName || post.author.username %></span>
+                    <% } %>
+                </div>
+            </header>
+
+        <% if (post.featuredImage) { %>
+                <figure class="article-featured">
+            <img src="<%= post.featuredImage %>" alt="Featured image for article: <%= post.title %>" class="featured-img blur-up" loading="eager" fetchpriority="high" decoding="async">
+                    <% if (post.excerpt) { %>
+                        <figcaption class="image-caption"><%= post.excerpt %></figcaption>
+                    <% } %>
+                </figure>
+            <% } %>
+        </div>
+    </section>
+
+    
+
+    <section class="article-body">
+        <div class="container">
+            <article class="prose-wrap">
+                <div class="prose-content">
+                    <%- post.content %>
+                </div>
+                <aside class="share-inline" aria-label="Share this article">
+                    <span>Share:</span>
+                    <a href="https://www.linkedin.com/sharing/share-offsite/?url=<%= encodeURIComponent(shareUrl) %>" target="_blank" rel="noopener" aria-label="Share on LinkedIn"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://twitter.com/intent/tweet?url=<%= encodeURIComponent(shareUrl) %>&text=<%= encodeURIComponent(post.title) %>" target="_blank" rel="noopener" aria-label="Share on X"><i class="fab fa-x-twitter"></i></a>
+                </aside>
+            </article>
+        </div>
+    </section>
+
+        <section class="author-bio">
+        <div class="container">
+            <div class="author-card">
+                    <div class="author-avatar" aria-hidden="true">
+                        <% if (post.author && post.author.avatarUrl) { %>
+                            <img src="<%= post.author.avatarUrl %>" alt="" style="width:100%;height:100%;object-fit:cover;" />
+                        <% } else { %>
+                            <div class="avatar-placeholder"><i class="fas fa-user"></i></div>
+                        <% } %>
+                    </div>
+                <div class="author-details">
+                        <h3><%= post.authorDisplayName || post.author?.fullName || post.author?.username || 'Author' %></h3>
+                        <p class="author-title"><%= (post.author && post.author.title) ? post.author.title : 'Vanier Capital' %></p>
+                        <p class="author-summary"><%= (post.author && post.author.bio) ? post.author.bio : 'Real estate investment and asset management specialist.' %></p>
+                    <div class="author-links">
+                            <% if (post.author && post.author.linkedinUrl) { %>
+                                <a href="<%= post.author.linkedinUrl %>" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                            <% } %>
+                            <% if (post.author && post.author.twitterUrl) { %>
+                                <a href="<%= post.author.twitterUrl %>" target="_blank" rel="noopener" aria-label="X"><i class="fab fa-x-twitter"></i></a>
+                            <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Signup CTA below author card -->
+    <section class="newsletter-cta">
+        <div class="container">
+            <div class="content-card">
+                <header class="text-center">
+                    <h2 class="section-title">Enjoyed this article?</h2>
+                    <p class="section-description">Get practical insights on real estate investing in your inbox.</p>
+                    <div class="cta-avatars" aria-hidden="true" style="margin-top:.25rem;">
+                        <span class="avatar"></span>
+                        <span class="avatar"></span>
+                        <span class="avatar"></span>
+                        <span class="avatar"></span>
+                        <span class="avatar"></span>
+                    </div>
+                </header>
+                <form class="signup-form" onsubmit="return false;">
+                    <label for="newsletterEmailPost" class="sr-only">Email address</label>
+                    <input id="newsletterEmailPost" type="email" name="email" placeholder="Enter your email" required />
+                    <button type="submit" class="cta-button primary-btn glow-button">Subscribe</button>
+                    <p class="form-message" aria-live="polite" hidden></p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <% if (relatedPosts && relatedPosts.length) { %>
+    <section class="related-posts">
+        <div class="container">
+            <h3 class="section-title">You Might Also Like</h3>
+            <div class="grid-container grid-3-col">
+                <% relatedPosts.forEach(rp => { %>
+                    <a class="related-card" href="/blog/<%= rp.slug %>" aria-label="Read: <%= rp.title %>">
+                        <% if (rp.featuredImage) { %>
+                            <div class="related-media">
+                                <img src="<%= rp.featuredImage %>" alt="" loading="lazy" decoding="async" class="blur-up" />
+                            </div>
+                        <% } %>
+                        <div class="related-body">
+                            <h4 class="related-title"><%= rp.title %></h4>
+                            <% if (rp.excerpt) { %>
+                                <p class="related-excerpt"><%= rp.excerpt %></p>
+                            <% } %>
+                            <div class="related-meta">
+                                <span class="date"><%= rp.publishedDate ? new Date(rp.publishedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '' %></span>
+                            </div>
+                        </div>
+                    </a>
+                <% }) %>
+            </div>
+            <div class="related-actions">
+                <a href="/blog" class="cta-button secondary-btn">View All Articles</a>
+            </div>
+        </div>
+    </section>
+    <% } %>
+
+    
+
+    <!-- Removed prev/next pagination in favor of curated recommendations only -->
+</main>
+
+<%- include('partials/footer') %>
+
+<style>
+    .single-post .container { max-width: 860px; margin: 0 auto; }
+    .article-hero { padding-top: 1.5rem; padding-bottom: 0; border-bottom: 1px solid var(--color-border-subtle); }
+    .article-header { text-align: left; }
+    .category-pill { display:inline-flex; align-items:center; gap:.25rem; padding:.25rem .5rem; border-radius:9999px; background:#e6f6fd; color:#075985; font-weight:700; font-size:.8rem; text-decoration:none; }
+    .article-title { font-size: 2rem; line-height: 1.15; font-weight: 800; margin:.5rem 0; }
+    @media (min-width:768px){ .article-title{ font-size: 2.5rem; } }
+    .article-meta { color: var(--color-text-muted); display:flex; gap:.5rem; flex-wrap:wrap; }
+    .article-featured { margin: 1rem 0 0.5rem 0; }
+    .featured-img { width:100%; height:auto; border-radius:.75rem; display:block; }
+    .image-caption { color: var(--color-text-muted); font-size: .875rem; margin-top:.25rem; text-align:center; }
+
+    .article-body { padding-top: 1rem; padding-bottom: 0; }
+    .prose-wrap { display:block; }
+    .prose-content { font-size: 1.0625rem; line-height: 1.85; color: var(--color-text-default); }
+    .prose-content h2 { font-size: 1.5rem; line-height: 1.25; margin-top: 1.5rem; margin-bottom: .5rem; font-weight:800; }
+    .prose-content h3 { font-size: 1.25rem; line-height: 1.35; margin-top: 1.25rem; margin-bottom: .5rem; font-weight:800; }
+    .prose-content blockquote { border-left: 4px solid var(--color-primary); padding-left: 1rem; color: var(--color-text-headings); font-style: italic; }
+    .prose-content ul, .prose-content ol { padding-left: 1.25rem; }
+    .prose-content img { border-radius: .5rem; box-shadow: 0 4px 18px rgba(0,0,0,0.06); }
+    .share-inline { margin-top: 1.5rem; display:flex; align-items:center; gap:.75rem; color: var(--color-text-muted); }
+    .share-inline a { color: var(--color-text-headings); text-decoration:none; }
+    .share-inline a:hover { color: var(--color-primary); }
+
+    .author-bio { padding-top: 2rem; padding-bottom: 2rem; }
+    .author-card { display:flex; gap:1rem; align-items:flex-start; background:#fff; border:1px solid var(--color-border-subtle); border-radius:.75rem; padding:1rem; }
+    .author-avatar { width:64px; height:64px; border-radius:9999px; overflow:hidden; background: var(--color-surface); display:flex; align-items:center; justify-content:center; }
+    .avatar-placeholder { width:100%; height:100%; display:flex; align-items:center; justify-content:center; color: var(--color-text-muted); }
+    .author-details h3 { margin:0; font-weight:800; }
+    .author-title { color: var(--color-text-muted); margin:.125rem 0 .5rem 0; }
+    .author-summary { color: var(--color-text-default); }
+    .author-links a { color: var(--color-text-headings); margin-right:.5rem; }
+    .author-links a:hover { color: var(--color-primary); }
+
+    .related-posts { padding-top: 1rem; padding-bottom: 2rem; }
+    .related-posts .section-title { margin-bottom: 1rem; }
+    .related-card { display:flex; flex-direction:column; background:#fff; border:1px solid var(--color-border-subtle); border-radius:.75rem; overflow:hidden; text-decoration:none; color: inherit; box-shadow: 0 1px 2px rgba(0,0,0,0.04); transition: transform .2s var(--ease-standard), box-shadow .2s var(--ease-standard), border-color .2s var(--ease-standard); }
+    .related-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); border-color: color-mix(in oklab, var(--color-primary) 20%, var(--color-border-subtle)); }
+    .related-media { aspect-ratio: 16/9; background: var(--color-surface); }
+    .related-media img { width:100%; height:100%; object-fit:cover; display:block; }
+    .related-body { padding: .75rem .9rem 1rem .9rem; display:flex; flex-direction:column; gap:.4rem; }
+    .related-title { margin:0; font-weight:800; font-size:1.05rem; line-height:1.25; }
+    .related-excerpt { margin:0; color: var(--color-text-default); line-height: 1.7; font-size: .975rem; }
+    .related-meta { color: var(--color-text-muted); font-size:.875rem; margin-top:.25rem; }
+    .related-actions { margin-top: 1rem; display:flex; align-items:center; justify-content:center; }
+    .post-cta { padding-top: 1.5rem; padding-bottom: 1.5rem; background: var(--color-surface); border-top: 1px solid var(--color-border-subtle); border-bottom: 1px solid var(--color-border-subtle); }
+    /* Add a touch more spacing below the subscription CTA */
+    .single-post .newsletter-cta { padding-bottom: 1rem; margin-bottom: 1rem; }
+    /* .post-nav removed per UX refinement */
+</style>

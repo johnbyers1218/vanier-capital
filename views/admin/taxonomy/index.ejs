@@ -2,13 +2,13 @@
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
   <!-- Left: List card -->
-  <section class="lg:col-span-2 bg-gray-700/40 border border-gray-700 rounded-lg shadow-sm">
-    <div class="px-5 py-4 border-b border-gray-600 flex items-center justify-between gap-3 flex-wrap">
+  <section class="lg:col-span-2 bg-neutral-700/40 border border-neutral-700 rounded-lg shadow-sm">
+    <div class="px-5 py-4 border-b border-neutral-600 flex items-center justify-between gap-3 flex-wrap">
       <h2 class="text-xl font-semibold"><%= pageTitle %></h2>
       <div class="flex items-center gap-2 ml-auto">
         <form action="<%= path %>" method="GET" class="flex items-center gap-2">
-          <input type="text" name="q" value="<%= typeof q !== 'undefined' ? q : '' %>" placeholder="Search name or slug" class="bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-56">
-          <select name="status" class="bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm focus:outline-none">
+          <input type="text" name="q" value="<%= typeof q !== 'undefined' ? q : '' %>" placeholder="Search name or slug" class="bg-[#111] border border-neutral-700 rounded-md px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-56">
+          <select name="status" class="bg-[#111] border border-neutral-700 rounded-md px-3 py-2 text-sm focus:outline-none">
             <option value="all" <%= (status||'all')==='all' ? 'selected' : '' %>>All</option>
             <option value="active" <%= status==='active' ? 'selected' : '' %>>Active</option>
             <option value="hidden" <%= status==='hidden' ? 'selected' : '' %>>Hidden</option>
@@ -20,7 +20,7 @@
         </form>
         <a href="<%= path %>/new" class="hidden md:inline-flex items-center gap-2 cta-button secondary-btn">
           <i class="fa-regular fa-square-plus"></i>
-          <span>New <%= entity === 'industry' ? 'Industry' : 'Service' %></span>
+          <span>New <%= entity === 'industry' ? 'Market' : 'Service' %></span>
         </a>
       </div>
     </div>
@@ -28,7 +28,7 @@
     <% if (items && items.length) { %>
       <div class="overflow-x-auto">
         <table class="min-w-full align-middle">
-          <thead class="text-sm uppercase text-gray-300 bg-gray-800/60">
+          <thead class="text-sm uppercase text-gray-300 bg-[#1a1a1a]/60">
             <tr>
               <th class="px-5 py-3 text-left">Name</th>
               <th class="px-5 py-3 text-left">Slug</th>
@@ -36,9 +36,9 @@
               <th class="px-5 py-3 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-700">
+          <tbody class="divide-y divide-neutral-700">
             <% items.forEach(function(item){ %>
-              <tr class="hover:bg-gray-800/40">
+              <tr class="hover:bg-[#1a1a1a]/40">
                 <td class="px-5 py-3 font-medium"><%= item.name %></td>
                 <td class="px-5 py-3"><code><%= item.slug %></code></td>
                 <td class="px-5 py-3">
@@ -46,19 +46,19 @@
                     <% if (item.isActive) { %>
                       <span class="inline-flex items-center rounded-md bg-green-900/30 text-green-300 px-2 py-1">Active</span>
                     <% } else { %>
-                      <span class="inline-flex items-center rounded-md bg-gray-700 text-gray-300 px-2 py-1">Hidden</span>
+                      <span class="inline-flex items-center rounded-md bg-neutral-700 text-gray-300 px-2 py-1">Hidden</span>
                     <% } %>
                   </button>
                 </td>
                 <td class="px-5 py-3">
                   <div class="flex items-center justify-end gap-2">
-                    <a href="<%= path %>/edit/<%= item._id %>" class="inline-flex items-center justify-center h-8 w-8 rounded-md border border-gray-600 bg-gray-700 hover:bg-gray-600 text-gray-200" title="Edit">
+                    <a href="<%= path %>/edit/<%= item._id %>" class="inline-flex items-center justify-center h-8 w-8 rounded-md border border-neutral-600 bg-neutral-700 hover:bg-neutral-600 text-gray-200" title="Edit">
                       <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
                       <span class="sr-only">Edit</span>
                     </a>
                     <form action="<%= path %>/delete/<%= item._id %>" method="POST" class="delete-form inline">
                       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                      <button type="submit" class="inline-flex items-center justify-center h-8 w-8 rounded-md border border-gray-600 bg-gray-700 hover:bg-red-700/60 text-gray-200" title="Delete">
+                      <button type="submit" class="inline-flex items-center justify-center h-8 w-8 rounded-md border border-neutral-600 bg-neutral-700 hover:bg-red-700/60 text-gray-200" title="Delete">
                         <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
                         <span class="sr-only">Delete</span>
                       </button>
@@ -72,39 +72,39 @@
       </div>
     <% } else { %>
       <div class="px-6 py-14 text-center">
-        <div class="mx-auto mb-4 h-12 w-12 rounded-full bg-gray-800/80 flex items-center justify-center text-gray-300">
+        <div class="mx-auto mb-4 h-12 w-12 rounded-full bg-[#1a1a1a]/80 flex items-center justify-center text-gray-300">
           <i class="fa-regular fa-folder-open text-xl"></i>
         </div>
         <h3 class="text-lg font-semibold mb-2">No <%= pageTitle %> yet</h3>
         <p class="text-sm text-gray-300 max-w-md mx-auto">
-          Start by adding your first <%= entity === 'industry' ? 'Industry' : 'Service' %> using the form on the right. You can edit or remove items anytime.
+          Start by adding your first <%= entity === 'industry' ? 'Market' : 'Service' %> using the form on the right. You can edit or remove items anytime.
         </p>
       </div>
     <% } %>
   </section>
 
   <!-- Right: Add form card -->
-  <aside class="bg-gray-700/40 border border-gray-700 rounded-lg shadow-sm">
-    <div class="px-5 py-4 border-b border-gray-600">
-      <h3 class="text-lg font-semibold">Add New <%= entity === 'industry' ? 'Industry' : 'Service' %></h3>
+  <aside class="bg-neutral-700/40 border border-neutral-700 rounded-lg shadow-sm">
+    <div class="px-5 py-4 border-b border-neutral-600">
+      <h3 class="text-lg font-semibold">Add New <%= entity === 'industry' ? 'Market' : 'Service' %></h3>
     </div>
   <form action="<%= path %>" method="POST" class="p-5 space-y-4" id="quickAddForm">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <div>
     <label for="qa-name" class="block text-sm mb-1">Name</label>
-    <input id="qa-name" name="name" type="text" required maxlength="80" class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+    <input id="qa-name" name="name" type="text" required maxlength="80" class="w-full bg-[#111] border border-neutral-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
       </div>
       <div>
     <label for="qa-slug" class="block text-sm mb-1">Slug</label>
-    <input id="qa-slug" name="slug" type="text" required maxlength="120" pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$" class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="auto-generated from name">
+    <input id="qa-slug" name="slug" type="text" required maxlength="120" pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$" class="w-full bg-[#111] border border-neutral-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="auto-generated from name">
         <p class="text-xs text-gray-400 mt-1">Lowercase, hyphen-separated. Example: real-estate, workflow-automation</p>
       </div>
       <div class="flex items-center gap-2">
-    <input id="qa-isActive" name="isActive" type="checkbox" class="h-4 w-4 border-gray-600 rounded bg-gray-900">
+    <input id="qa-isActive" name="isActive" type="checkbox" class="h-4 w-4 border-neutral-600 rounded bg-[#111]">
     <label for="qa-isActive" class="text-sm">Active</label>
       </div>
       <div class="pt-2">
-        <button type="submit" class="cta-button primary-btn w-full">Add <%= entity === 'industry' ? 'Industry' : 'Service' %></button>
+        <button type="submit" class="cta-button primary-btn w-full">Add <%= entity === 'industry' ? 'Market' : 'Service' %></button>
       </div>
     </form>
   </aside>
@@ -143,7 +143,7 @@
               pill.textContent = isActive ? 'Active' : 'Hidden';
               pill.classList.toggle('bg-green-900/30', isActive);
               pill.classList.toggle('text-green-300', isActive);
-              pill.classList.toggle('bg-gray-700', !isActive);
+              pill.classList.toggle('bg-neutral-700', !isActive);
               pill.classList.toggle('text-gray-300', !isActive);
             }
           } else {

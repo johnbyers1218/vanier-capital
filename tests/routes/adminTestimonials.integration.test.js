@@ -23,8 +23,8 @@ describe('Admin Testimonials CRUD (in-memory DB)', () => {
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     process.env.MONGODB_URI = mongoServer.getUri();
-    AdminUser = require('../../models/AdminUser.js');
-    Testimonial = require('../../models/Testimonials.js');
+    AdminUser = require('../../models/AdminUser.js'); if (AdminUser.default) AdminUser = AdminUser.default;
+    Testimonial = require('../../models/Testimonials.js'); if (Testimonial.default) Testimonial = Testimonial.default;
     if (mongoose.connection.readyState !== 1) {
       await mongoose.connect(process.env.MONGODB_URI);
     }

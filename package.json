@@ -1,9 +1,9 @@
 {
   "type": "module",
-  "name": "fnd-automations-webapp",
+  "name": "vanier-capital-webapp",
   "version": "1.0.0",
   "private": true,
-  "description": "Web application for FND Automations, featuring public site, admin CMS, and scheduling.",
+  "description": "Web application for Vanier Capital, Real Estate Investment Firm, featuring public site and admin CMS.",
   "main": "app.js",
   "migrate-mongo": {
     "config": "./migrate-mongo-config.js"
@@ -20,9 +20,9 @@
     "build:public-css:once": "npx @tailwindcss/cli -i ./public/css/main-input.css -o ./public/css/style.css --minify",
     "dev:css:public": "npx @tailwindcss/cli -i ./public/css/main-input.css -o ./public/css/style.css -w",
     "dev:css": "concurrently \"npm:build:admin-css\" \"npm:build:public-css\"",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
-    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "optimize:images": "node scripts/optimize-images.cjs",
@@ -44,7 +44,7 @@
     "express",
     "mongodb"
   ],
-  "author": "FND Automations <logan.mayfield@fndautomations.com>",
+  "author": "Vanier Capital <info@vaniercapital.com>",
   "license": "UNLICENSED",
   "bugs": {
     "url": "https://github.com/your-github-username/fnd-automations-repo/issues"
@@ -88,6 +88,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.28.3",
+    "@babel/plugin-syntax-import-meta": "^7.10.4",
     "@babel/preset-env": "^7.28.3",
     "@playwright/test": "^1.54.2",
     "@tailwindcss/cli": "^4.1.11",
@@ -95,6 +96,7 @@
     "@tailwindcss/typography": "^0.5.16",
     "autoprefixer": "^10.4.21",
     "babel-jest": "^30.0.5",
+    "babel-plugin-transform-import-meta": "^2.3.3",
     "concurrently": "^9.2.0",
     "cross-env": "^7.0.3",
     "d3-geo": "^3.1.0",

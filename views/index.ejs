@@ -1,81 +1,32 @@
 <!-- views/index.ejs -->
-<%# Homepage for FND Automations %>
+<%# Homepage for Vanier Capital %>
 
 <%- include('partials/header', {
-    pageTitle: 'FND Automations - AI & Process Automation Solutions',
-    pageDescription: 'FND Automations provides innovative AI and process automation services to boost efficiency, reduce costs, and drive business growth. Contact us for custom solutions.',
+    pageTitle: 'Vanier Capital | Real Estate Investment & Asset Management',
+    pageDescription: 'Vanier Capital is a real estate investment firm focused on building long-term, risk-adjusted returns through strategic acquisition and disciplined management of single-family and multifamily assets.',
     path: '/'
 }) %>
 
-<!-- Hero Section: full-bleed immersive -->
+<!-- Hero Section: full-bleed with static investment image -->
 <section id="hero" class="hero-section hero-fullbleed">
     <div class="hero-viewport">
-        <!-- Video Background -->
-        <video class="hero-video-background" autoplay loop muted playsinline poster="/images/HeroImage.png">
-            <!-- MP4 source (Primary and Only Video Choice) -->
-            <source src="/images/HeroVideo.mp4" type="video/mp4">
-
-            <!-- Fallback for browsers that don't support the <video> tag AT ALL,
-                or if they can't play MP4 -->
-            <img src="/images/HeroImage.png" alt="Hero Background Image" class="hero-fallback-image">
-            Your browser does not support the video tag. <!-- This text is also a fallback -->
-        </video>
-
-    <!-- Your existing script -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const heroVideo = document.querySelector('.hero-video-background');
-        let isVideoPlaying = false; // Flag to track if we've intentionally started it
-
-        if (heroVideo) {
-            // Check if the video element has actually loaded a video source
-            // and isn't just showing the fallback image.
-            // If heroVideo.currentSrc is empty, it means no video source was loaded.
-            if (heroVideo.currentSrc) {
-                heroVideo.addEventListener('ended', function() {
-                    console.log("Video ended, explicitly replaying.");
-                    this.currentTime = 0;
-                    this.play().catch(error => {
-                        console.warn("Error replaying video on 'ended' event:", error);
-                    });
-                }, false);
-
-                // Try to play initially
-                const playPromise = heroVideo.play();
-                if (playPromise !== undefined) {
-                    playPromise.then(() => {
-                        isVideoPlaying = true; // Successfully started playing
-                        console.log("Video playback started successfully.");
-                    }).catch(error => {
-                        console.warn("Initial video autoplay was prevented or failed:", error);
-                        // If autoplay fails, the poster image (or img fallback) should be visible.
-                    });
-                }
-            } else {
-                console.log("No video source loaded, fallback image should be showing.");
-            }
-        }
-    });
-    </script>
-
-        <!-- Overlay: This will sit on top of the video to darken it for text readability -->
-    <div class="hero-overlay hero-gradient"></div>
-
-        <!-- Content: This will sit on top of the overlay -->
-        <div class="hero-content">
-            <div class="hero-text-block">
-            <h1 class="hero-title hero-title-strong glowing-text">Unlock Your Business Potential with Intelligent Automation</h1>
-            <p class="hero-subtitle hero-subtitle-lg hero-subtitle-strong">Cut costs, speed up operations, and scale with AI‑driven workflows tailored to your team.</p>
-            <div class="hero-buttons hero-buttons-spaced">
-                <a href="/contact" class="cta-button primary-btn">Schedule a Consultation</a>
-                <a href="/services" class="cta-button secondary-btn">Our Services</a>
+        <!-- Static background image replacing video -->
+        <div class="hero-image-background" role="img" aria-label="Aerial view of established residential neighborhood" style="position:absolute;inset:0;background-image:url('/images/hero-real-estate.jpg');background-size:cover;background-position:center;background-repeat:no-repeat;transform:scale(1.04);"></div>
+        <!-- Dark gradient overlay for readability -->
+        <div class="hero-overlay" style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,30,25,0.60),rgba(10,30,25,0.55) 38%,rgba(255,255,255,0) 90%);mix-blend-mode:normal;"></div>
+        <!-- Hero content -->
+        <div class="hero-content" style="position:relative;z-index:10;display:flex;align-items:center;justify-content:flex-start;min-height:62vh;padding:4rem 1.25rem 3rem;max-width:1280px;margin:0 auto;">
+            <div class="hero-text-block" style="max-width:760px;">
+                <div class="eyebrow" style="background:rgba(11,77,58,0.15);border-color:rgba(11,77,58,0.35);color:#0b4d3a;">Long-Term Value</div>
+                <h1 class="hero-title hero-title-strong" style="font-family:'Merriweather',serif;font-weight:700;font-size:clamp(2.35rem,4.6vw,3.25rem);line-height:1.12;letter-spacing:-0.015em;color:#ffffff;text-shadow:0 3px 22px rgba(0,0,0,0.35);">Investing in Your Future.</h1>
+                <p class="hero-subtitle hero-subtitle-lg" style="margin-top:1.1rem;font-size:clamp(1.15rem,1.65vw,1.45rem);line-height:1.55;font-weight:500;color:#e4efe9;max-width:60ch;">Building generational wealth through strategic investments in resilient single-family and multifamily assets across targeted U.S. growth markets.</p>
+                <div class="hero-buttons hero-buttons-spaced" style="margin-top:1.85rem;display:flex;flex-wrap:wrap;gap:.9rem;">
+                    <a href="/portfolio" class="cta-button primary-btn" style="background-color:#0b4d3a;--tw-shadow:0 8px 30px -6px rgba(11,77,58,0.55);box-shadow:0 8px 30px -6px rgba(11,77,58,0.55);">Explore Portfolio</a>
+                    <a href="/for-rent" class="cta-button secondary-btn" style="background-color:#ffffff;color:#0b4d3a;border:1px solid rgba(11,77,58,0.35);">Rent a Property</a>
+                </div>
             </div>
-            </div>
-
-            <!-- Trusted By row inside hero -->
-            
         </div>
-        <!-- Curved divider for smooth transition -->
+        <!-- Curved divider -->
         <div class="hero-divider" aria-hidden="true">
             <svg viewBox="0 0 1440 120" preserveAspectRatio="none" focusable="false" xmlns="http://www.w3.org/2000/svg">
                 <path d="M0,80 C360,20 1080,20 1440,80 L1440,120 L0,120 Z" fill="#ffffff" />
@@ -84,71 +35,38 @@
     </div>
 </section>
 
-<!-- Trusted By (directly under hero on white background) -->
-<% if (heroTopClients && heroTopClients.length) { %>
-<section id="trusted-hero" class="trusted-hero">
-    <div class="container">
-        <div class="trusted-label section-title">Trusted by leading businesses, including:</div>
-        <div class="trusted-logos">
-            <% heroTopClients.forEach(c => { %>
-                <div class="trusted-logo-item">
-                    <% if (c.websiteUrl) { %>
-                        <a href="<%= c.websiteUrl %>" target="_blank" rel="noopener" class="trusted-logo-link" aria-label="<%= c.name || 'Client' %>">
-                            <img class="trusted-logo-img" src="<%= c.logoUrl %>" alt="<%= c.name || 'Client' %> logo" onerror="this.onerror=null;this.src='/images/FND_LOGO_SVG_BLACK.svg';" />
-                                                </a>
-                                                <% if (c.name) { %>
-                                                    <div class="trusted-caption"><%= c.name %></div>
-                                                <% } %>
-                    <% } else { %>
-                        <div class="trusted-logo-link" aria-label="<%= c.name || 'Client' %>">
-                            <img class="trusted-logo-img" src="<%= c.logoUrl %>" alt="<%= c.name || 'Client' %> logo" onerror="this.onerror=null;this.src='/images/FND_LOGO_SVG_BLACK.svg';" />
-                                                </div>
-                                                <% if (c.name) { %>
-                                                    <div class="trusted-caption"><%= c.name %></div>
-                                                <% } %>
-                    <% } %>
-                </div>
-            <% }) %>
-        </div>
-    </div>
- </section>
-<% } %>
-
-<!-- Serving Clients Globally (Credibility Sandwich) -->
-<section class="section global-reach">
+<!-- Sell Your Home Process -->
+<section id="sell-process" class="section">
     <div class="container">
         <div class="section-header">
-            <h2 class="section-title">Serving Clients Globally</h2>
-            <p class="section-description">A snapshot of locations we’ve partnered with. Hover a dot to see the location.</p>
+            <h2 class="section-title" style="font-family:'Merriweather',serif;">Sell Your Home Fast</h2>
+            <p class="section-description">We make selling your property simple, transparent, and stress-free.</p>
         </div>
-        <div class="world-map-card">
-            <!-- Vector container removed (using static SVG only) -->
-            <div id="world-map" class="world-map-canvas" aria-label="Client locations map" style="display:none;height:0;"></div>
-            <div class="world-map-static-wrap" id="world-map-static-wrap">
-                <button class="world-map-static-btn" id="open-map-modal" aria-label="Explore our client locations">
-                    <img src="/images/world-map-robinson-ne.svg"
-                         alt="Global client locations"
-                         class="world-map-static"
-                         loading="lazy"
-                         data-projection="robinson"
-                         style="width: 100%; height: auto; object-fit: contain;"/>
-                </button>
-                <svg id="world-map-overlay" class="world-map-overlay" aria-hidden="true"></svg>
+        <div class="process-steps" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem;margin-top:3rem;">
+            <div class="process-step" style="text-align:center;">
+                <div class="step-icon" style="width:64px;height:64px;background:rgba(11,77,58,0.1);color:#0b4d3a;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:1.5rem;">
+                    <i class="fas fa-home"></i>
+                </div>
+                <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.75rem;color:#1e293b;">1. Submit Your Property</h3>
+                <p style="color:#64748b;line-height:1.6;">Tell us about your home and its condition. It takes less than 5 minutes.</p>
+            </div>
+            <div class="process-step" style="text-align:center;">
+                <div class="step-icon" style="width:64px;height:64px;background:rgba(11,77,58,0.1);color:#0b4d3a;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:1.5rem;">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                </div>
+                <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.75rem;color:#1e293b;">2. Get A Cash Offer</h3>
+                <p style="color:#64748b;line-height:1.6;">We'll review your property and provide a fair, no-obligation cash offer within 72 hours.</p>
+            </div>
+            <div class="process-step" style="text-align:center;">
+                <div class="step-icon" style="width:64px;height:64px;background:rgba(11,77,58,0.1);color:#0b4d3a;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:1.5rem;">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.75rem;color:#1e293b;">3. Close On Your Terms</h3>
+                <p style="color:#64748b;line-height:1.6;">Choose your closing date. We handle the paperwork and make the process seamless.</p>
             </div>
         </div>
-
-        <!-- Near full-screen interactive map modal -->
-        <div id="map-modal" class="map-modal" aria-hidden="true" role="dialog" aria-labelledby="mapModalTitle" aria-modal="true" hidden>
-            <div class="map-backdrop" data-close></div>
-            <div class="map-card" role="document">
-                <div class="map-card-header">
-                    <h3 id="mapModalTitle">Explore our client locations</h3>
-                    <button class="map-close" id="close-map-modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                </div>
-                <div class="map-card-body">
-                    <div id="interactive-map" class="interactive-map" aria-label="Interactive world map"></div>
-                </div>
-            </div>
+        <div style="text-align:center;margin-top:3rem;">
+            <a href="/sell-your-home" class="cta-button primary-btn" style="background-color:#0b4d3a;color:white;padding:1rem 2rem;border-radius:0.5rem;font-weight:600;text-decoration:none;display:inline-block;">Get My Cash Offer</a>
         </div>
     </div>
 </section>
@@ -157,29 +75,49 @@
 <section id="our-process" class="section section-tight-top">
     <div class="container">
         <div class="section-header">
-            <h2 class="section-title">How We Work</h2>
-            <p class="section-description">A proven delivery model that de‑risks implementation and accelerates ROI.</p>
+            <h2 class="section-title" style="font-family:'Merriweather',serif;">Our Investment Process</h2>
+            <p class="section-description">A disciplined, data-driven approach to identifying high-value properties and maximizing investor returns.</p>
         </div>
-        <div class="process-steps">
-            <div class="process-step">
-                <div class="step-icon"><i class="fas fa-search"></i></div>
-                <h3>1. Discovery</h3>
-                <p>We map your workflows, data, and goals to identify the highest‑impact automation opportunities.</p>
+        <div class="process-steps" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem;margin-top:3rem;">
+            <!-- Step 1 -->
+            <div class="process-card" style="background:white;border-radius:1rem;overflow:hidden;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);display:flex;flex-direction:column;">
+                <div class="card-image" style="height:200px;background:#f1f5f9;">
+                    <img src="/images/Analysis.png" alt="Market Analysis" style="width:100%;height:100%;object-fit:cover;">
+                </div>
+                <div class="card-content" style="padding:2rem;flex-grow:1;display:flex;flex-direction:column;">
+                    <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.75rem;color:#1e293b;">1. Market Analysis</h3>
+                    <p style="color:#64748b;line-height:1.6;">We evaluate demographic trends, supply-demand dynamics, and off‑market deal flow to surface resilient target submarkets and properties.</p>
+                </div>
             </div>
-            <div class="process-step">
-                <div class="step-icon"><i class="fas fa-diagram-project"></i></div>
-                <h3>2. Strategy & Design</h3>
-                <p>Blueprints for a scalable system: architecture, integrations, and governance defined clearly.</p>
+            <!-- Step 2 -->
+            <div class="process-card" style="background:white;border-radius:1rem;overflow:hidden;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);display:flex;flex-direction:column;">
+                <div class="card-image" style="height:200px;background:#f1f5f9;">
+                    <img src="/images/Underwriting.png" alt="Due Diligence" style="width:100%;height:100%;object-fit:cover;">
+                </div>
+                <div class="card-content" style="padding:2rem;flex-grow:1;display:flex;flex-direction:column;">
+                    <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.75rem;color:#1e293b;">2. Due Diligence</h3>
+                    <p style="color:#64748b;line-height:1.6;">Comprehensive underwriting, financial modeling, inspections, and capital structuring culminating in disciplined acquisition.</p>
+                </div>
             </div>
-            <div class="process-step">
-                <div class="step-icon"><i class="fas fa-rocket"></i></div>
-                <h3>3. Implementation</h3>
-                <p>Rapid, iterative delivery with tight feedback loops and clear progress milestones.</p>
+            <!-- Step 3 -->
+            <div class="process-card" style="background:white;border-radius:1rem;overflow:hidden;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);display:flex;flex-direction:column;">
+                <div class="card-image" style="height:200px;background:#f1f5f9;">
+                    <img src="/images/Value add.png" alt="Value Add" style="width:100%;height:100%;object-fit:cover;">
+                </div>
+                <div class="card-content" style="padding:2rem;flex-grow:1;display:flex;flex-direction:column;">
+                    <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.75rem;color:#1e293b;">3. Value-Add</h3>
+                    <p style="color:#64748b;line-height:1.6;">Renovation, repositioning, and professional asset management to drive NOI growth and long‑term appreciation.</p>
+                </div>
             </div>
-            <div class="process-step">
-                <div class="step-icon"><i class="fas fa-life-ring"></i></div>
-                <h3>4. Support & Evolution</h3>
-                <p>Runbook, training, and ongoing optimization to expand wins across the organization.</p>
+            <!-- Step 4 -->
+            <div class="process-card" style="background:white;border-radius:1rem;overflow:hidden;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);display:flex;flex-direction:column;">
+                <div class="card-image" style="height:200px;background:#f1f5f9;">
+                    <img src="/images/Disposition.png" alt="Disposition" style="width:100%;height:100%;object-fit:cover;">
+                </div>
+                <div class="card-content" style="padding:2rem;flex-grow:1;display:flex;flex-direction:column;">
+                    <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.75rem;color:#1e293b;">4. Disposition</h3>
+                    <p style="color:#64748b;line-height:1.6;">Strategic exit timing, optimized sales process, and distribution of realized gains back to investors.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -189,17 +127,87 @@
 <section id="featured-testimonial" class="section section-muted">
     <div class="container">
         <div class="section-header" style="text-align:center;">
-            <h2 class="section-title">What Our Clients Say</h2>
-            <p class="section-description">Real outcomes from teams we’ve partnered with.</p>
+            <h2 class="section-title" style="font-family:'Merriweather',serif;">What Our Renters Say</h2>
+            <p class="section-description">We pride ourselves on providing exceptional living experiences for our tenants.</p>
         </div>
-        <div id="featured-testimonial-container" style="display:grid;justify-items:center;">
-            <!-- JS will inject the featured testimonial card here -->
-            <div class="content-card" style="text-align:center;">
-                <i class="fas fa-spinner fa-spin"></i>
-                <p style="margin-top:.5rem;color:var(--color-text-muted)">Loading testimonial…</p>
+        
+        <!-- Testimonial Carousel -->
+        <div class="testimonial-carousel" style="max-width:800px;margin:0 auto;position:relative;">
+            
+            <!-- Slides Container -->
+            <div class="carousel-slides" style="overflow:hidden;position:relative;border-radius:1rem;background:white;box-shadow:0 10px 30px -5px rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.05);">
+                <div class="slides-track" style="display:flex;transition:transform 0.5s ease-in-out;">
+                    <% if (typeof testimonials !== 'undefined' && testimonials.length > 0) { %>
+                        <% testimonials.forEach(t => { %>
+                            <div class="slide" style="min-width:100%;padding:3rem 5rem;box-sizing:border-box;text-align:center;">
+                                <div style="color:#0b4d3a;font-size:1.5rem;margin-bottom:1.5rem;">
+                                    <% for(let i=0; i < (t.rating || 5); i++) { %><i class="fas fa-star"></i><% } %>
+                                </div>
+                                <blockquote style="font-size:1.25rem;line-height:1.6;color:#334155;font-style:italic;margin-bottom:1.5rem;">
+                                    "<%= t.content %>"
+                                </blockquote>
+                                <cite style="font-weight:700;color:#0b4d3a;font-style:normal;display:block;"><%= t.author %></cite>
+                                <% if (t.position || t.company) { %>
+                                    <span style="font-size:0.875rem;color:#64748b;"><%= t.position ? t.position : '' %><%= (t.position && t.company) ? ' - ' : '' %><%= t.company ? t.company : '' %></span>
+                                <% } %>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <!-- Fallback/Placeholder Slide -->
+                        <div class="slide" style="min-width:100%;padding:3rem 5rem;box-sizing:border-box;text-align:center;">
+                            <div style="color:#0b4d3a;font-size:1.5rem;margin-bottom:1.5rem;">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            </div>
+                            <blockquote style="font-size:1.25rem;line-height:1.6;color:#334155;font-style:italic;margin-bottom:1.5rem;">
+                                "The maintenance team is always so quick to respond. I love living here! The apartment was spotless when I moved in and the management team has been incredibly helpful."
+                            </blockquote>
+                            <cite style="font-weight:700;color:#0b4d3a;font-style:normal;display:block;">Sarah M.</cite>
+                            <span style="font-size:0.875rem;color:#64748b;">Resident since 2022</span>
+                        </div>
+                    <% } %>
+                </div>
             </div>
+
+            <!-- Navigation Buttons -->
+            <button class="carousel-prev" aria-label="Previous Slide" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);background:white;border:1px solid #e2e8f0;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);color:#0b4d3a;transition:all 0.2s;">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="carousel-next" aria-label="Next Slide" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:white;border:1px solid #e2e8f0;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);color:#0b4d3a;transition:all 0.2s;">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
         </div>
     </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const track = document.querySelector('.slides-track');
+            const slides = document.querySelectorAll('.slide');
+            const nextBtn = document.querySelector('.carousel-next');
+            const prevBtn = document.querySelector('.carousel-prev');
+            let currentIndex = 0;
+
+            function updateSlide() {
+                track.style.transform = `translateX(-${currentIndex * 100}%)`;
+            }
+
+            nextBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex + 1) % slides.length;
+                updateSlide();
+            });
+
+            prevBtn.addEventListener('click', () => {
+                currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+                updateSlide();
+            });
+            
+            // Auto advance every 5 seconds
+            setInterval(() => {
+                currentIndex = (currentIndex + 1) % slides.length;
+                updateSlide();
+            }, 5000);
+        });
+    </script>
 </section>
 
  
@@ -210,119 +218,205 @@
 <section id="client-showcase" class="section section-muted section-compact">
     <div class="container">
         <div class="section-header">
-            <h2 class="section-title">Powering Industry Leaders</h2>
-            <p class="section-description">We partner with businesses of significant scale, driving enterprise-level growth and efficiency. The numbers below reflect the caliber of companies that trust our expertise.</p>
+                        <h2 class="section-title" style="font-family:'Merriweather',serif;">Portfolio at a Glance</h2>
+                        <p class="section-description">Representative performance indicators from our current and target portfolio profile.</p>
         </div>
-
-        <!-- Aggregate Stats -->
-        <div class="stats-grid" style="margin-top:0.5rem;">
-            <div class="stat-item">
-                <div class="stat-number" data-prefix="$" data-count="<%= aggregateStats ? Math.max(0, Math.round(aggregateStats.totalValuation / 1000000)) : 0 %>" data-suffix="M+">$0M+</div>
-                <div class="stat-label">Combined Partner Valuation</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" data-prefix="$" data-count="<%= aggregateStats ? Math.max(0, Math.round(aggregateStats.totalRevenue / 1000000)) : 0 %>" data-suffix="M+">$0M+</div>
-                <div class="stat-label">Combined Partner Revenue</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" data-count="<%= managedStats ? (managedStats.projectsCompleted || 0) : 0 %>" data-suffix="+">0+</div>
-                <div class="stat-label">Projects Completed</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" data-count="<%= managedStats ? (managedStats.manualHoursAutomated || 0) : 0 %>" data-suffix="+">0+</div>
-                <div class="stat-label">Manual Hours Automated</div>
-            </div>
-        </div>
-
-        <!-- Client Carousel -->
-        <% if (featuredProjects && featuredProjects.length > 0) { %>
-        <div class="client-carousel">
-            <% featuredProjects.forEach(project => { %>
-                <div class="client-card">
-                    <div class="client-card-header">
-                        <img src="<%= project.clientLogoUrl %>" alt="<%= project.clientName || 'Client' %> Logo" class="client-logo">
-                        <h3 class="client-name"><%= project.clientName || 'Confidential Client' %></h3>
+                <!-- Real Estate Portfolio KPIs -->
+                <div class="stats-grid" style="margin-top:0.5rem;">
+                    <div class="stat-item">
+                        <div class="stat-number"><%= managedStats.aum %></div>
+                        <div class="stat-label">Assets Under Management</div>
                     </div>
-                    <div class="client-card-body">
-                        <p class="success-snippet">"<%= project.successSnippet %>"</p>
+                    <div class="stat-item">
+                        <div class="stat-number"><%= managedStats.occupancyRate %></div>
+                        <div class="stat-label">Occupancy Rate</div>
                     </div>
-                    <div class="client-card-footer">
-                        <a href="/projects/<%= project.slug %>" class="card-link">View Case Study →</a>
+                    <div class="stat-item">
+                        <div class="stat-number"><%= managedStats.capRate %></div>
+                        <div class="stat-label">Portfolio Cap Rate</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number"><%= managedStats.unitsManaged %></div>
+                        <div class="stat-label">Total Units</div>
                     </div>
                 </div>
-            <% }); %>
-        </div>
-        <% } %>
+
+        <!-- Client Carousel Removed -->
     </div>
 </section>
 
-<!-- Services Preview Section -->
-<section id="services-preview" class="section section-muted">
+<!-- Investment Focus Section (refactored from Services Preview) -->
+<section id="investment-focus" class="section section-muted">
     <div class="container">
         <div class="section-header">
-            <h2 class="section-title">What We Offer</h2>
-            <p class="section-description">A glimpse into our comprehensive automation solutions designed for your business needs.</p>
+            <h2 class="section-title" style="font-family:'Merriweather',serif;">Our Investment Focus</h2>
+            <p class="section-description">We specialize in identifying and acquiring high-potential assets in growing markets.</p>
         </div>
         <div class="grid-container grid-3-col">
-            <div class="content-card service-card" data-href="/services#process-automation" tabindex="0" role="link" aria-label="Process Automation">
-                <div class="card-icon"><i class="fas fa-robot fa-fw"></i></div>
-                <h3>Process Automation</h3>
-                <p>Automate repetitive tasks and workflows using tools like n8n and Make to increase productivity and reduce errors.</p>
-                <a href="/services#process-automation" class="card-link reveal-on-hover">Read More →</a>
+            <div class="content-card service-card" tabindex="0" role="group" aria-label="Multi-Family Residential" style="padding:0;overflow:hidden;display:flex;flex-direction:column;">
+                <div style="height:200px;overflow:hidden;">
+                    <img src="/images/multifamily-residential.jpg" alt="Multi-Family Residential" style="width:100%;height:100%;object-fit:cover;transition:transform 0.5s ease;">
+                </div>
+                <div style="padding:2rem;flex-grow:1;display:flex;flex-direction:column;">
+                    <h3 style="margin-top:0;">Multi-Family Residential</h3>
+                    <p style="flex-grow:1;">Acquiring and operating stabilized and value‑add apartment communities to generate resilient cash flow and long‑term appreciation.</p>
+                    <span class="card-link reveal-on-hover" aria-hidden="true" style="margin-top:1rem;display:inline-block;">Core Strategy</span>
+                </div>
             </div>
-            <div class="content-card service-card" data-href="/services#ai-integration" tabindex="0" role="link" aria-label="AI Integration">
-                <div class="card-icon"><i class="fas fa-brain fa-fw"></i></div>
-                <h3>AI Integration</h3>
-                <p>Leverage AI models (OpenAI, Claude) for tasks like data analysis, content generation, and intelligent decision-making.</p>
-                 <a href="/services#ai-integration" class="card-link reveal-on-hover">Read More →</a>
+            <div class="content-card service-card" tabindex="0" role="group" aria-label="Commercial Properties" style="padding:0;overflow:hidden;display:flex;flex-direction:column;">
+                <div style="height:200px;overflow:hidden;">
+                    <img src="/images/commercial.jpg" alt="Commercial Properties" style="width:100%;height:100%;object-fit:cover;transition:transform 0.5s ease;">
+                </div>
+                <div style="padding:2rem;flex-grow:1;display:flex;flex-direction:column;">
+                    <h3 style="margin-top:0;">Commercial Properties</h3>
+                    <p style="flex-grow:1;">Select retail, office, and mixed‑use assets in supply‑constrained submarkets with repositioning or yield stabilization potential.</p>
+                    <span class="card-link reveal-on-hover" aria-hidden="true" style="margin-top:1rem;display:inline-block;">Selective Allocation</span>
+                </div>
             </div>
-            <div class="content-card service-card" data-href="/services#custom-solutions" tabindex="0" role="link" aria-label="Custom Solutions">
-                <div class="card-icon"><i class="fas fa-database fa-fw"></i></div>
-                <h3>Custom Solutions</h3>
-                <p>Tailored software and integrations connecting tools like Airtable, CRMs, and APIs for your specific workflows.</p>
-                 <a href="/services#custom-solutions" class="card-link reveal-on-hover">Read More →</a>
+            <div class="content-card service-card" tabindex="0" role="group" aria-label="Single Family Homes" style="padding:0;overflow:hidden;display:flex;flex-direction:column;">
+                <div style="height:200px;overflow:hidden;">
+                    <img src="/images/singlefamily.jpg" alt="Single Family Homes" style="width:100%;height:100%;object-fit:cover;transition:transform 0.5s ease;">
+                </div>
+                <div style="padding:2rem;flex-grow:1;display:flex;flex-direction:column;">
+                    <h3 style="margin-top:0;">Single Family Homes</h3>
+                    <p style="flex-grow:1;">Aggregating scattered-site single-family rentals in high-demand neighborhoods to build scalable, high-yield portfolios.</p>
+                    <span class="card-link reveal-on-hover" aria-hidden="true" style="margin-top:1rem;display:inline-block;">Growth Strategy</span>
+                </div>
             </div>
         </div>
-        <div style="text-align: center; margin-top: 3rem;">
-            <a href="/services" class="cta-button secondary-btn">View All Services</a>
+        <div style="text-align:center;margin-top:3rem;">
+            <a href="/services" class="cta-button secondary-btn">Explore Our Strategy</a>
         </div>
     </div>
 </section>
 
- <!-- Dynamic Projects Preview -->
- <section id="projects-preview" class="section">
+<!-- Featured Properties Section (refactored from Recent Projects) -->
+<section id="featured-properties" class="section">
     <div class="container">
         <div class="section-header">
-            <h2 class="section-title">Recent Projects</h2>
-            <p class="section-description">See how we've helped businesses like yours achieve tangible results.</p>
+            <h2 class="section-title" style="font-family:'Merriweather',serif;">Properties For Rent</h2>
+            <p class="section-description">Find your next home in one of our professionally managed properties.</p>
         </div>
-         <!-- Container where JS will inject project cards -->
-        <div id="projects-preview-grid" class="grid-container grid-3-col">
-             <!-- Example placeholder structure for JS target -->
-             <div class="content-card project-card is-loading" style="justify-content: center; align-items: center;">
-                <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-color);"></i>
-                <p style="margin-top: 1rem; color: var(--gray-text);">Loading Projects...</p>
-            </div>
-             <div class="content-card project-card is-loading" style="justify-content: center; align-items: center; display: none; /* Hide extra placeholders on larger screens */"></div>
-             <div class="content-card project-card is-loading" style="justify-content: center; align-items: center; display: none;"></div>
+        <div class="grid-container grid-3-col">
+            <% if (typeof properties !== 'undefined' && properties.length > 0) { %>
+                <% properties.forEach(property => { %>
+                    <div class="content-card project-card" role="group" aria-label="<%= property.title %>">
+                        <div style="aspect-ratio:16/9;border-radius:.6rem;overflow:hidden;position:relative;background:#e2e8f0;display:flex;align-items:center;justify-content:center;">
+                            <img src="<%= property.image %>" alt="<%= property.title %>" style="width:100%;height:100%;object-fit:cover;object-position:center;" onerror="this.src='https://placehold.co/600x400/0b4d3a/ffffff?text=<%= encodeURIComponent(property.title) %>'">
+                            <div style="position: absolute; top: 1rem; right: 1rem; background: rgba(11, 77, 58, 0.9); color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 600;">For Rent</div>
+                        </div>
+                        <div style="padding: 1.5rem;">
+                            <h3 class="client-name" style="margin-top:0;margin-bottom:0.5rem;"><%= property.title %></h3>
+                            <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:var(--color-primary);margin-bottom:0.5rem;"><%= property.address %></div>
+                            <p class="success-snippet" style="color:var(--color-text-muted);margin-bottom:1rem;"><%= property.description %></p>
+                            <div style="font-weight: 700; color: #0b4d3a; margin-bottom: 1rem;"><%= property.price %></div>
+                            <div>
+                                <a href="/contact?property=<%= encodeURIComponent(property.title) %>" class="cta-button primary-btn" style="width:100%;text-align:center;display:block;">Inquire Now</a>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p>No properties currently available.</p>
+            <% } %>
         </div>
-         <div style="text-align: center; margin-top: 3rem;">
-            <a href="/projects" class="cta-button secondary-btn">View All Projects</a>
+        <div style="text-align:center;margin-top:3rem;">
+            <a href="/for-rent" class="cta-button secondary-btn">View All Rentals</a>
         </div>
     </div>
- </section>
-
- 
-
-<!-- Call to Action Section -->
-<section id="cta" class="cta-section cta-alt full-bleed">
-     <div class="container">
-         <div class="cta-content">
-             <h2 class="section-title cta-title">Ready to Transform Your Business?</h2>
-             <p class="cta-description">Contact us today for a free consultation and discover how automation can drive your success.</p>
-             <a href="/contact" class="cta-button primary-btn glow-button">Get Started Now</a>
-         </div>
-     </div>
 </section>
+
+<style>
+    /* Homepage Scroll Effect Styles */
+    body {
+        transition: background-color 0.8s ease, color 0.8s ease;
+    }
+    
+    /* Dark Theme State (triggered by scroll) */
+    body.theme-dark-green {
+        background-color: #0b4d3a !important;
+        color: #ffffff !important;
+    }
+
+    /* Text Color Overrides for Dark Theme */
+    body.theme-dark-green .section-title { color: #ffffff !important; }
+    body.theme-dark-green .section-description { color: #e4efe9 !important; }
+    
+    /* Testimonial/Card Styling in Dark Theme */
+    /* Make testimonial container transparent so text floats */
+    body.theme-dark-green .carousel-slides {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    body.theme-dark-green .slide blockquote { color: #ffffff !important; font-weight: 300; }
+    body.theme-dark-green .slide cite { color: #fbbf24 !important; } /* Gold name */
+    body.theme-dark-green .slide span { color: #cbd5e1 !important; }
+    body.theme-dark-green .slide .fa-star { color: #fbbf24 !important; } /* Gold stars */
+
+    /* Investment Process Cards - Keep White in Dark Mode */
+    body.theme-dark-green .process-card {
+        background-color: #ffffff !important;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2) !important;
+    }
+    body.theme-dark-green .process-card h3 { color: #1e293b !important; }
+    body.theme-dark-green .process-card p { color: #64748b !important; }
+    body.theme-dark-green .process-card .step-icon {
+        background: rgba(11,77,58,0.1) !important;
+        color: #0b4d3a !important;
+    }
+
+    /* Property Cards in Dark Theme - Keep Light */
+    body.theme-dark-green .content-card {
+        background-color: #f8fafc !important;
+        border: none !important;
+    }
+    body.theme-dark-green .content-card h3 { color: #1e293b !important; }
+    body.theme-dark-green .content-card p { color: #64748b !important; }
+    body.theme-dark-green .content-card div { color: #0b4d3a !important; } /* Price/Address */
+    
+    /* Buttons in Dark Theme */
+    body.theme-dark-green .secondary-btn {
+        background-color: #ffffff !important;
+        border-color: #ffffff !important;
+        color: #0b4d3a !important;
+    }
+    body.theme-dark-green .secondary-btn:hover {
+        background-color: #f1f5f9 !important;
+    }
+
+    /* Footer in Dark Theme */
+    body.theme-dark-green footer {
+        background-color: #062c21 !important; /* Darker green for separation */
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Trigger at Testimonials section
+        const triggerSection = document.getElementById('featured-testimonial');
+        const body = document.body;
+        
+        if (triggerSection) {
+            // Initial check
+            checkScroll();
+            
+            // Scroll listener
+            window.addEventListener('scroll', checkScroll);
+            
+            function checkScroll() {
+                const rect = triggerSection.getBoundingClientRect();
+                // Trigger when the section is 50% up the viewport
+                const triggerPoint = window.innerHeight * 0.5;
+                
+                if (rect.top <= triggerPoint) {
+                    body.classList.add('theme-dark-green');
+                } else {
+                    body.classList.remove('theme-dark-green');
+                }
+            }
+        }
+    });
+</script>
 
 <%- include('partials/footer') %>

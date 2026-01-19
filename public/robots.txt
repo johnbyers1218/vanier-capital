@@ -1,16 +1,4 @@
-# FND Automations - Guiding Bots to a Brighter, Automated Future!
-#
-#   FFFFF  N   N  DDDD
-#   F      NN  N  D   D
-#   FFFF   N N N  D   D
-#   F      N  NN  D   D
-#   F      N   N  DDDD
-#
-#   AAA   U   U  TTTTT   OOO   M   M   AAA   TTTTT  III   OOO   N   N   SSS
-#  A   A  U   U    T    O   O  MM MM  A   A    T     I   O   O  NN  N  S
-#  AAAAA  U   U    T    O   O  M M M  AAAAA    T     I   O   O  N N N   SSS
-#  A   A  U   U    T    O   O  M   M  A   A    T     I   O   O  N  NN      S
-#  A   A   UUU     T     OOO   M   M  A   A    T    III   OOO   N   N  SSSS
+# Vanier Capital - Real Estate Investment & Asset Management
 #
 # We believe in open access for helpful bots that contribute to a better web!
 
@@ -25,7 +13,7 @@ Disallow: /admin/
 # general content pages that need disallowing.
 
 # Location of your XML Sitemap (very important for all crawlers)
-Sitemap: https://www.fndautomations.com/sitemap.xml
+Sitemap: https://www.vaniercapital.com/sitemap.xml
 
 # ---------------------------------------------------------------------
 # AI Engine Optimization (AEO) & Specific Bot Instructions
@@ -52,4 +40,4 @@ Allow: /
 User-agent: CCBot
 Allow: /
 
-# --- End of FND Automations robots.txt ---
+# --- End of Vanier Capital robots.txt ---

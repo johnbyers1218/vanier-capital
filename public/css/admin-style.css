@@ -234,9 +234,6 @@
   ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {
     padding-block: 0;
   }
-  ::-webkit-calendar-picker-indicator {
-    line-height: 1;
-  }
   :-moz-ui-invalid {
     box-shadow: none;
   }
@@ -493,6 +490,9 @@
   .table {
     display: table;
   }
+  .h-0\.5 {
+    height: calc(var(--spacing) * 0.5);
+  }
   .h-4 {
     height: calc(var(--spacing) * 4);
   }
@@ -510,6 +510,9 @@
   }
   .h-10 {
     height: calc(var(--spacing) * 10);
+  }
+  .h-11 {
+    height: calc(var(--spacing) * 11);
   }
   .h-12 {
     height: calc(var(--spacing) * 12);
@@ -634,6 +637,9 @@
   .grow {
     flex-grow: 1;
   }
+  .border-collapse {
+    border-collapse: collapse;
+  }
   .transform {
     transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
   }
@@ -684,6 +690,9 @@
   }
   .gap-1 {
     gap: calc(var(--spacing) * 1);
+  }
+  .gap-1\.5 {
+    gap: calc(var(--spacing) * 1.5);
   }
   .gap-2 {
     gap: calc(var(--spacing) * 2);
@@ -896,8 +905,14 @@
   .border-transparent {
     border-color: transparent;
   }
-  .bg-\[\#1f2937\] {
-    background-color: #1f2937;
+  .border-white\/30 {
+    border-color: color-mix(in srgb, #fff 30%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-white) 30%, transparent);
+    }
+  }
+  .bg-\[\#0c1a23\] {
+    background-color: #0c1a23;
   }
   .bg-\[var\(--color-surface\)\] {
     background-color: var(--color-surface);
@@ -922,6 +937,9 @@
     @supports (color: color-mix(in lab, red, red)) {
       background-color: color-mix(in oklab, var(--color-blue-900) 20%, transparent);
     }
+  }
+  .bg-current {
+    background-color: currentcolor;
   }
   .bg-emerald-500\/20 {
     background-color: color-mix(in srgb, oklch(69.6% 0.17 162.48) 20%, transparent);
@@ -1063,6 +1081,12 @@
   }
   .bg-white {
     background-color: var(--color-white);
+  }
+  .bg-white\/5 {
+    background-color: color-mix(in srgb, #fff 5%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-white) 5%, transparent);
+    }
   }
   .bg-yellow-900\/30 {
     background-color: color-mix(in srgb, oklch(42.1% 0.095 57.708) 30%, transparent);
@@ -1289,6 +1313,9 @@
   .whitespace-pre-wrap {
     white-space: pre-wrap;
   }
+  .text-\[\#0b4d3a\] {
+    color: #0b4d3a;
+  }
   .text-\[\#374151\] {
     color: #374151;
   }
@@ -1457,6 +1484,15 @@
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
     transition-duration: var(--tw-duration, var(--default-transition-duration));
   }
+  .transition-transform {
+    transition-property: transform, translate, scale, rotate;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .duration-300 {
+    --tw-duration: 300ms;
+    transition-duration: 300ms;
+  }
   .ease-out {
     --tw-ease: var(--ease-out);
     transition-timing-function: var(--ease-out);
@@ -1524,6 +1560,13 @@
     &:hover {
       @media (hover: hover) {
         background-color: var(--color-emerald-500);
+      }
+    }
+  }
+  .hover\:bg-gray-100 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-gray-100);
       }
     }
   }
@@ -1629,10 +1672,13 @@
       }
     }
   }
-  .hover\:text-\[var\(--color-primary\)\] {
+  .hover\:bg-white\/10 {
     &:hover {
       @media (hover: hover) {
-        color: var(--color-primary);
+        background-color: color-mix(in srgb, #fff 10%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--color-white) 10%, transparent);
+        }
       }
     }
   }
@@ -1723,6 +1769,11 @@
       --tw-ring-color: var(--color-red-400);
     }
   }
+  .focus\:ring-white {
+    &:focus {
+      --tw-ring-color: var(--color-white);
+    }
+  }
   .focus\:ring-offset-2 {
     &:focus {
       --tw-ring-offset-width: 2px;
@@ -1731,6 +1782,26 @@
   }
   .focus\:outline-none {
     &:focus {
+      --tw-outline-style: none;
+      outline-style: none;
+    }
+  }
+  .focus-visible\:ring-2 {
+    &:focus-visible {
+      --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
+      box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+    }
+  }
+  .focus-visible\:ring-white\/70 {
+    &:focus-visible {
+      --tw-ring-color: color-mix(in srgb, #fff 70%, transparent);
+      @supports (color: color-mix(in lab, red, red)) {
+        --tw-ring-color: color-mix(in oklab, var(--color-white) 70%, transparent);
+      }
+    }
+  }
+  .focus-visible\:outline-none {
+    &:focus-visible {
       --tw-outline-style: none;
       outline-style: none;
     }
@@ -1818,6 +1889,11 @@
   .md\:overflow-x-visible {
     @media (width >= 48rem) {
       overflow-x: visible;
+    }
+  }
+  .md\:py-4 {
+    @media (width >= 48rem) {
+      padding-block: calc(var(--spacing) * 4);
     }
   }
   .md\:py-5 {
@@ -2380,6 +2456,10 @@
   syntax: "*";
   inherits: false;
 }
+@property --tw-duration {
+  syntax: "*";
+  inherits: false;
+}
 @property --tw-ease {
   syntax: "*";
   inherits: false;
@@ -2441,7 +2521,55 @@
       --tw-backdrop-opacity: initial;
       --tw-backdrop-saturate: initial;
       --tw-backdrop-sepia: initial;
+      --tw-duration: initial;
       --tw-ease: initial;
     }
   }
 }
+
+/* Button Styles added by Copilot */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: #2563eb;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.btn-primary:hover {
+    background-color: #1d4ed8;
+}
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    color: #d1d5db;
+    background-color: #374151;
+    border: 1px solid #4b5563;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.btn-secondary:hover {
+    background-color: #4b5563;
+    color: #ffffff;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+

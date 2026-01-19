@@ -34,15 +34,15 @@
 			<label for="logoFile" class="block text-sm font-medium text-gray-200">Client Logo (Optional)</label>
 			<% if (editing && clientData && clientData.logoUrl) { %>
 				<div class="mt-2">
-					<img src="<%= clientData.logoUrl %>" alt="Current Logo" class="max-h-16 bg-white p-1 rounded border border-gray-700">
+					<img src="<%= clientData.logoUrl %>" alt="Current Logo" class="max-h-16 bg-white p-1 rounded border border-neutral-700">
 				</div>
 			<% } %>
 			<input type="hidden" id="logoUrl" name="logoUrl" value="<%= clientData && clientData.logoUrl ? clientData.logoUrl : '' %>">
 			<input type="hidden" id="logoPublicId" name="logoPublicId" value="<%= clientData && clientData.logoPublicId ? clientData.logoPublicId : '' %>">
 			<input type="hidden" id="removeLogo" name="removeLogo" value="false">
 			<div class="mt-2 flex flex-wrap items-center gap-3">
-				<input type="file" id="logoFile" name="logoFile" accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml" class="block w-full sm:w-auto text-sm text-gray-300 file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-700 file:text-gray-100 hover:file:bg-gray-600 cursor-pointer" aria-describedby="logo-help">
-				<button type="button" id="uploadLogoBtn" class="inline-flex items-center gap-2 bg-gray-700 text-gray-100 font-semibold py-2 px-4 rounded-md border border-gray-600 shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+				<input type="file" id="logoFile" name="logoFile" accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml" class="block w-full sm:w-auto text-sm text-gray-300 file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-neutral-700 file:text-gray-100 hover:file:bg-gray-600 cursor-pointer" aria-describedby="logo-help">
+				<button type="button" id="uploadLogoBtn" class="inline-flex items-center gap-2 bg-neutral-700 text-gray-100 font-semibold py-2 px-4 rounded-md border border-neutral-600 shadow-sm hover:bg-neutral-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
 					<i class="fas fa-cloud-upload-alt"></i>
 					Upload
 				</button>
@@ -56,7 +56,7 @@
 			</div>
 			<div id="logoPreview" class="mt-2">
 				<% if (clientData && clientData.logoUrl) { %>
-					<img src="<%= clientData.logoUrl %>" alt="Logo Preview" class="max-h-16 bg-white p-1 rounded border border-gray-700">
+					<img src="<%= clientData.logoUrl %>" alt="Logo Preview" class="max-h-16 bg-white p-1 rounded border border-neutral-700">
 				<% } %>
 			</div>
 			<p id="logo-help" class="mt-1 text-xs text-gray-400">Upload a logo (Max 5MB). Supported types: JPG, PNG, GIF, WEBP, SVG.</p>
@@ -65,7 +65,7 @@
 		<div>
 			<label for="websiteUrl" class="block text-sm font-medium text-gray-200">Website URL (Optional)</label>
 			<input type="url" id="websiteUrl" name="websiteUrl" placeholder="https://client-website.com" value="<%= clientData && clientData.websiteUrl ? clientData.websiteUrl : '' %>"
-				class="mt-1 block w-full rounded-md border-gray-700 bg-gray-800 text-gray-100 placeholder-gray-500 focus:border-primary focus:ring-primary">
+				class="mt-1 block w-full rounded-md border-neutral-700 bg-[#1a1a1a] text-gray-100 placeholder-gray-500 focus:border-primary focus:ring-primary">
 		</div>
 
 		<div class="form-row two-col">
@@ -84,16 +84,16 @@
 		</div>
 
 		<div>
-			<label for="industry" class="block text-sm font-medium text-gray-200">Industry (curated)</label>
-			<select id="industry" name="industry" class="mt-1 block w-full rounded-md border-gray-700 bg-gray-800 text-gray-100 focus:border-primary focus:ring-primary">
-				<option value="">— Select an industry —</option>
+			<label for="industry" class="block text-sm font-medium text-gray-200">Market (curated)</label>
+			<select id="industry" name="industry" class="mt-1 block w-full rounded-md border-neutral-700 bg-[#1a1a1a] text-gray-100 focus:border-primary focus:ring-primary">
+				<option value="">— Select a market —</option>
 				<% if (Array.isArray(industries)) { %>
 					<% industries.forEach(ind => { %>
 						<option value="<%= ind.name %>" <%= (clientData && clientData.industry === ind.name) ? 'selected' : '' %>><%= ind.name %></option>
 					<% }) %>
 				<% } %>
 			</select>
-			<p class="help-text mt-1">Used for analytics and the public metrics counter (Industries Served). Manage options in Admin > Industries.</p>
+			<p class="help-text mt-1">Used for analytics and the public metrics counter (Markets Served). Manage options in Admin > Markets.</p>
 		</div>
 
 		<div>
@@ -113,7 +113,7 @@
 				<i class="fas fa-save"></i>
 				<%= editing ? 'Update Client' : 'Save New Client' %>
 			</button>
-			<a href="/admin/clients" class="inline-flex items-center gap-2 bg-gray-700 text-gray-100 font-semibold py-2 px-4 rounded-md border border-gray-600 shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">Cancel</a>
+			<a href="/admin/clients" class="inline-flex items-center gap-2 bg-neutral-700 text-gray-100 font-semibold py-2 px-4 rounded-md border border-neutral-600 shadow-sm hover:bg-neutral-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">Cancel</a>
 		</div>
 	</form>
 </div>
@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
 					logoUrlInput.value = json.location;
 					if (json.publicId) { logoPublicIdInput.value = json.publicId; }
 					if (removeLogoInput) removeLogoInput.value = 'false';
-					preview.innerHTML = `<img src="${json.location}" alt="Logo Preview" class="max-h-16 bg-white p-1 rounded border border-gray-700" />`;
+					preview.innerHTML = `<img src="${json.location}" alt="Logo Preview" class="max-h-16 bg-white p-1 rounded border border-neutral-700" />`;
 					statusEl.textContent = 'Upload successful!';
 					statusEl.className = 'text-sm text-green-300';
 				} else {

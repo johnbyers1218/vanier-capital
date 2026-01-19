@@ -1,7 +1,7 @@
 <%# views/admin/testimonials/edit.ejs %>
 <%# Form for adding or editing a testimonial %>
 
-<%- include('../partials/header', { pageTitle: editing ? 'Edit Testimonial' : 'Add New Testimonial' }) %>
+<%- include('../partials/header', { pageTitle: editing ? 'Edit Review' : 'Add New Review' }) %>
 
 <div class="max-w-4xl mx-auto">
     <style>
@@ -21,56 +21,46 @@
     <form action="<%= editing ? '/admin/testimonials/edit/' + testimonial._id : '/admin/testimonials' %>" method="POST" id="testimonialForm">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-        <div class="bg-gray-800 border border-gray-700 rounded-lg shadow-sm p-5 space-y-4">
+        <div class="bg-[#1a1a1a] border border-neutral-700 rounded-lg shadow-sm p-5 space-y-4">
             <div>
                 <label for="author" class="block text-sm text-gray-300 mb-1">Author Name <span class="text-red-400">*</span></label>
-                <input id="author" name="author" type="text" required maxlength="100" value="<%= testimonial && testimonial.author ? testimonial.author : '' %>" class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <input id="author" name="author" type="text" required maxlength="100" value="<%= testimonial && testimonial.author ? testimonial.author : '' %>" class="w-full bg-[#111] border border-neutral-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
             </div>
 
             <div>
-                <label for="content" class="block text-sm text-gray-300 mb-1">Testimonial Content <span class="text-red-400">*</span></label>
-                <textarea id="content" name="content" rows="7" required maxlength="2000" class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"><%= testimonial && testimonial.content ? testimonial.content : '' %></textarea>
+                <label for="content" class="block text-sm text-gray-300 mb-1">Review Content <span class="text-red-400">*</span></label>
+                <textarea id="content" name="content" rows="7" required maxlength="2000" class="w-full bg-[#111] border border-neutral-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"><%= testimonial && testimonial.content ? testimonial.content : '' %></textarea>
                 <p class="text-xs text-gray-400 mt-1">Max 2000 characters. Plain text only.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label for="company" class="block text-sm text-gray-300 mb-1">Company Name (Optional)</label>
-                    <input id="company" name="company" type="text" maxlength="100" value="<%= testimonial && testimonial.company ? testimonial.company : '' %>" class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <label for="company" class="block text-sm text-gray-300 mb-1">Property Name (Optional)</label>
+                    <input id="company" name="company" type="text" maxlength="100" value="<%= testimonial && testimonial.company ? testimonial.company : '' %>" class="w-full bg-[#111] border border-neutral-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
                 </div>
                 <div>
-                    <label for="position" class="block text-sm text-gray-300 mb-1">Author's Position (Optional)</label>
-                    <input id="position" name="position" type="text" maxlength="100" value="<%= testimonial && testimonial.position ? testimonial.position : '' %>" class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <label for="position" class="block text-sm text-gray-300 mb-1">Unit Number (Optional)</label>
+                    <input id="position" name="position" type="text" maxlength="100" value="<%= testimonial && testimonial.position ? testimonial.position : '' %>" class="w-full bg-[#111] border border-neutral-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label for="client" class="block text-sm text-gray-300 mb-1">Linked Client (Optional)</label>
-                    <select id="client" name="client" class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">— Select client —</option>
-                        <% if (Array.isArray(clients)) { clients.forEach(c => { %>
-                            <option value="<%= c._id %>" <%= (testimonial && testimonial.client && String(testimonial.client) === String(c._id)) ? 'selected' : '' %>><%= c.name %></option>
+                    <label for="property" class="block text-sm text-gray-300 mb-1">Linked Property (Optional)</label>
+                    <select id="property" name="property" class="w-full bg-[#111] border border-neutral-700 rounded-md px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+                        <option value="">— Select property —</option>
+                        <% if (Array.isArray(properties)) { properties.forEach(p => { %>
+                            <option value="<%= p._id %>" <%= (testimonial && testimonial.property && String(testimonial.property) === String(p._id)) ? 'selected' : '' %>><%= p.title %></option>
                         <% }) } %>
                     </select>
-                    <p class="text-xs text-gray-400 mt-1">Used for industry filters and to show logo/name on the public testimonials.</p>
-                </div>
-                <div>
-                    <label for="project" class="block text-sm text-gray-300 mb-1">Linked Project (Optional)</label>
-                    <select id="project" name="project" class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">— Select project —</option>
-                        <% if (Array.isArray(projects)) { projects.forEach(p => { %>
-                            <option value="<%= p._id %>" <%= (testimonial && testimonial.project && String(testimonial.project) === String(p._id)) ? 'selected' : '' %>><%= p.title %><%= p.client && p.client.name ? ' — ' + p.client.name : '' %></option>
-                        <% }) } %>
-                    </select>
-                    <p class="text-xs text-gray-400 mt-1">If set, the card can include a "Read the Case Study" link.</p>
+                    <p class="text-xs text-gray-400 mt-1">If set, the card can include a "View Property" link.</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label for="rating" class="block text-sm text-gray-300 mb-1">Rating (Optional)</label>
-                    <select id="rating" name="rating" class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <select id="rating" name="rating" class="w-full bg-[#111] border border-neutral-700 rounded-md px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <option value="" <%= (!testimonial || !testimonial.rating) ? 'selected' : '' %>>-- No Rating --</option>
                         <% for (let i = 1; i <= 5; i++) { %>
                             <option value="<%= i %>" <%= (testimonial && testimonial.rating == i) ? 'selected' : '' %>><%= i %> Star<%= i > 1 ? 's' : '' %></option>
@@ -106,7 +96,7 @@
                     <i class="fas fa-save"></i>
                     <span><%= editing ? 'Update Testimonial' : 'Save New Testimonial' %></span>
                 </button>
-                <a href="/admin/testimonials" class="inline-flex items-center gap-2 border border-gray-600 text-gray-200 font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                <a href="/admin/testimonials" class="inline-flex items-center gap-2 border border-neutral-600 text-gray-200 font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                     <i class="fas fa-times"></i>
                     <span>Cancel</span>
                 </a>

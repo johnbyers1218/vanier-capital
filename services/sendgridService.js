@@ -63,7 +63,7 @@ async function sendEmail(msg) {
 async function sendTeamNotification(inquiry) {
   const to = getEnv('CONTACT_TEAM_EMAIL') || getEnv('SENDGRID_FROM_EMAIL');
   const from = getEnv('SENDGRID_FROM_EMAIL');
-  const fromName = getEnv('SENDGRID_FROM_NAME') || 'FND Automations';
+  const fromName = getEnv('SENDGRID_FROM_NAME') || 'Vanier Capital';
   if (!to || !from) {
     const missing = [!to ? 'CONTACT_TEAM_EMAIL|SENDGRID_FROM_EMAIL' : null, !from ? 'SENDGRID_FROM_EMAIL' : null]
       .filter(Boolean)
@@ -92,7 +92,7 @@ async function sendTeamNotification(inquiry) {
 async function sendUserConfirmation(inquiry) {
   const to = (inquiry && inquiry.email) ? String(inquiry.email).trim() : '';
   const from = getEnv('SENDGRID_FROM_EMAIL');
-  const fromName = getEnv('SENDGRID_FROM_NAME') || 'FND Automations';
+  const fromName = getEnv('SENDGRID_FROM_NAME') || 'Vanier Capital';
   if (!to || !from) {
     const missing = [!to ? 'recipient email' : null, !from ? 'SENDGRID_FROM_EMAIL' : null]
       .filter(Boolean)
@@ -102,17 +102,17 @@ async function sendUserConfirmation(inquiry) {
   }
   const subject = "We've received your message";
   const text = `Hi ${inquiry.name || 'there'},\n\n`+
-    `Thanks for reaching out to FND Automations — we’ve received your message and a team member will reply soon.\n\n`+
+    `Thanks for reaching out to Vanier Capital — we’ve received your message and a team member will reply soon.\n\n`+
     `Summary:\n`+
     `Subject: ${inquiry.subject || ''}\n`+
     `Message: ${inquiry.message || ''}\n\n`+
-    `— FND Automations`;
+    `— Vanier Capital`;
   let html = text.replace(/\n/g, '<br/>');
   try {
     const viewsDir = path.resolve(process.cwd(), 'views');
     const templatePath = path.join(viewsDir, 'emails', 'contact-confirmation.ejs');
     const siteUrl = getEnv('PUBLIC_SITE_URL') || getEnv('CORS_ORIGIN') || '';
-    const logoUrl = siteUrl ? `${siteUrl.replace(/\/$/, '')}/images/FND_LOGO_SVG_BLACK.svg` : '';
+    const logoUrl = siteUrl ? `${siteUrl.replace(/\/$/, '')}/images/vanier-logo.svg` : '';
     html = await ejs.renderFile(templatePath, {
       name: inquiry.name || 'there',
       email: inquiry.email || '',
@@ -124,7 +124,7 @@ async function sendUserConfirmation(inquiry) {
       supportEmail: from,
       // Helpful links
       blogUrl: siteUrl ? `${siteUrl.replace(/\/$/, '')}/blog` : '',
-      caseStudiesUrl: siteUrl ? `${siteUrl.replace(/\/$/, '')}/projects` : '',
+      caseStudiesUrl: siteUrl ? `${siteUrl.replace(/\/$/, '')}/portfolio` : '',
       servicesUrl: siteUrl ? `${siteUrl.replace(/\/$/, '')}/services` : '',
       contactUrl: siteUrl ? `${siteUrl.replace(/\/$/, '')}/contact` : '',
     }, { async: true });
@@ -144,7 +144,7 @@ async function sendUserConfirmation(inquiry) {
 async function sendWelcomeNewsletter(subscriber) {
   const to = (subscriber && subscriber.email) ? String(subscriber.email).trim() : '';
   const from = getEnv('SENDGRID_FROM_EMAIL');
-  const fromName = getEnv('SENDGRID_FROM_NAME') || 'FND Automations';
+  const fromName = getEnv('SENDGRID_FROM_NAME') || 'Vanier Capital';
   if (!to || !from) {
     const missing = [!to ? 'recipient email' : null, !from ? 'SENDGRID_FROM_EMAIL' : null].filter(Boolean).join(', ');
     logger.warn('[SendGrid] Missing configuration for newsletter welcome.', { missing });
@@ -153,8 +153,8 @@ async function sendWelcomeNewsletter(subscriber) {
   const firstName = subscriber.firstName || '';
   const subject = firstName ? `Welcome, ${firstName}!` : 'You’re in — welcome!';
   const siteUrl = getEnv('PUBLIC_SITE_URL') || getEnv('CORS_ORIGIN') || '';
-  const logoUrl = siteUrl ? `${siteUrl.replace(/\/$/, '')}/images/FND_LOGO_SVG_BLACK.svg` : '';
-  const text = `Welcome${firstName ? ' ' + firstName : ''}!\n\nThanks for subscribing. Your first issue will arrive soon. In the meantime you can explore:${siteUrl ? ' ' + siteUrl : ''}\n\n— FND Automations`;
+  const logoUrl = siteUrl ? `${siteUrl.replace(/\/$/, '')}/images/vanier-logo.svg` : '';
+  const text = `Welcome${firstName ? ' ' + firstName : ''}!\n\nThanks for subscribing. Your first issue will arrive soon. In the meantime you can explore:${siteUrl ? ' ' + siteUrl : ''}\n\n— Vanier Capital`;
   let html = '';
   try {
     const viewsDir = path.resolve(process.cwd(), 'views');

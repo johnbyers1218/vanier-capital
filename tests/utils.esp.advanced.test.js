@@ -1,3 +1,6 @@
+
+import { jest } from '@jest/globals';
+
 describe('esp.js advanced edge cases', () => {
   beforeEach(() => {
     jest.resetModules();
@@ -6,13 +9,10 @@ describe('esp.js advanced edge cases', () => {
     process.env.MAILCHIMP_LIST_ID = 'z';
     process.env.MAILCHIMP_FROM_EMAIL = 'a';
     process.env.MAILCHIMP_FROM_NAME = 'b';
-    // Remove any previous global import mocks
-    delete globalThis.import;
   });
 
   afterEach(() => {
     jest.resetModules();
-    delete globalThis.import;
   });
 
   it('getMailchimpClient returns null and logs warning if SDK import fails', async () => {
@@ -20,10 +20,15 @@ describe('esp.js advanced edge cases', () => {
     jest.doMock('../config/logger.js', () => ({
       logger: { warn: jest.fn(), info: jest.fn(), error: jest.fn() }
     }));
-    // Mock dynamic import to throw
-    globalThis.import = () => { throw new Error('fail'); };
-    const esp = require('../utils/esp.js');
-    const logger = require('../config/logger.js').logger;
+    
+    // Mock mailchimp to throw on import
+    jest.doMock('@mailchimp/mailchimp_marketing', () => {
+      throw new Error('fail');
+    }, { virtual: true });
+
+    const esp = await import('../utils/esp.js');
+    const { logger } = await import('../config/logger.js');
+    
     const result = await esp.getMailchimpClient();
     expect(result).toBeNull();
     expect(logger.warn).toHaveBeenCalledWith(
@@ -36,22 +41,28 @@ describe('esp.js advanced edge cases', () => {
     jest.doMock('../config/logger.js', () => ({
       logger: { warn: jest.fn(), info: jest.fn(), error: jest.fn() }
     }));
-    // Mock dynamic import to return a fake Mailchimp client
-    globalThis.import = async () => ({
+    
+    // Mock mailchimp
+    jest.doMock('@mailchimp/mailchimp_marketing', () => ({
+      __esModule: true,
       default: {
         setConfig: jest.fn(),
         lists: {
-          addListMember: () => { const err = new Error('is already a list member'); err.response = { text: 'is already a list member' }; throw err; }
+          addListMember: jest.fn().mockRejectedValue({
+             message: 'is already a list member',
+             response: { text: 'is already a list member' }
+          })
         }
       }
-    });
-    const esp = require('../utils/esp.js');
-    const logger = require('../config/logger.js').logger;
+    }), { virtual: true });
+
+    const esp = await import('../utils/esp.js');
+    const { logger } = await import('../config/logger.js');
+    
     const result = await esp.addSubscriber('exists@example.com');
     expect(result).toBe(true);
     expect(logger.info).toHaveBeenCalledWith(
-      expect.stringContaining('already exists'),
-      expect.anything()
+      expect.stringContaining('already exists')
     );
   });
 
@@ -59,16 +70,20 @@ describe('esp.js advanced edge cases', () => {
     jest.doMock('../config/logger.js', () => ({
       logger: { warn: jest.fn(), info: jest.fn(), error: jest.fn() }
     }));
-    globalThis.import = async () => ({
+    
+    jest.doMock('@mailchimp/mailchimp_marketing', () => ({
+      __esModule: true,
       default: {
         setConfig: jest.fn(),
         lists: {
-          addListMember: () => { throw new Error('fail'); }
+          addListMember: jest.fn().mockRejectedValue(new Error('fail'))
         }
       }
-    });
-    const esp = require('../utils/esp.js');
-    const logger = require('../config/logger.js').logger;
+    }), { virtual: true });
+
+    const esp = await import('../utils/esp.js');
+    const { logger } = await import('../config/logger.js');
+    
     const result = await esp.addSubscriber('fail@example.com');
     expect(result).toBe(false);
     expect(logger.error).toHaveBeenCalledWith(
@@ -77,3 +92,4 @@ describe('esp.js advanced edge cases', () => {
     );
   });
 });
+

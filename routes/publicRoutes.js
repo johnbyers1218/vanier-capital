@@ -5,17 +5,21 @@ import path from 'path';
 import { logger } from '../config/logger.js';
 import BlogPost from '../models/BlogPost.js';
 import Category from '../models/Category.js';
-import ImportedProjectModel from '../models/Projects.js';
+import Property from '../models/Property.js';
 import Testimonial from '../models/Testimonials.js';
-import Client from '../models/Client.js';
 import DailyMetric from '../models/DailyMetric.js';
-import Project from '../models/Projects.js';
+// Legacy variable names below still reference 'Project' in code; keep alias for now
+const Project = Property;
+const ImportedProjectModel = Property;
 import Settings from '../models/Settings.js';
 // AdminUser no longer used for public contact avatars; About team used instead
 
 
 const router = express.Router();
 const isSmoke = ['1','true','yes','on'].includes(String(process.env.SMOKE || '').toLowerCase());
+
+// Portfolio Data (Columbus, GA) - MOVED TO DB
+// Rental Data (Columbus, GA) - MOVED TO DB
 
 // --- ESM __dirname equivalent (though not strictly needed in this file now) ---
 // const __filename = fileURLToPath(import.meta.url);
@@ -28,81 +32,97 @@ router.get('/', async (req, res, next) => { // Make route async
     logger.debug(`Rendering view 'index' for path: ${req.originalUrl}`);
     // In SMOKE mode, skip DB queries to avoid Mongoose buffering timeouts and render fast
     if (isSmoke) {
+        console.log('[Homepage] SMOKE MODE ACTIVE - Returning default stats');
         return res.render('index', {
-            pageTitle: 'FND Automations - AI & Process Automation Solutions',
-            pageDescription: 'FND Automations provides innovative AI and process automation services to boost efficiency, reduce costs, and drive business growth. Contact us for custom solutions.',
+            pageTitle: 'Vanier Capital | Real Estate Investment & Asset Management',
+            pageDescription: 'Vanier Capital is a real estate investment firm focused on building long-term, risk-adjusted returns through strategic acquisition and disciplined management.',
             path: '/',
             featuredProjects: [],
             uniqueFeaturedProjects: [],
             aggregateStats: { totalValuation: 0, totalRevenue: 0, clientCount: 0 },
             visibleClients: [],
             heroTopClients: [],
-            managedStats: { projectsCompleted: 0, manualHoursAutomated: 0 }
+            managedStats: { 
+                projectsCompleted: 0, 
+                manualHoursAutomated: 0,
+                occupancyRate: '98%',
+                capRate: '7.5%',
+                aum: '$15M+',
+                unitsManaged: '0+',
+                tenantSatisfaction: '5.0/5'
+            },
+            properties: []
         });
     }
     try {
-        // 1. Fetch featured projects with client data (Hub & Spoke)
-        const featuredProjects = await ImportedProjectModel.find({
+        // 1. Fetch featured projects (formerly with client data)
+        const featuredProjects = await Property.find({
             isFeaturedOnHomepage: true,
             isPubliclyVisible: true
-        }).populate('client').sort({ createdAt: -1 }).lean();
+        }).sort({ createdAt: -1 }).lean();
 
-        // 2. Calculate aggregate statistics from Client collection (accurate public-facing stats)
-        // Use all clients that are not explicitly hidden (isPubliclyVisible !== false)
-        const clientStats = await Client.aggregate([
-            { $match: { isPubliclyVisible: { $ne: false } } },
-            {
-                $group: {
-                    _id: null,
-                    totalValuation: { $sum: '$companyValuation' },
-                    totalRevenue: { $sum: '$annualRevenue' },
-                    clientCount: { $sum: 1 }
-                }
-            }
-        ]);
-
-        const aggregateStats = clientStats.length > 0 ? clientStats[0] : {
+        // 2. Calculate aggregate statistics (Mocked or derived from Properties now)
+        const aggregateStats = {
             totalValuation: 0,
             totalRevenue: 0,
             clientCount: 0
         };
 
         // 3. Create unique featured projects (prevent double-counting)
-        const uniqueFeaturedProjects = featuredProjects.filter((project, index, self) => 
-            index === self.findIndex(p => p.client?._id?.toString() === project.client?._id?.toString())
-        );
+        const uniqueFeaturedProjects = featuredProjects;
 
-        // 4. Load publicly visible clients with logos (include valuation for hero subset)
-        const visibleClients = await Client.find({ isPubliclyVisible: { $ne: false }, logoUrl: { $exists: true, $ne: '' } })
-            .select('name logoUrl websiteUrl companyValuation')
-            .sort({ name: 1 })
-            .lean();
+        // 4. Load publicly visible clients (Deprecated - returning empty)
+        const visibleClients = [];
 
-        // 4a. Pick top 4-5 clients by highest estimated valuation for hero row
-        let heroTopClients = (visibleClients || [])
-            .filter(c => typeof c.companyValuation === 'number' && c.companyValuation > 0)
-            .sort((a, b) => (b.companyValuation || 0) - (a.companyValuation || 0))
-            .slice(0, 5);
-
-        // 4b. If fewer than 4 after valuation filter, fill from remaining visible clients with logos
-        if (heroTopClients.length < 4) {
-            const alreadyIds = new Set(heroTopClients.map(c => String(c._id)));
-            const fillers = (visibleClients || [])
-                .filter(c => !alreadyIds.has(String(c._id)))
-                .slice(0, Math.max(0, 5 - heroTopClients.length));
-            heroTopClients = heroTopClients.concat(fillers);
-        }
+        // 4a. Pick top 4-5 clients (Deprecated - returning empty)
+        let heroTopClients = [];
 
         // 5. Load managed stats from Settings
-        let managedStats = { projectsCompleted: 0, manualHoursAutomated: 0 };
+        let managedStats = { 
+            projectsCompleted: 0, 
+            manualHoursAutomated: 0,
+            occupancyRate: '98%',
+            capRate: '7.5%',
+            aum: '$15M+',
+            unitsManaged: '0+',
+            tenantSatisfaction: '5.0/5'
+        };
         try {
-            const [projSet, hoursSet] = await Promise.all([
+            const [projSet, hoursSet, occupancySet, capSet, aumSet, propertyCount, allTestimonials] = await Promise.all([
                 Settings.findOne({ key: 'projectsCompleted' }).lean(),
-                Settings.findOne({ key: 'manualHoursAutomated' }).lean()
+                Settings.findOne({ key: 'manualHoursAutomated' }).lean(),
+                Settings.findOne({ key: 'occupancyRate' }).lean(),
+                Settings.findOne({ key: 'capRate' }).lean(),
+                Settings.findOne({ key: 'aum' }).lean(),
+                Property.countDocuments({}),
+                Testimonial.find({ isVisible: true, rating: { $exists: true, $ne: null } }).select('rating').lean()
             ]);
             if (projSet && typeof projSet.valueNumber === 'number') managedStats.projectsCompleted = projSet.valueNumber;
             if (hoursSet && typeof hoursSet.valueNumber === 'number') managedStats.manualHoursAutomated = hoursSet.valueNumber;
-        } catch {}
+            if (occupancySet && occupancySet.valueString) managedStats.occupancyRate = occupancySet.valueString;
+            if (capSet && capSet.valueString) managedStats.capRate = capSet.valueString;
+            if (aumSet && aumSet.valueString) managedStats.aum = aumSet.valueString;
+            
+            // Calculate Units Managed (Property Count)
+            if (propertyCount) managedStats.unitsManaged = `${propertyCount}+`;
+
+            // Calculate Tenant Satisfaction (Avg Rating)
+            if (allTestimonials.length > 0) {
+                const totalRating = allTestimonials.reduce((sum, t) => sum + (t.rating || 0), 0);
+                const avgRating = (totalRating / allTestimonials.length).toFixed(1);
+                managedStats.tenantSatisfaction = `${avgRating}/5`;
+            }
+            
+            console.log('--------------------------------------------------');
+            console.log('[Homepage] DEBUG: Managed Stats being sent to view:');
+            console.log(JSON.stringify(managedStats, null, 2));
+            console.log('--------------------------------------------------');
+            
+            logger.debug('[Homepage] Managed Stats:', managedStats);
+        } catch (err) {
+            console.error('[Homepage] ERROR:', err);
+            logger.error('[Homepage] Error loading settings:', err);
+        }
 
         // 5b. Resolve client logo URLs. Prefer absolute URL; else, if Cloudinary publicId exists and cloud name is set,
         // build a Cloudinary URL; else, treat as a file under /images/clients/.
@@ -120,25 +140,40 @@ router.get('/', async (req, res, next) => { // Make route async
         (visibleClients || []).forEach(c => { c.logoUrl = resolveClientLogo(c); });
         (heroTopClients || []).forEach(c => { c.logoUrl = resolveClientLogo(c); });
 
+        // 5c. Fetch rental properties for homepage
+        const rentalPropertiesDB = await Property.find({ isAvailableForRent: true, isPubliclyVisible: true }).limit(3).lean();
+        const mappedRentals = rentalPropertiesDB.map(p => ({
+            title: p.title,
+            address: p.address,
+            summary: p.excerpt,
+            price: p.monthlyRent ? `$${p.monthlyRent.toLocaleString()}/mo` : (p.rentalPrice ? (p.rentalPrice.startsWith('$') ? p.rentalPrice : `$${p.rentalPrice}`) : 'Inquire'),
+            image: p.image || '/images/house-placeholder.jpg'
+        }));
+
+        // 5d. Fetch featured testimonials
+        const testimonials = await Testimonial.find({ isFeatured: true, isVisible: true }).sort({ createdAt: -1 }).limit(5).lean();
+
         // 6. Pass data to the template
         res.render('index', {
-            pageTitle: 'FND Automations - AI & Process Automation Solutions',
-            pageDescription: 'FND Automations provides innovative AI and process automation services to boost efficiency, reduce costs, and drive business growth. Contact us for custom solutions.',
+            pageTitle: 'Vanier Capital | Real Estate Investment & Asset Management',
+            pageDescription: 'Vanier Capital is a real estate investment firm focused on building long-term, risk-adjusted returns through strategic acquisition and disciplined management of single-family and multifamily assets.',
             path: '/',
             featuredProjects: featuredProjects, // All featured projects for carousel
             uniqueFeaturedProjects: uniqueFeaturedProjects, // Unique client projects for stats
             aggregateStats: aggregateStats,    // Accurate aggregate stats from Client collection
             visibleClients: visibleClients,    // Publicly visible client logos for Trusted By
             heroTopClients: heroTopClients,    // Top clients by valuation for hero social proof
-            managedStats
+            managedStats,
+            properties: mappedRentals,
+            testimonials: testimonials
         });
     } catch (error) {
         logger.error(`[Homepage] Error fetching data for homepage:`, { error: error.message, stack: error.stack });
         // Render the page without showcase data on error, or pass to an error handler
         // For now, let's render gracefully without the dynamic data.
         res.render('index', {
-            pageTitle: 'FND Automations - AI & Process Automation Solutions',
-            pageDescription: 'FND Automations provides innovative AI and process automation services to boost efficiency, reduce costs, and drive business growth. Contact us for custom solutions.',
+            pageTitle: 'Vanier Capital | Real Estate Investment & Asset Management',
+            pageDescription: 'Vanier Capital is a real estate investment firm focused on disciplined acquisitions and long-term value creation.',
             path: '/',
             featuredProjects: [], // Send empty array on error
             uniqueFeaturedProjects: [], // Send empty array on error
@@ -150,8 +185,8 @@ router.get('/', async (req, res, next) => { // Make route async
     }
 });
 
-// Services Page
-router.get('/services', async (req, res) => {
+// Investment Strategy Page (renamed from Services)
+router.get('/strategy', async (req, res) => {
     logger.debug(`Rendering view 'services' for path: ${req.originalUrl}`);
 
     // Helper to escape regex for client name fallback search
@@ -210,90 +245,145 @@ router.get('/services', async (req, res) => {
             clientLogoUrl: clientLogoUrl || null
         } : null;
 
-        res.render('services', {
-            pageTitle: 'Our Services - AI & Automation',
-            pageDescription: 'Explore the comprehensive suite of AI and process automation services offered by FND Automations, including custom solutions, integration, and data analytics.',
-            path: '/services',
+        res.render('investment-strategy', {
+            pageTitle: 'Investment Strategy | Vanier Capital',
+            pageDescription: 'Our disciplined investment philosophy focuses on resilient markets, value-add opportunities, and long-term wealth creation.',
+            path: '/strategy',
             servicesTestimonial: servicesTestimonial
         });
     } catch (err) {
         logger.error('[Services] Failed to load testimonial for services page', { error: err?.message });
         // Graceful render without testimonial data
-        res.render('services', {
-            pageTitle: 'Our Services - AI & Automation',
-            pageDescription: 'Explore the comprehensive suite of AI and process automation services offered by FND Automations, including custom solutions, integration, and data analytics.',
-            path: '/services',
+        res.render('investment-strategy', {
+            pageTitle: 'Investment Strategy | Vanier Capital',
+            pageDescription: 'Our disciplined investment philosophy focuses on resilient markets, value-add opportunities, and long-term wealth creation.',
+            path: '/strategy',
             servicesTestimonial: null
         });
     }
 });
 
-// Projects Page (Listing Page - this already exists)
-router.get('/projects', (req, res) => {
-    logger.debug(`Rendering view 'projects' (listing) for path: ${req.originalUrl}`);
-    res.render('projects', {
-        pageTitle: 'Our Projects - Automation Case Studies',
-        pageDescription: 'Explore case studies and examples of successful AI and process automation projects delivered by FND Automations across various industries.',
-        path: '/projects'
-    });
+router.get('/portfolio', async (req, res) => {
+    logger.debug(`Rendering view 'portfolio' (listing) for path: ${req.originalUrl}`);
+    try {
+        const properties = await Property.find({ isPubliclyVisible: true }).lean();
+        const mappedProperties = properties.map(p => ({
+            title: p.title,
+            location: p.address,
+            address: p.address,
+            image: p.image || '/images/property-placeholder-1.jpg',
+            summary: p.excerpt,
+            metrics: [
+                { label: 'Value', value: p.value ? `$${p.value.toLocaleString()}` : 'TBD' },
+                { label: 'Cap Rate', value: p.capRate ? (p.capRate.includes('%') ? p.capRate : `${p.capRate}%`) : 'TBD', highlight: true },
+                { label: 'NOI', value: (p.noi || p.cashflow) ? `$${(p.noi || p.cashflow).toLocaleString()}` : 'TBD' },
+                { label: 'LTV', value: p.ltv ? (p.ltv.includes('%') ? p.ltv : `${p.ltv}%`) : 'TBD' }
+            ]
+        }));
+
+        res.render('portfolio', {
+            pageTitle: 'Portfolio | Vanier Capital Properties',
+            pageDescription: 'Explore representative properties highlighting our value-add and long-term wealth creation approach.',
+            path: '/portfolio',
+            properties: mappedProperties
+        });
+    } catch (err) {
+        logger.error('[Portfolio] Error fetching properties', err);
+        res.render('portfolio', {
+            pageTitle: 'Portfolio | Vanier Capital Properties',
+            pageDescription: 'Explore representative properties highlighting our value-add and long-term wealth creation approach.',
+            path: '/portfolio',
+            properties: []
+        });
+    }
+});
+
+router.get('/for-rent', async (req, res) => {
+    logger.debug(`Rendering view 'for-rent' for path: ${req.originalUrl}`);
+    try {
+        const [properties, allTestimonials] = await Promise.all([
+            Property.find({ isAvailableForRent: true, isPubliclyVisible: true }).lean(),
+            Testimonial.find({ isVisible: true, rating: { $exists: true, $ne: null } }).select('rating').lean()
+        ]);
+
+        let tenantSatisfaction = '5.0/5';
+        if (allTestimonials.length > 0) {
+            const totalRating = allTestimonials.reduce((sum, t) => sum + (t.rating || 0), 0);
+            const avgRating = (totalRating / allTestimonials.length).toFixed(1);
+            tenantSatisfaction = `${avgRating}/5`;
+        }
+
+        const mappedProperties = properties.map(p => ({
+            title: p.title,
+            address: p.address,
+            summary: p.excerpt,
+            price: p.monthlyRent ? `$${p.monthlyRent.toLocaleString()}/mo` : (p.rentalPrice ? (p.rentalPrice.startsWith('$') ? p.rentalPrice : `$${p.rentalPrice}`) : 'Inquire'),
+            image: p.image || '/images/house-placeholder.jpg',
+            bedrooms: p.bedrooms,
+            bathrooms: p.bathrooms,
+            sqft: p.sqft,
+            isAvailable: p.isAvailableForRent,
+            rentalApplicationUrl: p.rentalApplicationUrl
+        }));
+
+        res.render('for-rent', {
+            pageTitle: 'For Rent | Vanier Capital',
+            pageDescription: 'View our available rental properties.',
+            path: '/for-rent',
+            properties: mappedProperties,
+            tenantSatisfaction
+        });
+    } catch (err) {
+        logger.error('[For Rent] Error fetching properties', err);
+        res.render('for-rent', {
+            pageTitle: 'For Rent | Vanier Capital',
+            pageDescription: 'View our available rental properties.',
+            path: '/for-rent',
+            properties: [],
+            tenantSatisfaction: '5.0/5'
+        });
+    }
 });
 
 // ****** SINGLE PROJECT PAGE ROUTE ******
-router.get('/projects/:slug', async (req, res, next) => {
-
-    if (ImportedProjectModel) {
-        
-    } else {
-        
-    }
+router.get('/property/:slug', async (req, res, next) => {
 
     try {
         const slugParam = req.params.slug;
-        logger.debug(`[Public Project Page] Attempting to find project with slug: '${slugParam}'`);
-
-        if (!ImportedProjectModel) { // Check the aliased name
-            logger.error("[Public Project Page] FATAL: ImportedProjectModel is not defined within route handler!");
-            const err = new Error("Project model (ImportedProjectModel) reference error in route.");
-            return next(err);
-        }
+        logger.debug(`[Public Property Page] Attempting to find property with slug: '${slugParam}'`);
 
         if (!slugParam || !/^[a-z0-9-]+$/.test(slugParam)) {
-            logger.warn(`[Public Project Page] Invalid slug format received: '${slugParam}'. Passing to 404.`);
+            logger.warn(`[Public Property Page] Invalid slug format received: '${slugParam}'. Passing to 404.`);
             return next();
         }
 
-        // Use the aliased import name here
-        const projectDocument = await ImportedProjectModel
+        const propertyDocument = await Property
             .findOne({ slug: slugParam, isPubliclyVisible: true })
             .populate('client')
-            .populate('industries', 'name slug')
-            .populate('serviceTypes', 'name slug')
+            //.populate('propertyTypes', 'name slug')
             .lean();
 
-        if (!projectDocument) {
-            logger.warn(`[Public Project Page] Project with slug '${slugParam}' not found or not publicly visible. Passing to 404.`);
+        if (!propertyDocument) {
+            logger.warn(`[Public Property Page] Property with slug '${slugParam}' not found or not publicly visible. Passing to 404.`);
             return next();
         }
 
-        logger.info(`[Public Project Page] SUCCESS: Found project: '${projectDocument.title}' for slug: '${slugParam}'`);
+        logger.info(`[Public Property Page] SUCCESS: Found property: '${propertyDocument.title}' for slug: '${slugParam}'`);
 
-        const industryNames = Array.isArray(projectDocument.industries) && projectDocument.industries.length
-            ? projectDocument.industries.map(i => i.name).join(', ')
-            : '';
-        let metaDescription = `Read about our project: ${projectDocument.title}.${industryNames ? ' Industry: ' + industryNames + '.' : ''}`;
-        if (projectDocument.description) {
-            const textContent = projectDocument.description.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+        let metaDescription = `Read about our property: ${propertyDocument.title}.`;
+        if (propertyDocument.description) {
+            const textContent = propertyDocument.description.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
             metaDescription = textContent.substring(0, 155) + (textContent.length > 155 ? '...' : '');
         }
 
         // Try to fetch a related testimonial (featured first)
         let relatedTestimonial = null;
         try {
-            relatedTestimonial = await Testimonial.findOne({ project: projectDocument._id, isVisible: true })
+            relatedTestimonial = await Testimonial.findOne({ project: propertyDocument._id, isVisible: true })
                 .sort({ isFeatured: -1, createdAt: -1 })
                 .lean();
         } catch (err) {
-            logger.warn('[Public Project Page] Unable to load related testimonial:', { error: err.message });
+            logger.warn('[Public Property Page] Unable to load related testimonial:', { error: err.message });
         }
 
         // Compute previous and next visible project by creation time
@@ -309,10 +399,10 @@ router.get('/projects/:slug', async (req, res, next) => {
             logger.warn('[Public Project Page] Unable to compute prev/next projects:', { error: navErr.message });
         }
 
-        res.render('project-single', {
-            pageTitle: `${projectDocument.title} | FND Automations Project`,
+        res.render('property-single', {
+            pageTitle: `${propertyDocument.title} | Vanier Capital Property`,
             pageDescription: metaDescription,
-            project: projectDocument,
+            property: propertyDocument,
             testimonial: relatedTestimonial,
             prevProject: prevProject,
             nextProject: nextProject,
@@ -324,13 +414,13 @@ router.get('/projects/:slug', async (req, res, next) => {
                 const proto = (req.headers['x-forwarded-proto'] || req.protocol || 'https');
                 const host = req.get('host');
                 const base = baseEnv || `${proto}://${host}`;
-                return `${base}/projects/${projectDocument.slug}`;
+                return `${base}/property/${propertyDocument.slug}`;
             })(),
-            path: '/projects'
+            path: '/portfolio'
         });
 
     } catch (error) {
-        logger.error(`[Public Project Page] Error fetching project with slug '${req.params.slug}':`, { errorName: error.name, errorMessage: error.message, errorStack: error.stack });
+        logger.error(`[Public Property Page] Error fetching property with slug '${req.params.slug}':`, { errorName: error.name, errorMessage: error.message, errorStack: error.stack });
         next(error);
     }
 });
@@ -359,8 +449,8 @@ router.get('/testimonials', async (req, res) => {
         } catch {}
 
         res.render('testimonials', {
-            pageTitle: 'Client Testimonials - FND Automations',
-            pageDescription: 'Read what our clients say about FND Automations\' impact on their business through successful AI and process automation solutions.',
+            pageTitle: 'Client Reviews - Vanier Capital',
+            pageDescription: 'Read what our partners and tenants say about Vanier Capital\'s commitment to quality, integrity, and long-term value creation.',
             path: '/testimonials',
             metrics: {
                 totalValuation,
@@ -372,8 +462,8 @@ router.get('/testimonials', async (req, res) => {
     } catch (e) {
         logger.error('[Testimonials] Failed to compute metrics, rendering shell', { message: e?.message });
         res.render('testimonials', {
-            pageTitle: 'Client Testimonials - FND Automations',
-            pageDescription: 'Read what our clients say about FND Automations\' impact on their business through successful AI and process automation solutions.',
+            pageTitle: 'Client Reviews - Vanier Capital',
+            pageDescription: 'Read what our clients say about Vanier Capital and the results delivered across our portfolio.',
             path: '/testimonials',
             metrics: {
                 totalValuation: 0,
@@ -435,8 +525,8 @@ router.get('/about', async (req, res, next) => {
         } catch {}
 
         res.render('about', {
-            pageTitle: 'About FND Automations',
-            pageDescription: 'Learn about the mission, vision, team, and expertise behind FND Automations, your partner in business automation and AI solutions.',
+            pageTitle: 'About Vanier Capital',
+            pageDescription: 'Learn about the mission, vision, and team behind Vanier Capital, a disciplined real estate investment firm focused on long-term value.',
             path: '/about',
             aboutStats: {
                 valuedPartners,
@@ -449,8 +539,8 @@ router.get('/about', async (req, res, next) => {
     } catch (err) {
         logger.error('[About] Failed to compute about stats', { message: err.message });
         res.render('about', {
-            pageTitle: 'About FND Automations',
-            pageDescription: 'Learn about the mission, vision, team, and expertise behind FND Automations, your partner in business automation and AI solutions.',
+            pageTitle: 'About Vanier Capital',
+            pageDescription: 'Learn about the mission, vision, and team behind Vanier Capital, a disciplined real estate investment firm focused on long-term value.',
             path: '/about',
             aboutStats: { valuedPartners: 0, projectsCompleted: 0, yearsCombinedExpertise: 0 },
             visibleClients: [],
@@ -464,10 +554,9 @@ router.get('/contact', async (req, res) => {
     logger.debug(`Rendering view 'contact' for path: ${req.originalUrl}`);
     // Use the About page team members for avatars to keep public-facing consistency
     const aboutTeam = [
-        { fullName: 'Logan Mayfield', avatarUrl: '/images/Logan.png', role: 'CEO' },
-        { fullName: 'John Byers', avatarUrl: '/images/John.png', role: 'CTO' },
-        { fullName: 'Haidan Mayfield', avatarUrl: '/images/Haidan.png', role: 'CMO' },
-        { fullName: 'Matthew Moellering', avatarUrl: '/images/Moe.png', role: 'CFO' }
+        { fullName: 'Logan Mayfield', avatarUrl: '/images/Logan.png', role: 'COO' },
+        { fullName: 'John Byers', avatarUrl: '/images/John.png', role: 'CIO' },
+        { fullName: 'Matthew Moellering', avatarUrl: '/images/Moe.png', role: 'CEO' }
     ];
     try {
         // Normalize any relative image paths (defensive, though we already provide absolute /images/*)
@@ -485,16 +574,16 @@ router.get('/contact', async (req, res) => {
         }));
 
         res.render('contact', {
-            pageTitle: 'Contact Us - FND Automations',
-            pageDescription: 'Get in touch with FND Automations to discuss your AI and automation needs. Contact us via form, email, or phone for a consultation.',
+            pageTitle: 'Contact Us - Vanier Capital',
+            pageDescription: 'Get in touch with Vanier Capital to discuss investment opportunities, property management, or selling your home.',
             path: '/contact',
             teamUsers
         });
     } catch (e) {
         logger.warn('[Contact] Failed to build team avatars from About team; rendering without avatars', { message: e.message });
         res.render('contact', {
-            pageTitle: 'Contact Us - FND Automations',
-            pageDescription: 'Get in touch with FND Automations to discuss your AI and automation needs. Contact us via form, email, or phone for a consultation.',
+            pageTitle: 'Contact Us - Vanier Capital',
+            pageDescription: 'Get in touch with Vanier Capital to discuss investment opportunities, property management, or selling your home.',
             path: '/contact',
             teamUsers: []
         });
@@ -507,9 +596,18 @@ router.get(['/map', '/world-map'], (req, res) => {
     res.redirect(302, '/contact');
 });
 
+// GET /sell-your-home
+router.get('/sell-your-home', async (req, res) => {
+    res.render('sell-your-home', {
+        pageTitle: 'Sell Your Home | Vanier Capital',
+        pageDescription: 'Get a cash offer for your home today.',
+        path: '/sell-your-home'
+    });
+});
+
 // --- Dynamic Blog Routes ---
 
-// GET /blog - Blog Index Page (with Pagination & Optional Tag Filter)
+// GET /blog - Articles Index Page (with Pagination & Optional Tag Filter)
 router.get('/blog', async (req, res, next) => {
     const page = parseInt(req.query.page) || 1;
     const postsPerPage = 6; // Two rows of three per page
@@ -628,9 +726,9 @@ router.get('/blog', async (req, res, next) => {
     // Public metric: business leaders informed (temporarily static until subscribers are live)
     const businessLeadersInformed = '15+';
 
-    const pageTitle = 'Blog';
+    const pageTitle = 'Articles';
 
-        res.render('blog-index', { // Renders views/blog-index.ejs
+        res.render('articles-index', { // Renders views/articles-index.ejs
             pageTitle: pageTitle,
             path: '/blog', // For nav highlight
             posts: posts,
@@ -766,9 +864,9 @@ router.get('/blog/:slug', async (req, res, next) => {
     } catch (dmErr) { /* swallow metric errors */ }
 
     // Pass the slugs (or null) to the render function
-        res.render('blog-post', {
-            pageTitle: `${post.title} | FND Automations Blog`,
-            pageDescription: post.excerpt || post.metaDescription || 'Read this FND Automations blog post.', // Use excerpt/meta if available
+        res.render('articles-post', {
+            pageTitle: `${post.title} | Vanier Capital Articles`,
+            pageDescription: post.excerpt || post.metaDescription || 'Read this Vanier Capital article.', // Use excerpt/meta if available
             post: post,
             path: '/blog', // Keep blog nav active
             prevPostSlug: prevPostSlug, // Pass previous slug
@@ -795,8 +893,8 @@ router.get('/privacy-policy', async (req, res) => {
         if (s?.valueString) lastUpdated = s.valueString;
     } catch {}
     res.render('privacy-policy', {
-        pageTitle: 'Privacy Policy - FND Automations',
-        pageDescription: 'Read the FND Automations Privacy Policy to understand how we collect, use, and protect your personal information.',
+        pageTitle: 'Privacy Policy - Vanier Capital',
+        pageDescription: 'Read the Vanier Capital Privacy Policy to understand how we collect, use, and protect your personal information.',
         path: '/privacy-policy', // For potential active nav styling
         lastUpdated
     });
@@ -810,8 +908,8 @@ router.get('/terms-of-service', async (req, res) => {
         if (s?.valueString) lastUpdated = s.valueString;
     } catch {}
     res.render('terms-of-service', {
-        pageTitle: 'Terms of Service - FND Automations',
-        pageDescription: 'Review the Terms of Service for using the FND Automations website and services.',
+        pageTitle: 'Terms of Service - Vanier Capital',
+        pageDescription: 'Review the Terms of Service for using the Vanier Capital website and services.',
         path: '/terms-of-service', // For potential active nav styling
         lastUpdated
     });
@@ -831,8 +929,10 @@ router.get('/sitemap.xml', async (req, res) => {
         // Static pages
         const staticPaths = [
             '/',
-            '/services',
-            '/projects',
+            '/for-rent',
+            '/sell-your-home',
+            '/strategy',
+            '/portfolio',
             '/testimonials',
             '/about',
             '/contact',
@@ -898,3 +998,4 @@ router.get('/sitemap.xml', async (req, res) => {
         return res.status(500).type('text/plain').send('Failed to generate sitemap');
     }
 });
+

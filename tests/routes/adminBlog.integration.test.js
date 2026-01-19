@@ -20,8 +20,8 @@ describe('Admin Blog CRUD (in-memory DB)', () => {
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     process.env.MONGODB_URI = mongoServer.getUri();
-    AdminUser = require('../../models/AdminUser.js');
-    BlogPost = require('../../models/BlogPost.js');
+    AdminUser = require('../../models/AdminUser.js'); if (AdminUser.default) AdminUser = AdminUser.default;
+    BlogPost = require('../../models/BlogPost.js'); if (BlogPost.default) BlogPost = BlogPost.default;
     if (mongoose.connection.readyState !== 1) {
       await mongoose.connect(process.env.MONGODB_URI);
     }

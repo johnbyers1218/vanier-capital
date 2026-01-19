@@ -1,7 +1,6 @@
 import express from 'express';
-import Project from '../../models/Projects.js';
+import Property from '../../models/Property.js';
 import BlogPost from '../../models/BlogPost.js';
-import Client from '../../models/Client.js';
 import { logger } from '../../config/logger.js';
 
 export default (csrfProtection) => {
@@ -14,15 +13,13 @@ export default (csrfProtection) => {
 				return res.render('admin/search', { pageTitle: 'Search', path: '/admin/search', q, results: [] });
 			}
 			const regex = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-			const [projects, posts, clients] = await Promise.all([
-				Project.find({ $or: [{ title: regex }, { slug: regex }] }).select('title slug').limit(20).lean(),
-				BlogPost.find({ $or: [{ title: regex }, { slug: regex }, { authorDisplayName: regex }] }).select('title slug isPublished').limit(20).lean(),
-				Client.find({ $or: [{ name: regex }] }).select('name').limit(20).lean()
+			const [properties, posts] = await Promise.all([
+				Property.find({ $or: [{ title: regex }, { slug: regex }] }).select('title slug').limit(20).lean(),
+				BlogPost.find({ $or: [{ title: regex }, { slug: regex }, { authorDisplayName: regex }] }).select('title slug isPublished').limit(20).lean()
 			]);
 			const results = [];
-			projects.forEach(p => results.push({ type: 'Project', title: p.title, href: `/admin/projects/edit/${p._id}` }));
+			properties.forEach(p => results.push({ type: 'Property', title: p.title, href: `/admin/properties/edit/${p._id}` }));
 			posts.forEach(p => results.push({ type: 'Blog Post', title: p.title, href: `/admin/blog/edit/${p._id}` }));
-			clients.forEach(c => results.push({ type: 'Client', title: c.name, href: `/admin/clients/edit/${c._id}` }));
 			res.render('admin/search', { pageTitle: `Search: ${q}`, path: '/admin/search', q, results });
 		} catch (e) {
 			logger.error('[Admin Search] Failed', { message: e.message });
@@ -36,15 +33,13 @@ export default (csrfProtection) => {
 			const q = (req.query.q || '').toString().trim();
 			if (!q) return res.json({ results: [] });
 			const regex = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-			const [projects, posts, clients] = await Promise.all([
-				Project.find({ $or: [{ title: regex }, { slug: regex }] }).select('title').limit(5).lean(),
-				BlogPost.find({ $or: [{ title: regex }, { slug: regex }] }).select('title').limit(5).lean(),
-				Client.find({ $or: [{ name: regex }] }).select('name').limit(5).lean()
+			const [properties, posts] = await Promise.all([
+				Property.find({ $or: [{ title: regex }, { slug: regex }] }).select('title').limit(5).lean(),
+				BlogPost.find({ $or: [{ title: regex }, { slug: regex }] }).select('title').limit(5).lean()
 			]);
 			const results = [];
-			projects.forEach(p => results.push({ type: 'Project', title: p.title, href: `/admin/projects/edit/${p._id}` }));
+			properties.forEach(p => results.push({ type: 'Property', title: p.title, href: `/admin/properties/edit/${p._id}` }));
 			posts.forEach(p => results.push({ type: 'Blog Post', title: p.title, href: `/admin/blog/edit/${p._id}` }));
-			clients.forEach(c => results.push({ type: 'Client', title: c.name, href: `/admin/clients/edit/${c._id}` }));
 			res.json({ results: results.slice(0,5) });
 		} catch (e) { res.status(500).json({ results: [], error: 'search_failed' }); }
 	});

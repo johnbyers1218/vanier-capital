@@ -1,0 +1,160 @@
+<!-- views/articles-index.ejs -->
+<%# Public Articles Listing Page %>
+
+<%- include('partials/header', {
+    pageTitle: 'Articles - Vanier Capital',
+    pageDescription: 'Read the latest insights on real estate, property management, and market trends from Vanier Capital.',
+    path: '/articles'
+}) %>
+
+<!-- Page Header (concise) -->
+<section class="page-header blog-header">
+    <div class="container">
+        <h1>Articles</h1>
+        <p class="page-subtitle">Expert-led insights on finding your home, market trends, and property management.</p>
+    </div>
+    
+</section>
+
+<!-- Featured Content + Intro Stats -->
+<!-- Stats directly under header -->
+<section class="section blog-stats-under-header">
+    <div class="container">
+        <div class="content-card" style="text-align:center; margin-bottom:1rem;">
+            <p class="section-description">
+                Discover helpful guides and market analysis. Learn how to find the perfect rental or sell your home for cash.
+            </p>
+        </div>
+        <div class="stats-grid" style="margin-top:0;">
+            <div class="stat-item">
+                <div class="stat-number" data-count="<%= blogMetrics?.expertArticles || 0 %>" data-suffix="">0</div>
+                <div class="stat-label">Expert Articles</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="<%= blogMetrics?.expertContributors || 0 %>" data-suffix="">0</div>
+                <div class="stat-label">Expert Contributors</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="<%= blogMetrics?.yearsCombinedExperience || 0 %>" data-suffix="+">0</div>
+                <div class="stat-label">Years Combined Experience</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-count="<%= blogMetrics?.expertiseCategories || 0 %>" data-suffix="">0</div>
+                <div class="stat-label">Expertise Categories</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section blog-featured-section">
+        <div class="container">
+            <!-- Featured Article (always visible) -->
+            <div class="featured-articles">
+                <% if (featuredOverride && featuredOverride.length > 0) { %>
+                    <% const primary = featuredOverride[0]; %>
+                    <article class="featured-card blog-featured-card">
+                        <div class="featured-media">
+                            <% if (primary.featuredImage) { %>
+                                <a href="/blog/<%= primary.slug %>" aria-label="Read featured: <%= primary.title %>">
+                                                                        <img src="<%= primary.featuredImage %>" alt="<%= primary.title %>" loading="eager" fetchpriority="high" decoding="async" class="blur-up">
+                                </a>
+                            <% } %>
+                        </div>
+                        <div class="featured-body">
+                            <h2 class="featured-title"><a href="/blog/<%= primary.slug %>"><%= primary.title %></a></h2>
+                                                                                    <% if (primary.featuredExcerpt) { %>
+                                                                                        <p class="featured-excerpt"><%= primary.featuredExcerpt %></p>
+                                                                                    <% } %>
+                            <a href="/blog/<%= primary.slug %>" class="cta-button primary-btn">Read Article <span class="icon-arrow">→</span></a>
+                        </div>
+                    </article>
+                <% } else { %>
+                    <div class="content-card"><p>No articles published yet.</p></div>
+                <% } %>
+                        </div>
+    </div>
+</section>
+
+<!-- Filter + Search Section (with sticky bar) -->
+<section class="section blog-filter-section" style="padding-top:1rem;padding-bottom:1rem;background:#fff;border-bottom:1px solid var(--color-border-subtle);">
+    <div class="container">
+    <nav class="filter-navigation blog-filter-navigation sticky" role="navigation" aria-label="Blog categories" aria-labelledby="filter-title" data-current-category="<%= typeof categoryQuery !== 'undefined' && categoryQuery ? categoryQuery : '' %>" data-current-tag="<%= typeof categoryQuery !== 'undefined' && categoryQuery ? categoryQuery : '' %>" style="position: sticky; top: calc(var(--header-height, 72px) + 8px); z-index: 50; background: color-mix(in oklab, var(--color-background) 92%, white); padding: .75rem .75rem; border: 1px solid var(--color-border-subtle); border-radius: .75rem;">
+            <div class="filter-bar">
+                <div class="filter-actions">
+                    <div class="filter-title" id="filter-title">Filter by Category</div>
+                    <div id="blogCatsGroup" class="filter-group collapsible" data-collapsed="false" style="flex-wrap: wrap; overflow: hidden; align-items:center; gap:.5rem; max-height: none; transition: max-height .25s ease;">
+                        <button class="filter-btn <%= (typeof categoryQuery === 'undefined' || !categoryQuery) ? 'active' : '' %>" data-filter="all" aria-pressed="<%= (typeof categoryQuery === 'undefined' || !categoryQuery) ? 'true' : 'false' %>">
+                            <span class="filter-label">All Articles</span>
+                            <span class="filter-count" data-count="all"><%= (blogMetrics && typeof blogMetrics.expertArticles === 'number') ? blogMetrics.expertArticles : '—' %></span>
+                        </button>
+                        <% (blogCategories || []).forEach(c => { %>
+                            <button class="filter-btn <%= (typeof categoryQuery !== 'undefined' && categoryQuery === c.slug) ? 'active' : '' %>" data-filter="<%= c.slug %>" aria-pressed="<%= (typeof categoryQuery !== 'undefined' && categoryQuery === c.slug) ? 'true' : 'false' %>">
+                                <span class="filter-label"><%= c.name %></span>
+                                <span class="filter-count" data-count="<%= c.slug %>"><%= (typeof categoryCounts !== 'undefined' && categoryCounts && typeof categoryCounts[c.slug] === 'number') ? categoryCounts[c.slug] : '—' %></span>
+                            </button>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+    </nav>
+
+    <% if ((posts && posts.length > 0) || (featuredOverride && featuredOverride.length > 0)) { %>
+            <!-- Blog Post Grid -->
+    <div id="article-grid" class="grid-container grid-3-col blog-list" style="align-items: stretch;"> <%# 3-column article cards %>
+                <% const featuredSlugs = (featuredOverride || []).map(p => p.slug); %>
+                <% (posts || []).forEach((post) => { %>
+            <% if (featuredSlugs.includes(post.slug)) { return; } %>
+                    <article class="content-card blog-post-summary" data-categories="<%= post.categories && post.categories.length ? post.categories.map(c => c.slug).join(',') : '' %>" style="display:flex; flex-direction:column; height:100%;">
+                        <%# Featured Image Link %>
+                        <% if (post.featuredImage) { %>
+                          <a href="/blog/<%= post.slug %>" class="blog-post-image-link" aria-hidden="true" tabindex="-1">
+                              <img src="<%= post.featuredImage %>" alt="" class="blog-post-summary-image blur-up" loading="lazy">
+                          </a>
+                        <% } else { %>
+                           <div class="blog-post-placeholder-image">
+                               <i class="fas fa-file-alt"></i>
+                           </div>
+                        <% } %>
+
+                        <div class="blog-post-summary-content" style="display:flex; flex-direction:column; flex:1 1 auto;">
+                            <% if (post.categories && post.categories.length) { %>
+                                <div class="featured-category"><span class="pill"><%= post.categories[0].name %></span></div>
+                            <% } %>
+                             <%# Post Title (Link) %>
+                                                            <h3><a href="/blog/<%= post.slug %>" class="blog-post-summary-title"><%- decodeHtmlEntities(post.title) %></a></h3>
+                                      <div class="blog-post-byline" style="margin:.25rem 0 .5rem 0; color: var(--color-text-muted);">
+                                          <% const by = (post.authorDisplayName || (post.author ? (post.author.fullName || post.author.username) : 'Vanier Capital Team')); %>
+                                          By <%= by %>
+                                      </div>
+                                                            <% if (post.excerpt) { %>
+                                                                <p class="blog-post-excerpt"><%= post.excerpt %></p>
+                                                            <% } %>
+
+                             <%# Date and Read button in same row %>
+                             <div class="blog-post-footer" style="margin-top:auto; padding-top:1rem; display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--color-border-subtle);">
+                                <div class="blog-post-date">
+                                    <i class="far fa-calendar-alt"></i>
+                                    <%= post.publishedDate ? post.publishedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Date N/A' %>
+                                </div>
+                                <a href="/blog/<%= post.slug %>" class="blog-post-read-btn">Read Article</a>
+                             </div>
+                        </div>
+                    </article>
+                <% }) %>
+            </div> <!-- /.blog-list -->
+
+            <!-- Pagination Controls -->
+            <%- include('partials/pagination', { currentPage, hasNextPage, hasPreviousPage, nextPage, previousPage, lastPage, baseUrl: '/blog', categoryQuery: (typeof categoryQuery !== 'undefined' ? categoryQuery : null) }) %>
+
+    <% } else { %>
+            <%# Message if no posts found (e.g., for a specific tag or empty blog) %>
+            <div class="no-posts-message">
+                <h3>No articles found</h3>
+                <p>Check back soon for the latest insights on real estate and market trends!</p>
+                <a href="/blog" class="cta-button secondary-btn">View All Articles</a>
+            </div>
+        <% } %>
+    </div> <!-- /.container -->
+</section> <!-- /.blog-filter-section + posts -->
+
+<%- include('partials/footer') %>

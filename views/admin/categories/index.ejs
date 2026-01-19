@@ -1,14 +1,14 @@
-<%- include('../partials/header', { pageTitle: 'Categories' }) %>
+<%- include('../partials/header', { pageTitle: 'Article Categories' }) %>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
   <!-- Left: List card -->
-  <section class="lg:col-span-2 bg-gray-700/40 border border-gray-700 rounded-lg shadow-sm">
-    <div class="px-5 py-4 border-b border-gray-600 flex items-center justify-between gap-3 flex-wrap">
-      <h2 class="text-xl font-semibold">Categories</h2>
+  <section class="lg:col-span-2 bg-neutral-700/40 border border-neutral-700 rounded-lg shadow-sm">
+    <div class="px-5 py-4 border-b border-neutral-600 flex items-center justify-between gap-3 flex-wrap">
+      <h2 class="text-xl font-semibold">Article Categories</h2>
       <div class="flex items-center gap-2 ml-auto">
         <form action="/admin/categories" method="GET" class="flex items-center gap-2">
-          <input type="text" name="q" value="<%= typeof q !== 'undefined' ? q : '' %>" placeholder="Search name or slug" class="bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-56">
-          <select name="status" class="bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm focus:outline-none">
+          <input type="text" name="q" value="<%= typeof q !== 'undefined' ? q : '' %>" placeholder="Search name or slug" class="bg-[#111] border border-neutral-700 rounded-md px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-56">
+          <select name="status" class="bg-[#111] border border-neutral-700 rounded-md px-3 py-2 text-sm focus:outline-none">
             <option value="all" <%= (status||'all')==='all' ? 'selected' : '' %>>All</option>
             <option value="active" <%= status==='active' ? 'selected' : '' %>>Active</option>
             <option value="hidden" <%= status==='hidden' ? 'selected' : '' %>>Hidden</option>
@@ -27,14 +27,14 @@
     <div class="px-5 pt-4">
       <div class="rounded-md border border-blue-800/60 bg-blue-900/20 text-blue-200 p-3 flex gap-3">
         <i class="fa-solid fa-circle-info mt-0.5"></i>
-        <p class="text-sm">Blog Categories are for posts. Projects use curated <strong>Industries</strong> and <strong>Services</strong> instead.</p>
+        <p class="text-sm">Article Categories are for articles. Projects use curated <strong>Markets</strong> instead.</p>
       </div>
     </div>
 
     <% if (categories && categories.length) { %>
       <div class="overflow-x-auto">
         <table class="min-w-full align-middle">
-          <thead class="text-sm uppercase text-gray-300 bg-gray-800/60">
+          <thead class="text-sm uppercase text-gray-300 bg-[#1a1a1a]/60">
             <tr>
               <th class="px-5 py-3 text-left">Name</th>
               <th class="px-5 py-3 text-left">Slug</th>
@@ -42,9 +42,9 @@
               <th class="px-5 py-3 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-700">
+          <tbody class="divide-y divide-neutral-700">
             <% categories.forEach(c => { %>
-              <tr class="hover:bg-gray-800/40">
+              <tr class="hover:bg-[#1a1a1a]/40">
                 <td class="px-5 py-3 font-medium"><%= c.name %></td>
                 <td class="px-5 py-3"><code><%= c.slug %></code></td>
                 <td class="px-5 py-3">
@@ -55,13 +55,13 @@
                 </td>
                 <td class="px-5 py-3">
                   <div class="flex items-center justify-end gap-2">
-                    <a href="/admin/categories/edit/<%= c._id %>" class="inline-flex items-center justify-center h-8 w-8 rounded-md border border-gray-600 bg-gray-700 hover:bg-gray-600 text-gray-200" title="Edit">
+                    <a href="/admin/categories/edit/<%= c._id %>" class="inline-flex items-center justify-center h-8 w-8 rounded-md border border-neutral-600 bg-neutral-700 hover:bg-neutral-600 text-gray-200" title="Edit">
                       <i class="fa-regular fa-pen-to-square" aria-hidden="true"></i>
                       <span class="sr-only">Edit</span>
                     </a>
                     <form action="/admin/categories/delete/<%= c._id %>" method="POST" class="delete-form inline">
                       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                      <button type="submit" class="inline-flex items-center justify-center h-8 w-8 rounded-md border border-gray-600 bg-gray-700 hover:bg-red-700/60 text-gray-200" title="Delete">
+                      <button type="submit" class="inline-flex items-center justify-center h-8 w-8 rounded-md border border-neutral-600 bg-neutral-700 hover:bg-red-700/60 text-gray-200" title="Delete">
                         <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
                         <span class="sr-only">Delete</span>
                       </button>
@@ -75,7 +75,7 @@
       </div>
     <% } else { %>
       <div class="px-6 py-14 text-center">
-        <div class="mx-auto mb-4 h-12 w-12 rounded-full bg-gray-800/80 flex items-center justify-center text-gray-300">
+        <div class="mx-auto mb-4 h-12 w-12 rounded-full bg-[#1a1a1a]/80 flex items-center justify-center text-gray-300">
           <i class="fa-regular fa-folder-open text-xl"></i>
         </div>
         <h3 class="text-lg font-semibold mb-2">No Categories yet</h3>
@@ -87,23 +87,23 @@
   </section>
 
   <!-- Right: Add form card -->
-  <aside class="bg-gray-700/40 border border-gray-700 rounded-lg shadow-sm">
-    <div class="px-5 py-4 border-b border-gray-600">
+  <aside class="bg-neutral-700/40 border border-neutral-700 rounded-lg shadow-sm">
+    <div class="px-5 py-4 border-b border-neutral-600">
       <h3 class="text-lg font-semibold">Add New Category</h3>
     </div>
     <form action="/admin/categories" method="POST" class="p-5 space-y-4" id="quickAddCategoryForm">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <div>
         <label for="qc-name" class="block text-sm mb-1">Name</label>
-        <input id="qc-name" name="name" type="text" required maxlength="100" class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        <input id="qc-name" name="name" type="text" required maxlength="100" class="w-full bg-[#111] border border-neutral-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
       </div>
       <div>
         <label for="qc-slug" class="block text-sm mb-1">Slug</label>
-        <input id="qc-slug" name="slug" type="text" required maxlength="120" pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$" class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="auto-generated from name">
-        <p class="text-xs text-gray-400 mt-1">Lowercase, hyphen-separated. Example: industry-insights, tech-tutorials</p>
+        <input id="qc-slug" name="slug" type="text" required maxlength="120" pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$" class="w-full bg-[#111] border border-neutral-700 rounded-md px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="auto-generated from name">
+        <p class="text-xs text-gray-400 mt-1">Lowercase, hyphen-separated. Example: market-insights, tech-tutorials</p>
       </div>
       <div class="flex items-center gap-2">
-        <input id="qc-isActive" name="isActive" type="checkbox" class="h-4 w-4 border-gray-600 rounded bg-gray-900">
+        <input id="qc-isActive" name="isActive" type="checkbox" class="h-4 w-4 border-neutral-600 rounded bg-[#111]">
         <label for="qc-isActive" class="text-sm">Active</label>
       </div>
       <div class="pt-2">

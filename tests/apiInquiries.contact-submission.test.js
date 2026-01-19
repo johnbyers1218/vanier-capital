@@ -5,17 +5,14 @@ import http from 'http';
 process.env.NODE_ENV = 'test';
 
 // Mock Inquiry model
-const mockCreate = jest.fn();
 jest.mock('../models/Inquiry.js', () => ({
-  create: mockCreate
+  create: jest.fn()
 }));
 
 // Mock SendGrid service
-const mockSendTeamNotification = jest.fn().mockResolvedValue({ ok: true });
-const mockSendUserConfirmation = jest.fn().mockResolvedValue({ ok: true });
 jest.mock('../services/sendgridService.js', () => ({
-  sendTeamNotification: mockSendTeamNotification,
-  sendUserConfirmation: mockSendUserConfirmation
+  sendTeamNotification: jest.fn().mockResolvedValue({ ok: true }),
+  sendUserConfirmation: jest.fn().mockResolvedValue({ ok: true })
 }));
 
 // Mock ESP/mailchimp to avoid side-effects during app import
@@ -27,6 +24,8 @@ jest.mock('../utils/esp.js', () => ({
 }));
 
 import { app } from '../app.js';
+import Inquiry from '../models/Inquiry.js';
+import { sendTeamNotification, sendUserConfirmation } from '../services/sendgridService.js';
 let server;
 let agent;
 
@@ -60,7 +59,7 @@ describe('POST /api/contact-submission', () => {
       createdAt: new Date().toISOString(),
       toObject() { return this; }
     };
-  mockCreate.mockResolvedValueOnce(fakeInquiry);
+    Inquiry.create.mockResolvedValueOnce(fakeInquiry);
 
     const res = await agent.post('/api/contact-submission')
       .send({
@@ -73,13 +72,13 @@ describe('POST /api/contact-submission', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
-  expect(mockCreate).toHaveBeenCalledWith(expect.objectContaining({
+    expect(Inquiry.create).toHaveBeenCalledWith(expect.objectContaining({
       name: 'Ada Lovelace', email: 'ada@example.com'
     }));
-  expect(mockSendTeamNotification).toHaveBeenCalledWith(expect.objectContaining({
+    expect(sendTeamNotification).toHaveBeenCalledWith(expect.objectContaining({
       name: 'Ada Lovelace', email: 'ada@example.com'
     }));
-  expect(mockSendUserConfirmation).toHaveBeenCalledWith(expect.objectContaining({
+    expect(sendUserConfirmation).toHaveBeenCalledWith(expect.objectContaining({
       name: 'Ada Lovelace', email: 'ada@example.com'
     }));
   });
@@ -95,8 +94,8 @@ describe('POST /api/contact-submission', () => {
 
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
-  expect(mockCreate).not.toHaveBeenCalled();
-  expect(mockSendTeamNotification).not.toHaveBeenCalled();
-  expect(mockSendUserConfirmation).not.toHaveBeenCalled();
+    expect(Inquiry.create).not.toHaveBeenCalled();
+    expect(sendTeamNotification).not.toHaveBeenCalled();
+    expect(sendUserConfirmation).not.toHaveBeenCalled();
   });
 });

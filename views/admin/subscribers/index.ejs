@@ -4,7 +4,7 @@
   <div class="flex items-center justify-between">
     <h1 class="text-2xl font-semibold">Subscribers</h1>
     <div class="flex items-center gap-3">
-      <div class="rounded-md border border-gray-700 bg-gray-800/50 px-3 py-2 text-sm text-gray-200">
+      <div class="rounded-md border border-neutral-700 bg-[#1a1a1a]/50 px-3 py-2 text-sm text-gray-200">
         Total Subscribers: <strong><%= typeof totalSubscribed === 'number' ? totalSubscribed : 0 %></strong>
       </div>
       <a href="/admin/subscribers/export.csv" class="inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-md"><i class="fas fa-file-csv"></i> Export CSV</a>
@@ -18,16 +18,16 @@
   </div>
 
   <form method="get" action="/admin/subscribers" class="flex items-center gap-2">
-    <input type="text" name="q" value="<%= q || '' %>" placeholder="Search by email or first name" class="rounded bg-gray-900 border border-gray-700 px-3 py-2 w-72" />
+    <input type="text" name="q" value="<%= q || '' %>" placeholder="Search by email or first name" class="rounded bg-[#111] border border-neutral-700 px-3 py-2 w-72" />
     <% if (pageSize) { %>
       <input type="hidden" name="pageSize" value="<%= pageSize %>" />
     <% } %>
-    <button class="px-3 py-2 rounded bg-gray-700 text-white">Search</button>
+    <button class="px-3 py-2 rounded bg-neutral-700 text-white">Search</button>
   </form>
 
-  <div class="rounded-lg border border-gray-700 bg-gray-800 p-4 overflow-x-auto">
+  <div class="rounded-lg border border-neutral-700 bg-[#1a1a1a] p-4 overflow-x-auto">
     <% if (processed) { %>
-      <div class="mb-3 rounded-md border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-gray-200">
+      <div class="mb-3 rounded-md border border-neutral-600 bg-[#111] px-3 py-2 text-sm text-gray-200">
         <% if (processed === 'unsubscribed') { %>
           <strong><%= processedCount %></strong> subscriber(s) unsubscribed.
         <% } else if (processed === 'deleted') { %>
@@ -60,14 +60,14 @@
           <th class="px-3 py-2">Subscribed</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-gray-700">
+      <tbody class="divide-y divide-neutral-700">
         <% if (subscribers && subscribers.length) { %>
           <% subscribers.forEach(s => { %>
             <tr>
               <td class="px-3 py-2"><input type="checkbox" name="ids" value="<%= s._id %>" class="rowCheck" /></td>
               <td class="px-3 py-2"><%= s.email %></td>
               <td class="px-3 py-2"><%= s.firstName || '' %></td>
-              <td class="px-3 py-2"><span class="inline-block px-2 py-0.5 rounded bg-gray-700 text-gray-200"><%= s.status || 'Subscribed' %></span></td>
+              <td class="px-3 py-2"><span class="inline-block px-2 py-0.5 rounded bg-neutral-700 text-gray-200"><%= s.status || 'Subscribed' %></span></td>
               <td class="px-3 py-2"><%= s.role || '' %></td>
               <td class="px-3 py-2"><%= s.companyName || '' %></td>
               <td class="px-3 py-2"><%= s.createdAt ? s.createdAt.toLocaleString('en-US', { dateStyle: 'medium' }) : '' %></td>
@@ -80,7 +80,7 @@
     </table>
 
       <div class="mt-3 flex items-center gap-2">
-        <select name="action" class="rounded bg-gray-900 border border-gray-700 px-3 py-2">
+        <select name="action" class="rounded bg-[#111] border border-neutral-700 px-3 py-2">
           <option value="unsubscribe">Unsubscribe</option>
           <option value="delete">Delete</option>
         </select>
@@ -92,11 +92,11 @@
   <div class="flex items-center justify-end gap-3">
     <% const totalPages = Math.ceil((total || 0) / (pageSize || 20)); %>
     <% if (page > 1) { %>
-      <a href="/admin/subscribers?page=<%= page - 1 %>&pageSize=<%= pageSize %><%= q ? '&q=' + encodeURIComponent(q) : '' %>" class="px-3 py-1 border border-gray-600 rounded-md">Previous</a>
+      <a href="/admin/subscribers?page=<%= page - 1 %>&pageSize=<%= pageSize %><%= q ? '&q=' + encodeURIComponent(q) : '' %>" class="px-3 py-1 border border-neutral-600 rounded-md">Previous</a>
     <% } %>
     <span class="text-gray-300">Page <%= page %> of <%= totalPages || 1 %></span>
     <% if (page < totalPages) { %>
-      <a href="/admin/subscribers?page=<%= page + 1 %>&pageSize=<%= pageSize %><%= q ? '&q=' + encodeURIComponent(q) : '' %>" class="px-3 py-1 border border-gray-600 rounded-md">Next</a>
+      <a href="/admin/subscribers?page=<%= page + 1 %>&pageSize=<%= pageSize %><%= q ? '&q=' + encodeURIComponent(q) : '' %>" class="px-3 py-1 border border-neutral-600 rounded-md">Next</a>
     <% } %>
   </div>
 </div>

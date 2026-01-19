@@ -8,7 +8,7 @@
       - preserve: Record<string, string | undefined> (optional) - other query params to keep
 %>
 
-<div class="inline-flex items-center gap-2 rounded-lg bg-gray-800/60 border border-gray-700 p-1">
+<div class="inline-flex items-center gap-2 rounded-lg bg-[#1a1a1a]/60 border border-neutral-700 p-1">
   <% (items || []).forEach(function(it){
       var isAll = (it.value === '' || it.value === 'all');
       var isActive = currentValue ? (String(currentValue) === String(it.value)) : isAll;
@@ -29,6 +29,6 @@
       }
       var href = pairs.length ? (basePath + '?' + pairs.join('&')) : basePath;
   %>
-    <a href="<%= href %>" class="px-3 py-1.5 text-sm rounded-md <%= isActive ? 'bg-gray-700 text-white' : 'text-gray-300 hover:text-white' %>"><%= it.label %></a>
+    <a href="<%= href %>" class="px-3 py-1.5 text-sm rounded-md <%= isActive ? 'bg-neutral-700 text-white' : 'text-gray-300 hover:text-white' %>"><%= it.label %></a>
   <% }) %>
 </div>

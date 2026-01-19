@@ -1,119 +1,103 @@
 
-# FND Automations Webapp
+<div align="center">
 
-Production-ready Node.js/Express/Mongoose web application for FND Automations, featuring:
+# Vanier Capital - Real Estate Investment Platform
 
-- Modern, responsive UI (Tailwind CSS, light theme)
-- Secure authentication (Clerk or legacy JWT)
-- Robust admin dashboard and content management
-- Rich text editing (TinyMCE, see AUTHORING_GUIDE.md)
-- SEO best practices (dynamic sitemap, meta tags, JSON-LD, canonical URLs)
-- Accessibility (skip links, ARIA, semantic HTML)
-- Performance optimizations (gzip, cache headers, image WebP support)
-- Comprehensive error handling and logging (Winston)
-- Heroku-ready deployment (Procfile, environment config)
-- Automated email/newsletter (SendGrid, Mailchimp)
-- Full test suite (Jest, integration/unit tests)
+A proprietary CMS and Investor Relations portal designed to manage multifamily assets, track performance metrics, and facilitate capital raising operations.
 
----
+</div>
 
-## 🚀 Getting Started
+## System Overview
 
-1. **Clone the repo:**
-	```bash
-	git clone https://github.com/johnbyers1218/fnd-automations-webapp.git
-	cd fnd-automations-webapp
-	```
-2. **Install dependencies:**
-	```bash
-	npm install
-	```
-3. **Configure environment:**
-	- Copy `.env.example` to `.env` and fill in required values (see below).
-4. **Run locally:**
-	```bash
-	npm start
-	```
-5. **Run tests:**
-	```bash
-	npm test
-	```
+This platform enables **Vanier Capital** to showcase its portfolio, capture investor interest through a regulated funnel, and manage content via a unified administrative dashboard.
+
+### Core Architecture
+
+-   **Stack**: Node.js (Express), MongoDB (Mongoose), EJS Templates, Tailwind CSS.
+-   **Security**: Helmet, CSRF protection, RBAC (Admin/Public), and input sanitization.
+-   **Infrastructure**: Stateless application design suited for Heroku/Containerized environments with MongoDB Atlas persistence.
+
+### Domain Model
+
+1.  **Property (Core Entity)**
+    -   Represents a real estate asset (Multifamily/Single Family).
+    -   Key Attributes: Financial metrics (NOI, Cap Rate, LTV, IRR), occupancy status, gallery images, and location data.
+2.  **Market**
+    -   Defines geographic investment focus areas (e.g., "Southeast", "Sun Belt").
+    -   Used for portfolio categorization and strategic analysis.
+3.  **Article**
+    -   Content management for investment theses, market updates, and quarterly reports.
 
 ---
 
-## 🌐 Features
+## 🚀 Quick Start
 
-- **Security:** Helmet, CORS, rate limiting, CSRF, secure sessions, input validation
-- **SEO:** Dynamic sitemap, meta tags, Open Graph, Twitter Cards, robots.txt, structured data
-- **Performance:** Gzip compression, static asset caching, CDN-ready, image optimization
-- **Accessibility:** Skip links, ARIA, semantic HTML, color contrast
-- **Admin:** Project/blog CRUD, user management, newsletter, analytics
-- **Logging:** Winston (file/console), HTTP logs, error tracking
-- **Testing:** Jest, integration/unit tests, coverage
-- **Deployment:** Heroku Procfile, environment-based config, health checks
+### Prerequisites
+-   Node.js v18+
+-   MongoDB instance (Local or Atlas connection string)
 
----
+### Installation
 
-## ⚙️ Environment Variables
+1.  **Clone & Install**
+    ```bash
+    git clone https://github.com/johnbyers1218/vanier-capital-webapp.git
+    cd vanier-capital-webapp
+    npm install
+    ```
 
-Set these in your `.env` or Heroku config:
+2.  **Configuration**
+    Duplicate `.env.example` to `.env` and configure the essential variables (see below).
 
-- `PORT` (default: 3000)
-- `NODE_ENV` (development/production)
-- `MONGODB_URI` (MongoDB connection string)
-- `SESSION_SECRET` (strong random string)
-- `SENDGRID_API_KEY`, `SENDGRID_FROM_EMAIL`, `SENDGRID_FROM_NAME`
-- `MAILCHIMP_API_KEY`, `MAILCHIMP_SERVER_PREFIX`, `MAILCHIMP_LIST_ID`, `MAILCHIMP_FROM_EMAIL`, `MAILCHIMP_FROM_NAME`
-- `MAILCHIMP_SYNC_ENABLED` (optional, default: false)
-- `CORS_ORIGIN` (your domain)
-- `PUBLIC_SITE_URL` (e.g. https://www.fndautomations.com)
-- `CDN_URL` (optional, for static asset CDN)
-- `JWT_SECRET` (if using legacy JWT auth)
+3.  **Build Styles**
+    ```bash
+    npm run build:public-css:once
+    ```
 
----
-
-## 🛠️ Scripts
-
-- `npm start` — Start the server
-- `npm test` — Run all tests
-- `npm run optimize-images` — Optimize images in /public/images
-- `npm run lint` — Lint codebase
+4.  **Run Application**
+    ```bash
+    npm start
+    ```
 
 ---
 
-## 🏗️ Deployment (Heroku)
+## ⚙️ Environment Configuration
 
-1. Set all required environment variables in Heroku dashboard or CLI
-2. Push to Heroku:
-	```bash
-	git push heroku main
-	```
-3. Scale dynos:
-	```bash
-	heroku ps:scale web=1
-	```
-4. Open app:
-	```bash
-	heroku open
-	```
+| Variable | Purpose |
+| --- | --- |
+| `NODE_ENV` | `development` or `production` |
+| `PORT` | Application port (default: 3000) |
+| `MONGODB_URI` | Connection string for MongoDB Atlas or local instance |
+| `SESSION_SECRET` | Strong secret for session signing |
+| `SENDGRID_API_KEY` | For transactional emails (Welcome, Reset Password) |
+| `INVESTOR_CLUB_NOTIFY_EMAIL` | Recipient for new investor application alerts |
+| `CLOUDINARY_URL` | (Optional) CDN for property image management |
 
 ---
 
-## 📄 Documentation
+## 🛠️ NPM Scripts
 
-- [AUTHORING_GUIDE.md](AUTHORING_GUIDE.md) — Rich text/blog formatting
-- [WEBSITE_ARCHITECTURE.md](WEBSITE_ARCHITECTURE.md) — App structure
-- [PROJECT_BLOG_FORMATTING.md](PROJECT_BLOG_FORMATTING.md) — Blog/project content
-
----
-
-## 📝 Notes
-
-- All logging uses Winston (no console.log in production)
-- All errors are user-friendly and logged
-- All static assets are cache-busted and CDN-ready
-- Accessibility and SEO are first-class citizens
+| Script | Description |
+| --- | --- |
+| `npm start` | Launch production server |
+| `npm run dev` | Development mode with auto-reload (Nodemon) |
+| `npm run build:css` | Watch and compile Tailwind CSS changes |
+| `npm test` | Run functionality and unit tests (Jest) |
+| `npm run setup-admin` | Create an initial admin user (Development only) |
 
 ---
 
-## © 2025 FND Automations
+## 🚢 Deployment
+
+This application is **Heroku-ready**.
+
+1.  **Provision Database**: Create a cluster on MongoDB Atlas.
+2.  **Configure Environment**: Set the `MONGODB_URI` and `SESSION_SECRET` in your hosting provider's config vars.
+3.  **Deploy**:
+    ```bash
+    git push heroku main
+    ```
+4.  **Scale**: Ensure at least one web dynamo is active.
+
+---
+
+© 2025 Vanier Capital, LLC. All rights reserved.

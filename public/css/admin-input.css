@@ -11,8 +11,8 @@
 @theme {
 	--font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 	/* Brand colors used in admin */
-	--color-primary: #2563eb; /* blue-600 */
-	--color-primary-hover: #1d4ed8; /* blue-700 */
+	--color-primary: #0b4d3a; /* brand green */
+	--color-primary-hover: #093d2d; /* brand dark */
 	--color-secondary: #475569; /* slate-600 */
 	/* Gray palette needed by templates */
 	--color-gray-50:  #f9fafb;

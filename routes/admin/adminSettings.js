@@ -1,7 +1,6 @@
 import express from 'express';
 import { body, validationResult } from 'express-validator';
 import Settings from '../../models/Settings.js';
-import Client from '../../models/Client.js';
 import { logger } from '../../config/logger.js';
 
 export default (csrfProtection) => {
@@ -23,31 +22,20 @@ export default (csrfProtection) => {
   // GET KPI manager
   router.get('/kpi', csrfProtection, async (req, res, next) => {
     try {
-      const [manual, projects, years, clientAgg, clientCount] = await Promise.all([
-        Settings.findOne({ key: 'manualHoursAutomated' }).lean(),
-        Settings.findOne({ key: 'projectsCompleted' }).lean(),
-        Settings.findOne({ key: 'yearsCombinedExpertise' }).lean(),
-        Client.aggregate([
-          { $match: { isPubliclyVisible: { $ne: false } } },
-          { $group: { _id: null, totalValuation: { $sum: '$companyValuation' }, totalRevenue: { $sum: '$annualRevenue' } } }
-        ]),
-        Client.countDocuments({})
+      const [occupancy, capRate, aum] = await Promise.all([
+        Settings.findOne({ key: 'occupancyRate' }).lean(),
+        Settings.findOne({ key: 'capRate' }).lean(),
+        Settings.findOne({ key: 'aum' }).lean()
       ]);
-      const totals = {
-        totalValuation: clientAgg?.[0]?.totalValuation || 0,
-        totalRevenue: clientAgg?.[0]?.totalRevenue || 0,
-        valuedPartners: clientCount || 0
-      };
       res.render('admin/settings/kpi', {
         pageTitle: 'KPI Manager',
         path: '/admin/settings/kpi',
         csrfToken: req.csrfToken(),
         settings: {
-          manualHoursAutomated: manual?.valueNumber ?? '',
-          projectsCompleted: projects?.valueNumber ?? '',
-          yearsCombinedExpertise: years?.valueNumber ?? ''
+          occupancyRate: occupancy?.valueString ?? '',
+          capRate: capRate?.valueString ?? '',
+          aum: aum?.valueString ?? ''
         },
-        totals,
         errorMessages: [],
         successMessage: req.flash('success')
       });
@@ -57,29 +45,31 @@ export default (csrfProtection) => {
     }
   });
 
+  // Redirect GET /kpi/save to /kpi to prevent 404s on refresh
+  router.get('/kpi/save', (req, res) => res.redirect('/admin/settings/kpi'));
+
   // POST KPI save
   router.post('/kpi/save', csrfProtection, [
-    body('manualHoursAutomated').optional({ checkFalsy: true }).isNumeric().withMessage('Manual Hours Automated must be a number.'),
-    body('projectsCompleted').optional({ checkFalsy: true }).isNumeric().withMessage('Projects Completed must be a number.'),
-    body('yearsCombinedExpertise').optional({ checkFalsy: true }).isNumeric().withMessage('Years Combined Expertise must be a number.'),
+    body('occupancyRate').optional({ checkFalsy: true }).trim(),
+    body('capRate').optional({ checkFalsy: true }).trim(),
+    body('aum').optional({ checkFalsy: true }).trim(),
   ], async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).render('admin/settings/kpi', {
         pageTitle: 'KPI Manager (Errors)', path: '/admin/settings/kpi', csrfToken: req.csrfToken(),
         settings: {
-          manualHoursAutomated: req.body.manualHoursAutomated,
-          projectsCompleted: req.body.projectsCompleted,
-          yearsCombinedExpertise: req.body.yearsCombinedExpertise
+          occupancyRate: req.body.occupancyRate,
+          capRate: req.body.capRate,
+          aum: req.body.aum
         }, errorMessages: errors.array(), successMessage: null
       });
     }
     try {
-      const toNum = (v) => (v === '' || v === undefined) ? null : Number(v);
       const updates = [
-        { key: 'manualHoursAutomated', label: 'Manual Hours Automated', valueNumber: toNum(req.body.manualHoursAutomated) },
-        { key: 'projectsCompleted', label: 'Projects Completed', valueNumber: toNum(req.body.projectsCompleted) },
-        { key: 'yearsCombinedExpertise', label: 'Years Combined Expertise', valueNumber: toNum(req.body.yearsCombinedExpertise) }
+        { key: 'occupancyRate', label: 'Occupancy Rate', valueString: req.body.occupancyRate },
+        { key: 'capRate', label: 'Portfolio Cap Rate', valueString: req.body.capRate },
+        { key: 'aum', label: 'Assets Under Management', valueString: req.body.aum }
       ];
       await Promise.all(updates.map(u => Settings.updateOne(
         { key: u.key },
@@ -89,7 +79,7 @@ export default (csrfProtection) => {
       req.flash('success', 'KPI statistics updated.');
       res.redirect('/admin/settings/kpi');
     } catch (e) {
-      logger.error('[Admin Settings] Failed updating Manual Hours Automated', { message: e.message });
+      logger.error('[Admin Settings] Failed updating KPIs', { message: e.message });
       next(e);
     }
   });
