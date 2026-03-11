@@ -197,7 +197,7 @@ router.get('/portfolio/:slug', async (req, res) => {
 // ── Data Room Access Request (lead capture) ──
 router.post('/contact/data-room-request', (req, res) => {
     const { name, email, firm, linkedin, asset, assetSlug } = req.body;
-    logger.info(`[Data Room Request] Name: ${name}, Email: ${email}, Firm: ${firm || 'N/A'}, Asset: ${asset}, LinkedIn: ${linkedin || 'N/A'}`);
+    logger.info('[Data Room Request] Received', { asset: asset || 'unknown' });
     // TODO: In production, persist to Inquiry model and trigger SendGrid notification
     return res.redirect(`/portfolio/${assetSlug || ''}?request=submitted`);
 });

@@ -15,13 +15,11 @@ let sgMail = null;
   const missing = needed.filter(n => !(process.env[n]||'').trim());
   if (missing.length) {
     logger.warn('[SendGrid][Init] Missing required env vars; emails will be disabled until set.', { missing });
-  } else {
-    logger.info('[SendGrid][Init] Core env vars present.');
   }
   const optional = ['SENDGRID_FROM_NAME','CONTACT_TEAM_EMAIL','PUBLIC_SITE_URL','CORS_ORIGIN'];
   const missingOptional = optional.filter(n => !(process.env[n]||'').trim());
   if (missingOptional.length) {
-    logger.info('[SendGrid][Init] Optional env vars absent (some template links or routing may be generic).', { missingOptional });
+    logger.warn('[SendGrid][Init] Optional env vars absent (some template links or routing may be generic).', { missingOptional });
   }
 })();
 async function ensureConfigured() {

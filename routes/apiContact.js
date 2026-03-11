@@ -61,7 +61,7 @@ router.post('/contact', contactAndScheduleValidationRules, async (req, res, next
 
         // Save to Contacts collection
         const newContactEntry = await Contact.create(contactData);
-        logger.info(`Contact form submission SAVED TO DB: ID=${newContactEntry._id}, Email=${email}`);
+        logger.info('[Contact] Submission saved', { id: newContactEntry._id });
 
         // Mirror into Inquiry collection so it appears in /admin/inquiries (legacy dashboard expects Inquiry model)
         let inquiryEntry = null;

@@ -8,6 +8,7 @@ import mongoose from 'mongoose';
 import helmet from 'helmet';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
+import mongoSanitize from 'express-mongo-sanitize';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import flash from 'connect-flash';
@@ -123,7 +124,6 @@ app.use(['/admin', '/admin/*', '/auth/*'], (req, res, next) => {
 
 
 app.set('trust proxy', 1);
-logger.info('[INIT] Express "trust proxy" setting configured.');
 
 
 // --- Make Utilities Available to EJS Templates ---
@@ -167,7 +167,7 @@ async function connectToDatabase() {
     (logger || console).error('FATAL ERROR: MONGODB_URI environment variable is not set. Application cannot start.');
     process.exit(1);
   }
-  logger.info(`[DB] Attempting to connect to MongoDB at URI: ${MONGODB_URI}`);
+  logger.info(`[DB] Attempting to connect to MongoDB...`);
   try {
     await mongoose.connect(MONGODB_URI);
     logger.info('MongoDB Connected successfully.');
@@ -185,20 +185,16 @@ async function connectToDatabase() {
 app.set('view engine', 'ejs');
 app.set('views', path.join(currentDirname, 'views'));
 app.locals.basedir = currentDirname;
-logger.debug(`[INIT] View engine setup complete. Views path set to: ${path.join(currentDirname, 'views')}`);
 
 // --- Core Middleware Pipeline ---
-logger.debug('[INIT] Applying httpLoggerMiddleware...');
 app.use(httpLoggerMiddleware);
-logger.debug('[INIT] Applied httpLoggerMiddleware.');
 
-logger.debug('[INIT] Applying helmet...');
 const cspDirectives = {
   defaultSrc: ["'self'"],
   scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud", "https://www.googletagmanager.com", "https://calendar.google.com", "https://apis.google.com","https://www.gstatic.com", "https://unpkg.com", "https://cdn.jsdelivr.net", "https://*.clerk.accounts.dev", "https://*.clerk.com"],
   styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud", "https://calendar.google.com","https://apis.google.com", "https://unpkg.com", "https://*.clerk.accounts.dev", "https://*.clerk.com"],
   fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
-  imgSrc: ["'self'", "data:", "blob:", "https://res.cloudinary.com", "https://apis.google.com", "https://img.clerk.com", "https://www.googletagmanager.com"],
+  imgSrc: ["'self'", "data:", "blob:", "https://res.cloudinary.com", "https://apis.google.com", "https://img.clerk.com", "https://www.googletagmanager.com", "https://sp.tinymce.com"],
   connectSrc: [
     "'self'",
     "https://*.tiny.cloud",
@@ -250,9 +246,6 @@ app.use(helmet({
     crossOriginEmbedderPolicy: false,
     crossOriginResourcePolicy: { policy: "same-site" }
 }));
-logger.debug('[INIT] Applied helmet.');
-
-logger.debug('[INIT] Applying CORS...');
 
 const allowedOrigins = [];
 const productionCustomDomain = process.env.CORS_ORIGIN; // e.g., https://www.fndautomations.com
@@ -321,11 +314,9 @@ app.use(cors({
   },
   credentials: true
 }));
-logger.debug('[INIT] Applied CORS.');
 
 
-logger.debug('[INIT] Applying body parsers...');
-// Tight body limit for public form submission endpoints (Finding 6.3 — prevent payload bombs)
+// Tight body limit for public form submission endpoints (prevent payload bombs)
 const tightBodyParser = express.json({ limit: '10kb' });
 app.use('/api/contact', tightBodyParser);
 app.use('/api/contact-submission', tightBodyParser);
@@ -333,7 +324,9 @@ app.use('/api/investor-club', tightBodyParser);
 // Global parsers for admin/general routes
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true, limit: '5mb' }));
-logger.debug('[INIT] Applied body parsers.');
+
+// --- NoSQL Injection Prevention ---
+app.use(mongoSanitize());
 
 // --- Liveness/Readiness Probe ---
 // Returns 200 only when MongoDB is connected to avoid race conditions in E2E
@@ -343,28 +336,22 @@ app.get('/healthz', (req, res) => {
   return res.status(503).json({ status: 'starting', db: 'connecting' });
 });
 
-logger.debug('[INIT] Applying cookieParser...');
 if (!process.env.COOKIE_SECRET && process.env.NODE_ENV === 'production') {
     logger.error('FATAL: COOKIE_SECRET is not set in production. Required for signed cookies.');
-    process.exit(1); // More critical in prod
+    process.exit(1);
 }
 app.use(cookieParser(process.env.COOKIE_SECRET));
-logger.debug('[INIT] Applied cookieParser.');
 
 
 if (process.env.NODE_ENV === 'production') {
-  logger.debug('[INIT] Applying HTTPS redirect middleware for production...');
   app.use((req, res, next) => {
     if (req.header('x-forwarded-proto') !== 'https') {
-      logger.info(`Redirecting http://${req.header('host')}${req.url} to https`);
       return res.redirect(301, `https://${req.header('host')}${req.url}`);
     }
     next();
   });
-  logger.debug('[INIT] Applied HTTPS redirect.');
 }
 
-logger.debug('[INIT] Applying session middleware...');
 // Provide a default secret in test so the app can initialize without env.
 if (!process.env.SESSION_SECRET) {
   if (isTestEnv) {
@@ -392,11 +379,8 @@ app.use(session({
   store: sessionStore,
   cookie: { secure: process.env.NODE_ENV === 'production', httpOnly: true, maxAge: 1000 * 60 * 60 * 2, sameSite: 'strict' }
 }));
-logger.debug('[INIT] Applied session middleware.');
 
-logger.debug('[INIT] Applying flash middleware...');
 app.use(flash());
-logger.debug('[INIT] Applied flash middleware.');
 
 // --- Clerk global middleware ---
 // clerkMiddleware() reads the session JWT from cookies/headers and populates req.auth.
@@ -422,14 +406,11 @@ if (process.env.NODE_ENV !== 'test') {
   logger.info('[AUTH] Test mode — skipping clerkMiddleware().');
 }
 
-logger.debug('[INIT] Setting up CSRF protection (to be applied by routes)...');
 // In test, bypass CSRF but still provide a csrfToken() shim so routes rendering forms don't break
 const csrfProtection = process.env.NODE_ENV === 'test'
   ? ((req, res, next) => { req.csrfToken = () => 'test-csrf-token'; next(); })
   : csrf({ cookie: false });
-logger.debug('[INIT] CSRF protection setup complete.');
 
-logger.debug('[INIT] Applying custom locals middleware...');
 app.use((req, res, next) => {
     res.locals.successMessage = req.flash('success');
     res.locals.errorMessage = req.flash('error');
@@ -444,7 +425,6 @@ app.use((req, res, next) => {
     }
     next();
 });
-logger.debug('[INIT] Applied custom locals middleware.');
 
 // --- Global siteSettings injection (KPI Engine) ---
 // Makes all Settings key-value pairs available to every EJS template via res.locals.siteSettings
@@ -471,11 +451,9 @@ app.use(async (req, res, next) => {
     }
     next();
 });
-logger.debug('[INIT] Applied global siteSettings middleware (60s cache).');
 
 // --- Global portfolio nav data injection (for header mega menu) ---
 app.use(globalLocals);
-logger.debug('[INIT] Applied global portfolio nav locals middleware (60s cache).');
 
 // --- Admin Auth: @clerk/express (clerkMiddleware global + requireAuth per-route) ---
 // clerkMiddleware() is applied globally above.
@@ -483,12 +461,7 @@ logger.debug('[INIT] Applied global portfolio nav locals middleware (60s cache).
 // Public sign-ups are disabled in the Clerk dashboard — any authenticated user is authorized.
 logger.info('[AUTH] Using Clerk-based admin auth (requireAdminClerk middleware).');
 
-// NOTE: Deliberately mount static files AFTER public routes so that dynamic routes like /sitemap.xml aren't overridden by a static file
-logger.debug('[INIT] Deferring static file serving until after routers...');
-
-logger.debug('[INIT] Applying API rate limiter...');
-
-// CSRF-equivalent protection for public API POSTs (Finding 4.1)
+// CSRF-equivalent protection for public API POSTs
 // Simple form submissions bypass CORS; custom header requirement blocks them.
 const requireApiHeader = (req, res, next) => {
     if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
@@ -529,12 +502,8 @@ const apiLimiter = rateLimit({
   standardHeaders: true, legacyHeaders: false,
 });
 app.use('/api', apiLimiter);
-logger.debug('[INIT] Applied API rate limiter.');
-
-// (Removed temporary EJS debug routes)
 
 // --- Mount Routers ---
-logger.debug('[INIT] Mounting routers...');
 const adminGuard = requireAdminClerk;
 app.use('/', publicRoutes);
 app.use('/api', apiPublicRoutes);
@@ -547,10 +516,8 @@ app.use('/admin/inquiries', adminGuard, adminInquiriesRoutes(csrfProtection));
 app.use('/admin/applicants', adminGuard, adminApplicantRoutes(csrfProtection));
 app.use('/admin/settings', adminGuard, adminSettingsRoutes(csrfProtection));
 app.use('/admin/search', adminGuard, adminSearchRoutes(csrfProtection));
-logger.debug('[INIT] Routers mounted.');
 
-logger.debug('[INIT] Applying static file serving...');
-// Serve static files (including favicon) after routes so /sitemap.xml dynamic route wins over any static file
+// Serve static files after routes so /sitemap.xml dynamic route wins over any static file
 app.use(express.static(path.join(currentDirname, 'public'), {
   setHeaders: (res, filePath) => {
     // Cache all except HTML for 30 days
@@ -561,8 +528,6 @@ app.use(express.static(path.join(currentDirname, 'public'), {
     }
   }
 }));
-logger.debug('[INIT] Applied static file serving.');
-
 // Mount Clerk-based admin auth endpoints (login + logout — not guarded by requireAuth)
 app.use('/admin', adminAuthRoutes(csrfProtection));
 
@@ -574,7 +539,6 @@ app.get('/sign-in', (req, res) => {
 });
 
 // --- Error Handling Middleware ---
-logger.debug('[INIT] Setting up error handlers...');
 app.use((req, res, next) => { // 404 Handler
   if (res.writableEnded || res.headersSent) return; // Clerk handshake already sent response
   logger.warn(`404 Not Found: ${req.method} ${req.originalUrl} from IP: ${req.ip}`);
@@ -604,7 +568,6 @@ app.use((err, req, res, next) => { // Global Error Handler
     res.status(statusCode).type('text/plain').send(`${isProduction ? 'Internal Server Error' : responseMessage}`);
   }
 });
-logger.debug('[INIT] Error handlers setup.');
 
 
 // --- Refactored Startup Sequence ---

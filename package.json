@@ -30,7 +30,8 @@
     "set:legal-dates": "node scripts/set-legal-updated.mjs",
     "migrate:create": "npx migrate-mongo create",
     "migrate:up": "npx migrate-mongo up",
-    "migrate:down": "npx migrate-mongo down"
+    "migrate:down": "npx migrate-mongo down",
+    "heroku-postbuild": "npm run build:public-css:once"
   },
   "repository": {
     "type": "git",
@@ -64,6 +65,7 @@
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
+    "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^7.2.0",
     "express-session": "^1.18.0",
     "express-validator": "^7.1.0",

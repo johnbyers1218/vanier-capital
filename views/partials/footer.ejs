@@ -174,8 +174,7 @@
  gtag('config', '<%= process.env.GA_MEASUREMENT_ID %>'); // Use env variable
 </script>
 <% } else if (process.env.NODE_ENV === 'production' && !process.env.GA_MEASUREMENT_ID) { %>
-<!-- Warning if in production but ID is missing -->
-<script>console.warn('Google Analytics Measurement ID (GA_MEASUREMENT_ID) is not configured for production.');</script>
+<!-- GA Measurement ID not configured -->
 <% } %>
 
 </body>

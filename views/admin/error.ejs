@@ -1,61 +1,77 @@
-<%# views/admin/error.ejs %>
-<%# Generic Error Page for Admin Panel %>
-
-<%# Set default title and message if not provided %>
+<%# views/admin/error.ejs — Self-contained error page (no complex includes) %>
 <% const displayTitle = typeof pageTitle !== 'undefined' ? pageTitle : 'An Error Occurred'; %>
 <% const displayMessage = typeof message !== 'undefined' ? message : 'An unexpected error occurred while processing your request.'; %>
-<%# Determine a status code if possible (passed from route handler) %>
 <% const statusCode = typeof status !== 'undefined' ? status : 500; %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title><%= displayTitle %> | Vanier Capital Admin</title>
+    <link rel="icon" href="/images/vanier-logo.svg" sizes="any">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: #f9f8f6; color: #1a1a1a; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .error-card { max-width: 540px; width: 100%; margin: 2rem; padding: 3rem 2.5rem; background: #fff; border: 1px solid rgba(15,46,34,0.15); text-align: center; }
+        .error-icon { font-size: 2.5rem; margin-bottom: 1.25rem; }
+        .error-heading { font-family: 'Merriweather', serif; font-size: 1.25rem; font-weight: 700; color: #0f2e22; margin-bottom: 0.75rem; }
+        .error-message { font-size: 0.9rem; color: #4b5563; line-height: 1.6; margin-bottom: 1.5rem; }
+        .error-stack { text-align: left; font-size: 0.8rem; background: #f9f8f6; border: 1px solid rgba(15,46,34,0.15); padding: 1rem; max-height: 16rem; overflow-y: auto; white-space: pre-wrap; word-break: break-all; margin-bottom: 1.5rem; font-family: monospace; }
+        .error-actions { display: flex; align-items: center; justify-content: center; gap: 0.75rem; flex-wrap: wrap; }
+        .btn-back, .btn-dashboard { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; padding: 0.625rem 1.25rem; text-decoration: none; transition: background 0.15s ease; }
+        .btn-back { background: #fff; color: #0f2e22; border: 1px solid rgba(15,46,34,0.2); }
+        .btn-back:hover { background: #f9f8f6; }
+        .btn-dashboard { background: #0f2e22; color: #fff; border: 1px solid #0f2e22; }
+        .btn-dashboard:hover { background: #1a1a1a; }
+        .error-footer { font-size: 0.8rem; color: #9ca3af; margin-top: 1.25rem; }
+    </style>
+</head>
+<body>
+    <div class="error-card">
+        <div class="error-icon">
+            <% if (statusCode === 404) { %>
+                <i class="fas fa-search" style="color:#d97706;"></i>
+            <% } else if (statusCode === 403) { %>
+                <i class="fas fa-user-lock" style="color:#dc2626;"></i>
+            <% } else if (statusCode >= 400 && statusCode < 500) { %>
+                <i class="fas fa-exclamation-triangle" style="color:#d97706;"></i>
+            <% } else { %>
+                <i class="fas fa-server" style="color:#9ca3af;"></i>
+            <% } %>
+        </div>
 
-<%- include('partials/header', { pageTitle: displayTitle }) %>
+        <h2 class="error-heading">
+            <% if (statusCode === 404) { %>
+                Resource Not Found
+            <% } else if (statusCode === 403) { %>
+                Access Denied
+            <% } else { %>
+                Something Went Wrong
+            <% } %>
+        </h2>
 
-<div class="max-w-2xl mx-auto my-8 p-8 bg-white border border-[#0f2e22]/20 text-center">
-    <div class="text-4xl mb-4">
-        <% if (statusCode === 404) { %>
-            <i class="fas fa-search text-amber-500"></i>
-        <% } else if (statusCode === 403) { %>
-             <i class="fas fa-user-lock text-red-600"></i>
-        <% } else if (statusCode >= 400 && statusCode < 500) { %>
-            <i class="fas fa-exclamation-triangle text-amber-500"></i>
-        <% } else { %>
-            <i class="fas fa-server text-gray-400"></i>
+        <p class="error-message"><%= displayMessage %></p>
+
+        <% if (process.env.NODE_ENV !== 'production' && typeof error !== 'undefined' && error && error.stack) { %>
+            <pre class="error-stack"><%= error.stack %></pre>
         <% } %>
+
+        <div class="error-actions">
+            <a href="javascript:history.back()" class="btn-back"><i class="fas fa-arrow-left"></i> Go Back</a>
+            <a href="/admin/dashboard" class="btn-dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        </div>
+
+        <p class="error-footer">
+            If the problem persists, contact your administrator.
+            <% if (typeof errorId !== 'undefined' && errorId) { %>
+                <br>Error Reference: <%= errorId %>
+            <% } %>
+        </p>
     </div>
-
-    <h2 class="text-xl font-semibold text-[#1a1a1a] mb-3">
-        <% if (statusCode === 404) { %>
-            Resource Not Found
-        <% } else if (statusCode === 403) { %>
-             Access Denied
-        <% } else { %>
-             Oops! Something Went Wrong
-        <% } %>
-    </h2>
-
-    <p class="text-gray-600 mb-4"><%= displayMessage %></p>
-
-    <%# Optionally display more details in development %>
-    <% if (process.env.NODE_ENV !== 'production' && typeof error !== 'undefined' && error && error.stack) { %>
-        <pre class="text-left text-sm bg-[#f9f8f6] border border-[#0f2e22]/20 p-4 text-[#1a1a1a] max-h-64 overflow-y-auto whitespace-pre-wrap break-all mb-4"><%= error.stack %></pre>
-    <% } %>
-
-    <div class="flex items-center justify-center gap-3 mt-4">
-        <a href="javascript:history.back()" class="inline-flex items-center gap-2 bg-white text-[#0f2e22] font-bold py-2 px-4 border border-[#0f2e22]/20 hover:bg-[#f9f8f6] text-xs uppercase tracking-widest">
-            <i class="fas fa-arrow-left"></i> Go Back
-        </a>
-        <a href="/admin/dashboard" class="inline-flex items-center gap-2 bg-[#0f2e22] text-white font-bold py-2 px-4 border border-[#0f2e22] hover:bg-[#1a1a1a] text-xs uppercase tracking-widest">
-            <i class="fas fa-tachometer-alt"></i> Go to Dashboard
-        </a>
-    </div>
-
-     <p class="text-sm text-gray-500 mt-4">
-         If the problem persists, please contact technical support or your administrator.
-         <br>
-         <% if (typeof errorId !== 'undefined' && errorId) { %>
-              Error Reference: <%= errorId %>
-         <% } %>
-     </p>
-
-</div>
-
-<%- include('partials/footer') %>
+</body>
+</html>
