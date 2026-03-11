@@ -4,419 +4,233 @@
 <%- include('partials/header', {
     pageTitle: 'Vanier Capital | Real Estate Investment & Asset Management',
     pageDescription: 'Vanier Capital is a real estate investment firm focused on building long-term, risk-adjusted returns through strategic acquisition and disciplined management of single-family and multifamily assets.',
-    path: '/'
+    path: '/',
+    isHeroPage: true
 }) %>
 
-<!-- Hero Section: full-bleed with static investment image -->
-<section id="hero" class="hero-section hero-fullbleed">
-    <div class="hero-viewport">
-        <!-- Static background image replacing video -->
-        <div class="hero-image-background" role="img" aria-label="Aerial view of established residential neighborhood" style="position:absolute;inset:0;background-image:url('/images/hero-real-estate.jpg');background-size:cover;background-position:center;background-repeat:no-repeat;transform:scale(1.04);"></div>
-        <!-- Dark gradient overlay for readability -->
-        <div class="hero-overlay" style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,30,25,0.60),rgba(10,30,25,0.55) 38%,rgba(255,255,255,0) 90%);mix-blend-mode:normal;"></div>
-        <!-- Hero content -->
-        <div class="hero-content" style="position:relative;z-index:10;display:flex;align-items:center;justify-content:flex-start;min-height:62vh;padding:4rem 1.25rem 3rem;max-width:1280px;margin:0 auto;">
-            <div class="hero-text-block" style="max-width:760px;">
-                <div class="eyebrow" style="background:rgba(11,77,58,0.15);border-color:rgba(11,77,58,0.35);color:#0b4d3a;">Long-Term Value</div>
-                <h1 class="hero-title hero-title-strong" style="font-family:'Merriweather',serif;font-weight:700;font-size:clamp(2.35rem,4.6vw,3.25rem);line-height:1.12;letter-spacing:-0.015em;color:#ffffff;text-shadow:0 3px 22px rgba(0,0,0,0.35);">Investing in Your Future.</h1>
-                <p class="hero-subtitle hero-subtitle-lg" style="margin-top:1.1rem;font-size:clamp(1.15rem,1.65vw,1.45rem);line-height:1.55;font-weight:500;color:#e4efe9;max-width:60ch;">Building generational wealth through strategic investments in resilient single-family and multifamily assets across targeted U.S. growth markets.</p>
-                <div class="hero-buttons hero-buttons-spaced" style="margin-top:1.85rem;display:flex;flex-wrap:wrap;gap:.9rem;">
-                    <a href="/portfolio" class="cta-button primary-btn" style="background-color:#0b4d3a;--tw-shadow:0 8px 30px -6px rgba(11,77,58,0.55);box-shadow:0 8px 30px -6px rgba(11,77,58,0.55);">Explore Portfolio</a>
-                    <a href="/for-rent" class="cta-button secondary-btn" style="background-color:#ffffff;color:#0b4d3a;border:1px solid rgba(11,77,58,0.35);">Rent a Property</a>
-                </div>
-            </div>
-        </div>
-        <!-- Curved divider -->
-        <div class="hero-divider" aria-hidden="true">
-            <svg viewBox="0 0 1440 120" preserveAspectRatio="none" focusable="false" xmlns="http://www.w3.org/2000/svg">
-                <path d="M0,80 C360,20 1080,20 1440,80 L1440,120 L0,120 Z" fill="#ffffff" />
-            </svg>
-        </div>
+<!-- Hero Section: Full-screen Mega-Fund Style -->
+<section id="hero" class="hero-institutional">
+    <!-- Background Image -->
+    <div class="hero-media">
+        <img 
+            src="/images/hero-real-estate.jpg" 
+            alt="Aerial view of real estate development" 
+            class="hero-media-image"
+        >
+        <!-- Subtle neutral tint for text contrast — no green gradient -->
+        <div class="absolute inset-0 bg-black/20"></div>
+    </div>
+    
+    <!-- Floating Text — Left-Aligned, No Solid Box -->
+    <div class="hero-anchor-card flex flex-col items-start text-left">
+        <h1 class="anchor-headline text-left drop-shadow-lg">
+            <span class="anchor-line anchor-line-1">Enduring</span>
+            <span class="anchor-line anchor-line-2">Value.</span>
+        </h1>
+        <p class="font-sans text-lg md:text-xl text-white/90 mt-6 max-w-2xl drop-shadow-md leading-relaxed">We apply disciplined capital and operational excellence to build resilient real estate portfolios across the Southeast.</p>
+        <a href="/firm/overview" class="inline-block mt-8 font-sans text-xs font-bold uppercase tracking-widest text-white border-b border-white pb-1 hover:text-gray-300 hover:border-gray-300 transition-colors drop-shadow-md">Explore Our Firm &rarr;</a>
     </div>
 </section>
 
-<!-- Sell Your Home Process -->
-<section id="sell-process" class="section">
-    <div class="container">
-        <div class="section-header">
-            <h2 class="section-title" style="font-family:'Merriweather',serif;">Sell Your Home Fast</h2>
-            <p class="section-description">We make selling your property simple, transparent, and stress-free.</p>
-        </div>
-        <div class="process-steps" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem;margin-top:3rem;">
-            <div class="process-step" style="text-align:center;">
-                <div class="step-icon" style="width:64px;height:64px;background:rgba(11,77,58,0.1);color:#0b4d3a;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:1.5rem;">
-                    <i class="fas fa-home"></i>
-                </div>
-                <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.75rem;color:#1e293b;">1. Submit Your Property</h3>
-                <p style="color:#64748b;line-height:1.6;">Tell us about your home and its condition. It takes less than 5 minutes.</p>
+<!-- Our Moat: Engineering-Grade Asset Management -->
+<section id="our-moat" class="bg-[#f9f8f6]">
+    <div class="max-w-screen-xl mx-auto px-8 md:px-16 py-24">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
+            <div>
+                <h2 class="font-serif text-4xl md:text-5xl text-[#0f2e22] leading-tight">Process-Driven<br/>Asset Management.</h2>
             </div>
-            <div class="process-step" style="text-align:center;">
-                <div class="step-icon" style="width:64px;height:64px;background:rgba(11,77,58,0.1);color:#0b4d3a;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:1.5rem;">
-                    <i class="fas fa-file-invoice-dollar"></i>
-                </div>
-                <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.75rem;color:#1e293b;">2. Get A Cash Offer</h3>
-                <p style="color:#64748b;line-height:1.6;">We'll review your property and provide a fair, no-obligation cash offer within 72 hours.</p>
-            </div>
-            <div class="process-step" style="text-align:center;">
-                <div class="step-icon" style="width:64px;height:64px;background:rgba(11,77,58,0.1);color:#0b4d3a;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:1.5rem;">
-                    <i class="fas fa-handshake"></i>
-                </div>
-                <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.75rem;color:#1e293b;">3. Close On Your Terms</h3>
-                <p style="color:#64748b;line-height:1.6;">Choose your closing date. We handle the paperwork and make the process seamless.</p>
-            </div>
-        </div>
-        <div style="text-align:center;margin-top:3rem;">
-            <a href="/sell-your-home" class="cta-button primary-btn" style="background-color:#0b4d3a;color:white;padding:1rem 2rem;border-radius:0.5rem;font-weight:600;text-decoration:none;display:inline-block;">Get My Cash Offer</a>
-        </div>
-    </div>
-</section>
-
-<!-- Our Process Section -->
-<section id="our-process" class="section section-tight-top">
-    <div class="container">
-        <div class="section-header">
-            <h2 class="section-title" style="font-family:'Merriweather',serif;">Our Investment Process</h2>
-            <p class="section-description">A disciplined, data-driven approach to identifying high-value properties and maximizing investor returns.</p>
-        </div>
-        <div class="process-steps" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem;margin-top:3rem;">
-            <!-- Step 1 -->
-            <div class="process-card" style="background:white;border-radius:1rem;overflow:hidden;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);display:flex;flex-direction:column;">
-                <div class="card-image" style="height:200px;background:#f1f5f9;">
-                    <img src="/images/Analysis.png" alt="Market Analysis" style="width:100%;height:100%;object-fit:cover;">
-                </div>
-                <div class="card-content" style="padding:2rem;flex-grow:1;display:flex;flex-direction:column;">
-                    <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.75rem;color:#1e293b;">1. Market Analysis</h3>
-                    <p style="color:#64748b;line-height:1.6;">We evaluate demographic trends, supply-demand dynamics, and off‑market deal flow to surface resilient target submarkets and properties.</p>
-                </div>
-            </div>
-            <!-- Step 2 -->
-            <div class="process-card" style="background:white;border-radius:1rem;overflow:hidden;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);display:flex;flex-direction:column;">
-                <div class="card-image" style="height:200px;background:#f1f5f9;">
-                    <img src="/images/Underwriting.png" alt="Due Diligence" style="width:100%;height:100%;object-fit:cover;">
-                </div>
-                <div class="card-content" style="padding:2rem;flex-grow:1;display:flex;flex-direction:column;">
-                    <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.75rem;color:#1e293b;">2. Due Diligence</h3>
-                    <p style="color:#64748b;line-height:1.6;">Comprehensive underwriting, financial modeling, inspections, and capital structuring culminating in disciplined acquisition.</p>
-                </div>
-            </div>
-            <!-- Step 3 -->
-            <div class="process-card" style="background:white;border-radius:1rem;overflow:hidden;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);display:flex;flex-direction:column;">
-                <div class="card-image" style="height:200px;background:#f1f5f9;">
-                    <img src="/images/Value add.png" alt="Value Add" style="width:100%;height:100%;object-fit:cover;">
-                </div>
-                <div class="card-content" style="padding:2rem;flex-grow:1;display:flex;flex-direction:column;">
-                    <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.75rem;color:#1e293b;">3. Value-Add</h3>
-                    <p style="color:#64748b;line-height:1.6;">Renovation, repositioning, and professional asset management to drive NOI growth and long‑term appreciation.</p>
-                </div>
-            </div>
-            <!-- Step 4 -->
-            <div class="process-card" style="background:white;border-radius:1rem;overflow:hidden;box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);display:flex;flex-direction:column;">
-                <div class="card-image" style="height:200px;background:#f1f5f9;">
-                    <img src="/images/Disposition.png" alt="Disposition" style="width:100%;height:100%;object-fit:cover;">
-                </div>
-                <div class="card-content" style="padding:2rem;flex-grow:1;display:flex;flex-direction:column;">
-                    <h3 style="font-size:1.25rem;font-weight:700;margin-bottom:0.75rem;color:#1e293b;">4. Disposition</h3>
-                    <p style="color:#64748b;line-height:1.6;">Strategic exit timing, optimized sales process, and distribution of realized gains back to investors.</p>
-                </div>
+            <div>
+                <p class="font-sans text-lg text-gray-700 leading-relaxed mb-6">Vanier Capital does not chase speculative trends. We deploy capital based on conservative underwriting, strict standard operating procedures, and a relentless focus on ground-level cash flow.</p>
+                <p class="font-sans text-lg text-gray-700 leading-relaxed mb-8">Every asset in our portfolio is stress-tested against macro headwinds before a single dollar is committed. Our underwriting framework synthesizes demographic migration data, supply-constraint indices, and rent growth trajectories&mdash;ensuring each acquisition meets our return thresholds with a built-in margin of safety.</p>
+                <a href="/firm/overview" class="font-sans text-xs font-bold uppercase tracking-widest text-[#0f2e22] border-b border-[#0f2e22] pb-1 hover:text-[#1a1a1a] transition-colors">Learn About Our Firm &rarr;</a>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Featured Testimonial Highlight -->
-<section id="featured-testimonial" class="section section-muted">
+<!-- Portfolio Metrics Section - Brookfield Left-Aligned Style -->
+<section id="portfolio-metrics" class="section-metrics">
     <div class="container">
-        <div class="section-header" style="text-align:center;">
-            <h2 class="section-title" style="font-family:'Merriweather',serif;">What Our Renters Say</h2>
-            <p class="section-description">We pride ourselves on providing exceptional living experiences for our tenants.</p>
+        <div class="metrics-header">
+            <h2 class="metrics-title">Portfolio at a Glance</h2>
         </div>
-        
-        <!-- Testimonial Carousel -->
-        <div class="testimonial-carousel" style="max-width:800px;margin:0 auto;position:relative;">
-            
-            <!-- Slides Container -->
-            <div class="carousel-slides" style="overflow:hidden;position:relative;border-radius:1rem;background:white;box-shadow:0 10px 30px -5px rgba(0,0,0,0.05);border:1px solid rgba(0,0,0,0.05);">
-                <div class="slides-track" style="display:flex;transition:transform 0.5s ease-in-out;">
-                    <% if (typeof testimonials !== 'undefined' && testimonials.length > 0) { %>
-                        <% testimonials.forEach(t => { %>
-                            <div class="slide" style="min-width:100%;padding:3rem 5rem;box-sizing:border-box;text-align:center;">
-                                <div style="color:#0b4d3a;font-size:1.5rem;margin-bottom:1.5rem;">
-                                    <% for(let i=0; i < (t.rating || 5); i++) { %><i class="fas fa-star"></i><% } %>
-                                </div>
-                                <blockquote style="font-size:1.25rem;line-height:1.6;color:#334155;font-style:italic;margin-bottom:1.5rem;">
-                                    "<%= t.content %>"
-                                </blockquote>
-                                <cite style="font-weight:700;color:#0b4d3a;font-style:normal;display:block;"><%= t.author %></cite>
-                                <% if (t.position || t.company) { %>
-                                    <span style="font-size:0.875rem;color:#64748b;"><%= t.position ? t.position : '' %><%= (t.position && t.company) ? ' - ' : '' %><%= t.company ? t.company : '' %></span>
-                                <% } %>
-                            </div>
-                        <% }); %>
-                    <% } else { %>
-                        <!-- Fallback/Placeholder Slide -->
-                        <div class="slide" style="min-width:100%;padding:3rem 5rem;box-sizing:border-box;text-align:center;">
-                            <div style="color:#0b4d3a;font-size:1.5rem;margin-bottom:1.5rem;">
-                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                            </div>
-                            <blockquote style="font-size:1.25rem;line-height:1.6;color:#334155;font-style:italic;margin-bottom:1.5rem;">
-                                "The maintenance team is always so quick to respond. I love living here! The apartment was spotless when I moved in and the management team has been incredibly helpful."
-                            </blockquote>
-                            <cite style="font-weight:700;color:#0b4d3a;font-style:normal;display:block;">Sarah M.</cite>
-                            <span style="font-size:0.875rem;color:#64748b;">Resident since 2022</span>
-                        </div>
+        <div class="metrics-grid">
+            <div class="metric-item">
+                <div class="metric-number"><%= managedStats.aum %></div>
+                <div class="metric-label">Assets Under Management</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-number"><%= managedStats.targetIrr %></div>
+                <div class="metric-label">Target IRR</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-number"><%= managedStats.capRate %></div>
+                <div class="metric-label">Stabilized Cap Rate</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-number"><%= managedStats.unitsManaged %></div>
+                <div class="metric-label">Total Units</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Investment Process Section -->
+<section id="our-process" class="section section-institutional section-alt">
+    <div class="container">
+        <div class="section-header-left">
+            <h2 class="section-title-institutional">Our Investment Process</h2>
+            <p class="section-description-institutional">A disciplined, data-driven approach to identifying high-value properties and maximizing investor returns.</p>
+        </div>
+        <div class="process-cards-grid">
+            <div class="process-card-institutional">
+                <div class="card-image-institutional">
+                    <img src="/images/property-sourcing.png" alt="Sourcing">
+                </div>
+                <div class="card-content-institutional">
+                    <span class="card-step">01</span>
+                    <h3>Sourcing</h3>
+                    <p>Leverages established broker networks, off-market proprietary leads, and distressed asset channels to secure a competitive entry basis.</p>
+                </div>
+            </div>
+            <div class="process-card-institutional">
+                <div class="card-image-institutional">
+                    <img src="/images/property-underwriting.png" alt="Underwriting">
+                </div>
+                <div class="card-content-institutional">
+                    <span class="card-step">02</span>
+                    <h3>Underwriting</h3>
+                    <p>Rigorous multi-scenario financial modeling and risk-adjusted return analysis to ensure disciplined capital allocation and a defined margin of safety.</p>
+                </div>
+            </div>
+            <div class="process-card-institutional">
+                <div class="card-image-institutional">
+                    <img src="/images/property-valueadd.png" alt="Value-Add">
+                </div>
+                <div class="card-content-institutional">
+                    <span class="card-step">03</span>
+                    <h3>Value-Add</h3>
+                    <p>Deployment of standardized CapEx programs and institutional management SOPs to compress expenses and drive Net Operating Income (NOI) expansion.</p>
+                </div>
+            </div>
+            <div class="process-card-institutional">
+                <div class="card-image-institutional">
+                    <img src="/images/property-disposition.png" alt="Disposition">
+                </div>
+                <div class="card-content-institutional">
+                    <span class="card-step">04</span>
+                    <h3>Disposition</h3>
+                    <p>Cycle-aware exit execution or recapitalization designed to maximize absolute returns and efficiently distribute realized gains to partners.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Market Thesis Section -->
+<section id="market-thesis" class="bg-[#f9f8f6]">
+    <div class="max-w-screen-xl mx-auto px-8 md:px-16 py-24">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
+            <div>
+                <h2 class="font-serif text-4xl text-[#0f2e22] mb-6">The Current Opportunity.</h2>
+            </div>
+            <div>
+                <p class="font-sans text-lg text-gray-700 leading-relaxed mb-6">We are currently operating in a highly dislocated macroeconomic environment. Elevated interest rates have temporarily sidelined institutional mega-funds and completely frozen retail homebuyers. This liquidity vacuum has created a rare, asymmetric acquisition window.</p>
+                <p class="font-sans text-lg text-gray-700 leading-relaxed">By deploying cash-heavy, disciplined capital into the Southeast and Sun Belt, Vanier Capital is securing yielding assets at a highly favorable, below-replacement-cost basis.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Investment Focus Section -->
+<section id="investment-focus" class="section section-institutional">
+    <div class="container">
+        <div class="section-header-left">
+            <h2 class="section-title-institutional">Our Investment Focus</h2>
+            <p class="section-description-institutional">We specialize in identifying and acquiring high-potential assets in growing markets.</p>
+        </div>
+        <div class="focus-grid">
+            <div class="focus-card">
+                <div class="focus-image">
+                    <img src="/images/multifamily-residential.png" alt="Small-Balance Multi-Family">
+                </div>
+                <div class="focus-content">
+                    <span class="focus-tag">Core Strategy</span>
+                    <h3>Small-Balance Multi-Family</h3>
+                    <p>Acquiring and repositioning under-managed 2-to-4 unit residential assets to generate immediate cash-on-cash yield and capture sub-market operational density.</p>
+                </div>
+            </div>
+            <div class="focus-card">
+                <div class="focus-image">
+                    <img src="/images/multifamily-apartments.png" alt="Workforce Housing">
+                </div>
+                <div class="focus-content">
+                    <span class="focus-tag">Value-Add</span>
+                    <h3>Workforce Housing</h3>
+                    <p>Targeting existing residential stock in high-demand employment corridors for comprehensive value-add renovations, optimizing Net Operating Income (NOI) while preserving local housing affordability.</p>
+                </div>
+            </div>
+            <div class="focus-card">
+                <div class="focus-image">
+                    <img src="/images/singlefamily-residential.png" alt="Single Family Rentals">
+                </div>
+                <div class="focus-content">
+                    <span class="focus-tag">Growth Strategy</span>
+                    <h3>Single Family Rentals</h3>
+                    <p>Executing a high-volume aggregation strategy of scattered-site Single Family Rentals (SFRs) in high-growth Southeastern markets to build diversified, institutional-grade portfolios.</p>
+                </div>
+            </div>
+        </div>
+        <div class="section-cta">
+            <a href="/strategies" class="btn-institutional-secondary">Explore Our Strategy</a>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Portfolio Section -->
+<section id="featured-properties" class="bg-[#f9f8f6]">
+    <div class="max-w-screen-xl mx-auto px-8 md:px-16 py-24">
+        <div class="mb-16">
+            <h2 class="font-serif text-4xl text-[#0f2e22] mb-4">Featured Portfolio</h2>
+            <p class="font-sans text-lg text-gray-600">Select holdings from our actively managed residential portfolio.</p>
+        </div>
+        <% if (featuredProperties && featuredProperties.length > 0) { %>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <% featuredProperties.slice(0, 3).forEach(asset => { %>
+            <a href="/portfolio/<%= asset.slug %>" class="group block border border-[#0f2e22]/20 bg-white hover:shadow-sm transition-all">
+                <div class="h-64 bg-gray-200 overflow-hidden">
+                    <img src="<%= asset.image || '/images/hero-real-estate.jpg' %>" alt="<%= asset.title %>" class="w-full h-full object-cover grayscale transform-gpu backface-hidden will-change-transform">
+                </div>
+                <div class="p-6">
+                    <% if (asset.strategy) { %>
+                    <span class="font-sans text-[10px] font-bold uppercase tracking-widest text-gray-500 block mb-2"><%= asset.strategy %></span>
                     <% } %>
-                </div>
-            </div>
-
-            <!-- Navigation Buttons -->
-            <button class="carousel-prev" aria-label="Previous Slide" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);background:white;border:1px solid #e2e8f0;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);color:#0b4d3a;transition:all 0.2s;">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button class="carousel-next" aria-label="Next Slide" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:white;border:1px solid #e2e8f0;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);color:#0b4d3a;transition:all 0.2s;">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-
-        </div>
-    </div>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const track = document.querySelector('.slides-track');
-            const slides = document.querySelectorAll('.slide');
-            const nextBtn = document.querySelector('.carousel-next');
-            const prevBtn = document.querySelector('.carousel-prev');
-            let currentIndex = 0;
-
-            function updateSlide() {
-                track.style.transform = `translateX(-${currentIndex * 100}%)`;
-            }
-
-            nextBtn.addEventListener('click', () => {
-                currentIndex = (currentIndex + 1) % slides.length;
-                updateSlide();
-            });
-
-            prevBtn.addEventListener('click', () => {
-                currentIndex = (currentIndex - 1 + slides.length) % slides.length;
-                updateSlide();
-            });
-            
-            // Auto advance every 5 seconds
-            setInterval(() => {
-                currentIndex = (currentIndex + 1) % slides.length;
-                updateSlide();
-            }, 5000);
-        });
-    </script>
-</section>
-
- 
-
-<!-- Removed lower Trusted By section to consolidate social proof into the hero -->
-
-<!-- Client Showcase & Social Proof Section -->
-<section id="client-showcase" class="section section-muted section-compact">
-    <div class="container">
-        <div class="section-header">
-                        <h2 class="section-title" style="font-family:'Merriweather',serif;">Portfolio at a Glance</h2>
-                        <p class="section-description">Representative performance indicators from our current and target portfolio profile.</p>
-        </div>
-                <!-- Real Estate Portfolio KPIs -->
-                <div class="stats-grid" style="margin-top:0.5rem;">
-                    <div class="stat-item">
-                        <div class="stat-number"><%= managedStats.aum %></div>
-                        <div class="stat-label">Assets Under Management</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number"><%= managedStats.occupancyRate %></div>
-                        <div class="stat-label">Occupancy Rate</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number"><%= managedStats.capRate %></div>
-                        <div class="stat-label">Portfolio Cap Rate</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number"><%= managedStats.unitsManaged %></div>
-                        <div class="stat-label">Total Units</div>
-                    </div>
-                </div>
-
-        <!-- Client Carousel Removed -->
-    </div>
-</section>
-
-<!-- Investment Focus Section (refactored from Services Preview) -->
-<section id="investment-focus" class="section section-muted">
-    <div class="container">
-        <div class="section-header">
-            <h2 class="section-title" style="font-family:'Merriweather',serif;">Our Investment Focus</h2>
-            <p class="section-description">We specialize in identifying and acquiring high-potential assets in growing markets.</p>
-        </div>
-        <div class="grid-container grid-3-col">
-            <div class="content-card service-card" tabindex="0" role="group" aria-label="Multi-Family Residential" style="padding:0;overflow:hidden;display:flex;flex-direction:column;">
-                <div style="height:200px;overflow:hidden;">
-                    <img src="/images/multifamily-residential.jpg" alt="Multi-Family Residential" style="width:100%;height:100%;object-fit:cover;transition:transform 0.5s ease;">
-                </div>
-                <div style="padding:2rem;flex-grow:1;display:flex;flex-direction:column;">
-                    <h3 style="margin-top:0;">Multi-Family Residential</h3>
-                    <p style="flex-grow:1;">Acquiring and operating stabilized and value‑add apartment communities to generate resilient cash flow and long‑term appreciation.</p>
-                    <span class="card-link reveal-on-hover" aria-hidden="true" style="margin-top:1rem;display:inline-block;">Core Strategy</span>
-                </div>
-            </div>
-            <div class="content-card service-card" tabindex="0" role="group" aria-label="Commercial Properties" style="padding:0;overflow:hidden;display:flex;flex-direction:column;">
-                <div style="height:200px;overflow:hidden;">
-                    <img src="/images/commercial.jpg" alt="Commercial Properties" style="width:100%;height:100%;object-fit:cover;transition:transform 0.5s ease;">
-                </div>
-                <div style="padding:2rem;flex-grow:1;display:flex;flex-direction:column;">
-                    <h3 style="margin-top:0;">Commercial Properties</h3>
-                    <p style="flex-grow:1;">Select retail, office, and mixed‑use assets in supply‑constrained submarkets with repositioning or yield stabilization potential.</p>
-                    <span class="card-link reveal-on-hover" aria-hidden="true" style="margin-top:1rem;display:inline-block;">Selective Allocation</span>
-                </div>
-            </div>
-            <div class="content-card service-card" tabindex="0" role="group" aria-label="Single Family Homes" style="padding:0;overflow:hidden;display:flex;flex-direction:column;">
-                <div style="height:200px;overflow:hidden;">
-                    <img src="/images/singlefamily.jpg" alt="Single Family Homes" style="width:100%;height:100%;object-fit:cover;transition:transform 0.5s ease;">
-                </div>
-                <div style="padding:2rem;flex-grow:1;display:flex;flex-direction:column;">
-                    <h3 style="margin-top:0;">Single Family Homes</h3>
-                    <p style="flex-grow:1;">Aggregating scattered-site single-family rentals in high-demand neighborhoods to build scalable, high-yield portfolios.</p>
-                    <span class="card-link reveal-on-hover" aria-hidden="true" style="margin-top:1rem;display:inline-block;">Growth Strategy</span>
-                </div>
-            </div>
-        </div>
-        <div style="text-align:center;margin-top:3rem;">
-            <a href="/services" class="cta-button secondary-btn">Explore Our Strategy</a>
-        </div>
-    </div>
-</section>
-
-<!-- Featured Properties Section (refactored from Recent Projects) -->
-<section id="featured-properties" class="section">
-    <div class="container">
-        <div class="section-header">
-            <h2 class="section-title" style="font-family:'Merriweather',serif;">Properties For Rent</h2>
-            <p class="section-description">Find your next home in one of our professionally managed properties.</p>
-        </div>
-        <div class="grid-container grid-3-col">
-            <% if (typeof properties !== 'undefined' && properties.length > 0) { %>
-                <% properties.forEach(property => { %>
-                    <div class="content-card project-card" role="group" aria-label="<%= property.title %>">
-                        <div style="aspect-ratio:16/9;border-radius:.6rem;overflow:hidden;position:relative;background:#e2e8f0;display:flex;align-items:center;justify-content:center;">
-                            <img src="<%= property.image %>" alt="<%= property.title %>" style="width:100%;height:100%;object-fit:cover;object-position:center;" onerror="this.src='https://placehold.co/600x400/0b4d3a/ffffff?text=<%= encodeURIComponent(property.title) %>'">
-                            <div style="position: absolute; top: 1rem; right: 1rem; background: rgba(11, 77, 58, 0.9); color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 600;">For Rent</div>
+                    <h3 class="font-serif text-2xl text-[#0f2e22] mb-4"><%= asset.title %></h3>
+                    <div class="flex justify-between border-t border-gray-100 pt-4 mt-4">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Doors</span>
+                            <span class="text-sm font-bold text-[#1a1a1a]"><%= asset.doors || '—' %></span>
                         </div>
-                        <div style="padding: 1.5rem;">
-                            <h3 class="client-name" style="margin-top:0;margin-bottom:0.5rem;"><%= property.title %></h3>
-                            <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:var(--color-primary);margin-bottom:0.5rem;"><%= property.address %></div>
-                            <p class="success-snippet" style="color:var(--color-text-muted);margin-bottom:1rem;"><%= property.description %></p>
-                            <div style="font-weight: 700; color: #0b4d3a; margin-bottom: 1rem;"><%= property.price %></div>
-                            <div>
-                                <a href="/contact?property=<%= encodeURIComponent(property.title) %>" class="cta-button primary-btn" style="width:100%;text-align:center;display:block;">Inquire Now</a>
-                            </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Occupancy</span>
+                            <span class="text-sm font-bold text-[#1a1a1a]"><%= asset.occupancy || '—' %></span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Target IRR</span>
+                            <span class="text-sm font-bold text-[#1a1a1a]"><%= asset.targetIRR || '—' %></span>
                         </div>
                     </div>
-                <% }); %>
-            <% } else { %>
-                <p>No properties currently available.</p>
-            <% } %>
+                </div>
+            </a>
+            <% }); %>
         </div>
-        <div style="text-align:center;margin-top:3rem;">
-            <a href="/for-rent" class="cta-button secondary-btn">View All Rentals</a>
+        <% } else { %>
+        <p class="font-sans text-gray-500">Portfolio assets are being prepared. Check back soon.</p>
+        <% } %>
+        <div class="mt-12">
+            <a href="/portfolio" class="font-sans text-xs font-bold uppercase tracking-widest text-[#0f2e22] border-b border-[#0f2e22] pb-1 hover:text-[#1a1a1a] transition-colors">View Full Portfolio &rarr;</a>
         </div>
     </div>
 </section>
-
-<style>
-    /* Homepage Scroll Effect Styles */
-    body {
-        transition: background-color 0.8s ease, color 0.8s ease;
-    }
-    
-    /* Dark Theme State (triggered by scroll) */
-    body.theme-dark-green {
-        background-color: #0b4d3a !important;
-        color: #ffffff !important;
-    }
-
-    /* Text Color Overrides for Dark Theme */
-    body.theme-dark-green .section-title { color: #ffffff !important; }
-    body.theme-dark-green .section-description { color: #e4efe9 !important; }
-    
-    /* Testimonial/Card Styling in Dark Theme */
-    /* Make testimonial container transparent so text floats */
-    body.theme-dark-green .carousel-slides {
-        background-color: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-    }
-    body.theme-dark-green .slide blockquote { color: #ffffff !important; font-weight: 300; }
-    body.theme-dark-green .slide cite { color: #fbbf24 !important; } /* Gold name */
-    body.theme-dark-green .slide span { color: #cbd5e1 !important; }
-    body.theme-dark-green .slide .fa-star { color: #fbbf24 !important; } /* Gold stars */
-
-    /* Investment Process Cards - Keep White in Dark Mode */
-    body.theme-dark-green .process-card {
-        background-color: #ffffff !important;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2) !important;
-    }
-    body.theme-dark-green .process-card h3 { color: #1e293b !important; }
-    body.theme-dark-green .process-card p { color: #64748b !important; }
-    body.theme-dark-green .process-card .step-icon {
-        background: rgba(11,77,58,0.1) !important;
-        color: #0b4d3a !important;
-    }
-
-    /* Property Cards in Dark Theme - Keep Light */
-    body.theme-dark-green .content-card {
-        background-color: #f8fafc !important;
-        border: none !important;
-    }
-    body.theme-dark-green .content-card h3 { color: #1e293b !important; }
-    body.theme-dark-green .content-card p { color: #64748b !important; }
-    body.theme-dark-green .content-card div { color: #0b4d3a !important; } /* Price/Address */
-    
-    /* Buttons in Dark Theme */
-    body.theme-dark-green .secondary-btn {
-        background-color: #ffffff !important;
-        border-color: #ffffff !important;
-        color: #0b4d3a !important;
-    }
-    body.theme-dark-green .secondary-btn:hover {
-        background-color: #f1f5f9 !important;
-    }
-
-    /* Footer in Dark Theme */
-    body.theme-dark-green footer {
-        background-color: #062c21 !important; /* Darker green for separation */
-    }
-</style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // Trigger at Testimonials section
-        const triggerSection = document.getElementById('featured-testimonial');
-        const body = document.body;
-        
-        if (triggerSection) {
-            // Initial check
-            checkScroll();
-            
-            // Scroll listener
-            window.addEventListener('scroll', checkScroll);
-            
-            function checkScroll() {
-                const rect = triggerSection.getBoundingClientRect();
-                // Trigger when the section is 50% up the viewport
-                const triggerPoint = window.innerHeight * 0.5;
-                
-                if (rect.top <= triggerPoint) {
-                    body.classList.add('theme-dark-green');
-                } else {
-                    body.classList.remove('theme-dark-green');
-                }
-            }
-        }
-    });
-</script>
 
 <%- include('partials/footer') %>

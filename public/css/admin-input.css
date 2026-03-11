@@ -5,7 +5,7 @@
 @source not "../../public";
 
 /* Safelist critical utilities used broadly in admin */
-@source inline("{hover:,focus:,}bg-gray-800 bg-gray-800/50 bg-gray-800/60 text-gray-100 text-gray-300 text-gray-400 border-gray-700 divide-gray-700 divide-gray-800 bg-blue-600 text-blue-700 bg-white text-white bg-gray-700 hover:bg-gray-600 focus:ring-primary focus:ring-2 focus:ring-offset-2");
+@source inline("{hover:,focus:,}bg-gray-800 bg-gray-800/50 bg-gray-800/60 text-gray-100 text-gray-300 text-gray-400 border-gray-700 divide-gray-700 divide-gray-800 bg-blue-600 text-blue-700 bg-white text-white bg-gray-700 hover:bg-gray-600 focus:ring-primary focus:ring-2 focus:ring-offset-2 bg-[#f9f8f6] bg-[#0f2e22] text-[#1a1a1a] text-gray-600 border-[#0f2e22]/20 hover:bg-gray-50 border-b border-gray-200");
 
 /* Admin theme tweaks (v4 CSS-first config) */
 @theme {
@@ -33,13 +33,13 @@
 
 /* Error summary and field validation styles */
 @layer components {
-	.error-summary { display: flex; gap: .75rem; align-items: flex-start; background: color-mix(in oklab, #ef4444 12%, transparent); border: 1px solid #ef4444; color: #fecaca; padding: .75rem .9rem; border-radius: .5rem; margin: 0 0 1rem 0; }
-	.error-summary-icon { color: #fca5a5; font-size: 1.25rem; line-height: 1; margin-top: .15rem; }
-	.error-summary-title { font-weight: 800; color: #fff; margin: 0 0 .25rem 0; }
-	.error-summary-list { margin: 0; padding-left: 1.1rem; color: #ffe4e6; }
+	.error-summary { display: flex; gap: .75rem; align-items: flex-start; background: color-mix(in oklab, #ef4444 8%, white); border: 1px solid #ef4444; color: #991b1b; padding: .75rem .9rem; margin: 0 0 1rem 0; }
+	.error-summary-icon { color: #dc2626; font-size: 1.25rem; line-height: 1; margin-top: .15rem; }
+	.error-summary-title { font-weight: 800; color: #991b1b; margin: 0 0 .25rem 0; }
+	.error-summary-list { margin: 0; padding-left: 1.1rem; color: #b91c1c; }
 
-	.field-error { margin-top: .35rem; color: #fecaca; font-size: .875rem; }
-	.label-error { color: #fca5a5 !important; }
+	.field-error { margin-top: .35rem; color: #dc2626; font-size: .875rem; }
+	.label-error { color: #dc2626 !important; }
 	.input-error { border-color: #ef4444 !important; outline: none; box-shadow: 0 0 0 2px color-mix(in oklab, #ef4444 30%, transparent); }
 	.has-error .richtext-editor { border: 1px solid #ef4444; }
 
@@ -53,18 +53,18 @@
 	.admin-form input[type="tel"],
 	.admin-form select,
 	.admin-form textarea {
-		@apply block w-full rounded-md border border-gray-700 bg-gray-800 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary;
+		@apply block w-full border border-[#0f2e22]/20 bg-white text-[#1a1a1a] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary;
 	}
 
-	/* File input - keep native but make it readable in dark theme */
+	/* File input - readable in light theme */
 	.admin-form input[type="file"] {
-		@apply block w-full text-sm text-gray-300 file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-700 file:text-gray-100 hover:file:bg-gray-600;
+		@apply block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-[#0f2e22] file:text-white hover:file:bg-[#1a1a1a];
 	}
 
 	/* Checkbox alignment helpers */
 	.admin-form .checkbox-inline { @apply flex items-center gap-2; }
-	.admin-form .checkbox-inline input[type="checkbox"] { @apply h-4 w-4 rounded border-gray-700 bg-gray-800 text-primary focus:ring-primary; }
+	.admin-form .checkbox-inline input[type="checkbox"] { @apply h-4 w-4 border-[#0f2e22]/20 bg-white text-primary focus:ring-primary; }
 
 	/* Small helper text under fields */
-	.admin-form .help-text { @apply text-sm text-gray-400; }
+	.admin-form .help-text { @apply text-sm text-gray-500; }
 }

@@ -1,81 +1,157 @@
 <!-- views/investment-strategy.ejs -->
 <%- include('partials/header', {
   pageTitle: 'Investment Strategy | Vanier Capital',
-  pageDescription: 'Our disciplined investment philosophy focuses on resilient markets, value-add opportunities, and long-term wealth creation.',
+  pageDescription: 'Disciplined, data-driven, and long-term. We target resilient cash-flowing assets in growth corridors, applying conservative underwriting and active asset management to compound value over multi-year hold periods.',
   path: '/strategy'
 }) %>
 
-<section class="section">
-  <div class="container">
-    <div class="section-header" style="max-width:860px;margin-inline:auto;text-align:center;">
-      <p class="eyebrow" style="background:rgba(11,77,58,0.12);border-color:rgba(11,77,58,0.3);color:#0b4d3a;">Our Philosophy</p>
-      <h1 class="section-title" style="font-family:'Merriweather',serif;">Disciplined, Data‑Driven, Long-Term</h1>
-      <p class="section-description" style="font-size:1.15rem;color:var(--color-text-muted);margin-top:.85rem;">We target resilient cash‑flowing assets in growth corridors, applying conservative underwriting and active asset management to compound value over multi‑year hold periods.</p>
+<!-- Hero — Deep Evergreen -->
+<section id="philosophy" class="pt-32 pb-20 px-8 md:px-16 bg-[#0f2e22] text-white">
+  <div class="max-w-screen-xl mx-auto">
+    <span class="font-sans text-sm font-bold text-white/60 uppercase tracking-widest block mb-4">Investment Philosophy</span>
+    <h1 class="font-serif text-5xl md:text-6xl text-white tracking-tight mb-6">Investment Strategy.</h1>
+    <p class="font-sans text-xl text-white/80 max-w-3xl leading-relaxed">Vanier Capital operates at the intersection of macroeconomic research and operational excellence. Our core thesis is built on the "Missing Middle" of the Southeastern housing market—assets that are too large for individual retail buyers but too small for the largest institutional REITs. By targeting this gap, we secure a pricing advantage while applying the same rigorous analytics used by mega-funds.</p>
+  </div>
+</section>
+
+<!-- Sticky Sub-Navigation -->
+<nav id="strategy-subnav" class="sticky top-[88px] z-30 bg-white border-b border-[#0f2e22]/10 hidden md:block">
+  <div class="max-w-screen-xl mx-auto px-8 md:px-16 flex items-center gap-8 overflow-x-auto">
+    <a href="#philosophy" class="strategy-nav-link font-sans text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-[#0f2e22] py-4 border-b-2 border-transparent transition-colors whitespace-nowrap">Philosophy</a>
+    <a href="#market-selection" class="strategy-nav-link font-sans text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-[#0f2e22] py-4 border-b-2 border-transparent transition-colors whitespace-nowrap">Market Selection</a>
+    <a href="#execution" class="strategy-nav-link font-sans text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-[#0f2e22] py-4 border-b-2 border-transparent transition-colors whitespace-nowrap">Execution Framework</a>
+  </div>
+</nav>
+
+<!-- Section 1: Philosophy Pillars — Editorial Numbered Rows -->
+<section id="market-selection" class="max-w-screen-xl mx-auto px-8 md:px-16 py-24 divide-y divide-[#0f2e22]/20 scroll-mt-[120px]">
+
+  <!-- 01 Market Selection -->
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-12 py-16">
+    <div class="md:col-span-4">
+      <h2 class="font-serif text-3xl text-[#0f2e22]">
+        <span class="text-sm font-sans block text-gray-400 mb-2">01</span>
+        Market Selection
+      </h2>
+    </div>
+    <div class="md:col-span-8">
+      <p class="font-sans text-lg text-gray-700 leading-relaxed mb-6">We prioritize the "Southeastern Triangle"—markets defined by a specific set of quantitative triggers. We look for MSAs where net inbound migration outpaces new housing starts by at least 2:1. Our selection process focuses on "Path of Progress" submarkets—those located within 30 minutes of major logistical hubs or emerging tech/medical corridors. We seek environments with diverse employment bases to ensure that no single industry volatility can compromise the portfolio's debt service coverage.</p>
+      <ul class="space-y-3 border-l-2 border-[#0f2e22] pl-6">
+        <li class="text-base text-[#1a1a1a] font-medium">Population & employment momentum</li>
+        <li class="text-base text-[#1a1a1a] font-medium">Constrained new supply</li>
+        <li class="text-base text-[#1a1a1a] font-medium">Infrastructure & logistics linkages</li>
+        <li class="text-base text-[#1a1a1a] font-medium">Favorable regulatory posture and asset-protection frameworks</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 02 Asset Criteria -->
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-12 py-16">
+    <div class="md:col-span-4">
+      <h2 class="font-serif text-3xl text-[#0f2e22]">
+        <span class="text-sm font-sans block text-gray-400 mb-2">02</span>
+        Asset Criteria
+      </h2>
+    </div>
+    <div class="md:col-span-8">
+      <p class="font-sans text-lg text-gray-700 leading-relaxed mb-6">Our mandate targets under-managed, lightly capitalized residential assets operating below their intrinsic potential. We specifically seek properties exhibiting operational friction—where our standardized management SOPs and targeted CapEx deployment can force immediate NOI expansion and secure a below-replacement-cost basis.</p>
+      <ul class="space-y-3 border-l-2 border-[#0f2e22] pl-6">
+        <li class="text-base text-[#1a1a1a] font-medium">Value-add and workforce housing opportunities</li>
+        <li class="text-base text-[#1a1a1a] font-medium">Operational inefficiencies ripe for correction</li>
+        <li class="text-base text-[#1a1a1a] font-medium">Strong rent growth tailwinds</li>
+        <li class="text-base text-[#1a1a1a] font-medium">Below-replacement-cost basis</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 03 Risk Management -->
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-12 py-16">
+    <div class="md:col-span-4">
+      <h2 class="font-serif text-3xl text-[#0f2e22]">
+        <span class="text-sm font-sans block text-gray-400 mb-2">03</span>
+        Risk Management
+      </h2>
+    </div>
+    <div class="md:col-span-8">
+      <p class="font-sans text-lg text-gray-700 leading-relaxed mb-6">Capital preservation dictates every phase of our underwriting. We employ conservative leverage structures, mandate extensive CapEx reserves, and utilize quantitative stress-testing—modeling severe downside scenarios for rent stagnation and exit-cap expansion—to ensure our portfolio remains resilient across all market cycles.</p>
+      <ul class="space-y-3 border-l-2 border-[#0f2e22] pl-6">
+        <li class="text-base text-[#1a1a1a] font-medium">Stress-tested underwriting across multiple scenarios</li>
+        <li class="text-base text-[#1a1a1a] font-medium">CapEx reserves and capital planning discipline</li>
+        <li class="text-base text-[#1a1a1a] font-medium">Active performance monitoring and reporting</li>
+        <li class="text-base text-[#1a1a1a] font-medium">Conservative debt structuring with rate protection</li>
+      </ul>
+    </div>
+  </div>
+
+</section>
+
+<!-- Section 2: Execution Framework — 5-Column Grid -->
+<section id="execution" class="bg-[#f9f8f6] pt-32 pb-24 px-8 md:px-16 scroll-mt-[120px]">
+  <div class="max-w-screen-xl mx-auto mb-16">
+    <h2 class="font-serif text-4xl text-[#0f2e22] mb-4">Execution Framework</h2>
+    <p class="font-sans text-lg text-gray-700">A repeatable framework that protects capital while creating upside at every phase of ownership.</p>
+  </div>
+  <div class="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-8">
+    <div class="border-t-2 border-[#0f2e22] pt-6">
+      <span class="font-sans text-xs font-bold text-gray-500 mb-2 block">01</span>
+      <h3 class="font-serif text-xl text-[#1a1a1a] mb-3">Sourcing</h3>
+      <p class="font-sans text-sm text-gray-600 leading-relaxed">Through direct broker relationships, MLS monitoring, and systematic market scanning, we identify off-market and mispriced assets. By maintaining consistent deal flow across our target corridors, we secure acquisitions at a competitive basis before they reach broader market syndication.</p>
+    </div>
+    <div class="border-t-2 border-[#0f2e22] pt-6">
+      <span class="font-sans text-xs font-bold text-gray-500 mb-2 block">02</span>
+      <h3 class="font-serif text-xl text-[#1a1a1a] mb-3">Underwriting</h3>
+      <p class="font-sans text-sm text-gray-600 leading-relaxed">Our financial models apply rigorous sensitivity analysis to every assumption. We stress-test operational expenses, debt service coverage, and disposition metrics to ensure high-conviction capital deployment at every stage.</p>
+    </div>
+    <div class="border-t-2 border-[#0f2e22] pt-6">
+      <span class="font-sans text-xs font-bold text-gray-500 mb-2 block">03</span>
+      <h3 class="font-serif text-xl text-[#1a1a1a] mb-3">Value Creation</h3>
+      <p class="font-sans text-sm text-gray-600 leading-relaxed">Standardized Capital Improvement: We modernize assets using a uniform specification package. By standardizing flooring, fixtures, and mechanical systems across the portfolio, we reduce long-term maintenance overhead and create a consistent brand identity that commands a premium in the rental market.</p>
+    </div>
+    <div class="border-t-2 border-[#0f2e22] pt-6">
+      <span class="font-sans text-xs font-bold text-gray-500 mb-2 block">04</span>
+      <h3 class="font-serif text-xl text-[#1a1a1a] mb-3">Optimization</h3>
+      <p class="font-sans text-sm text-gray-600 leading-relaxed">Operational Efficiency: Management is treated as a logistics problem. We utilize centralized systems for leasing and maintenance triage, reducing vacancy turnaround times and ensuring high-touch communication with residents to maximize retention.</p>
+    </div>
+    <div class="border-t-2 border-[#0f2e22] pt-6">
+      <span class="font-sans text-xs font-bold text-gray-500 mb-2 block">05</span>
+      <h3 class="font-serif text-xl text-[#1a1a1a] mb-3">Exit Strategy</h3>
+      <p class="font-sans text-sm text-gray-600 leading-relaxed">Our disposition timeline is cycle-aware, not rigid. We continuously monitor stabilized yield metrics against macro liquidity trends, executing refinancing or divestment only when it maximizes risk-adjusted, absolute returns for our partners.</p>
     </div>
   </div>
 </section>
 
-<section class="section section-muted">
-  <div class="container">
-    <div class="grid-container grid-3-col">
-      <div class="content-card" role="group" aria-label="Market Selection">
-        <div class="card-icon"><i class="fas fa-location-dot"></i></div>
-        <h3>Market Selection</h3>
-        <p>We evaluate demographic inflows, job diversity, supply pipelines, and regulatory posture to focus on durable Sun Belt and secondary markets with asymmetric growth profiles.</p>
-        <ul style="margin:.75rem 0 0 1rem;font-size:.9rem;color:var(--color-text-muted);line-height:1.5;">
-          <li>Population & employment momentum</li>
-          <li>Constrained new supply</li>
-          <li>Infrastructure & logistics linkages</li>
-        </ul>
-      </div>
-      <div class="content-card" role="group" aria-label="Asset Criteria">
-        <div class="card-icon"><i class="fas fa-building"></i></div>
-        <h3>Asset Criteria</h3>
-        <p>Focus on under‑managed, lightly capitalized, or repositionable assets where targeted improvements and professional management unlock NOI expansion.</p>
-        <ul style="margin:.75rem 0 0 1rem;font-size:.9rem;color:var(--color-text-muted);line-height:1.5;">
-          <li>Value‑add potential</li>
-          <li>Operational inefficiencies</li>
-          <li>Strong rent growth tailwinds</li>
-        </ul>
-      </div>
-      <div class="content-card" role="group" aria-label="Risk Management">
-        <div class="card-icon"><i class="fas fa-shield"></i></div>
-        <h3>Risk Management</h3>
-        <p>Conservative leverage, diversified tenant mixes, rigorous due diligence, and contingency planning are embedded at every stage of acquisition and ownership.</p>
-        <ul style="margin:.75rem 0 0 1rem;font-size:.9rem;color:var(--color-text-muted);line-height:1.5;">
-          <li>Stress-tested underwriting</li>
-          <li>CapEx & reserve discipline</li>
-          <li>Active performance monitoring</li>
-        </ul>
-      </div>
-    </div>
-  </div>
+<!-- Section 3: Call To Action -->
+<section class="max-w-screen-xl mx-auto px-8 md:px-16 py-24 border-t border-[#0f2e22]/20 text-center">
+  <h2 class="font-serif text-4xl text-[#0f2e22] mb-4">Partner With a Disciplined Operator</h2>
+  <p class="font-sans text-lg text-gray-600 mb-8 max-w-2xl mx-auto">Request our full strategy deck and learn about current acquisition criteria, target markets, and investment structure.</p>
+  <a href="/contact?topic=investor-relations" class="inline-block font-sans text-sm font-bold uppercase tracking-widest text-white bg-[#0f2e22] border border-[#0f2e22] px-8 py-4 hover:bg-white hover:text-[#0f2e22] transition-colors">Request Strategy Deck</a>
 </section>
 
-<section class="section">
-  <div class="container">
-    <div class="section-header" style="text-align:center;max-width:800px;margin-inline:auto;">
-      <h2 class="section-title" style="font-family:'Merriweather',serif;">Lifecycle Approach</h2>
-      <p class="section-description">A repeatable framework that protects capital while creating upside.</p>
-    </div>
-    <div class="process-steps" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
-      <div class="process-step"><div class="step-icon"><i class="fas fa-chart-line"></i></div><h3>1. Sourcing</h3><p>Broker relationships, off‑market outreach, and data tools surface mispriced or overlooked assets.</p></div>
-      <div class="process-step"><div class="step-icon"><i class="fas fa-file-invoice-dollar"></i></div><h3>2. Underwriting</h3><p>Rigorous financial models stress test rent, expense, and exit assumptions under multiple scenarios.</p></div>
-      <div class="process-step"><div class="step-icon"><i class="fas fa-hammer"></i></div><h3>3. Value Creation</h3><p>CapEx execution, unit upgrades, amenity enhancements, and operational efficiency initiatives.</p></div>
-      <div class="process-step"><div class="step-icon"><i class="fas fa-chart-pie"></i></div><h3>4. Optimization</h3><p>Active asset management drives occupancy quality, expense control, and revenue optimization.</p></div>
-      <div class="process-step"><div class="step-icon"><i class="fas fa-right-left"></i></div><h3>5. Exit Strategy</h3><p>Disposition timing informed by market cycles, stabilized yield, and alternative capital deployment.</p></div>
-    </div>
-  </div>
-</section>
+<!-- Strategy Sub-Navigation Active State -->
+<script>
+(function() {
+  const sections = document.querySelectorAll('#philosophy, #market-selection, #execution');
+  const navLinks = document.querySelectorAll('.strategy-nav-link');
+  if (!sections.length || !navLinks.length) return;
 
-<section class="cta-section cta-alt full-bleed">
-  <div class="container">
-    <div class="cta-content">
-      <h2 class="section-title cta-title" style="font-family:'Merriweather',serif;">Partner With a Disciplined Operator</h2>
-      <p class="cta-description">Request our full strategy deck and learn about current acquisition criteria.</p>
-      <a href="/contact" class="cta-button primary-btn">Request Strategy Deck</a>
-    </div>
-  </div>
-</section>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => {
+          link.classList.remove('text-[#0f2e22]', 'border-[#0f2e22]');
+          link.classList.add('text-gray-400', 'border-transparent');
+        });
+        const activeLink = document.querySelector('.strategy-nav-link[href="#' + entry.target.id + '"]');
+        if (activeLink) {
+          activeLink.classList.remove('text-gray-400', 'border-transparent');
+          activeLink.classList.add('text-[#0f2e22]', 'border-[#0f2e22]');
+        }
+      }
+    });
+  }, { rootMargin: '-120px 0px -60% 0px', threshold: 0 });
+
+  sections.forEach(section => observer.observe(section));
+})();
+</script>
 
 <%- include('partials/footer') %>

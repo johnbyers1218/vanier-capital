@@ -20,7 +20,7 @@ export default (csrfProtection) => {
 			const results = [];
 			properties.forEach(p => results.push({ type: 'Property', title: p.title, href: `/admin/properties/edit/${p._id}` }));
 			posts.forEach(p => results.push({ type: 'Blog Post', title: p.title, href: `/admin/blog/edit/${p._id}` }));
-			res.render('admin/search', { pageTitle: `Search: ${q}`, path: '/admin/search', q, results });
+			return res.render('admin/search', { pageTitle: `Search: ${q}`, path: '/admin/search', q, results });
 		} catch (e) {
 			logger.error('[Admin Search] Failed', { message: e.message });
 			next(e);
@@ -40,8 +40,8 @@ export default (csrfProtection) => {
 			const results = [];
 			properties.forEach(p => results.push({ type: 'Property', title: p.title, href: `/admin/properties/edit/${p._id}` }));
 			posts.forEach(p => results.push({ type: 'Blog Post', title: p.title, href: `/admin/blog/edit/${p._id}` }));
-			res.json({ results: results.slice(0,5) });
-		} catch (e) { res.status(500).json({ results: [], error: 'search_failed' }); }
+			return res.json({ results: results.slice(0,5) });
+		} catch (e) { return res.status(500).json({ results: [], error: 'search_failed' }); }
 	});
 
 	return router;

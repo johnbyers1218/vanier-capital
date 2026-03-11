@@ -10,6 +10,7 @@ const InquirySchema = new Schema({
   subject: { type: String, required: true, trim: true, maxlength: 150 },
   message: { type: String, required: true, trim: true, minlength: 10, maxlength: 5000 },
   status: { type: String, enum: ['New', 'Viewed', 'Responded'], default: 'New', index: true },
+  inquiryType: { type: String, enum: ['general_inquiry', 'investor_lead'], default: 'general_inquiry', index: true },
 }, { timestamps: { createdAt: true, updatedAt: true } });
 
 InquirySchema.index({ createdAt: -1 });

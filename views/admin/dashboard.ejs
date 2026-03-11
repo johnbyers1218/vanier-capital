@@ -7,76 +7,72 @@
 
         <%# Welcome message using res.locals.adminUser %>
         <% if (isAuthenticated && adminUser) { %>
-            <h2 class="text-xl font-light">Welcome back, <strong class="font-semibold"><%= adminUser.fullName || adminUser.username %></strong>!</h2>
+            <h2 class="text-xl font-light text-[#1a1a1a]">Welcome back, <strong class="font-semibold"><%= adminUser.fullName || adminUser.username %></strong>.</h2>
         <% } else { %>
-            <h2 class="text-xl font-light">Admin Dashboard</h2>
-            <div class="flex items-center gap-2 rounded-md border border-red-700/50 bg-red-900/20 text-red-200 px-3 py-2 text-sm mt-4">
+            <h2 class="text-xl font-light text-[#1a1a1a]">Admin Dashboard</h2>
+            <div class="flex items-center gap-2 border border-red-300 bg-red-50 text-red-800 px-3 py-2 text-sm mt-4">
                 <i class="fas fa-exclamation-circle"></i>
                 <span>Error: User data not found. Please try logging in again.</span>
             </div>
         <% } %>
 
-    <p class="text-gray-300 mb-6 text-base">
+    <p class="text-gray-600 mb-6 text-base">
             Manage your website content and view recent activity from the sidebar navigation.
         </p>
 
-    <!-- Quick Action Links Section (smaller buttons; removed Quick Start card) -->
-    <section id="widget-quick-actions" class="rounded-lg border border-neutral-700 bg-[#1a1a1a] p-6 shadow-md">
+    <!-- Quick Action Links Section -->
+    <section id="widget-quick-actions" class="border border-[#0f2e22]/20 bg-white p-6">
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-semibold text-gray-100">Quick Actions</h2>
-                <button id="dashCustomizeBtn" type="button" class="text-sm text-gray-300 hover:text-white">Customize</button>
+                <h2 class="text-xl font-semibold text-[#1a1a1a]">Quick Actions</h2>
+                <button id="dashCustomizeBtn" type="button" class="text-sm text-gray-500 hover:text-[#1a1a1a]">Customize</button>
             </div>
-            <div id="dashCustomizePanel" class="hidden mb-4 border border-neutral-700 rounded p-3 bg-[#111]/50">
-                <div class="text-xs text-gray-400 mb-2">Show/Hide widgets</div>
+            <div id="dashCustomizePanel" class="hidden mb-4 border border-[#0f2e22]/20 p-3 bg-[#f9f8f6]">
+                <div class="text-xs text-gray-500 mb-2">Show/Hide widgets</div>
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 text-sm" id="dashCustomizeList">
                     <!-- checkboxes injected by script -->
                 </div>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                <a id="widget-quick-newpost" href="/admin/blog/new" class="inline-flex items-center justify-center gap-2 bg-primary text-white font-medium py-2 px-3 rounded-md shadow-sm hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition text-sm">
+                <a id="widget-quick-newpost" href="/admin/blog/new" class="inline-flex items-center justify-center gap-2 bg-[#0f2e22] text-white font-bold py-3 px-6 border border-[#0f2e22] hover:bg-[#1a1a1a] uppercase tracking-widest text-xs transition">
                     <i class="fas fa-plus-circle"></i>
-                    <span>New Article</span>
+                    <span>New Perspective</span>
                 </a>
-                <a id="widget-quick-newproperty" href="/admin/properties/new" class="inline-flex items-center justify-center gap-2 bg-primary text-white font-medium py-2 px-3 rounded-md shadow-sm hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition text-sm">
+                <a id="widget-quick-newproperty" href="/admin/properties/new" class="inline-flex items-center justify-center gap-2 bg-[#0f2e22] text-white font-bold py-3 px-6 border border-[#0f2e22] hover:bg-[#1a1a1a] uppercase tracking-widest text-xs transition">
                     <i class="fas fa-plus-circle"></i>
-                    <span>New Project</span>
-                </a>
-                <a id="widget-quick-newtestimonial" href="/admin/testimonials/new" class="inline-flex items-center justify-center gap-2 bg-primary text-white font-medium py-2 px-3 rounded-md shadow-sm hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition text-sm">
-                    <i class="fas fa-plus-circle"></i>
-                    <span>New Review</span>
+                    <span>New Asset</span>
                 </a>
                 <% const hasDrafts = typeof draftPostCount === 'number' && draftPostCount > 0; %>
-                <a id="widget-quick-viewdrafts" href="<%= hasDrafts ? '/admin/blog?status=draft' : 'javascript:void(0)' %>" class="inline-flex items-center justify-center gap-2 font-medium py-2 px-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition text-sm <%= hasDrafts ? 'bg-secondary text-white hover:bg-neutral-600 focus:ring-primary' : 'bg-neutral-700 text-gray-400 cursor-not-allowed opacity-70' %>" aria-disabled="<%= hasDrafts ? 'false' : 'true' %>">
+                <a id="widget-quick-viewdrafts" href="<%= hasDrafts ? '/admin/blog?status=draft' : 'javascript:void(0)' %>" class="inline-flex items-center justify-center gap-2 font-bold py-3 px-6 border uppercase tracking-widest text-xs transition <%= hasDrafts ? 'bg-white text-[#0f2e22] border-[#0f2e22] hover:bg-[#f9f8f6]' : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-70' %>" aria-disabled="<%= hasDrafts ? 'false' : 'true' %>">
                     <i class="fas fa-pencil-alt"></i>
                     <span>View Drafts</span>
                 </a>
             </div>
         </section>
 
-    <!-- Content Overview / Stats Section -->
-                <section id="widget-stats" class="rounded-lg border border-neutral-700 bg-[#1a1a1a] p-6 shadow-md">
-            <h2 class="text-xl font-semibold text-gray-100 mb-4">Content Overview</h2>
+    <!-- Fund Overview / Stats Section -->
+                <section id="widget-stats" class="border border-[#0f2e22]/20 bg-white p-6">
+            <h2 class="text-xl font-semibold text-[#1a1a1a] mb-4">Fund Overview</h2>
                         <div id="stats" class="grid grid-cols-2 md:grid-cols-5 gap-4">
-                                <a href="/admin/properties" class="rounded-md border border-neutral-700 bg-[#1a1a1a]/50 p-4 text-center hover:bg-neutral-700/40 transition">
-                    <h4 class="text-gray-300 text-sm uppercase tracking-wide mb-2">Total Properties</h4>
-                                        <span class="block text-3xl font-semibold text-primary" data-stat="projectCount"><%= (typeof projectCount === 'number') ? projectCount : '--' %></span>
+                                <a href="/admin/settings/kpi" class="border border-[#0f2e22]/20 bg-[#f9f8f6] p-4 text-center hover:bg-gray-50 transition">
+                    <h4 class="text-gray-500 text-xs font-bold uppercase tracking-widest mb-2">AUM</h4>
+                                        <span class="block text-3xl font-semibold text-[#0f2e22]"><%= (typeof siteSettings !== 'undefined' && siteSettings.aum) ? siteSettings.aum : '$1M+' %></span>
                                 </a>
-                                <a href="/admin/blog?status=published" class="rounded-md border border-neutral-700 bg-[#1a1a1a]/50 p-4 text-center hover:bg-neutral-700/40 transition">
-                    <h4 class="text-gray-300 text-sm uppercase tracking-wide mb-2">Published Articles</h4>
-                                        <span class="block text-3xl font-semibold text-primary" data-stat="blogPostCount"><%= (typeof blogPostCount === 'number') ? blogPostCount : '--' %></span>
+                                <a href="/admin/properties" class="border border-[#0f2e22]/20 bg-[#f9f8f6] p-4 text-center hover:bg-gray-50 transition">
+                    <h4 class="text-gray-500 text-xs font-bold uppercase tracking-widest mb-2">Total Assets</h4>
+                                        <span class="block text-3xl font-semibold text-[#0f2e22]" data-stat="propertyCount"><%= (typeof propertyCount === 'number') ? propertyCount : '--' %></span>
                                 </a>
-                                <div class="rounded-md border border-neutral-700 bg-[#1a1a1a]/50 p-4 text-center">
-                    <h4 class="text-gray-300 text-sm uppercase tracking-wide mb-2">Visible Reviews</h4>
-                                        <span class="block text-3xl font-semibold text-primary" data-stat="testimonialCount"><%= (typeof testimonialCount === 'number') ? testimonialCount : '--' %></span>
-                </div>
-                                <a href="/admin/blog?status=draft" class="rounded-md border border-neutral-700 bg-[#1a1a1a]/50 p-4 text-center hover:bg-neutral-700/40 transition">
-                    <h4 class="text-gray-300 text-sm uppercase tracking-wide mb-2">Draft Articles</h4>
-                                        <span class="block text-3xl font-semibold text-primary" data-stat="draftPostCount"><%= (typeof draftPostCount === 'number') ? draftPostCount : '--' %></span>
+                                <a href="/admin/settings/kpi" class="border border-[#0f2e22]/20 bg-[#f9f8f6] p-4 text-center hover:bg-gray-50 transition">
+                    <h4 class="text-gray-500 text-xs font-bold uppercase tracking-widest mb-2">Avg Portfolio Occupancy</h4>
+                                        <span class="block text-3xl font-semibold text-[#0f2e22]"><%= (typeof siteSettings !== 'undefined' && siteSettings.occupancyRate) ? siteSettings.occupancyRate : '96%' %></span>
+                                </a>
+                                <a href="/admin/applicants" class="border border-[#0f2e22]/20 bg-[#f9f8f6] p-4 text-center hover:bg-gray-50 transition">
+                    <h4 class="text-gray-500 text-xs font-bold uppercase tracking-widest mb-2">Vetting Applications</h4>
+                                        <span class="block text-3xl font-semibold text-[#0f2e22]" data-stat="applicantCount"><%= (typeof applicantCount === 'number') ? applicantCount : '--' %></span>
                                 </a>
 
-                <a href="/admin/inquiries?status=New" class="rounded-md border border-neutral-700 bg-[#1a1a1a]/50 p-4 text-center hover:bg-neutral-700/40 transition">
-            <h4 class="text-gray-300 text-sm uppercase tracking-wide mb-2">New Inquiries</h4>
-                    <span class="block text-3xl font-semibold text-primary" data-stat="newInquiries">--</span>
+                <a href="/admin/inquiries?status=New" class="border border-[#0f2e22]/20 bg-[#f9f8f6] p-4 text-center hover:bg-gray-50 transition">
+            <h4 class="text-gray-500 text-xs font-bold uppercase tracking-widest mb-2">New Inquiries</h4>
+                    <span class="block text-3xl font-semibold text-[#0f2e22]" data-stat="newInquiries">--</span>
                 </a>
             </div>
         </section>
@@ -86,60 +82,67 @@
 
 
             <!-- Content Pipeline Chart (smaller donut) -->
-            <div id="widget-chart-pipeline" class="rounded-lg border border-neutral-700 bg-[#1a1a1a] p-4 shadow-md">
-                <h2 class="text-lg font-semibold text-gray-100 mb-2">Content Pipeline</h2>
+            <div id="widget-chart-pipeline" class="border border-[#0f2e22]/20 bg-white p-4">
+                <h2 class="text-lg font-semibold text-[#1a1a1a] mb-2">Content Pipeline</h2>
                 <div class="h-40 flex items-center justify-center" id="pipeline-skeleton">
-                    <div class="w-28 h-28 bg-neutral-700/40 animate-pulse rounded-full"></div>
+                    <div class="w-28 h-28 bg-gray-100 animate-pulse rounded-full"></div>
                 </div>
                 <div class="relative max-w-[220px] mx-auto">
-                    <div id="pipelineTotal" class="absolute inset-0 flex items-center justify-center text-2xl font-bold text-gray-100 pointer-events-none hidden">0</div>
+                    <div id="pipelineTotal" class="absolute inset-0 flex items-center justify-center text-2xl font-bold text-[#1a1a1a] pointer-events-none hidden">0</div>
                     <canvas id="pipelineChart" class="hidden" height="120"></canvas>
                 </div>
             </div>
 
-            <!-- Blog Views (30d) -->
-            <div id="widget-chart-views" class="rounded-lg border border-neutral-700 bg-[#1a1a1a] p-4 shadow-md">
-                <h2 class="text-lg font-semibold text-gray-100 mb-2">Article Views (30d)</h2>
-                <div class="h-40 flex items-center justify-center" id="views-skeleton">
-                    <div class="w-full h-32 bg-neutral-700/40 animate-pulse rounded"></div>
-                </div>
-                <canvas id="viewsChart" class="hidden" height="120"></canvas>
-            </div>
-        </section>
-
-        <!-- Second charts row: Contact forms (30d) only when space allows -->
-        <section class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            <div id="widget-chart-contacts" class="rounded-lg border border-neutral-700 bg-[#1a1a1a] p-4 shadow-md xl:col-span-1">
-                <h2 class="text-lg font-semibold text-gray-100 mb-2">Contact Forms (30d)</h2>
+            <!-- Contact Forms (30d) -->
+            <div id="widget-chart-contacts" class="border border-[#0f2e22]/20 bg-white p-4">
+                <h2 class="text-lg font-semibold text-[#1a1a1a] mb-2">Contact Forms (30d)</h2>
                 <div class="h-40 flex items-center justify-center" id="contacts-skeleton">
-                    <div class="w-full h-32 bg-neutral-700/40 animate-pulse rounded"></div>
+                    <div class="w-full h-32 bg-gray-100 animate-pulse"></div>
                 </div>
                 <canvas id="contactsChart" class="hidden" height="120"></canvas>
             </div>
         </section>
 
-        <!-- Content Health + Team -->
+        <!-- Recent Asset Activity (replaces Content Health + Blog Views) -->
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Content Health -->
-            <div id="widget-health" class="rounded-lg border border-neutral-700 bg-[#1a1a1a] p-6 shadow-md">
-                <h2 class="text-xl font-semibold text-gray-100 mb-4">Content Health</h2>
-                <ul class="space-y-3">
-                    <li class="flex items-center justify-between">
-                        <span class="text-gray-200">Articles Missing Featured Image</span>
-                        <a href="/admin/blog?status=published" class="text-primary font-semibold hover:underline"><%= (contentHealth && typeof contentHealth.postsMissingFeatured === 'number') ? contentHealth.postsMissingFeatured : 0 %></a>
-                    </li>
-                    <li class="flex items-center justify-between">
-                        <span class="text-gray-200">Drafts Older Than 30 Days</span>
-                        <a href="/admin/blog?status=draft" class="text-primary font-semibold hover:underline"><%= (contentHealth && typeof contentHealth.staleDrafts === 'number') ? contentHealth.staleDrafts : 0 %></a>
-                    </li>
-                </ul>
+            <!-- Capital Pipeline -->
+            <div id="widget-health" class="border border-[#0f2e22]/20 bg-white p-6">
+                <h2 class="text-xl font-semibold text-[#1a1a1a] mb-4">Capital Pipeline</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="bg-[#f9f8f6] border-y border-[#0f2e22]/20">
+                                <th class="px-4 py-3 text-[#1a1a1a] font-sans text-xs font-bold uppercase tracking-widest">Metric</th>
+                                <th class="px-4 py-3 text-[#1a1a1a] font-sans text-xs font-bold uppercase tracking-widest text-right">Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="bg-white border-b border-gray-200">
+                                <td class="px-4 py-3 text-sm text-[#1a1a1a]">Published Perspectives</td>
+                                <td class="px-4 py-3 text-sm text-[#1a1a1a] text-right font-semibold" data-stat="blogPostCount"><%= (typeof blogPostCount === 'number') ? blogPostCount : '--' %></td>
+                            </tr>
+                            <tr class="bg-white border-b border-gray-200">
+                                <td class="px-4 py-3 text-sm text-[#1a1a1a]">Draft Perspectives</td>
+                                <td class="px-4 py-3 text-sm text-[#1a1a1a] text-right font-semibold" data-stat="draftPostCount"><%= (typeof draftPostCount === 'number') ? draftPostCount : '--' %></td>
+                            </tr>
+                            <tr class="bg-white border-b border-gray-200">
+                                <td class="px-4 py-3 text-sm text-[#1a1a1a]">Perspectives Missing Featured Image</td>
+                                <td class="px-4 py-3 text-sm text-[#1a1a1a] text-right font-semibold"><%= (contentHealth && typeof contentHealth.postsMissingFeatured === 'number') ? contentHealth.postsMissingFeatured : 0 %></td>
+                            </tr>
+                            <tr class="bg-white border-b border-gray-200">
+                                <td class="px-4 py-3 text-sm text-[#1a1a1a]">Stale Drafts (30d+)</td>
+                                <td class="px-4 py-3 text-sm text-[#1a1a1a] text-right font-semibold"><%= (contentHealth && typeof contentHealth.staleDrafts === 'number') ? contentHealth.staleDrafts : 0 %></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- User Roles -->
-            <div id="widget-team" class="rounded-lg border border-neutral-700 bg-[#1a1a1a] p-6 shadow-md">
+            <div id="widget-team" class="border border-[#0f2e22]/20 bg-white p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold text-gray-100">Team</h2>
-                      <a href="/admin/settings/team" class="text-sm text-primary hover:underline">Manage Team</a>
+                    <h2 class="text-xl font-semibold text-[#1a1a1a]">Team</h2>
+                      <a href="/admin/settings/team" class="text-sm text-[#0f2e22] hover:underline">Manage Team</a>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <% (teamUsers || []).forEach(function(u){
@@ -148,8 +151,8 @@
                             avatarSrc = '/images/' + avatarSrc;
                         }
                     %>
-                        <div class="flex items-center gap-3 p-3 rounded-md border border-neutral-700 bg-[#1a1a1a]/40">
-                            <div class="w-10 h-10 rounded-full overflow-hidden bg-neutral-700 flex items-center justify-center text-gray-300">
+                        <div class="flex items-center gap-3 p-3 border border-[#0f2e22]/20 bg-[#f9f8f6]">
+                            <div class="w-10 h-10 overflow-hidden bg-gray-200 flex items-center justify-center text-gray-500">
                                 <% if (avatarSrc) { %>
                                     <img src="<%= avatarSrc %>" alt="<%= u.fullName || u.username %>" class="w-full h-full object-cover" />
                                 <% } else { %>
@@ -157,32 +160,32 @@
                                 <% } %>
                             </div>
                             <div class="min-w-0">
-                                <div class="font-medium truncate"><%= u.fullName || u.username %></div>
-                                <div class="text-xs text-gray-400 uppercase tracking-wide"><%= u.role %></div>
+                                <div class="font-medium text-[#1a1a1a] truncate"><%= u.fullName || u.username %></div>
+                                <div class="text-xs text-gray-500 uppercase tracking-wide"><%= u.role %></div>
                             </div>
                         </div>
                     <% }) %>
                     <% if (!teamUsers || teamUsers.length === 0) { %>
-                        <p class="text-gray-400">No team members found.</p>
+                        <p class="text-gray-500">No team members found.</p>
                     <% } %>
                 </div>
             </div>
         </section>
 
         <!-- Recent Admin Activity -->
-        <section id="widget-activity" class="rounded-lg border border-neutral-700 bg-[#1a1a1a] p-6 shadow-md">
+        <section id="widget-activity" class="border border-[#0f2e22]/20 bg-white p-6">
             <div class="flex items-center justify-between mb-3">
-                <h2 class="text-xl font-semibold text-gray-100">Recent Admin Activity</h2>
+                <h2 class="text-xl font-semibold text-[#1a1a1a]">Recent Admin Activity</h2>
                 <div>
-                    <div class="inline-flex rounded-md bg-[#1a1a1a]/60 border border-neutral-700 p-1 text-sm" id="activityFilter">
-                        <button data-filter="all" class="px-3 py-1.5 rounded-md bg-neutral-700 text-white">All Activity</button>
-                        <button data-filter="mine" class="px-3 py-1.5 rounded-md text-gray-300 hover:text-white">My Activity</button>
+                    <div class="inline-flex bg-[#f9f8f6] border border-[#0f2e22]/20 p-1 text-sm" id="activityFilter">
+                        <button data-filter="all" class="px-3 py-1.5 bg-[#0f2e22] text-white">All Activity</button>
+                        <button data-filter="mine" class="px-3 py-1.5 text-gray-600 hover:text-[#1a1a1a]">My Activity</button>
                     </div>
                 </div>
             </div>
-            <div class="border border-neutral-700 rounded-md bg-[#1a1a1a]/30 overflow-hidden">
+            <div class="border border-[#0f2e22]/20 bg-[#f9f8f6] overflow-hidden">
                 <% if (typeof recentLogs !== 'undefined' && recentLogs && recentLogs.length > 0) { %>
-                    <ul class="divide-y divide-neutral-800 max-h-[450px] overflow-y-auto" id="activityList">
+                    <ul class="divide-y divide-gray-200 max-h-[450px] overflow-y-auto" id="activityList">
                         <% recentLogs.forEach(function(log){
                             var actor = log.adminUser || {};
                             var name = actor.fullName || actor.username || 'System';
@@ -204,19 +207,19 @@
                             var titleMatch = detail.match(/Title:\s*([^,]+)/);
                             var title = titleMatch ? titleMatch[1].trim() : detail || log.action;
                         %>
-                        <li class="flex items-start gap-4 px-4 py-3 text-sm" data-actor="<%= actor.username || '' %>">
-                            <div class="w-9 h-9 rounded-full overflow-hidden bg-neutral-700 flex items-center justify-center shrink-0">
+                        <li class="flex items-start gap-4 px-4 py-3 text-sm bg-white" data-actor="<%= actor.username || '' %>">
+                            <div class="w-9 h-9 overflow-hidden bg-gray-200 flex items-center justify-center shrink-0">
                                 <% if (avatar) { %>
                                     <img src="<%= avatar %>" alt="<%= name %>" class="w-full h-full object-cover" />
                                 <% } else { %>
-                                    <i class="fas fa-user text-gray-300"></i>
+                                    <i class="fas fa-user text-gray-400"></i>
                                 <% } %>
                             </div>
                             <div class="grow min-w-0">
                                 <div class="flex items-center gap-2 flex-wrap">
-                                    <span class="text-primary font-medium"><%= name %></span>
+                                    <span class="text-[#0f2e22] font-medium"><%= name %></span>
                                     <span class="text-gray-400">•</span>
-                                    <span class="text-gray-200"><%= log.action.replace(/_/g,' ').replace(/\b\w/g, s=>s.toUpperCase()) %></span>
+                                    <span class="text-[#1a1a1a]"><%= log.action.replace(/_/g,' ').replace(/\b\w/g, s=>s.toUpperCase()) %></span>
                                 </div>
                                 <div class="mt-1 truncate">
                                     <% if (editHref) { %>
@@ -226,7 +229,7 @@
                                     <% } %>
                                 </div>
                                 <% if (log.ipAddress || ts) { %>
-                                    <div class="mt-1 text-xs text-gray-400">
+                                    <div class="mt-1 text-xs text-gray-500">
                                         <% if (ts) { %>
                                             <i class="far fa-clock"></i>
                                             <time class="activity-time" datetime="<%= ts.toISOString() %>" title="<%= ts.toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'long'}) %>">...</time>
@@ -239,7 +242,7 @@
                         <% }) %>
                     </ul>
                 <% } else { %>
-                    <p class="text-gray-400 text-center p-6">No recent admin activity recorded.</p>
+                    <p class="text-gray-500 text-center p-6">No recent admin activity recorded.</p>
                 <% } %>
             </div>
         </section>
@@ -255,11 +258,10 @@
         const qs = (s, r=document) => r.querySelector(s);
         const qsa = (s, r=document) => Array.from(r.querySelectorAll(s));
         const statEls = {
-            projectCount: qs('[data-stat="projectCount"]'),
+            propertyCount: qs('[data-stat="propertyCount"]'),
             blogPostCount: qs('[data-stat="blogPostCount"]'),
             draftPostCount: qs('[data-stat="draftPostCount"]'),
-            totalSubscribers: qs('[data-stat="totalSubscribers"]'),
-            testimonialCount: qs('[data-stat="testimonialCount"]')
+            applicantCount: qs('[data-stat="applicantCount"]')
         };
         // Refresh stats in background to avoid layout shift
         fetch('/admin/dashboard/api/stats').then(r=>r.json()).then(data=>{
@@ -274,8 +276,9 @@
             filterWrap.addEventListener('click', (e)=>{
                 const btn = e.target.closest('button[data-filter]');
                 if (!btn) return;
-                qsa('button', filterWrap).forEach(b=>b.classList.remove('bg-neutral-700','text-white'));
-                btn.classList.add('bg-neutral-700','text-white');
+                qsa('button', filterWrap).forEach(b=>{b.classList.remove('bg-[#0f2e22]','text-white');b.classList.add('text-gray-600');});
+                btn.classList.add('bg-[#0f2e22]','text-white');
+                btn.classList.remove('text-gray-600');
                 const mode = btn.getAttribute('data-filter');
             const me = `<%= adminUser ? (adminUser.username) : '' %>`;
                 qsa('li[data-actor]', list).forEach(li=>{
@@ -287,22 +290,6 @@
         }
 
         // Charts
-    const subsCtx = qs('#subsChart');
-        const subsSkeleton = qs('#subs-skeleton');
-            fetch('/admin/dashboard/api/subscribers/last-30-days').then(r=>r.json()).then(({labels, data})=>{
-            if (subsCtx) {
-                subsCtx.classList.remove('hidden');
-                if (subsSkeleton) subsSkeleton.classList.add('hidden');
-                    const total = (data||[]).reduce((a,b)=>a+b,0);
-                    const summaryEl = qs('#subsSummary'); if (summaryEl) summaryEl.textContent = `Total New in 30 Days: ${total}`;
-                    new Chart(subsCtx, {
-                    type: 'line',
-                        data: { labels, datasets: [{ label: 'New', data, borderColor: '#00A8E8', backgroundColor: 'rgba(0,168,232,0.15)', fill: true, tension: 0.3, pointRadius: 0 }] },
-                        options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxTicksLimit: 6 } }, y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } } }
-                });
-            }
-        }).catch(()=>{});
-
     const pipeCtx = qs('#pipelineChart');
         const pipeSkeleton = qs('#pipeline-skeleton');
             fetch('/admin/dashboard/api/posts/pipeline').then(r=>r.json()).then(({published, drafts})=>{
@@ -313,7 +300,7 @@
                     const totalEl = qs('#pipelineTotal'); if (totalEl) { totalEl.textContent = String(total); totalEl.classList.remove('hidden'); }
                     const chart = new Chart(pipeCtx, {
                     type: 'doughnut',
-                    data: { labels: ['Published','Drafts'], datasets: [{ data: [published, drafts], backgroundColor: ['#10B981','#F59E0B'] }] },
+                    data: { labels: ['Published','Drafts'], datasets: [{ data: [published, drafts], backgroundColor: ['#0f2e22','#9ca3af'] }] },
                     options: { plugins: { legend: { position: 'bottom' } }, cutout: '60%' }
                 });
                     // Make legend interactive: navigate on click
@@ -327,25 +314,10 @@
                     if (wrapper && !wrapper.querySelector('.pipeline-links')) {
                         const div = document.createElement('div');
                         div.className = 'pipeline-links mt-2 text-sm text-center';
-                        div.innerHTML = `<a class="text-emerald-400 hover:underline mx-2" href="${legendMap[0].href}">Published</a>
-                                                         <a class="text-amber-400 hover:underline mx-2" href="${legendMap[1].href}">Drafts</a>`;
+                        div.innerHTML = `<a class="text-[#0f2e22] hover:underline mx-2" href="${legendMap[0].href}">Published</a>
+                                                         <a class="text-gray-500 hover:underline mx-2" href="${legendMap[1].href}">Drafts</a>`;
                         wrapper.appendChild(div);
                     }
-            }
-        }).catch(()=>{});
-
-        // Blog Views (30d)
-        const viewsCtx = qs('#viewsChart');
-        const viewsSkeleton = qs('#views-skeleton');
-        fetch('/admin/dashboard/api/blog-views/last-30-days').then(r=>r.json()).then(({labels, data})=>{
-            if (viewsCtx) {
-                viewsCtx.classList.remove('hidden');
-                if (viewsSkeleton) viewsSkeleton.classList.add('hidden');
-                new Chart(viewsCtx, {
-                    type: 'bar',
-                    data: { labels, datasets: [{ label: 'Views', data, backgroundColor: '#60A5FA' }] },
-                    options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxTicksLimit: 6 } }, y: { beginAtZero: true, ticks: { precision: 0 } } } }
-                });
             }
         }).catch(()=>{});
 
@@ -358,7 +330,7 @@
                 if (contactsSkeleton) contactsSkeleton.classList.add('hidden');
                 new Chart(contactsCtx, {
                     type: 'line',
-                    data: { labels, datasets: [{ label: 'Submissions', data, borderColor: '#34D399', backgroundColor: 'rgba(52,211,153,0.15)', tension: 0.3, fill: true, pointRadius: 0 }] },
+                    data: { labels, datasets: [{ label: 'Submissions', data, borderColor: '#0f2e22', backgroundColor: 'rgba(15,46,34,0.1)', tension: 0.3, fill: true, pointRadius: 0 }] },
                     options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxTicksLimit: 6 } }, y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 } } } }
                 });
             }
@@ -393,8 +365,8 @@
         setInterval(updateTimes, 30000);
 
         // Simple dashboard customization: show/hide widgets with persistence
-    const widgetIds = ['widget-quick-actions','widget-quick-newpost','widget-quick-newproject','widget-quick-newtestimonial','widget-quick-viewdrafts','widget-stats','widget-chart-subs','widget-chart-pipeline','widget-chart-views','widget-chart-contacts','widget-health','widget-team','widget-activity'];
-        const storageKey = 'adminDashWidgets:v1';
+    const widgetIds = ['widget-quick-actions','widget-quick-newpost','widget-quick-newproject','widget-quick-viewdrafts','widget-stats','widget-chart-subs','widget-chart-pipeline','widget-chart-contacts','widget-health','widget-team','widget-activity'];
+        const storageKey = 'adminDashWidgets:v2';
         const loadPrefs = () => {
             try { return JSON.parse(localStorage.getItem(storageKey)) || {}; } catch { return {}; }
         };
@@ -422,10 +394,10 @@
                 if (!target) return; // skip missing widget
                 const label = id.replace('widget-','').replace(/-/g,' ');
                 const wrap = document.createElement('label');
-                wrap.className = 'flex items-center gap-2 p-2 rounded hover:bg-[#1a1a1a]/60 cursor-pointer';
+                wrap.className = 'flex items-center gap-2 p-2 hover:bg-[#f9f8f6] cursor-pointer';
                 const cb = document.createElement('input');
                 cb.type = 'checkbox';
-                cb.className = 'accent-blue-600';
+                cb.className = 'accent-[#0f2e22]';
                 cb.checked = prefs[id] !== false;
                 cb.addEventListener('change', ()=>{
                     prefs[id] = cb.checked;
@@ -437,23 +409,6 @@
                 wrap.appendChild(cb);
                 wrap.appendChild(span);
                 listEl.appendChild(wrap);
-            });
-        }
-    })();
-</script>
-<script async crossorigin src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js"></script>
-<script>
-    // Clerk signOut integration for admin nav
-    (function() {
-        var logout = document.getElementById('clerk-logout-link');
-        if (logout) {
-            logout.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (window.Clerk) {
-                    window.Clerk.signOut();
-                } else {
-                    window.location.href = '/auth/sign-in?redirectTo=' + encodeURIComponent('/admin/dashboard');
-                }
             });
         }
     })();

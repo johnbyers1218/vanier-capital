@@ -1,73 +1,64 @@
 <!-- views/admin/partials/sidebar.ejs -->
-<aside class="w-64 shrink-0 flex flex-col bg-[#0b4d3a] text-gray-100 min-h-screen border-r border-[#093d2d] sticky top-0 h-screen" style="background-color: #0b4d3a;">
-  <div class="px-5 py-6 border-b border-[#093d2d]">
-    <a href="/admin/dashboard" class="block">
-      <img src="/images/vanier-logo.svg" alt="Vanier Capital Logo" class="h-10 w-auto" />
-    </a>
-  </div>
+<aside class="w-64 shrink-0 flex flex-col bg-[#0f2e22] text-gray-100 min-h-screen border-r border-[#1a1a1a] sticky top-0 h-screen">
+  <a href="/admin/dashboard" class="flex flex-col items-center justify-center py-6 border-b border-white/10 mb-6">
+      <span class="font-serif text-2xl text-white tracking-[0.15em] uppercase leading-none">VANIER</span>
+      <span class="font-sans text-[9px] font-bold text-white/70 uppercase tracking-[0.4em] mt-1">ADMIN</span>
+  </a>
   <nav class="flex-1 px-2 py-4">
     <ul class="space-y-1">
       <li>
         <% const isDashboard = (typeof path === 'string' && path === '/admin/dashboard'); %>
-  <a href="/admin/dashboard" class="flex items-center gap-3 px-3 py-2 rounded-md border border-transparent hover:bg-[#093d2d] hover:text-white <%= isDashboard ? 'bg-[#093d2d] text-white border-[#093d2d]' : 'text-gray-100' %>">
+  <a href="/admin/dashboard" class="flex items-center gap-3 px-3 py-2 rounded-md border border-transparent hover:bg-[#1a1a1a] hover:text-white <%= isDashboard ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]' : 'text-gray-100' %>">
           <i class="fas fa-tachometer-alt w-5 text-center"></i>
           <span>Dashboard</span>
         </a>
       </li>
       <li>
-  <% const isProjects = (typeof path === 'string' && path.startsWith('/admin/properties')); %>
-  <a href="/admin/properties" class="flex items-center gap-3 px-3 py-2 rounded-md border border-transparent hover:bg-[#093d2d] hover:text-white <%= isProjects ? 'bg-[#093d2d] text-white border-[#093d2d]' : 'text-gray-100' %>">
-          <i class="fas fa-project-diagram w-5 text-center"></i>
-          <span>Properties</span>
+  <% const isProperties = (typeof path === 'string' && path.startsWith('/admin/properties')); %>
+  <a href="/admin/properties" class="flex items-center gap-3 px-3 py-2 rounded-md border border-transparent hover:bg-[#1a1a1a] hover:text-white <%= isProperties ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]' : 'text-gray-100' %>">
+          <i class="fas fa-building w-5 text-center"></i>
+          <span>Portfolio Track Record</span>
         </a>
       </li>
       <li>
-        <% const isTestimonials = (typeof path === 'string' && path.startsWith('/admin/testimonials')); %>
-  <a href="/admin/testimonials" class="flex items-center gap-3 px-3 py-2 rounded-md border border-transparent hover:bg-[#093d2d] hover:text-white <%= isTestimonials ? 'bg-[#093d2d] text-white border-[#093d2d]' : 'text-gray-100' %>">
-          <i class="fas fa-comment-dots w-5 text-center"></i>
-          <span>Reviews</span>
+  <% const isApplicants = (typeof path === 'string' && path.startsWith('/admin/applicants')); %>
+  <a href="/admin/applicants" class="flex items-center gap-3 px-3 py-2 rounded-md border border-transparent hover:bg-[#1a1a1a] hover:text-white <%= isApplicants ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]' : 'text-gray-100' %>">
+          <i class="fas fa-user-shield w-5 text-center"></i>
+          <span>Vetting Applications</span>
         </a>
       </li>
       <li>
-        <% const isBlog = (typeof path === 'string' && path.startsWith('/admin/blog')); %>
-  <a href="/admin/blog" class="flex items-center gap-3 px-3 py-2 rounded-md border border-transparent hover:bg-[#093d2d] hover:text-white <%= isBlog ? 'bg-[#093d2d] text-white border-[#093d2d]' : 'text-gray-100' %>">
-          <i class="fas fa-newspaper w-5 text-center"></i>
-          <span>Articles</span>
+  <% const isGeneralInquiries = (typeof path === 'string' && path.startsWith('/admin/inquiries') && !path.includes('type=investor_lead')); %>
+  <a href="/admin/inquiries" class="flex items-center gap-3 px-3 py-2 rounded-md border border-transparent hover:bg-[#1a1a1a] hover:text-white <%= isGeneralInquiries ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]' : 'text-gray-100' %>">
+          <i class="fas fa-inbox w-5 text-center"></i>
+          <span>General Inquiries</span>
         </a>
       </li>
       <li>
-        <!-- Intentionally left blank: Site Management links moved below divider -->
+  <% const isDistributionLeads = (typeof path === 'string' && path.includes('type=investor_lead')); %>
+  <a href="/admin/inquiries?type=investor_lead" class="flex items-center gap-3 px-3 py-2 rounded-md border border-transparent hover:bg-[#1a1a1a] hover:text-white <%= isDistributionLeads ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]' : 'text-gray-100' %>">
+          <i class="fas fa-users w-5 text-center"></i>
+          <span>Distribution List Leads</span>
+        </a>
       </li>
     </ul>
 
-    <div class="mt-8 border-t border-[#093d2d] pt-4 space-y-2">
-      <% const isCategories = (typeof path === 'string' && path.startsWith('/admin/categories')); %>
-      <% const isMarkets = (typeof path === 'string' && path.startsWith('/admin/markets')); %>
-      <% const isSettings = (typeof path === 'string' && path.startsWith('/admin/settings')); %>
-      <% const isInquiries = (typeof path === 'string' && path.startsWith('/admin/inquiries')); %>
-      <a href="/admin/inquiries" class="flex items-center gap-3 px-3 py-2 rounded-md border border-transparent hover:bg-[#093d2d] hover:text-white <%= isInquiries ? 'bg-[#093d2d] text-white border-[#093d2d]' : 'text-gray-100' %>">
-        <i class="fas fa-inbox w-5 text-center"></i>
-        <span>Inquiries</span>
+    <div class="mt-8 border-t border-[#1a1a1a] pt-4 space-y-2">
+      <% const isBlog = (typeof path === 'string' && path.startsWith('/admin/blog')); %>
+      <a href="/admin/blog" class="flex items-center gap-3 px-3 py-2 rounded-md border border-transparent hover:bg-[#1a1a1a] hover:text-white <%= isBlog ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]' : 'text-gray-100' %>">
+          <i class="fas fa-newspaper w-5 text-center"></i>
+          <span>Perspectives</span>
       </a>
 
-      <a href="/admin/categories" class="flex items-center gap-3 px-3 py-2 rounded-md border border-transparent hover:bg-[#093d2d] hover:text-white <%= isCategories ? 'bg-[#093d2d] text-white border-[#093d2d]' : 'text-gray-100' %>">
-        <i class="fas fa-tags w-5 text-center"></i>
-        <span>Article Categories</span>
-      </a>
-
-      <a href="/admin/markets" class="flex items-center gap-3 px-3 py-2 rounded-md border border-transparent hover:bg-[#093d2d] hover:text-white <%= isMarkets ? 'bg-[#093d2d] text-white border-[#093d2d]' : 'text-gray-100' %>">
-        <i class="fas fa-globe w-5 text-center"></i>
-        <span>Markets</span>
-      </a>
-
-      <div class="border-t border-[#093d2d] pt-3 space-y-2">
-  <a href="/admin/settings" class="flex items-center gap-3 px-3 py-2 rounded-md border border-transparent hover:bg-[#093d2d] hover:text-white <%= isSettings ? 'bg-[#093d2d] text-white border-[#093d2d]' : 'text-gray-100' %>">
+      <div class="border-t border-[#1a1a1a] pt-3 space-y-2">
+  <% const isSettings = (typeof path === 'string' && path.startsWith('/admin/settings')); %>
+  <a href="/admin/settings" class="flex items-center gap-3 px-3 py-2 rounded-md border border-transparent hover:bg-[#1a1a1a] hover:text-white <%= isSettings ? 'bg-[#1a1a1a] text-white border-[#1a1a1a]' : 'text-gray-100' %>">
           <i class="fas fa-cogs w-5 text-center"></i>
           <span>Settings</span>
         </a>
       </div>
 
-      <a href="/" target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-300 hover:text-gray-100 hover:bg-[#0b4d3a]">
+      <a href="/" target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-md text-gray-300 hover:text-gray-100 hover:bg-[#0f2e22]">
         <i class="fas fa-external-link-alt w-5 text-center"></i>
         <span>View Public Site</span>
       </a>

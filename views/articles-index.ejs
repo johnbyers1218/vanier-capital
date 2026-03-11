@@ -1,160 +1,117 @@
 <!-- views/articles-index.ejs -->
-<%# Public Articles Listing Page %>
+<%# Public Perspectives / Research Listing Page %>
 
 <%- include('partials/header', {
-    pageTitle: 'Articles - Vanier Capital',
-    pageDescription: 'Read the latest insights on real estate, property management, and market trends from Vanier Capital.',
-    path: '/articles'
+    pageTitle: (typeof pageHeading !== 'undefined' ? pageHeading.replace('.', '') : 'Perspectives') + ' - Vanier Capital',
+    pageDescription: typeof pageDescription !== 'undefined' ? pageDescription : 'Market research, operational case studies, and firm updates from the Vanier Capital investment team.',
+    path: '/blog',
+    isHeroPage: true
 }) %>
 
-<!-- Page Header (concise) -->
-<section class="page-header blog-header">
-    <div class="container">
-        <h1>Articles</h1>
-        <p class="page-subtitle">Expert-led insights on finding your home, market trends, and property management.</p>
-    </div>
-    
-</section>
-
-<!-- Featured Content + Intro Stats -->
-<!-- Stats directly under header -->
-<section class="section blog-stats-under-header">
-    <div class="container">
-        <div class="content-card" style="text-align:center; margin-bottom:1rem;">
-            <p class="section-description">
-                Discover helpful guides and market analysis. Learn how to find the perfect rental or sell your home for cash.
-            </p>
-        </div>
-        <div class="stats-grid" style="margin-top:0;">
-            <div class="stat-item">
-                <div class="stat-number" data-count="<%= blogMetrics?.expertArticles || 0 %>" data-suffix="">0</div>
-                <div class="stat-label">Expert Articles</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" data-count="<%= blogMetrics?.expertContributors || 0 %>" data-suffix="">0</div>
-                <div class="stat-label">Expert Contributors</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" data-count="<%= blogMetrics?.yearsCombinedExperience || 0 %>" data-suffix="+">0</div>
-                <div class="stat-label">Years Combined Experience</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" data-count="<%= blogMetrics?.expertiseCategories || 0 %>" data-suffix="">0</div>
-                <div class="stat-label">Expertise Categories</div>
-            </div>
-        </div>
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="bg-[#0f2e22] pt-32 pb-20 px-8 md:px-16">
+    <div class="max-w-screen-xl mx-auto">
+        <h1 class="font-serif text-5xl md:text-6xl text-white tracking-tight mb-6"><%= typeof pageHeading !== 'undefined' ? pageHeading : 'Perspectives.' %></h1>
+        <p class="font-sans text-xl text-white/80 max-w-3xl leading-relaxed"><%= typeof pageDescription !== 'undefined' ? pageDescription : 'Market research, operational case studies, and firm updates from the Vanier Capital investment team.' %></p>
     </div>
 </section>
 
-<section class="section blog-featured-section">
-        <div class="container">
-            <!-- Featured Article (always visible) -->
-            <div class="featured-articles">
-                <% if (featuredOverride && featuredOverride.length > 0) { %>
-                    <% const primary = featuredOverride[0]; %>
-                    <article class="featured-card blog-featured-card">
-                        <div class="featured-media">
-                            <% if (primary.featuredImage) { %>
-                                <a href="/blog/<%= primary.slug %>" aria-label="Read featured: <%= primary.title %>">
-                                                                        <img src="<%= primary.featuredImage %>" alt="<%= primary.title %>" loading="eager" fetchpriority="high" decoding="async" class="blur-up">
-                                </a>
-                            <% } %>
-                        </div>
-                        <div class="featured-body">
-                            <h2 class="featured-title"><a href="/blog/<%= primary.slug %>"><%= primary.title %></a></h2>
-                                                                                    <% if (primary.featuredExcerpt) { %>
-                                                                                        <p class="featured-excerpt"><%= primary.featuredExcerpt %></p>
-                                                                                    <% } %>
-                            <a href="/blog/<%= primary.slug %>" class="cta-button primary-btn">Read Article <span class="icon-arrow">→</span></a>
-                        </div>
-                    </article>
-                <% } else { %>
-                    <div class="content-card"><p>No articles published yet.</p></div>
+<!-- ═══════════════ FEATURED REPORT ═══════════════ -->
+<% if (featuredOverride && featuredOverride.length > 0) { %>
+<% const primary = featuredOverride[0]; %>
+<section class="bg-[#0f2e22]">
+    <div class="max-w-screen-xl mx-auto px-8 md:px-16 py-16 md:py-20">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-10 items-center">
+            <div class="md:col-span-8">
+                <span class="font-sans text-xs font-bold uppercase tracking-widest text-white/40 mb-4 block">Featured Report</span>
+                <h2 class="font-serif text-3xl md:text-5xl text-white mb-6 leading-tight">
+                    <a href="/blog/<%= primary.slug %>" class="hover:text-white/80 transition-colors"><%- decodeHtmlEntities(primary.title) %></a>
+                </h2>
+                <% if (primary.featuredExcerpt) { %>
+                    <p class="font-sans text-lg text-white/60 leading-relaxed mb-8 max-w-2xl"><%= primary.featuredExcerpt %></p>
                 <% } %>
-                        </div>
+                <a href="/blog/<%= primary.slug %>" class="inline-block font-sans text-sm font-bold text-[#0f2e22] bg-white px-8 py-4 uppercase tracking-wider hover:bg-[#f9f8f6] transition-colors">Read Report &rarr;</a>
+            </div>
+            <div class="md:col-span-4 hidden md:flex flex-col items-end justify-center">
+                <% if (primary.publishedDate) { %>
+                    <span class="font-sans text-xs font-bold uppercase tracking-widest text-white/30 mb-2">Published</span>
+                    <span class="font-serif text-2xl text-white/70"><%= primary.publishedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) %></span>
+                <% } %>
+                <% if (primary.categories && primary.categories.length) { %>
+                    <span class="font-sans text-xs font-bold uppercase tracking-widest text-white/30 mt-6 mb-2">Category</span>
+                    <span class="font-sans text-sm text-white/70 uppercase tracking-wider"><%= primary.categories[0].name %></span>
+                <% } %>
+            </div>
+        </div>
     </div>
 </section>
+<% } %>
 
-<!-- Filter + Search Section (with sticky bar) -->
-<section class="section blog-filter-section" style="padding-top:1rem;padding-bottom:1rem;background:#fff;border-bottom:1px solid var(--color-border-subtle);">
-    <div class="container">
-    <nav class="filter-navigation blog-filter-navigation sticky" role="navigation" aria-label="Blog categories" aria-labelledby="filter-title" data-current-category="<%= typeof categoryQuery !== 'undefined' && categoryQuery ? categoryQuery : '' %>" data-current-tag="<%= typeof categoryQuery !== 'undefined' && categoryQuery ? categoryQuery : '' %>" style="position: sticky; top: calc(var(--header-height, 72px) + 8px); z-index: 50; background: color-mix(in oklab, var(--color-background) 92%, white); padding: .75rem .75rem; border: 1px solid var(--color-border-subtle); border-radius: .75rem;">
-            <div class="filter-bar">
-                <div class="filter-actions">
-                    <div class="filter-title" id="filter-title">Filter by Category</div>
-                    <div id="blogCatsGroup" class="filter-group collapsible" data-collapsed="false" style="flex-wrap: wrap; overflow: hidden; align-items:center; gap:.5rem; max-height: none; transition: max-height .25s ease;">
-                        <button class="filter-btn <%= (typeof categoryQuery === 'undefined' || !categoryQuery) ? 'active' : '' %>" data-filter="all" aria-pressed="<%= (typeof categoryQuery === 'undefined' || !categoryQuery) ? 'true' : 'false' %>">
-                            <span class="filter-label">All Articles</span>
-                            <span class="filter-count" data-count="all"><%= (blogMetrics && typeof blogMetrics.expertArticles === 'number') ? blogMetrics.expertArticles : '—' %></span>
-                        </button>
-                        <% (blogCategories || []).forEach(c => { %>
-                            <button class="filter-btn <%= (typeof categoryQuery !== 'undefined' && categoryQuery === c.slug) ? 'active' : '' %>" data-filter="<%= c.slug %>" aria-pressed="<%= (typeof categoryQuery !== 'undefined' && categoryQuery === c.slug) ? 'true' : 'false' %>">
-                                <span class="filter-label"><%= c.name %></span>
-                                <span class="filter-count" data-count="<%= c.slug %>"><%= (typeof categoryCounts !== 'undefined' && categoryCounts && typeof categoryCounts[c.slug] === 'number') ? categoryCounts[c.slug] : '—' %></span>
-                            </button>
-                        <% }) %>
-                    </div>
-                </div>
-            </div>
-    </nav>
+<!-- ═══════════════ CATEGORY FILTER BAR ═══════════════ -->
+<% if (blogCategories && blogCategories.length > 0) { %>
+<section class="bg-white border-b border-[#0f2e22]/10 sticky top-[88px] z-30">
+    <div class="max-w-screen-xl mx-auto px-8 md:px-16">
+        <% const perspBase = typeof perspectivesBaseUrl !== 'undefined' ? perspectivesBaseUrl : null; %>
+        <nav class="flex items-center gap-6 py-4 overflow-x-auto" role="navigation" aria-label="Research categories" data-current-category="<%= typeof categoryQuery !== 'undefined' && categoryQuery ? categoryQuery : '' %>">
+            <a href="<%= perspBase || '/blog' %>" class="font-sans text-sm font-bold uppercase tracking-wider whitespace-nowrap pb-2 border-b-2 <%= (!categoryQuery) ? 'text-[#0f2e22] border-[#0f2e22]' : 'text-gray-400 border-transparent hover:text-[#1a1a1a]' %> transition-colors">All</a>
+            <% (blogCategories || []).forEach(c => { %>
+                <a href="<%= perspBase ? perspBase + '/' + c.slug : '/blog?category=' + c.slug %>" class="font-sans text-sm font-bold uppercase tracking-wider whitespace-nowrap pb-2 border-b-2 <%= (categoryQuery === c.slug) ? 'text-[#0f2e22] border-[#0f2e22]' : 'text-gray-400 border-transparent hover:text-[#1a1a1a]' %> transition-colors"><%= c.name %></a>
+            <% }) %>
+        </nav>
+    </div>
+</section>
+<% } %>
 
-    <% if ((posts && posts.length > 0) || (featuredOverride && featuredOverride.length > 0)) { %>
-            <!-- Blog Post Grid -->
-    <div id="article-grid" class="grid-container grid-3-col blog-list" style="align-items: stretch;"> <%# 3-column article cards %>
-                <% const featuredSlugs = (featuredOverride || []).map(p => p.slug); %>
-                <% (posts || []).forEach((post) => { %>
-            <% if (featuredSlugs.includes(post.slug)) { return; } %>
-                    <article class="content-card blog-post-summary" data-categories="<%= post.categories && post.categories.length ? post.categories.map(c => c.slug).join(',') : '' %>" style="display:flex; flex-direction:column; height:100%;">
-                        <%# Featured Image Link %>
-                        <% if (post.featuredImage) { %>
-                          <a href="/blog/<%= post.slug %>" class="blog-post-image-link" aria-hidden="true" tabindex="-1">
-                              <img src="<%= post.featuredImage %>" alt="" class="blog-post-summary-image blur-up" loading="lazy">
-                          </a>
+<!-- ═══════════════ ARTICLE FEED ═══════════════ -->
+<section class="bg-white">
+    <div class="max-w-screen-xl mx-auto px-8 md:px-16 py-16" id="article-grid">
+        <% if ((posts && posts.length > 0) || (featuredOverride && featuredOverride.length > 0)) { %>
+
+            <% const featuredSlugs = (featuredOverride || []).map(p => p.slug); %>
+            <% (posts || []).forEach((post) => { %>
+                <% if (featuredSlugs.includes(post.slug)) { return; } %>
+                <div class="group border-b border-[#0f2e22]/20 py-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-[#f9f8f6] transition-colors px-4 -mx-4" data-categories="<%= post.categories && post.categories.length ? post.categories.map(c => c.slug).join(',') : '' %>">
+                    <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-8 flex-1 min-w-0">
+                        <span class="font-sans text-xs font-bold uppercase tracking-widest text-gray-400 w-28 shrink-0">
+                            <%= post.publishedDate ? post.publishedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '' %>
+                        </span>
+                        <% if (post.categories && post.categories.length) { %>
+                            <span class="font-sans text-xs font-bold uppercase tracking-widest text-[#0f2e22] bg-[#0f2e22]/5 px-3 py-1 w-max shrink-0"><%= post.categories[0].name %></span>
                         <% } else { %>
-                           <div class="blog-post-placeholder-image">
-                               <i class="fas fa-file-alt"></i>
-                           </div>
+                            <span class="font-sans text-xs font-bold uppercase tracking-widest text-[#0f2e22] bg-[#0f2e22]/5 px-3 py-1 w-max shrink-0">Market Research</span>
                         <% } %>
+                        <a href="/blog/<%= post.slug %>" class="font-serif text-xl md:text-2xl text-[#1a1a1a] group-hover:text-[#0f2e22] transition-colors mt-2 md:mt-0 truncate"><%- decodeHtmlEntities(post.title) %></a>
+                    </div>
+                    <a href="/blog/<%= post.slug %>" class="hidden md:inline-flex font-sans text-xs font-bold uppercase tracking-widest text-[#0f2e22] border border-[#0f2e22] px-6 py-3 hover:bg-[#0f2e22] hover:text-white transition-colors shrink-0 ml-8">Read Report</a>
+                </div>
+            <% }) %>
 
-                        <div class="blog-post-summary-content" style="display:flex; flex-direction:column; flex:1 1 auto;">
-                            <% if (post.categories && post.categories.length) { %>
-                                <div class="featured-category"><span class="pill"><%= post.categories[0].name %></span></div>
-                            <% } %>
-                             <%# Post Title (Link) %>
-                                                            <h3><a href="/blog/<%= post.slug %>" class="blog-post-summary-title"><%- decodeHtmlEntities(post.title) %></a></h3>
-                                      <div class="blog-post-byline" style="margin:.25rem 0 .5rem 0; color: var(--color-text-muted);">
-                                          <% const by = (post.authorDisplayName || (post.author ? (post.author.fullName || post.author.username) : 'Vanier Capital Team')); %>
-                                          By <%= by %>
-                                      </div>
-                                                            <% if (post.excerpt) { %>
-                                                                <p class="blog-post-excerpt"><%= post.excerpt %></p>
-                                                            <% } %>
+            <!-- Pagination -->
+            <div class="border-t border-[#0f2e22]/20 pt-10">
+                <%- include('partials/pagination', { currentPage, hasNextPage, hasPreviousPage, nextPage, previousPage, lastPage, baseUrl: (typeof baseUrl !== 'undefined' ? baseUrl : '/blog'), categoryQuery: (typeof perspectivesBaseUrl !== 'undefined' ? null : (typeof categoryQuery !== 'undefined' ? categoryQuery : null)) }) %>
+            </div>
 
-                             <%# Date and Read button in same row %>
-                             <div class="blog-post-footer" style="margin-top:auto; padding-top:1rem; display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--color-border-subtle);">
-                                <div class="blog-post-date">
-                                    <i class="far fa-calendar-alt"></i>
-                                    <%= post.publishedDate ? post.publishedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Date N/A' %>
-                                </div>
-                                <a href="/blog/<%= post.slug %>" class="blog-post-read-btn">Read Article</a>
-                             </div>
-                        </div>
-                    </article>
-                <% }) %>
-            </div> <!-- /.blog-list -->
-
-            <!-- Pagination Controls -->
-            <%- include('partials/pagination', { currentPage, hasNextPage, hasPreviousPage, nextPage, previousPage, lastPage, baseUrl: '/blog', categoryQuery: (typeof categoryQuery !== 'undefined' ? categoryQuery : null) }) %>
-
-    <% } else { %>
-            <%# Message if no posts found (e.g., for a specific tag or empty blog) %>
-            <div class="no-posts-message">
-                <h3>No articles found</h3>
-                <p>Check back soon for the latest insights on real estate and market trends!</p>
-                <a href="/blog" class="cta-button secondary-btn">View All Articles</a>
+        <% } else { %>
+            <div class="py-20 text-center">
+                <h3 class="font-serif text-3xl text-[#1a1a1a] mb-4">No reports published yet.</h3>
+                <p class="font-sans text-lg text-gray-600 mb-8">Check back for market research, case studies, and firm updates.</p>
+                <% if (categoryQuery) { %>
+                    <a href="<%= typeof perspectivesBaseUrl !== 'undefined' ? perspectivesBaseUrl : '/blog' %>" class="inline-block font-sans text-sm font-bold text-white bg-[#0f2e22] px-8 py-4 uppercase tracking-wider hover:bg-[#1a1a1a] transition-colors rounded-none">View All Perspectives</a>
+                <% } %>
             </div>
         <% } %>
-    </div> <!-- /.container -->
-</section> <!-- /.blog-filter-section + posts -->
+    </div>
+</section>
+
+<!-- ═══════════════ CTA BLOCK ═══════════════ -->
+<section class="bg-[#0f2e22]">
+    <div class="max-w-screen-xl mx-auto px-8 md:px-16 py-20 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+        <div>
+            <h2 class="font-serif text-3xl md:text-4xl text-white mb-3">Stay Informed.</h2>
+            <p class="font-sans text-lg text-white/70 max-w-xl">Join our private distribution list to receive market research, operational case studies, and periodic firm updates.</p>
+        </div>
+        <a href="/investor-club/apply" class="inline-block font-sans text-sm font-bold text-[#0f2e22] bg-white px-10 py-4 uppercase tracking-wider hover:bg-[#f9f8f6] transition-colors rounded-none whitespace-nowrap">Join Distribution List</a>
+    </div>
+</section>
 
 <%- include('partials/footer') %>

@@ -6,13 +6,9 @@ import { logger } from '../config/logger.js';
 import BlogPost from '../models/BlogPost.js';
 import Category from '../models/Category.js';
 import Property from '../models/Property.js';
-import Testimonial from '../models/Testimonials.js';
+// Testimonial import REMOVED: feature eradicated
 import DailyMetric from '../models/DailyMetric.js';
-// Legacy variable names below still reference 'Project' in code; keep alias for now
-const Project = Property;
-const ImportedProjectModel = Property;
 import Settings from '../models/Settings.js';
-// AdminUser no longer used for public contact avatars; About team used instead
 
 
 const router = express.Router();
@@ -20,6 +16,9 @@ const isSmoke = ['1','true','yes','on'].includes(String(process.env.SMOKE || '')
 
 // Portfolio Data (Columbus, GA) - MOVED TO DB
 // Rental Data (Columbus, GA) - MOVED TO DB
+
+// ── Institutional Portfolio Data ──────────────────────────────────────────────
+// Portfolio data now served from Property model (DB-driven)
 
 // --- ESM __dirname equivalent (though not strictly needed in this file now) ---
 // const __filename = fileURLToPath(import.meta.url);
@@ -37,111 +36,52 @@ router.get('/', async (req, res, next) => { // Make route async
             pageTitle: 'Vanier Capital | Real Estate Investment & Asset Management',
             pageDescription: 'Vanier Capital is a real estate investment firm focused on building long-term, risk-adjusted returns through strategic acquisition and disciplined management.',
             path: '/',
-            featuredProjects: [],
-            uniqueFeaturedProjects: [],
-            aggregateStats: { totalValuation: 0, totalRevenue: 0, clientCount: 0 },
-            visibleClients: [],
-            heroTopClients: [],
+            isHomepage: true,
+            featuredProperties: [],
             managedStats: { 
-                projectsCompleted: 0, 
-                manualHoursAutomated: 0,
-                occupancyRate: '98%',
-                capRate: '7.5%',
-                aum: '$15M+',
-                unitsManaged: '0+',
-                tenantSatisfaction: '5.0/5'
+                targetIrr: '15%+',
+                capRate: '8.3%',
+                aum: '$1M',
+                unitsManaged: '7+'
             },
             properties: []
         });
     }
     try {
-        // 1. Fetch featured projects (formerly with client data)
-        const featuredProjects = await Property.find({
+        // 1. Fetch featured properties for homepage
+        const featuredProperties = await Property.find({
             isFeaturedOnHomepage: true,
             isPubliclyVisible: true
         }).sort({ createdAt: -1 }).lean();
 
-        // 2. Calculate aggregate statistics (Mocked or derived from Properties now)
-        const aggregateStats = {
-            totalValuation: 0,
-            totalRevenue: 0,
-            clientCount: 0
-        };
-
-        // 3. Create unique featured projects (prevent double-counting)
-        const uniqueFeaturedProjects = featuredProjects;
-
-        // 4. Load publicly visible clients (Deprecated - returning empty)
-        const visibleClients = [];
-
-        // 4a. Pick top 4-5 clients (Deprecated - returning empty)
-        let heroTopClients = [];
-
-        // 5. Load managed stats from Settings
+        // 2. Load managed stats from Settings
         let managedStats = { 
-            projectsCompleted: 0, 
-            manualHoursAutomated: 0,
-            occupancyRate: '98%',
-            capRate: '7.5%',
-            aum: '$15M+',
-            unitsManaged: '0+',
-            tenantSatisfaction: '5.0/5'
+            targetIrr: '15%+',
+            capRate: '8.3%',
+            aum: '$1M',
+            unitsManaged: '7+'
         };
         try {
-            const [projSet, hoursSet, occupancySet, capSet, aumSet, propertyCount, allTestimonials] = await Promise.all([
-                Settings.findOne({ key: 'projectsCompleted' }).lean(),
-                Settings.findOne({ key: 'manualHoursAutomated' }).lean(),
-                Settings.findOne({ key: 'occupancyRate' }).lean(),
+            const [targetIrrSet, capSet, aumSet, propertyCount] = await Promise.all([
+                Settings.findOne({ key: 'targetIrr' }).lean(),
                 Settings.findOne({ key: 'capRate' }).lean(),
                 Settings.findOne({ key: 'aum' }).lean(),
-                Property.countDocuments({}),
-                Testimonial.find({ isVisible: true, rating: { $exists: true, $ne: null } }).select('rating').lean()
+                Property.countDocuments({})
             ]);
-            if (projSet && typeof projSet.valueNumber === 'number') managedStats.projectsCompleted = projSet.valueNumber;
-            if (hoursSet && typeof hoursSet.valueNumber === 'number') managedStats.manualHoursAutomated = hoursSet.valueNumber;
-            if (occupancySet && occupancySet.valueString) managedStats.occupancyRate = occupancySet.valueString;
+            if (targetIrrSet && targetIrrSet.valueString) managedStats.targetIrr = targetIrrSet.valueString;
             if (capSet && capSet.valueString) managedStats.capRate = capSet.valueString;
             if (aumSet && aumSet.valueString) managedStats.aum = aumSet.valueString;
             
             // Calculate Units Managed (Property Count)
             if (propertyCount) managedStats.unitsManaged = `${propertyCount}+`;
-
-            // Calculate Tenant Satisfaction (Avg Rating)
-            if (allTestimonials.length > 0) {
-                const totalRating = allTestimonials.reduce((sum, t) => sum + (t.rating || 0), 0);
-                const avgRating = (totalRating / allTestimonials.length).toFixed(1);
-                managedStats.tenantSatisfaction = `${avgRating}/5`;
-            }
-            
-            console.log('--------------------------------------------------');
-            console.log('[Homepage] DEBUG: Managed Stats being sent to view:');
-            console.log(JSON.stringify(managedStats, null, 2));
-            console.log('--------------------------------------------------');
             
             logger.debug('[Homepage] Managed Stats:', managedStats);
         } catch (err) {
-            console.error('[Homepage] ERROR:', err);
             logger.error('[Homepage] Error loading settings:', err);
         }
 
-        // 5b. Resolve client logo URLs. Prefer absolute URL; else, if Cloudinary publicId exists and cloud name is set,
-        // build a Cloudinary URL; else, treat as a file under /images/clients/.
-        const resolveClientLogo = (client) => {
-            const url = (client?.logoUrl || '').toString().trim();
-            const publicId = (client?.logoPublicId || '').toString().trim();
-            if (url && (/^https?:\/\//i.test(url) || url.startsWith('/'))) return url;
-            const cloud = process.env.CLOUDINARY_CLOUD_NAME;
-            if (publicId && cloud) {
-                return `https://res.cloudinary.com/${cloud}/image/upload/f_auto,q_auto/${publicId}`;
-            }
-            if (url) return `/images/clients/${url}`;
-            return '';
-        };
-        (visibleClients || []).forEach(c => { c.logoUrl = resolveClientLogo(c); });
-        (heroTopClients || []).forEach(c => { c.logoUrl = resolveClientLogo(c); });
-
-        // 5c. Fetch rental properties for homepage
-        const rentalPropertiesDB = await Property.find({ isAvailableForRent: true, isPubliclyVisible: true }).limit(3).lean();
+        // 3. Fetch stabilized properties for homepage
+        const rentalPropertiesDB = await Property.find({ isStabilized: true, isPubliclyVisible: true }).limit(3).lean();
         const mappedRentals = rentalPropertiesDB.map(p => ({
             title: p.title,
             address: p.address,
@@ -150,459 +90,299 @@ router.get('/', async (req, res, next) => { // Make route async
             image: p.image || '/images/house-placeholder.jpg'
         }));
 
-        // 5d. Fetch featured testimonials
-        const testimonials = await Testimonial.find({ isFeatured: true, isVisible: true }).sort({ createdAt: -1 }).limit(5).lean();
-
-        // 6. Pass data to the template
-        res.render('index', {
+        // 5. Pass data to the template
+        return res.render('index', {
             pageTitle: 'Vanier Capital | Real Estate Investment & Asset Management',
             pageDescription: 'Vanier Capital is a real estate investment firm focused on building long-term, risk-adjusted returns through strategic acquisition and disciplined management of single-family and multifamily assets.',
             path: '/',
-            featuredProjects: featuredProjects, // All featured projects for carousel
-            uniqueFeaturedProjects: uniqueFeaturedProjects, // Unique client projects for stats
-            aggregateStats: aggregateStats,    // Accurate aggregate stats from Client collection
-            visibleClients: visibleClients,    // Publicly visible client logos for Trusted By
-            heroTopClients: heroTopClients,    // Top clients by valuation for hero social proof
+            isHomepage: true,
+            featuredProperties,
             managedStats,
-            properties: mappedRentals,
-            testimonials: testimonials
+            properties: mappedRentals
         });
     } catch (error) {
         logger.error(`[Homepage] Error fetching data for homepage:`, { error: error.message, stack: error.stack });
-        // Render the page without showcase data on error, or pass to an error handler
-        // For now, let's render gracefully without the dynamic data.
-        res.render('index', {
+        return res.render('index', {
             pageTitle: 'Vanier Capital | Real Estate Investment & Asset Management',
             pageDescription: 'Vanier Capital is a real estate investment firm focused on disciplined acquisitions and long-term value creation.',
             path: '/',
-            featuredProjects: [], // Send empty array on error
-            uniqueFeaturedProjects: [], // Send empty array on error
-            aggregateStats: { totalValuation: 0, totalRevenue: 0, clientCount: 0 }, // Send zeroed stats on error
-            visibleClients: [],
-            heroTopClients: [],
-            managedStats: { projectsCompleted: 0, manualHoursAutomated: 0 }
+            isHomepage: true,
+            featuredProperties: [],
+            managedStats: { targetIrr: '15%+', capRate: '8.3%', aum: '$1M', unitsManaged: '7+' },
+            properties: []
         });
     }
 });
 
-// Investment Strategy Page (renamed from Services)
-router.get('/strategy', async (req, res) => {
-    logger.debug(`Rendering view 'services' for path: ${req.originalUrl}`);
-
-    // Helper to escape regex for client name fallback search
-    const escapeRegex = (s) => String(s || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+// Investment Strategy Page — canonical route is /strategies
+async function renderStrategyPage(req, res) {
+    logger.debug(`Rendering view 'investment-strategy' for path: ${req.originalUrl}`);
 
     try {
-        const targetAuthor = 'Amanda Shapiro';
-
-        // Try to load Amanda's testimonial first (case-insensitive), with project -> client populated
-        let t = await Testimonial.findOne({
-            isVisible: true,
-            author: { $regex: `^${escapeRegex(targetAuthor)}$`, $options: 'i' }
-        })
-        .populate({ path: 'project', populate: { path: 'client', select: 'name logoUrl', model: 'Client' } })
-        .sort({ isFeatured: -1, createdAt: -1 })
-        .lean();
-
-        // Fallbacks: featured visible testimonial, then any visible testimonial
-        if (!t) {
-            t = await Testimonial.findOne({ isVisible: true, isFeatured: true })
-                .populate({ path: 'project', populate: { path: 'client', select: 'name logoUrl', model: 'Client' } })
-                .sort({ createdAt: -1 })
-                .lean();
-        }
-        if (!t) {
-            t = await Testimonial.findOne({ isVisible: true })
-                .populate({ path: 'project', populate: { path: 'client', select: 'name logoUrl', model: 'Client' } })
-                .sort({ createdAt: -1 })
-                .lean();
-        }
-
-        let clientName = t?.project?.client?.name || t?.company || null;
-        let clientLogoUrl = t?.project?.client?.logoUrl || null;
-
-        // If logo missing but company/client name present, try to resolve via Client collection
-        if (!clientLogoUrl && clientName) {
-            try {
-                const clientDoc = await Client.findOne({ name: { $regex: `^${escapeRegex(clientName)}$`, $options: 'i' } })
-                    .select('name logoUrl')
-                    .lean();
-                if (clientDoc) {
-                    clientName = clientDoc.name || clientName;
-                    clientLogoUrl = clientDoc.logoUrl || clientLogoUrl;
-                }
-            } catch (clientLookupErr) {
-                logger.warn('[Services] Client lookup fallback failed', { error: clientLookupErr?.message });
-            }
-        }
-
-        const servicesTestimonial = t ? {
-            quote: t.content,
-            author: t.author,
-            position: t.position || null,
-            company: t.company || null,
-            clientName: clientName || null,
-            clientLogoUrl: clientLogoUrl || null
-        } : null;
-
-        res.render('investment-strategy', {
+        return res.render('investment-strategy', {
             pageTitle: 'Investment Strategy | Vanier Capital',
-            pageDescription: 'Our disciplined investment philosophy focuses on resilient markets, value-add opportunities, and long-term wealth creation.',
-            path: '/strategy',
-            servicesTestimonial: servicesTestimonial
+            pageDescription: 'Disciplined, data-driven, and long-term. We target resilient cash-flowing assets in growth corridors, applying conservative underwriting and active asset management.',
+            path: '/strategies'
         });
     } catch (err) {
-        logger.error('[Services] Failed to load testimonial for services page', { error: err?.message });
-        // Graceful render without testimonial data
-        res.render('investment-strategy', {
+        logger.error('[Strategy] Failed to render strategy page', { error: err?.message });
+        return res.render('investment-strategy', {
             pageTitle: 'Investment Strategy | Vanier Capital',
-            pageDescription: 'Our disciplined investment philosophy focuses on resilient markets, value-add opportunities, and long-term wealth creation.',
-            path: '/strategy',
-            servicesTestimonial: null
+            pageDescription: 'Disciplined, data-driven, and long-term. We target resilient cash-flowing assets in growth corridors, applying conservative underwriting and active asset management.',
+            path: '/strategies'
         });
     }
-});
+}
+router.get('/strategy', (req, res) => res.redirect(301, '/strategies'));
+router.get('/strategies', renderStrategyPage);
 
 router.get('/portfolio', async (req, res) => {
     logger.debug(`Rendering view 'portfolio' (listing) for path: ${req.originalUrl}`);
     try {
-        const properties = await Property.find({ isPubliclyVisible: true }).lean();
-        const mappedProperties = properties.map(p => ({
-            title: p.title,
-            location: p.address,
-            address: p.address,
-            image: p.image || '/images/property-placeholder-1.jpg',
-            summary: p.excerpt,
-            metrics: [
-                { label: 'Value', value: p.value ? `$${p.value.toLocaleString()}` : 'TBD' },
-                { label: 'Cap Rate', value: p.capRate ? (p.capRate.includes('%') ? p.capRate : `${p.capRate}%`) : 'TBD', highlight: true },
-                { label: 'NOI', value: (p.noi || p.cashflow) ? `$${(p.noi || p.cashflow).toLocaleString()}` : 'TBD' },
-                { label: 'LTV', value: p.ltv ? (p.ltv.includes('%') ? p.ltv : `${p.ltv}%`) : 'TBD' }
-            ]
-        }));
-
-        res.render('portfolio', {
-            pageTitle: 'Portfolio | Vanier Capital Properties',
-            pageDescription: 'Explore representative properties highlighting our value-add and long-term wealth creation approach.',
+        const properties = await Property.find({ isPubliclyVisible: true })
+            .sort({ isFeatured: -1, createdAt: -1 })
+            .lean();
+        return res.render('portfolio', {
+            pageTitle: 'Portfolio Track Record | Vanier Capital',
+            pageDescription: 'Representative assets demonstrating our disciplined approach to capital stewardship, value-add execution, and long-term wealth creation.',
             path: '/portfolio',
-            properties: mappedProperties
+            properties
         });
     } catch (err) {
-        logger.error('[Portfolio] Error fetching properties', err);
-        res.render('portfolio', {
-            pageTitle: 'Portfolio | Vanier Capital Properties',
-            pageDescription: 'Explore representative properties highlighting our value-add and long-term wealth creation approach.',
+        logger.error('[Portfolio] Error fetching portfolio assets:', err);
+        return res.render('portfolio', {
+            pageTitle: 'Portfolio Track Record | Vanier Capital',
+            pageDescription: 'Representative assets demonstrating our disciplined approach to capital stewardship.',
             path: '/portfolio',
             properties: []
         });
     }
 });
 
-router.get('/for-rent', async (req, res) => {
-    logger.debug(`Rendering view 'for-rent' for path: ${req.originalUrl}`);
+// ── Portfolio Tear Sheet (individual asset detail — Case Study) ──
+router.get('/portfolio/:slug', async (req, res) => {
     try {
-        const [properties, allTestimonials] = await Promise.all([
-            Property.find({ isAvailableForRent: true, isPubliclyVisible: true }).lean(),
-            Testimonial.find({ isVisible: true, rating: { $exists: true, $ne: null } }).select('rating').lean()
-        ]);
-
-        let tenantSatisfaction = '5.0/5';
-        if (allTestimonials.length > 0) {
-            const totalRating = allTestimonials.reduce((sum, t) => sum + (t.rating || 0), 0);
-            const avgRating = (totalRating / allTestimonials.length).toFixed(1);
-            tenantSatisfaction = `${avgRating}/5`;
-        }
-
-        const mappedProperties = properties.map(p => ({
-            title: p.title,
-            address: p.address,
-            summary: p.excerpt,
-            price: p.monthlyRent ? `$${p.monthlyRent.toLocaleString()}/mo` : (p.rentalPrice ? (p.rentalPrice.startsWith('$') ? p.rentalPrice : `$${p.rentalPrice}`) : 'Inquire'),
-            image: p.image || '/images/house-placeholder.jpg',
-            bedrooms: p.bedrooms,
-            bathrooms: p.bathrooms,
-            sqft: p.sqft,
-            isAvailable: p.isAvailableForRent,
-            rentalApplicationUrl: p.rentalApplicationUrl
-        }));
-
-        res.render('for-rent', {
-            pageTitle: 'For Rent | Vanier Capital',
-            pageDescription: 'View our available rental properties.',
-            path: '/for-rent',
-            properties: mappedProperties,
-            tenantSatisfaction
-        });
-    } catch (err) {
-        logger.error('[For Rent] Error fetching properties', err);
-        res.render('for-rent', {
-            pageTitle: 'For Rent | Vanier Capital',
-            pageDescription: 'View our available rental properties.',
-            path: '/for-rent',
-            properties: [],
-            tenantSatisfaction: '5.0/5'
-        });
-    }
-});
-
-// ****** SINGLE PROJECT PAGE ROUTE ******
-router.get('/property/:slug', async (req, res, next) => {
-
-    try {
-        const slugParam = req.params.slug;
-        logger.debug(`[Public Property Page] Attempting to find property with slug: '${slugParam}'`);
-
-        if (!slugParam || !/^[a-z0-9-]+$/.test(slugParam)) {
-            logger.warn(`[Public Property Page] Invalid slug format received: '${slugParam}'. Passing to 404.`);
-            return next();
-        }
-
-        const propertyDocument = await Property
-            .findOne({ slug: slugParam, isPubliclyVisible: true })
-            .populate('client')
-            //.populate('propertyTypes', 'name slug')
+        const asset = await Property.findOne({ slug: req.params.slug, isPubliclyVisible: true })
+            .populate('markets', 'name slug')
             .lean();
-
-        if (!propertyDocument) {
-            logger.warn(`[Public Property Page] Property with slug '${slugParam}' not found or not publicly visible. Passing to 404.`);
-            return next();
+        if (!asset) {
+            logger.warn(`Portfolio asset not found for slug: ${req.params.slug}`);
+            return res.status(404).render('404', {
+                pageTitle: 'Not Found | Vanier Capital',
+                path: req.originalUrl
+            });
         }
-
-        logger.info(`[Public Property Page] SUCCESS: Found property: '${propertyDocument.title}' for slug: '${slugParam}'`);
-
-        let metaDescription = `Read about our property: ${propertyDocument.title}.`;
-        if (propertyDocument.description) {
-            const textContent = propertyDocument.description.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-            metaDescription = textContent.substring(0, 155) + (textContent.length > 155 ? '...' : '');
-        }
-
-        // Try to fetch a related testimonial (featured first)
-        let relatedTestimonial = null;
-        try {
-            relatedTestimonial = await Testimonial.findOne({ project: propertyDocument._id, isVisible: true })
-                .sort({ isFeatured: -1, createdAt: -1 })
-                .lean();
-        } catch (err) {
-            logger.warn('[Public Property Page] Unable to load related testimonial:', { error: err.message });
-        }
-
-        // Compute previous and next visible project by creation time
-        let prevProject = null;
-        let nextProject = null;
-        try {
-            const [prevP, nextP] = await Promise.all([
-                ImportedProjectModel.findOne({ isPubliclyVisible: true, createdAt: { $lt: projectDocument.createdAt } }, 'slug title').sort({ createdAt: -1 }).lean(),
-                ImportedProjectModel.findOne({ isPubliclyVisible: true, createdAt: { $gt: projectDocument.createdAt } }, 'slug title').sort({ createdAt: 1 }).lean()
-            ]);
-            prevProject = prevP; nextProject = nextP;
-        } catch (navErr) {
-            logger.warn('[Public Project Page] Unable to compute prev/next projects:', { error: navErr.message });
-        }
-
-        res.render('property-single', {
-            pageTitle: `${propertyDocument.title} | Vanier Capital Property`,
-            pageDescription: metaDescription,
-            property: propertyDocument,
-            testimonial: relatedTestimonial,
-            prevProject: prevProject,
-            nextProject: nextProject,
-            // Compute/share canonical URL for template + structured data
-            shareUrl: (() => {
-                const baseEnv = process.env.PUBLIC_SITE_URL && /^https?:\/\//i.test(process.env.PUBLIC_SITE_URL)
-                    ? process.env.PUBLIC_SITE_URL.replace(/\/$/, '')
-                    : null;
-                const proto = (req.headers['x-forwarded-proto'] || req.protocol || 'https');
-                const host = req.get('host');
-                const base = baseEnv || `${proto}://${host}`;
-                return `${base}/property/${propertyDocument.slug}`;
-            })(),
-            path: '/portfolio'
-        });
-
-    } catch (error) {
-        logger.error(`[Public Property Page] Error fetching property with slug '${req.params.slug}':`, { errorName: error.name, errorMessage: error.message, errorStack: error.stack });
-        next(error);
-    }
-});
-
-// Testimonials Page (Shell)
-router.get('/testimonials', async (req, res) => {
-    logger.debug(`Rendering view 'testimonials' with dynamic metrics for path: ${req.originalUrl}`);
-    try {
-        // Compute live sums for valuation and revenue
-        const agg = await Client.aggregate([
-            { $group: { _id: null, totalValuation: { $sum: '$companyValuation' }, totalRevenue: { $sum: '$annualRevenue' } } }
-        ]).catch(() => []);
-        const totalValuation = agg[0]?.totalValuation || 0;
-        const totalRevenue = agg[0]?.totalRevenue || 0;
-
-        // Load managed metrics (Projects Completed, Manual Hours Automated)
-        let projectsCompleted = 0;
-        let manualHoursAutomated = 0;
-        try {
-            const [projSet, hoursSet] = await Promise.all([
-                Settings.findOne({ key: 'projectsCompleted' }).lean(),
-                Settings.findOne({ key: 'manualHoursAutomated' }).lean()
-            ]);
-            if (projSet && typeof projSet.valueNumber === 'number') projectsCompleted = projSet.valueNumber;
-            if (hoursSet && typeof hoursSet.valueNumber === 'number') manualHoursAutomated = hoursSet.valueNumber;
-        } catch {}
-
-        res.render('testimonials', {
-            pageTitle: 'Client Reviews - Vanier Capital',
-            pageDescription: 'Read what our partners and tenants say about Vanier Capital\'s commitment to quality, integrity, and long-term value creation.',
-            path: '/testimonials',
-            metrics: {
-                totalValuation,
-                totalRevenue,
-                projectsCompleted,
-                manualHoursAutomated
-            }
-        });
-    } catch (e) {
-        logger.error('[Testimonials] Failed to compute metrics, rendering shell', { message: e?.message });
-        res.render('testimonials', {
-            pageTitle: 'Client Reviews - Vanier Capital',
-            pageDescription: 'Read what our clients say about Vanier Capital and the results delivered across our portfolio.',
-            path: '/testimonials',
-            metrics: {
-                totalValuation: 0,
-                totalRevenue: 0,
-                projectsCompleted: 0,
-                manualHoursAutomated: 0
-            }
-        });
-    }
-});
-
-// Newsletter Welcome & Profile Page
-router.get('/newsletter/welcome', (req, res) => {
-    logger.debug(`Rendering view 'newsletter-welcome' for path: ${req.originalUrl}`);
-    const email = (req.query.email || '').toString();
-    res.render('newsletter-welcome', {
-        pageTitle: 'Thank You for Subscribing!',
-        pageDescription: 'Thanks for joining our newsletter. Optionally tell us a bit about your role so we can tailor content to you.',
-        path: '/newsletter/welcome',
-        email: email
-    });
-});
-
-// Newsletter Complete Profile page (Stage 2)
-router.get('/subscribe/complete-profile', (req, res) => {
-    const email = (req.session && req.session.pendingSubscriberEmail) || '';
-    if (!email) {
-        // If email is missing in session, send back to homepage where signup form exists
-        return res.redirect('/');
-    }
-    res.render('subscribe-complete-profile', {
-        pageTitle: 'Complete Your Profile',
-        pageDescription: 'Add your name (and optionally your role and company) to complete your subscription.',
-        path: '/subscribe/complete-profile',
-        email
-    });
-});
-
-// About Us Page
-router.get('/about', async (req, res, next) => {
-    logger.debug(`Rendering view 'about' for path: ${req.originalUrl}`);
-    try {
-        // Clients: show only publicly visible logos, and compute valued partners (count of all clients)
-        const [visibleClients, valuedPartners] = await Promise.all([
-            Client.find({ isPubliclyVisible: { $ne: false } }).sort({ name: 1 }).lean(),
-            Client.countDocuments({})
-        ]);
-
-        // Managed stats from Settings
-        let projectsCompletedManaged = 0;
-        let yearsCombinedExpertise = 0;
-        try {
-            const [projSet, yearsSet] = await Promise.all([
-                Settings.findOne({ key: 'projectsCompleted' }).lean(),
-                Settings.findOne({ key: 'yearsCombinedExpertise' }).lean()
-            ]);
-            if (projSet && typeof projSet.valueNumber === 'number') projectsCompletedManaged = projSet.valueNumber;
-            if (yearsSet && typeof yearsSet.valueNumber === 'number') yearsCombinedExpertise = yearsSet.valueNumber;
-        } catch {}
-
-        res.render('about', {
-            pageTitle: 'About Vanier Capital',
-            pageDescription: 'Learn about the mission, vision, and team behind Vanier Capital, a disciplined real estate investment firm focused on long-term value.',
-            path: '/about',
-            aboutStats: {
-                valuedPartners,
-                projectsCompleted: projectsCompletedManaged,
-                yearsCombinedExpertise
-            },
-            visibleClients: visibleClients,
-            visibleProjectsCount: 0
+        logger.debug(`Rendering portfolio case study for: ${asset.title}`);
+        return res.render('portfolio-detail', {
+            pageTitle: `${asset.title} — Case Study | Vanier Capital`,
+            pageDescription: (asset.summary || '').substring(0, 157) + '...',
+            path: `/portfolio/${asset.slug}`,
+            isHeroPage: true,
+            asset
         });
     } catch (err) {
-        logger.error('[About] Failed to compute about stats', { message: err.message });
-        res.render('about', {
-            pageTitle: 'About Vanier Capital',
-            pageDescription: 'Learn about the mission, vision, and team behind Vanier Capital, a disciplined real estate investment firm focused on long-term value.',
-            path: '/about',
-            aboutStats: { valuedPartners: 0, projectsCompleted: 0, yearsCombinedExpertise: 0 },
-            visibleClients: [],
-            visibleProjectsCount: 0
+        logger.error('[Portfolio Detail] Error fetching asset:', err);
+        return res.status(500).render('404', {
+            pageTitle: 'Error | Vanier Capital',
+            path: req.originalUrl
         });
     }
 });
 
-// Contact Page
-router.get('/contact', async (req, res) => {
-    logger.debug(`Rendering view 'contact' for path: ${req.originalUrl}`);
-    // Use the About page team members for avatars to keep public-facing consistency
-    const aboutTeam = [
-        { fullName: 'Logan Mayfield', avatarUrl: '/images/Logan.png', role: 'COO' },
-        { fullName: 'John Byers', avatarUrl: '/images/John.png', role: 'CIO' },
-        { fullName: 'Matthew Moellering', avatarUrl: '/images/Moe.png', role: 'CEO' }
-    ];
-    try {
-        // Normalize any relative image paths (defensive, though we already provide absolute /images/*)
-        const normalizeImg = (u, prefix) => {
-            const s = (u || '').toString().trim();
-            if (!s) return '';
-            if (/^https?:\/\//i.test(s) || s.startsWith('/')) return s;
-            return `${prefix}${s}`;
-        };
-        const teamUsers = aboutTeam.map(u => ({
-            fullName: u.fullName,
-            username: (u.fullName || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
-            role: u.role,
-            avatarUrl: normalizeImg(u.avatarUrl, '/images/')
-        }));
-
-        res.render('contact', {
-            pageTitle: 'Contact Us - Vanier Capital',
-            pageDescription: 'Get in touch with Vanier Capital to discuss investment opportunities, property management, or selling your home.',
-            path: '/contact',
-            teamUsers
-        });
-    } catch (e) {
-        logger.warn('[Contact] Failed to build team avatars from About team; rendering without avatars', { message: e.message });
-        res.render('contact', {
-            pageTitle: 'Contact Us - Vanier Capital',
-            pageDescription: 'Get in touch with Vanier Capital to discuss investment opportunities, property management, or selling your home.',
-            path: '/contact',
-            teamUsers: []
-        });
-    }
+// ── Data Room Access Request (lead capture) ──
+router.post('/contact/data-room-request', (req, res) => {
+    const { name, email, firm, linkedin, asset, assetSlug } = req.body;
+    logger.info(`[Data Room Request] Name: ${name}, Email: ${email}, Firm: ${firm || 'N/A'}, Asset: ${asset}, LinkedIn: ${linkedin || 'N/A'}`);
+    // TODO: In production, persist to Inquiry model and trigger SendGrid notification
+    return res.redirect(`/portfolio/${assetSlug || ''}?request=submitted`);
 });
 
-// Map fallback routes to ensure the world map is always accessible
-router.get(['/map', '/world-map'], (req, res) => {
-    // Reuse the contact page which hosts the map component
-    res.redirect(302, '/contact');
+// ****** LEGACY /property/:slug — Redirect to /portfolio/:slug ******
+router.get('/property/:slug', (req, res) => {
+    logger.info(`[Legacy Redirect] /property/${req.params.slug} → /portfolio/${req.params.slug}`);
+    return res.redirect(301, `/portfolio/${req.params.slug}`);
 });
 
-// GET /sell-your-home
-router.get('/sell-your-home', async (req, res) => {
-    res.render('sell-your-home', {
-        pageTitle: 'Sell Your Home | Vanier Capital',
-        pageDescription: 'Get a cash offer for your home today.',
-        path: '/sell-your-home'
+// --- Firm Section Routes ---
+
+// Firm Overview
+router.get('/firm/overview', async (req, res) => {
+    logger.debug(`Rendering view 'firm/overview' for path: ${req.originalUrl}`);
+    return res.render('firm/overview', {
+        pageTitle: 'Our Firm | Vanier Capital',
+        pageDescription: 'Learn about Vanier Capital\'s mission, investment philosophy, and commitment to disciplined real estate investing.',
+        path: '/firm/overview'
     });
+});
+
+// Firm Leadership
+router.get('/firm/leadership', async (req, res) => {
+    logger.debug(`Rendering view 'firm/leadership' for path: ${req.originalUrl}`);
+    
+    const team = [
+        {
+            slug: 'matthew-moellering',
+            fullName: 'Matthew Moellering',
+            role: 'Partner, Chief Executive Officer',
+            shortBio: 'Matthew sets the strategic vision for Vanier Capital, guiding macro-market thesis development, firm operations, and long-term portfolio structuring.',
+            avatarUrl: '/images/MoeBW.png',
+            education: [
+                'B.S. Economics, United States Military Academy at West Point'
+            ]
+        },
+        {
+            slug: 'logan-mayfield',
+            fullName: 'Logan Mayfield',
+            role: 'Partner, Chief Operating Officer',
+            shortBio: 'Logan directs asset execution, CapEx management, and portfolio stabilization. He builds and enforces the standard operating procedures that minimize friction and drive ground-level cash flow.',
+            avatarUrl: '/images/LoganBW.png',
+            education: [
+                'B.S. Engineering Management, United States Military Academy at West Point'
+            ]
+        },
+        {
+            slug: 'john-byers',
+            fullName: 'John Byers',
+            role: 'Partner, Chief Investment Officer',
+            shortBio: 'John leads financial underwriting, deal structuring, and risk management. He applies a strict engineering approach to stress-test acquisitions, manage debt, and ensure a defined margin of safety.',
+            avatarUrl: '/images/JohnBW.png',
+            education: [
+                'B.S. Mechanical Engineering, United States Military Academy at West Point',
+                'M.S. Mechanical Engineering, Massachusetts Institute of Technology'
+            ]
+        }
+    ];
+    
+    return res.render('firm/leadership', {
+        pageTitle: 'Leadership - Vanier Capital',
+        pageDescription: 'A partnership built on process and execution. Strict operational discipline and data-driven underwriting applied to middle-market residential real estate.',
+        path: '/firm/leadership',
+        isHeroPage: true,
+        team
+    });
+});
+
+// Individual Bio Page
+router.get('/firm/leadership/:slug', async (req, res, next) => {
+    logger.debug(`Rendering view 'firm/bio' for path: ${req.originalUrl}`);
+    
+    const teamData = {
+        'matthew-moellering': {
+            slug: 'matthew-moellering',
+            fullName: 'Matthew Moellering',
+            role: 'Partner, Chief Executive Officer',
+            avatarUrl: '/images/MoeBW.png',
+            bio: `Matthew sets the strategic vision for Vanier Capital, guiding macro-market thesis development, firm operations, and long-term portfolio structuring. He oversees property management systems, tenant screening programs, lease enforcement protocols, and internal accounting controls across the seed portfolio. Matthew ensures operational consistency and capital preservation through disciplined process execution and transparent reporting.`,
+            education: [
+                'B.S. Economics, United States Military Academy at West Point'
+            ],
+            focus: ['Strategic Vision', 'Firm Operations', 'Portfolio Structuring']
+        },
+        'logan-mayfield': {
+            slug: 'logan-mayfield',
+            fullName: 'Logan Mayfield',
+            role: 'Partner, Chief Operating Officer',
+            avatarUrl: '/images/LoganBW.png',
+            bio: `Logan directs asset execution, CapEx management, and portfolio stabilization at Vanier Capital. He builds and enforces the standard operating procedures that minimize friction and drive ground-level cash flow. Logan ensures consistent operational execution through rigorous preventive maintenance scheduling, cost-controlled renovation scoping, and systematic vendor procurement across every asset in the portfolio.`,
+            education: [
+                'B.S. Engineering Management, United States Military Academy at West Point'
+            ],
+            focus: ['Asset Execution', 'CapEx Management', 'Portfolio Stabilization']
+        },
+        'john-byers': {
+            slug: 'john-byers',
+            fullName: 'John Byers',
+            role: 'Partner, Chief Investment Officer',
+            avatarUrl: '/images/JohnBW.png',
+            bio: `John leads financial underwriting, deal structuring, and risk management at Vanier Capital. He applies a strict engineering approach to stress-test acquisitions, manage debt, and ensure a defined margin of safety on every deal. John manages all deal-level financial analysis, debt structuring, and investment committee documentation.`,
+            education: [
+                'B.S. Mechanical Engineering, United States Military Academy at West Point',
+                'M.S. Mechanical Engineering, Massachusetts Institute of Technology'
+            ],
+            focus: ['Financial Underwriting', 'Deal Structuring', 'Risk Management']
+        }
+    };
+    
+    const member = teamData[req.params.slug];
+    
+    if (!member) {
+        return next(); // 404
+    }
+    
+    return res.render('firm/bio', {
+        pageTitle: `${member.fullName} | Vanier Capital`,
+        pageDescription: `${member.fullName} is the ${member.role} at Vanier Capital.`,
+        path: '/firm/leadership',
+        isHeroPage: true,
+        member
+    });
+});
+
+// Firm Stewardship
+router.get('/firm/stewardship', async (req, res) => {
+    logger.debug(`Rendering view 'firm/stewardship' for path: ${req.originalUrl}`);
+    return res.render('firm/stewardship', {
+        pageTitle: 'Stewardship | Vanier Capital',
+        pageDescription: 'Our commitment to operational excellence, asset preservation, and responsible capital management.',
+        path: '/firm/stewardship'
+    });
+});
+
+// Contact Page — Investor Relations
+router.get('/contact/investor-relations', (req, res) => {
+    return res.render('contact-investor-relations', {
+        pageTitle: 'Investor Relations - Vanier Capital',
+        pageDescription: 'Connect with the Vanier Capital investor relations team regarding capital partnerships, fund commitments, and LP reporting.',
+        path: '/contact',
+        isHeroPage: true
+    });
+});
+
+// Contact Page — Acquisitions
+router.get('/contact/acquisitions', (req, res) => {
+    return res.render('contact-acquisitions', {
+        pageTitle: 'Acquisitions - Vanier Capital',
+        pageDescription: 'Reach the Vanier Capital acquisitions team to discuss off-market opportunities, property dispositions, and joint venture partnerships.',
+        path: '/contact',
+        isHeroPage: true
+    });
+});
+
+// Contact Page — General
+router.get('/contact', (req, res) => {
+    const topic = (req.query.topic || 'general').toString().toLowerCase().trim();
+    return res.render('contact', {
+        pageTitle: 'Connect - Vanier Capital',
+        pageDescription: 'Reach out to the Vanier Capital leadership team regarding capital partnerships, asset acquisitions, or general inquiries.',
+        path: '/contact',
+        isHeroPage: true,
+        topic: topic
+    });
+});
+
+// Investors — Main Investor Relations hub
+router.get('/investors', (req, res) => {
+    return res.render('investors/index', {
+        pageTitle: 'Investor Relations | Vanier Capital',
+        pageDescription: 'Capital partnerships for family offices, RIAs, and accredited individuals seeking durable real estate yields.',
+        path: '/investors',
+        isHeroPage: true
+    });
+});
+
+// Investors — Fund Roadmap & Disclosures
+router.get('/investors/disclosures', (req, res) => {
+    return res.render('investors/disclosures', {
+        pageTitle: 'Fund Roadmap & Disclosures | Vanier Capital',
+        pageDescription: 'Transparent regulatory disclosures, fund roadmap, and institutional pedigree for Vanier Capital.',
+        path: '/investors/disclosures',
+        isHeroPage: true
+    });
+});
+
+// /investors/apply — Alias for investor-club/apply
+router.get('/investors/apply', (req, res) => {
+    return res.redirect(301, '/investor-club/apply');
 });
 
 // --- Dynamic Blog Routes ---
@@ -726,9 +506,9 @@ router.get('/blog', async (req, res, next) => {
     // Public metric: business leaders informed (temporarily static until subscribers are live)
     const businessLeadersInformed = '15+';
 
-    const pageTitle = 'Articles';
+    const pageTitle = 'Perspectives';
 
-        res.render('articles-index', { // Renders views/articles-index.ejs
+        return res.render('articles-index', { // Renders views/articles-index.ejs
             pageTitle: pageTitle,
             path: '/blog', // For nav highlight
             posts: posts,
@@ -757,8 +537,201 @@ router.get('/blog', async (req, res, next) => {
 
     } catch (error) {
         logger.error('Error fetching public blog index:', { error: error.message, page: page, category: categoryQuery });
-        next(error); // Pass error to global handler
+        return next(error); // Pass error to global handler
     }
+});
+
+// ── Perspectives — Category-Filtered Index Pages ──────────────────────
+// Maps: /perspectives → all, /perspectives/market-research, /perspectives/case-studies, /perspectives/firm-updates
+const PERSPECTIVES_CATEGORIES = {
+    'market-research': {
+        pageHeading: 'Market Research.',
+        pageDescription: 'Data-driven analysis on supply constraints, demographic shifts, and economic catalysts across our target Southeast corridor — spanning from Raleigh-Durham through Alabama and Florida.',
+    },
+    'case-studies': {
+        pageHeading: 'Case Studies.',
+        pageDescription: 'Factual breakdowns of our self-funded seed acquisitions, detailing our acquisition thesis, CapEx execution, and operational stabilization.',
+    },
+    'firm-updates': {
+        pageHeading: 'Firm Updates.',
+        pageDescription: 'Periodic insights from the founding partners regarding underwriting philosophy, debt structuring, and internal standard operating procedures.',
+    },
+    // Legacy redirects — keep old slugs functional
+    'market-commentary': { redirect: '/perspectives/market-research' },
+    'quarterly-letters': { redirect: '/perspectives/firm-updates' },
+    'news': { redirect: '/perspectives/case-studies' },
+};
+
+// Helper: shared query logic for perspectives pages
+async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeading, pageDescription }) {
+    const page = parseInt(req.query.page) || 1;
+    const postsPerPage = 6;
+
+    if (page < 1) {
+        const base = categorySlug ? `/perspectives/${categorySlug}` : '/perspectives';
+        return res.redirect(`${base}?page=1`);
+    }
+
+    try {
+        const baseQuery = { isPublished: true };
+
+        // If a category slug is specified, resolve it from the Category collection
+        let selectedCategory = null;
+        if (categorySlug) {
+            selectedCategory = await Category.findOne({ slug: categorySlug }).select('_id slug name').lean();
+            if (selectedCategory) {
+                baseQuery.categories = { $in: [selectedCategory._id] };
+            }
+        }
+
+        // Category filter bar data
+        const blogCategoriesAll = await Category.find({ isActive: true }).sort({ name: 1 }).lean();
+        let categoryCounts = {};
+        const [totalPublishedPosts] = await Promise.all([
+            BlogPost.countDocuments({ isPublished: true })
+        ]);
+
+        try {
+            const agg = await BlogPost.aggregate([
+                { $match: { isPublished: true } },
+                { $unwind: '$categories' },
+                { $group: { _id: '$categories', count: { $sum: 1 } } }
+            ]);
+            const countMap = new Map((agg || []).map(x => [String(x._id), x.count]));
+            categoryCounts = (blogCategoriesAll || []).reduce((acc, c) => {
+                acc[c.slug] = countMap.get(String(c._id)) || 0;
+                return acc;
+            }, {});
+        } catch {}
+        const blogCategories = (blogCategoriesAll || []).filter(c => (categoryCounts[c.slug] || 0) > 0);
+
+        // Contributors
+        const contributorDocs = await BlogPost.find(
+            { isPublished: true },
+            { authorDisplayName: 1, author: 1 }
+        ).populate('author', 'fullName username').lean();
+        const nameSet = new Set();
+        for (const d of (contributorDocs || [])) {
+            const displayName = (d.authorDisplayName && d.authorDisplayName.trim())
+                || (d.author && (d.author.fullName || d.author.username)) || '';
+            const norm = String(displayName).trim().toLowerCase();
+            if (norm) nameSet.add(norm);
+        }
+        const expertContributors = nameSet.size;
+        const expertiseCategoriesCount = blogCategories.length;
+        const yearsCombinedExperience = 8;
+
+        // Hero post
+        let heroPost = null;
+        {
+            const heroQuery = { isPublished: true, isFeatured: true };
+            if (selectedCategory) heroQuery.categories = { $in: [selectedCategory._id] };
+            const explicitHero = await BlogPost.find(heroQuery).sort({ publishedDate: -1 }).limit(1).lean();
+            if (explicitHero && explicitHero.length) {
+                heroPost = explicitHero[0];
+            } else {
+                const fallbackQuery = { ...baseQuery };
+                const fallback = await BlogPost.find(fallbackQuery).sort({ publishedDate: -1 }).limit(1).lean();
+                heroPost = (fallback && fallback.length) ? fallback[0] : null;
+            }
+        }
+
+        // Main list (excluding hero)
+        const mainListQuery = { ...baseQuery };
+        if (heroPost && heroPost._id) {
+            mainListQuery._id = { $ne: heroPost._id };
+        }
+
+        const totalPosts = await BlogPost.countDocuments(mainListQuery);
+        const totalPages = Math.ceil(Math.max(0, totalPosts) / postsPerPage);
+
+        if (page > totalPages && totalPages > 0) {
+            const base = categorySlug ? `/perspectives/${categorySlug}` : '/perspectives';
+            return res.redirect(`${base}?page=${totalPages}`);
+        }
+
+        let posts = await BlogPost.find(mainListQuery)
+            .populate('author', 'username fullName')
+            .populate('categories', 'name slug')
+            .sort({ publishedDate: -1 })
+            .skip((page - 1) * postsPerPage)
+            .limit(postsPerPage)
+            .lean();
+        posts = (posts || []).map(p => ({ ...p }));
+
+        function buildFeaturedExcerpt(postDoc) {
+            if (!postDoc) return '';
+            if (postDoc.excerpt && postDoc.excerpt.trim()) return postDoc.excerpt.trim();
+            if (postDoc.metaDescription && postDoc.metaDescription.trim()) return postDoc.metaDescription.trim();
+            try {
+                const raw = String(postDoc.content || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+                return raw.length > 0 ? raw.slice(0, 180) + (raw.length > 180 ? '…' : '') : '';
+            } catch { return ''; }
+        }
+        const featuredOverrideComputed = heroPost ? [{ ...heroPost, featuredExcerpt: buildFeaturedExcerpt(heroPost) }] : [];
+
+        const baseUrl = categorySlug ? `/perspectives/${categorySlug}` : '/perspectives';
+
+        return res.render('articles-index', {
+            pageTitle: pageHeading.replace('.', '') + ' - Vanier Capital',
+            pageHeading,
+            pageDescription,
+            path: '/blog',
+            posts,
+            popularPosts: [],
+            isFirstPage: page === 1,
+            featuredOverride: featuredOverrideComputed,
+            blogCategories,
+            categoryCounts,
+            tagQuery: null,
+            categoryQuery: categorySlug || null,
+            currentPage: page,
+            hasNextPage: page < totalPages,
+            hasPreviousPage: page > 1,
+            nextPage: page + 1,
+            previousPage: page - 1,
+            lastPage: totalPages,
+            baseUrl,
+            perspectivesBaseUrl: '/perspectives',
+            blogMetrics: {
+                expertArticles: totalPublishedPosts,
+                expertContributors,
+                yearsCombinedExperience,
+                expertiseCategories: expertiseCategoriesCount,
+                businessLeadersInformed: '15+'
+            }
+        });
+    } catch (error) {
+        logger.error('Error fetching perspectives index:', { error: error.message, page, category: categorySlug });
+        return next(error);
+    }
+}
+
+// GET /perspectives — All Perspectives (unfiltered)
+router.get('/perspectives', (req, res, next) => {
+    renderPerspectivesIndex(req, res, next, {
+        categorySlug: null,
+        pageHeading: 'Perspectives.',
+        pageDescription: 'Market research, operational case studies, and firm updates from the Vanier Capital investment team.',
+    });
+});
+
+// GET /perspectives/:category — Category-Filtered Perspectives
+router.get('/perspectives/:category', (req, res, next) => {
+    const slug = req.params.category.toLowerCase().trim();
+    const config = PERSPECTIVES_CATEGORIES[slug];
+    if (!config) {
+        return res.redirect('/perspectives');
+    }
+    // Legacy slug redirect
+    if (config.redirect) {
+        return res.redirect(301, config.redirect);
+    }
+    renderPerspectivesIndex(req, res, next, {
+        categorySlug: slug,
+        pageHeading: config.pageHeading,
+        pageDescription: config.pageDescription,
+    });
 });
 
 
@@ -864,9 +837,9 @@ router.get('/blog/:slug', async (req, res, next) => {
     } catch (dmErr) { /* swallow metric errors */ }
 
     // Pass the slugs (or null) to the render function
-        res.render('articles-post', {
-            pageTitle: `${post.title} | Vanier Capital Articles`,
-            pageDescription: post.excerpt || post.metaDescription || 'Read this Vanier Capital article.', // Use excerpt/meta if available
+        return res.render('articles-post', {
+            pageTitle: `${post.title} | Vanier Capital Perspectives`,
+            pageDescription: post.excerpt || post.metaDescription || 'Market research and institutional perspectives from the Vanier Capital investment team.', // Use excerpt/meta if available
             post: post,
             path: '/blog', // Keep blog nav active
             prevPostSlug: prevPostSlug, // Pass previous slug
@@ -880,9 +853,28 @@ router.get('/blog/:slug', async (req, res, next) => {
 
     } catch (error) {
         logger.error(`Error fetching public blog post slug ${req.params.slug}:`, { error: error.message, stack: error.stack }); // Log stack trace too
-        next(error);
+        return next(error);
     }
 });
+
+// ****** INVESTOR CLUB ROUTES ******
+router.get('/investor-club/apply', (req, res) => {
+    return res.render('investor-club/apply', {
+        pageTitle: 'Investor Accreditation — Vanier Capital',
+        pageDescription: 'Request access to the Vanier Capital secure data room. Restricted to accredited investors under SEC Regulation D.',
+        path: '/investor-club/apply',
+        ref: req.query.ref || ''
+    });
+});
+
+router.get('/investor-club/request-received', (req, res) => {
+    return res.render('investor-club/request-received', {
+        pageTitle: 'Application Received — Vanier Capital',
+        pageDescription: 'Your investor accreditation request has been received and is under review.',
+        path: '/investor-club/request-received'
+    });
+});
+// ****** END INVESTOR CLUB ROUTES ******
 
 // ****** NEW LEGAL PAGE ROUTES ******
 router.get('/privacy-policy', async (req, res) => {
@@ -892,7 +884,7 @@ router.get('/privacy-policy', async (req, res) => {
         const s = await Settings.findOne({ key: 'privacyPolicyLastUpdated' }).lean();
         if (s?.valueString) lastUpdated = s.valueString;
     } catch {}
-    res.render('privacy-policy', {
+    return res.render('privacy-policy', {
         pageTitle: 'Privacy Policy - Vanier Capital',
         pageDescription: 'Read the Vanier Capital Privacy Policy to understand how we collect, use, and protect your personal information.',
         path: '/privacy-policy', // For potential active nav styling
@@ -907,7 +899,7 @@ router.get('/terms-of-service', async (req, res) => {
         const s = await Settings.findOne({ key: 'termsOfServiceLastUpdated' }).lean();
         if (s?.valueString) lastUpdated = s.valueString;
     } catch {}
-    res.render('terms-of-service', {
+    return res.render('terms-of-service', {
         pageTitle: 'Terms of Service - Vanier Capital',
         pageDescription: 'Review the Terms of Service for using the Vanier Capital website and services.',
         path: '/terms-of-service', // For potential active nav styling
@@ -916,12 +908,8 @@ router.get('/terms-of-service', async (req, res) => {
 });
 // ****** END NEW LEGAL PAGE ROUTES ******
 
-
-// Use ESM default export for the router
-export default router;
- 
 // --- Dynamic Sitemap ---
-// Serves a dynamic sitemap.xml enumerating public pages, blog posts, and projects
+// Serves a dynamic sitemap.xml enumerating public pages, blog posts, and properties
 router.get('/sitemap.xml', async (req, res) => {
     try {
         const siteBase = (process.env.SITE_BASE_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/, '');
@@ -929,16 +917,22 @@ router.get('/sitemap.xml', async (req, res) => {
         // Static pages
         const staticPaths = [
             '/',
-            '/for-rent',
-            '/sell-your-home',
-            '/strategy',
+            '/firm/overview',
+            '/firm/leadership',
+            '/firm/stewardship',
+            '/strategies',
             '/portfolio',
-            '/testimonials',
-            '/about',
             '/contact',
             '/privacy-policy',
             '/terms-of-service',
-            '/blog'
+            '/blog',
+            '/perspectives',
+            '/perspectives/market-research',
+            '/perspectives/case-studies',
+            '/perspectives/firm-updates',
+            '/contact/investor-relations',
+            '/contact/acquisitions',
+            '/investor-club/apply'
         ];
 
         // Blog posts and blog pagination
@@ -952,8 +946,8 @@ router.get('/sitemap.xml', async (req, res) => {
             .sort({ publishedDate: -1 })
             .lean();
 
-        // Projects
-        const projects = await ImportedProjectModel.find({ isPubliclyVisible: true })
+        // Properties
+        const properties = await Property.find({ isPubliclyVisible: true })
             .select('slug updatedAt createdAt')
             .sort({ createdAt: -1 })
             .lean();
@@ -973,10 +967,10 @@ router.get('/sitemap.xml', async (req, res) => {
             pushUrl(`/blog/${post.slug}`, new Date(last).toISOString(), '0.7', 'monthly');
         });
 
-        // Projects
-        (projects || []).forEach(pr => {
+        // Properties
+        (properties || []).forEach(pr => {
             const last = pr.updatedAt || pr.createdAt || new Date();
-            pushUrl(`/projects/${pr.slug}`, new Date(last).toISOString(), '0.7', 'monthly');
+            pushUrl(`/property/${pr.slug}`, new Date(last).toISOString(), '0.7', 'monthly');
         });
 
         const xml = `<?xml version="1.0" encoding="UTF-8"?>\n` +
@@ -999,3 +993,5 @@ router.get('/sitemap.xml', async (req, res) => {
     }
 });
 
+// Use ESM default export for the router
+export default router;

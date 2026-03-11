@@ -21,8 +21,8 @@ const AdminLogSchema = new Schema(
             trim: true,
             enum: [ // Define expected actions for consistency
                 'login_success', 'login_fail', 'logout',
-                'create_project', 'update_project', 'delete_project',
-                'create_testimonial', 'update_testimonial', 'delete_testimonial',
+                'create_property', 'update_property', 'delete_property',
+                'create_project', 'update_project', 'delete_project', // legacy — kept for existing log documents
                 'create_blog_post', 'update_blog_post', 'delete_blog_post',
                 'upload_image',
                 // Add other actions as needed (e.g., 'update_user', 'change_settings')

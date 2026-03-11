@@ -19,8 +19,8 @@
 
     <%# Add any admin-specific JavaScript files here %>
     <%# Example: JS for a rich text editor, confirmation dialogs, etc. %>
-    <div class="text-center text-gray-500 text-xs mt-6">
-        Need formatting tips? Read the <a href="/AUTHORING_GUIDE.md" target="_blank" rel="noopener" class="text-primary hover:text-primary-hover">Authoring Guide</a>.
+    <div class="text-center text-gray-400 text-xs mt-6">
+        Need formatting tips? Read the <a href="/AUTHORING_GUIDE.md" target="_blank" rel="noopener" class="text-[#0f2e22] hover:underline">Authoring Guide</a>.
     </div>
     <%# <script src="/js/admin-scripts.js"></script> %>
 
@@ -35,7 +35,7 @@
                               const errors = JSON.parse('<%- JSON.stringify(errorMessage || []) %>');
                             const makeToast = (text, type) => {
                                 const el = document.createElement('div');
-                                el.className = 'pointer-events-auto flex items-center gap-2 rounded-md px-4 py-3 text-sm shadow border ' + (type==='success' ? 'bg-green-900/80 text-green-100 border-green-700' : 'bg-red-900/80 text-red-100 border-red-700');
+                                el.className = 'pointer-events-auto flex items-center gap-2 px-4 py-3 text-sm border ' + (type==='success' ? 'bg-green-50 text-green-800 border-green-300' : 'bg-red-50 text-red-800 border-red-300');
                                 el.innerHTML = (type==='success' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-circle"></i>') + ' <span>'+String(text)+'</span>';
                                 root.appendChild(el);
                                 setTimeout(()=>{ el.style.opacity = '0'; el.style.transform = 'translateY(-6px)'; setTimeout(()=> el.remove(), 300); }, 3500);
@@ -73,8 +73,8 @@
                     items.forEach((r, i) => {
                         const li = document.createElement('li');
                         li.setAttribute('role','option');
-                        li.className = 'px-3 py-2 hover:bg-neutral-700 cursor-pointer flex items-center justify-between';
-                        li.innerHTML = `<span class="text-gray-100">${r.title}</span><span class="text-xs text-gray-400 ml-3">${r.type}</span>`;
+                        li.className = 'px-3 py-2 hover:bg-[#f9f8f6] cursor-pointer flex items-center justify-between';
+                        li.innerHTML = `<span class="text-[#1a1a1a]">${r.title}</span><span class="text-xs text-gray-500 ml-3">${r.type}</span>`;
                         li.addEventListener('mouseenter', ()=>{ idx=i; highlight(); });
                         li.addEventListener('click', ()=>{ window.location.href = r.href; });
                         list.appendChild(li);
@@ -82,7 +82,7 @@
                     if (items.length) show(); else hide();
                 };
                 const highlight = () => {
-                    [...list.children].forEach((li, i) => li.classList.toggle('bg-neutral-700', i===idx));
+                    [...list.children].forEach((li, i) => li.classList.toggle('bg-[#f9f8f6]', i===idx));
                 };
                 const search = async (q) => {
                     try {

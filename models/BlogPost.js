@@ -61,6 +61,16 @@ const BlogPostSchema = new Schema({
         trim: true,
         maxlength: 160
     },
+    publicationType: {
+        type: String,
+        enum: ['Market Research', 'Case Studies', 'Firm Updates'],
+        default: 'Market Research'
+    },
+    pdfDocumentUrl: {
+        type: String,
+        trim: true,
+        match: [/^https?:\/\/.+\..+/, 'Please enter a valid PDF URL.']
+    },
     // Featured flag for homepage/blog featured section
     isFeatured: {
         type: Boolean,

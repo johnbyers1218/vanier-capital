@@ -66,7 +66,7 @@ router.post('/contact', contactAndScheduleValidationRules, async (req, res, next
         // Mirror into Inquiry collection so it appears in /admin/inquiries (legacy dashboard expects Inquiry model)
         let inquiryEntry = null;
         try {
-            inquiryEntry = await Inquiry.create({ name, email, phone: phone || '', subject, message, status: 'New' });
+            inquiryEntry = await Inquiry.create({ name, email, phone: phone || '', subject, message, status: 'New', inquiryType: 'general_inquiry' });
             logger.info('[Contact->Inquiry Mirror] Created inquiry record', { inquiryId: inquiryEntry._id });
         } catch (mirrorErr) {
             logger.warn('[Contact->Inquiry Mirror] Failed to create inquiry record', { error: mirrorErr.message });

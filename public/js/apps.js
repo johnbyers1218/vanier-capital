@@ -5,7 +5,7 @@
  * - Initialize UI components on DOM load.
  * - Handle mobile navigation toggle.
  * - Highlight active navigation link based on URL.
- * - Fetch and display dynamic content (Projects, Testimonials) via API calls.
+ * - Fetch and display dynamic content (Properties) via API calls.
  * - Handle Contact form submission (via API).
  * - Trigger and handle Scheduling form submission (via API).
  * - Implement FAQ accordion functionality.
@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // Initialize core UI components
+    initSmartHeader();
+    initMobileNavNew();
     initMobileNav();
     setActiveNavLink();
     initFAQAccordion();
@@ -30,9 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (document.querySelector('.blog-filter-navigation')) {
         initBlogFilters(); // Activate blog filter buttons if present
-    }
-    if (document.getElementById('testimonials-grid-container')) {
-        loadTestimonials(); // Load testimonials on the /testimonials page
     }
     if (document.getElementById('projects-preview-grid')) {
         loadProjectPreview(); // Load preview on the homepage /
@@ -182,7 +181,7 @@ function initMobileNav() {
 }
 
 function setActiveNavLink() {
-    const navLinks = document.querySelectorAll('.nav-links a');
+    const navLinks = document.querySelectorAll('.nav-links a, #main-header ul a, #mobile-nav a');
     // Get the path relative to the root (e.g., "/", "/about", "/blog")
     const currentPath = window.location.pathname;
 
@@ -404,19 +403,12 @@ document.addEventListener('DOMContentLoaded', () => {
         loadProperties();
         initProjectFilters();
     }
-    if (document.getElementById('testimonials-grid-container')) {
-        loadTestimonials();
-    }
     if (document.getElementById('projects-preview-grid')) { // Homepage project preview
         // Ensure loadProjectPreview uses createProjectCardHtml which now links to slug
         loadProjectPreview(); // This function likely needs to use createProjectCardHtml with isPreview=true
     }
     if (document.getElementById('featured-project-container')) { // For /projects page featured
         loadFeaturedProject();
-    }
-    if (document.getElementById('featured-testimonial-container')) {
-        // Prefer top-3 by largest clients if available; otherwise fallback to one featured
-        loadTopClientTestimonials(3).catch(() => loadFeaturedTestimonial());
     }
 
     if (document.getElementById('contact-form'))initContactAndScheduleForm();
@@ -1578,94 +1570,6 @@ async function loadProjectPreview() {
     }
 }
 
-/** Creates HTML for a single Testimonial card */
-function createTestimonialCardHtml(testimonial) {
-    const ratingStars = testimonial.rating ?
-        '<span class="star" aria-hidden="true">★</span>'.repeat(testimonial.rating) +
-        '<span class="star star-muted" aria-hidden="true">★</span>'.repeat(5 - testimonial.rating)
-        : '';
-    const ratingHtml = testimonial.rating ? `<div class="rating" role="img" aria-label="Rated ${testimonial.rating} out of 5">${ratingStars}</div>` : '';
-
-    // Decode trusted admin-entered fields so entities like &amp; display correctly
-    const authorTitle = `${decodeHtmlEntities(testimonial.position || '')}${testimonial.position && testimonial.company ? ', ' : ''}${decodeHtmlEntities(testimonial.company || '')}`;
-
-    // Optional client logo/link and project link
-    let clientLogoHtml = '';
-    let caseStudyLinkHtml = '';
-    try {
-        const client = (testimonial.project && testimonial.project.client) ? testimonial.project.client : (testimonial.client || null);
-        if (client && (client.logoUrl || client.name)) {
-            const logoImg = client.logoUrl ? `<img class="client-logo" src="${escapeHtml(client.logoUrl)}" alt="${escapeHtml(client.name || 'Client logo')}" loading="lazy"/>` : '';
-            const nameCaption = client.name ? `<div class="logo-name">${escapeHtml(client.name)}</div>` : '';
-            const linkStart = client.websiteUrl ? `<a href="${escapeHtml(client.websiteUrl)}" class="logo-link" target="_blank" rel="noopener">` : '<div class="logo-link">';
-            const linkEnd = client.websiteUrl ? '</a>' : '</div>';
-            clientLogoHtml = `<div class="logo-item" style="justify-content:flex-end;">${linkStart}${logoImg}${nameCaption}${linkEnd}</div>`;
-        }
-        if (testimonial.project && testimonial.project.slug) {
-            caseStudyLinkHtml = `<a href="/projects/${escapeHtml(testimonial.project.slug)}" class="card-link">Read the Case Study →</a>`;
-        }
-    } catch(_) { /* no-op */ }
-
-    const services = Array.isArray(testimonial.project?.services) ? testimonial.project.services : [];
-
-    return `
-    <div class="testimonial-card" data-services="${escapeHtml(services.join(','))}">
-            <div class="testimonial-quote">
-                <p>${decodeHtmlEntities(testimonial.content)}</p>
-            </div>
-            <div class="testimonial-author-info">
-                <div>
-                    <h3>${decodeHtmlEntities(testimonial.author)}</h3>
-                    ${authorTitle ? `<p>${authorTitle}</p>` : ''}
-                    ${ratingHtml}
-                </div>
-                ${clientLogoHtml}
-            </div>
-            ${caseStudyLinkHtml ? `<div style="margin-top:.5rem;">${caseStudyLinkHtml}</div>` : ''}
-        </div>
-    `;
-}
-
-/** Creates HTML for testimonial carousel slide */
-function createTestimonialSlideHtml(testimonial) {
-    const ratingStars = testimonial.rating ?
-        '<span class="star" aria-hidden="true">★</span>'.repeat(testimonial.rating) +
-        '<span class="star star-muted" aria-hidden="true">★</span>'.repeat(5 - testimonial.rating)
-        : '';
-    const ratingHtml = testimonial.rating ? `<div class="rating" role="img" aria-label="Rated ${testimonial.rating} out of 5">${ratingStars}</div>` : '';
-
-    const authorTitle = `${decodeHtmlEntities(testimonial.position || '')}${testimonial.position && testimonial.company ? ', ' : ''}${decodeHtmlEntities(testimonial.company || '')}`;
-
-    // Optional client logo and link (if testimonial is linked to a project with a client)
-    let clientLogoHtml = '';
-    try {
-        const client = testimonial.project && testimonial.project.client ? testimonial.project.client : null;
-        if (client && (client.logoUrl || client.name)) {
-            const logoImg = client.logoUrl ? `<img class="client-logo" src="${escapeHtml(client.logoUrl)}" alt="${escapeHtml(client.name || 'Client logo')}" loading="lazy"/>` : '';
-            const nameCaption = client.name ? `<div class="logo-name">${escapeHtml(client.name)}</div>` : '';
-            const linkStart = client.websiteUrl ? `<a href="${escapeHtml(client.websiteUrl)}" class="logo-link" target="_blank" rel="noopener">` : '<div class="logo-link">';
-            const linkEnd = client.websiteUrl ? '</a>' : '</div>';
-            clientLogoHtml = `<div class="logo-item" style="justify-content:flex-end;">${linkStart}${logoImg}${nameCaption}${linkEnd}</div>`;
-        }
-    } catch(_) { /* no-op */ }
-
-    return `
-        <div class="testimonial-slide">
-            <div class="quote-content">
-                <p class="quote-text">${decodeHtmlEntities(testimonial.content)}</p>
-            </div>
-            <div class="author-info">
-                <div>
-                    <div class="author-name">${decodeHtmlEntities(testimonial.author)}</div>
-                    ${authorTitle ? `<div class="author-title">${authorTitle}</div>` : ''}
-                    ${ratingHtml}
-                </div>
-                ${clientLogoHtml}
-            </div>
-        </div>
-    `;
-}
-
 // --- Loaders ---
 
 async function loadGenericContent(apiPath, containerId, cardRenderer, typeName) {
@@ -1689,273 +1593,6 @@ async function loadGenericContent(apiPath, containerId, cardRenderer, typeName) 
     } catch (error) {
         renderErrorMessage(container, `Could not load ${typeName}. ${error.message}`);
     }
-}
-
-function loadTestimonials() {
-    // Load carousel testimonials
-    loadTestimonialsCarousel();
-    
-    // Load grid testimonials
-    loadTestimonialsGrid();
-}
-
-async function loadTestimonialsGrid() {
-    const container = document.getElementById('testimonials-grid-container');
-    if (!container) return;
-    renderLoadingIndicator(container);
-    try {
-        const data = await fetchData('/api/testimonials');
-        const list = data.testimonials || [];
-        if (!list.length) {
-            renderNoDataMessage(container, 'testimonials');
-            return;
-        }
-        container.innerHTML = '';
-        list.forEach(t => container.insertAdjacentHTML('beforeend', createTestimonialCardHtml(t)));
-        buildTestimonialFilters(list);
-        initTestimonialFilters();
-        updateTestimonialFilterCounts();
-    } catch (err) {
-        renderErrorMessage(container, `Could not load testimonials. ${err.message}`);
-    }
-}
-
-function buildTestimonialFilters(testimonials) {
-    const wrap = document.getElementById('testimonial-filters');
-    if (!wrap) return;
-    wrap.innerHTML = '';
-}
-
-function initTestimonialFilters() {
-    const wrap = document.getElementById('testimonial-filters');
-    const grid = document.getElementById('testimonials-grid-container');
-    if (!wrap || !grid) return;
-}
-
-function updateTestimonialFilterCounts() {
-    return;
-}
-
-function filterTestimonialsByIndustry(industryFilter = 'all') {
-    return;
-}
-
-// --- Testimonials Carousel Functions ---
-
-async function loadTestimonialsCarousel() {
-    const carouselContainer = document.getElementById('carousel-track');
-    if (!carouselContainer) return;
-
-    try {
-        const data = await fetchData('/api/testimonials');
-        if (data.testimonials && data.testimonials.length > 0) {
-            carouselContainer.innerHTML = '';
-            
-            // Create slides
-            data.testimonials.forEach(testimonial => {
-                carouselContainer.insertAdjacentHTML('beforeend', createTestimonialSlideHtml(testimonial));
-            });
-            
-            // Initialize carousel
-            initTestimonialsCarousel(data.testimonials.length);
-            
-            // Initialize stats counter
-            initStatsCounter();
-        } else {
-            carouselContainer.innerHTML = '<div class="testimonial-loading"><p>No testimonials available.</p></div>';
-        }
-    } catch (error) {
-        console.error('Error loading testimonials carousel:', error);
-        carouselContainer.innerHTML = '<div class="testimonial-loading"><p>Error loading testimonials.</p></div>';
-    }
-}
-
-let currentSlide = 0;
-let totalSlides = 0;
-let isAnimating = false;
-let autoTimer = null;
-const AUTO_MS = 7000;
-
-function initTestimonialsCarousel(slideCount) {
-    totalSlides = slideCount;
-    currentSlide = 0;
-    
-    createCarouselDots();
-    // Set initial slide states for 3D glide effect
-    applySlideStates();
-    updateCarousel();
-    
-    // Add event listeners
-    const prevBtn = document.querySelector('.prev-btn');
-    const nextBtn = document.querySelector('.next-btn');
-    
-    if (prevBtn) {
-        prevBtn.addEventListener('click', () => prevSlide());
-    }
-    
-    if (nextBtn) {
-        nextBtn.addEventListener('click', () => nextSlide());
-    }
-    
-    // Auto-advance
-    startAutoAdvance();
-    
-    // Keyboard support
-    const region = document.getElementById('testimonials-carousel');
-    if (region) {
-        region.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight') { e.preventDefault(); nextSlide(true); }
-            if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(true); }
-        });
-        // Pause auto on focus/hover, resume on blur/mouseleave
-        region.addEventListener('mouseenter', pauseAutoAdvance);
-        region.addEventListener('mouseleave', startAutoAdvance);
-        region.addEventListener('focusin', pauseAutoAdvance);
-        region.addEventListener('focusout', startAutoAdvance);
-    }
-    
-    // Touch/swipe support
-    addTouchSupport();
-}
-
-function createCarouselDots() {
-    const dotsContainer = document.getElementById('carousel-dots');
-    if (!dotsContainer) return;
-    
-    dotsContainer.innerHTML = '';
-    
-    for (let i = 0; i < totalSlides; i++) {
-        const dot = document.createElement('button');
-        dot.className = 'carousel-dot';
-        dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
-        dot.addEventListener('click', () => goToSlide(i));
-        dotsContainer.appendChild(dot);
-    }
-}
-
-function updateCarousel() {
-    const track = document.getElementById('carousel-track');
-    const dots = document.querySelectorAll('.carousel-dot');
-    const prevBtn = document.querySelector('.prev-btn');
-    const nextBtn = document.querySelector('.next-btn');
-    const announcer = document.getElementById('carousel-announcer');
-    
-    if (track) {
-        track.classList.add('is-animating');
-        track.style.transform = `translateX(-${currentSlide * 100}%)`;
-        setTimeout(() => track.classList.remove('is-animating'), 650);
-    }
-    
-    // Update dots
-    dots.forEach((dot, index) => {
-        const active = index === currentSlide;
-        dot.classList.toggle('active', active);
-        dot.setAttribute('aria-selected', active ? 'true' : 'false');
-        dot.setAttribute('aria-label', `Slide ${index + 1}${active ? ' (current)' : ''}`);
-    });
-    
-    // Keep controls always enabled for continuous loop feel
-    if (prevBtn) prevBtn.disabled = false;
-    if (nextBtn) nextBtn.disabled = false;
-
-    // Announce for screen readers
-    if (announcer) {
-        announcer.textContent = `Showing testimonial ${currentSlide + 1} of ${totalSlides}`;
-    }
-}
-
-function prevSlide(userInitiated = false) {
-    if (isAnimating) return;
-    isAnimating = true;
-    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-    applySlideStates();
-    updateCarousel();
-    setTimeout(() => { isAnimating = false; }, 600);
-    if (userInitiated) restartAutoAdvance();
-}
-
-function nextSlide(userInitiated = false) {
-    if (isAnimating) return;
-    isAnimating = true;
-    currentSlide = (currentSlide + 1) % totalSlides;
-    applySlideStates();
-    updateCarousel();
-    setTimeout(() => { isAnimating = false; }, 600);
-    if (userInitiated) restartAutoAdvance();
-}
-
-function goToSlide(slideIndex) {
-    if (isAnimating || slideIndex === currentSlide) return;
-    isAnimating = true;
-    currentSlide = slideIndex;
-    applySlideStates();
-    updateCarousel();
-    setTimeout(() => { isAnimating = false; }, 600);
-}
-
-function applySlideStates() {
-    const slides = Array.from(document.querySelectorAll('.testimonial-slide'));
-    slides.forEach((slide, idx) => {
-        slide.classList.remove('entering', 'entered', 'exiting');
-        if (idx === currentSlide) {
-            slide.classList.add('entered');
-        } else if (idx === (currentSlide - 1 + totalSlides) % totalSlides) {
-            slide.classList.add('exiting');
-        } else if (idx === (currentSlide + 1) % totalSlides) {
-            slide.classList.add('entering');
-        }
-    });
-}
-
-function addTouchSupport() {
-    const carousel = document.querySelector('.testimonial-carousel');
-    if (!carousel) return;
-    
-    let startX = 0;
-    let currentX = 0;
-    let isDragging = false;
-    
-    carousel.addEventListener('touchstart', (e) => {
-        startX = e.touches[0].clientX;
-        isDragging = true;
-    });
-    
-    carousel.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
-        currentX = e.touches[0].clientX;
-    });
-    
-    carousel.addEventListener('touchend', () => {
-        if (!isDragging) return;
-        isDragging = false;
-        
-        const diffX = startX - currentX;
-        const threshold = 50;
-        
-        if (Math.abs(diffX) > threshold) {
-            if (diffX > 0) {
-                nextSlide(true);
-            } else {
-                prevSlide(true);
-            }
-        }
-    });
-}
-
-// Auto-advance helpers
-function startAutoAdvance() {
-    pauseAutoAdvance();
-    autoTimer = setInterval(() => {
-        if (!isAnimating) nextSlide();
-    }, AUTO_MS);
-}
-
-function pauseAutoAdvance() {
-    if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
-}
-
-function restartAutoAdvance() {
-    startAutoAdvance();
 }
 
 // Stats Counter Animation
@@ -2465,124 +2102,6 @@ async function loadFeaturedProject() {
         }
     } catch (error) {
          container.innerHTML = `<p style="text-align: center; color: var(--danger-color);">Error loading featured project.</p>`;
-    }
-}
-
-async function loadFeaturedTestimonial() {
-    const container = document.getElementById('featured-testimonial-container');
-    if (!container) {
-        console.warn('Featured testimonial container not found.');
-        return;
-    }
-    container.innerHTML = '<p style="text-align: center; padding: 1rem; color: var(--gray-text);">Loading featured testimonial...</p>';
-    try {
-        const data = await fetchData('/api/testimonials?featured=true&limit=1');
-      
-
-        if (data.success && data.testimonials && data.testimonials.length > 0) {
-            const featuredTestimonial = data.testimonials[0]; // Assuming the API returns it sorted
-            container.innerHTML = createFeaturedTestimonialHtml(featuredTestimonial);
-        } else {
-            console.warn('No featured testimonial found or API success was false.');
-            // Display a more user-friendly message or hide the section
-            container.innerHTML = '<p style="text-align: center; color: var(--gray-text); padding: 1rem;">No featured testimonial available at the moment.</p>';
-            // container.style.display = 'none'; // Or hide section
-        }
-    } catch (error) {
-         console.error('Error in loadFeaturedTestimonial:', error); // Log the actual error
-         container.innerHTML = `<p style="text-align: center; color: var(--danger-color);">Error loading featured testimonial. ${escapeHtml(error.message)}</p>`;
-    }
-}
-
-function createFeaturedTestimonialHtml(testimonial) {
-     // Ensure all fields used here (testimonial.content, testimonial.author, etc.) exist
-     if (!testimonial || !testimonial.content || !testimonial.author) {
-         console.error("Missing data for createFeaturedTestimonialHtml", testimonial);
-         return '<p style="text-align: center; color: var(--danger-color);">Error: Incomplete testimonial data.</p>';
-     }
-     const ratingStars = testimonial.rating ? '<span class="star">★</span>'.repeat(testimonial.rating) + '<span class="star" style="color: #555;">★</span>'.repeat(5 - testimonial.rating) : '';
-     const ratingHtml = testimonial.rating ? `<div class="rating">${ratingStars}</div>` : '';
-    const authorTitle = `${decodeHtmlEntities(testimonial.position || '')}${testimonial.position && testimonial.company ? ', ' : ''}${decodeHtmlEntities(testimonial.company || '')}`;
-
-     return `
-         <div class="featured-testimonial" style="background-color: var(--card-hover-bg); padding: 2.5rem; border-radius: var(--border-radius); border: 1px solid var(--primary-color); max-width: 900px; margin: 0 auto;">
-              <div class="testimonial-quote">
-                  <span class="quote-mark">"</span>
-                  <p>${decodeHtmlEntities(testimonial.content)}</p>
-                  <span class="quote-mark closing">"</span>
-              </div>
-               <div class="testimonial-author-info">
-                  <div>
-                      <h3>${decodeHtmlEntities(testimonial.author)}</h3>
-                      ${authorTitle ? `<p>${authorTitle}</p>` : ''}
-                      ${ratingHtml}
-                  </div>
-              </div>
-          </div>
-     `;
-}
-
-
-
-// public/js/apps.js
-
-// ... (other functions like escapeHtml, fetchData, etc. remain the same) ...
-
-// createFeaturedProjectHtml is defined earlier with the unified featured-card markup.
-
-// ... (rest of your apps.js file, including loadFeaturedProject and DOMContentLoaded listener) ...
-
-// --- Modify DOMContentLoaded Listener ---
-document.addEventListener('DOMContentLoaded', () => {
-    // ... other initializations ...
-
-    // Initialize dynamic FEATURED content loading
-    if (document.getElementById('featured-project-container')) {
-        loadFeaturedProject();
-    }
-    if (document.getElementById('featured-testimonial-container')) {
-        loadFeaturedTestimonial();
-    }
-
-    // Initialize dynamic LIST content loading (prevent double loading if preview exists)
-    if (document.getElementById('properties-grid-container') && !document.getElementById('projects-preview-grid')) {
-        loadProperties();
-        initProjectFilters();
-    }
-    if (document.getElementById('testimonials-grid-container') && !document.getElementById('featured-testimonial-container')) {
-        // Only load full list if not already showing featured (or adjust logic as needed)
-        loadTestimonials();
-    }
-     // Preview loader (ensure it doesn't conflict if on same page as full list)
-     if (document.getElementById('projects-preview-grid')) {
-        loadProjectPreview();
-    }
-
-    // Ensure stat counters on pages without carousel
-    if (document.querySelector('.stat-number')) {
-        initStatsCounter();
-    }
-
-    // ... form handlers etc. ...
-});
-
-// Render up to N testimonials from the largest clients by valuation (visible-only)
-async function loadTopClientTestimonials(n = 3) {
-    const container = document.getElementById('featured-testimonial-container');
-    if (!container) return;
-    try {
-        const data = await fetchData(`/api/testimonials?topClients=${encodeURIComponent(n)}&limit=${encodeURIComponent(n)}`);
-        if (data && data.success && Array.isArray(data.testimonials) && data.testimonials.length > 0) {
-            const items = data.testimonials.slice(0, n);
-            // Build stacked cards centered
-            container.innerHTML = items.map(createFeaturedTestimonialHtml).join('');
-        } else {
-            throw new Error('No testimonials for top clients');
-        }
-    } catch (err) {
-        // Bubble up so caller can fallback
-        console.warn('Top-client testimonials unavailable:', err.message);
-        throw err;
     }
 }
 
@@ -3164,9 +2683,80 @@ function initLegalToc() {
 }
 
 function getHeaderOffset() {
-    const header = document.getElementById('site-header');
-    if (!header) return 72;
-    // Prefer actual height; fall back to CSS var
-    const h = header.offsetHeight || 72;
-    return Number.isFinite(h) ? h : 72;
+    const header = document.getElementById('main-header') || document.getElementById('site-header');
+    if (!header) return 88;
+    const h = header.offsetHeight || 88;
+    return Number.isFinite(h) ? h : 88;
+}
+
+// --- Smart Header Controller (Brookfield Scroll Logic) ---
+// JS ONLY manages baseline scroll-position classes.
+// CSS hover states on group/header handle the rest without conflict.
+function initSmartHeader() {
+    const header = document.getElementById('main-header');
+    if (!header) return;
+
+    const behavior = header.getAttribute('data-header-behavior');
+
+    // Only manage scroll transparency if EJS told us to (homepage + hero pages)
+    if (behavior === 'scroll-transparent') {
+        const handleScroll = () => {
+            if (window.scrollY > 10) {
+                // Scrolled: solid white background
+                header.classList.remove('bg-transparent', 'text-white');
+                header.classList.add('bg-white', 'text-[#1a1a1a]', 'shadow-sm');
+            } else {
+                // At top: restore transparent for dark hero
+                header.classList.add('bg-transparent', 'text-white');
+                header.classList.remove('bg-white', 'text-[#1a1a1a]', 'shadow-sm');
+            }
+        };
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll(); // Init on load
+    }
+    // static-opaque: EJS has already set bg-white text-[#1a1a1a] — JS does nothing
+}
+
+// --- Mobile Navigation (New Brookfield Header) ---
+function initMobileNavNew() {
+    const btn = document.getElementById('mobile-menu-btn');
+    const nav = document.getElementById('mobile-nav');
+    if (!btn || !nav) return;
+
+    btn.addEventListener('click', () => {
+        const isOpen = nav.classList.contains('flex');
+        if (isOpen) {
+            nav.classList.add('hidden');
+            nav.classList.remove('flex');
+        } else {
+            nav.classList.remove('hidden');
+            nav.classList.add('flex');
+        }
+        btn.setAttribute('aria-expanded', String(!isOpen));
+
+        // Animate hamburger lines
+        const lines = btn.querySelectorAll('.hamburger-line');
+        if (!isOpen) {
+            if (lines[0]) { lines[0].style.transform = 'rotate(45deg) translate(5px, 5px)'; }
+            if (lines[1]) { lines[1].style.opacity = '0'; }
+            if (lines[2]) { lines[2].style.transform = 'rotate(-45deg) translate(5px, -5px)'; }
+        } else {
+            if (lines[0]) { lines[0].style.transform = 'none'; }
+            if (lines[1]) { lines[1].style.opacity = '1'; }
+            if (lines[2]) { lines[2].style.transform = 'none'; }
+        }
+    });
+
+    // Close mobile nav when clicking a link
+    nav.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            nav.classList.add('hidden');
+            nav.classList.remove('flex');
+            btn.setAttribute('aria-expanded', 'false');
+            const lines = btn.querySelectorAll('.hamburger-line');
+            if (lines[0]) { lines[0].style.transform = 'none'; }
+            if (lines[1]) { lines[1].style.opacity = '1'; }
+            if (lines[2]) { lines[2].style.transform = 'none'; }
+        });
+    });
 }

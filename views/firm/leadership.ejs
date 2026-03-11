@@ -1,0 +1,95 @@
+<!-- views/firm/leadership.ejs -->
+<%# Institutional Leadership Roster — Constrained Editorial Layout %>
+
+<%- include('../partials/header', {
+    pageTitle: pageTitle,
+    pageDescription: pageDescription,
+    path: path,
+    isHeroPage: true
+}) %>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="bg-[#0f2e22] pt-32 pb-20 px-8 md:px-16">
+    <div class="max-w-[1200px] mx-auto">
+        <p class="font-sans text-xs font-bold uppercase tracking-widest text-white/50 mb-4">Our Firm</p>
+        <h1 class="font-serif text-5xl md:text-6xl text-white tracking-tight mb-6">Leadership.</h1>
+        <p class="font-sans text-xl text-white/80 max-w-3xl leading-relaxed">A partnership built on process and execution. We apply strict operational discipline and data-driven underwriting to middle-market residential real estate.</p>
+    </div>
+</section>
+
+<!-- ═══════════════ PARTNER ROSTER ═══════════════ -->
+<section class="bg-white">
+    <div class="max-w-[1200px] mx-auto px-8 md:px-16 py-20 divide-y divide-[#0f2e22]/10">
+
+        <% (team || []).forEach((member, index) => { %>
+        <!-- Partner Row: <%= member.fullName %> -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-10 py-16 <%= index === 0 ? 'pt-0' : '' %>">
+
+            <!-- Image Column (Span 3 — Constrained) -->
+            <div class="md:col-span-3">
+                <div class="aspect-square overflow-hidden border border-gray-200">
+                    <img
+                        src="<%= member.avatarUrl %>"
+                        alt="<%= member.fullName %>"
+                        loading="<%= index === 0 ? 'eager' : 'lazy' %>"
+                        class="w-full h-full object-cover object-top transform-gpu backface-hidden will-change-transform rounded-none"
+                    >
+                </div>
+            </div>
+
+            <!-- Bio Column (Span 9 — Expanded) -->
+            <div class="md:col-span-9 flex flex-col pt-4 md:pt-0">
+                <h2 class="font-serif text-3xl text-[#1a1a1a] mb-1"><%= member.fullName %></h2>
+                <span class="font-sans text-sm font-bold text-[#1a1a1a]/60 uppercase tracking-widest mb-6"><%= member.role %></span>
+                <p class="font-sans text-lg text-gray-700 leading-relaxed mb-2"><%= member.shortBio %></p>
+                <% if (member.education && member.education.length) { %>
+                    <div class="flex flex-col gap-1 mt-4">
+                        <% member.education.forEach(line => { %>
+                            <span class="font-sans text-[13px] text-gray-500"><%= line %></span>
+                        <% }) %>
+                    </div>
+                <% } %>
+                <a href="/firm/leadership/<%= member.slug %>" class="inline-block font-sans text-sm font-bold text-[#0f2e22] uppercase tracking-wider mt-6 hover:underline">View Full Profile &rarr;</a>
+            </div>
+
+        </div>
+        <% }) %>
+
+    </div>
+</section>
+
+<!-- ═══════════════ INSTITUTIONAL PEDIGREE ═══════════════ -->
+<section class="bg-[#f9f8f6] border-t border-[#0f2e22]/10">
+    <div class="max-w-[1200px] mx-auto px-8 md:px-16 py-20">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
+            <div>
+                <span class="font-serif text-5xl text-[#0f2e22] block mb-4">&#9670;</span>
+                <h3 class="font-serif text-lg text-[#1a1a1a] mb-2">Complete Integration</h3>
+                <p class="font-sans text-sm text-gray-600 leading-relaxed">Each partner brings distinct domain expertise — macro strategy, asset operations, and financial modeling — ensuring our entire investment lifecycle is managed in-house.</p>
+            </div>
+            <div>
+                <span class="font-serif text-5xl text-[#0f2e22] block mb-4">&#9670;</span>
+                <h3 class="font-serif text-lg text-[#1a1a1a] mb-2">Process-Driven Operations</h3>
+                <p class="font-sans text-sm text-gray-600 leading-relaxed">A firm culture rooted in extreme accountability. We rely on rigid standard operating procedures (SOPs) to manage vendor procurement, execute renovations, and stabilize assets without third-party friction.</p>
+            </div>
+            <div>
+                <span class="font-serif text-5xl text-[#0f2e22] block mb-4">&#9670;</span>
+                <h3 class="font-serif text-lg text-[#1a1a1a] mb-2">Disciplined Underwriting</h3>
+                <p class="font-sans text-sm text-gray-600 leading-relaxed">Real estate is an equation, not a localized trade. We strip away emotion and rely on hard demographic data, supply-constraint metrics, and conservative debt modeling to protect downside risk.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ CTA BLOCK ═══════════════ -->
+<section class="bg-[#0f2e22]">
+    <div class="max-w-[1200px] mx-auto px-8 md:px-16 py-20 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+        <div>
+            <h2 class="font-serif text-3xl md:text-4xl text-white mb-3">Follow Our Progress.</h2>
+            <p class="font-sans text-lg text-white/70 max-w-xl">Connect with our team to join our private distribution list and receive our quarterly operational updates and market research.</p>
+        </div>
+        <a href="/investors/apply" class="inline-block font-sans text-sm font-bold text-[#0f2e22] bg-white px-10 py-4 uppercase tracking-wider hover:bg-[#f9f8f6] transition-colors rounded-none whitespace-nowrap">Join Distribution List</a>
+    </div>
+</section>
+
+<%- include('../partials/footer') %>

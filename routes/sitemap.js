@@ -28,10 +28,10 @@ router.get('/', async (req, res) => {
 			<changefreq>weekly</changefreq>
 			<priority>0.8</priority>
 		</url>`).join('')}
-	${properties.map(project => `
+	${properties.map(prop => `
 		<url>
-			<loc>${domain}/portfolio/${project.slug}</loc>
-			<lastmod>${project.updatedAt ? project.updatedAt.toISOString() : ''}</lastmod>
+			<loc>${domain}/portfolio/${prop.slug}</loc>
+			<lastmod>${prop.updatedAt ? prop.updatedAt.toISOString() : ''}</lastmod>
 			<changefreq>monthly</changefreq>
 			<priority>0.7</priority>
 		</url>`).join('')}

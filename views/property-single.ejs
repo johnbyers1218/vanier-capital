@@ -1,6 +1,6 @@
 <%# views/project-single.ejs — Enterprise-grade case study layout %>
 
-<%- include('partials/header', { pageTitle: pageTitle, pageDescription: pageDescription }) %>
+<%- include('partials/header', { pageTitle: pageTitle, p: pageDescription }) %>
 
 <!-- Structured Data: Project/Case Study -->
 <script type="application/ld+json">
@@ -122,21 +122,6 @@
                     </div>
                 <% }) %>
             </div>
-        </div>
-    </section>
-    <% } %>
-
-    <!-- Testimonial (optional) -->
-    <% if (typeof testimonial !== 'undefined' && testimonial && testimonial.content) { %>
-    <section class="py-10 border-t border-[var(--color-border-subtle)]">
-        <div class="container mx-auto px-4">
-            <blockquote class="relative rounded-xl border border-[var(--color-border-subtle)] bg-white p-8 shadow-sm">
-                <div class="absolute -top-5 left-6 text-5xl text-[var(--color-primary)]">“</div>
-                <p class="mt-4 text-lg text-[var(--color-text-headings)]"><%= testimonial.content %></p>
-                <footer class="mt-4 text-[var(--color-text-muted)]">
-                    — <strong><%= testimonial.author %></strong><% if (testimonial.position) { %>, <%= testimonial.position %><% } %><% if (testimonial.company) { %>, <%= testimonial.company %><% } %>
-                </footer>
-            </blockquote>
         </div>
     </section>
     <% } %>

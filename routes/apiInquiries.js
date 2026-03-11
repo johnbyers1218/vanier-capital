@@ -23,7 +23,7 @@ router.post('/contact-submission', rules, async (req, res, next) => {
   const { name, email, phone, subject, message } = req.body;
   try {
     // 1) Save to DB
-    const inquiry = await Inquiry.create({ name, email, phone, subject, message });
+    const inquiry = await Inquiry.create({ name, email, phone, subject, message, inquiryType: 'general_inquiry' });
     logger.info('[Inquiry] Saved', { id: inquiry._id, email });
 
     // 2) Send team notification

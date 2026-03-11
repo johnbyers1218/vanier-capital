@@ -1,0 +1,166 @@
+<!-- views/contact-investor-relations.ejs -->
+<%# Dedicated Investor Relations Contact Page %>
+
+<%- include('partials/header', {
+    pageTitle: 'Investor Relations - Vanier Capital',
+    pageDescription: 'Connect with Vanier Capital regarding our private distribution list and future capital partnership opportunities.',
+    path: '/contact',
+    isHeroPage: true
+}) %>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="bg-[#0f2e22] pt-32 pb-20 px-8 md:px-16">
+    <div class="max-w-screen-xl mx-auto">
+        <p class="font-sans text-xs font-bold uppercase tracking-widest text-white/50 mb-4">Connect</p>
+        <h1 class="font-serif text-5xl md:text-6xl text-white tracking-tight mb-6">Investor Relations.</h1>
+        <p class="font-sans text-xl text-white/80 max-w-3xl leading-relaxed">Connect with our team regarding our private distribution list and future capital partnership opportunities.</p>
+    </div>
+</section>
+
+<!-- ═══════════════ MAIN CONTENT ═══════════════ -->
+<section class="bg-white">
+    <div class="max-w-screen-xl mx-auto px-8 md:px-16 py-20 grid grid-cols-1 md:grid-cols-12 gap-16">
+
+        <!-- LEFT COLUMN: IR Overview -->
+        <div class="md:col-span-4">
+            <h2 class="font-serif text-2xl text-[#0f2e22] mb-8">Capital Partnerships</h2>
+
+            <div class="space-y-10">
+                <div class="border-t border-[#0f2e22]/20 pt-6">
+                    <h3 class="font-serif text-lg text-[#1a1a1a] mb-2">Direct Contact</h3>
+                    <p class="font-sans text-sm text-gray-500 mb-3">For distribution list inquiries, portfolio updates, and partnership interest.</p>
+                    <a href="mailto:ir@vaniercapital.com" class="font-sans text-sm text-[#0f2e22] hover:underline block mb-1">ir@vaniercapital.com</a>
+                </div>
+
+                <div class="border-t border-[#0f2e22]/20 pt-6">
+                    <h3 class="font-serif text-lg text-[#1a1a1a] mb-2">What We Discuss</h3>
+                    <ul class="font-sans text-sm text-gray-600 space-y-2">
+                        <li class="flex items-start gap-2"><span class="text-[#0f2e22] mt-0.5">—</span> Distribution list inclusion</li>
+                        <li class="flex items-start gap-2"><span class="text-[#0f2e22] mt-0.5">—</span> Quarterly portfolio updates</li>
+                        <li class="flex items-start gap-2"><span class="text-[#0f2e22] mt-0.5">—</span> Self-funded track record</li>
+                        <li class="flex items-start gap-2"><span class="text-[#0f2e22] mt-0.5">—</span> Future partnership criteria</li>
+                    </ul>
+                </div>
+
+                <div class="border-t border-[#0f2e22]/20 pt-6">
+                    <h3 class="font-serif text-lg text-[#1a1a1a] mb-2">Other Departments</h3>
+                    <ul class="font-sans text-sm space-y-2">
+                        <li><a href="/contact/acquisitions" class="text-[#0f2e22] hover:underline">Acquisitions Team &rarr;</a></li>
+                        <li><a href="/contact" class="text-[#0f2e22] hover:underline">General Inquiries &rarr;</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Form -->
+        <div class="md:col-span-8">
+            <h2 class="font-serif text-2xl text-[#0f2e22] mb-8">Investor Inquiry</h2>
+
+            <div id="contact-form-message" class="mb-6"></div>
+
+            <form id="contact-form" class="space-y-6">
+                <input type="hidden" id="requestedMeeting" name="requestedMeeting" value="false" />
+                <input type="hidden" id="subject" name="subject" value="Investor Relations" />
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="name" class="block font-sans text-sm font-medium text-[#1a1a1a] mb-2">Full Name <span class="text-red-600">*</span></label>
+                        <input type="text" id="name" name="name" required
+                               class="w-full font-sans text-base px-4 py-3 border border-gray-300 rounded-none bg-white text-[#1a1a1a] placeholder-gray-400 focus:outline-none focus:border-[#0f2e22] focus:ring-0 transition-colors"
+                               placeholder="Enter your full name">
+                    </div>
+                    <div>
+                        <label for="email" class="block font-sans text-sm font-medium text-[#1a1a1a] mb-2">Email Address <span class="text-red-600">*</span></label>
+                        <input type="email" id="email" name="email" required
+                               class="w-full font-sans text-base px-4 py-3 border border-gray-300 rounded-none bg-white text-[#1a1a1a] placeholder-gray-400 focus:outline-none focus:border-[#0f2e22] focus:ring-0 transition-colors"
+                               placeholder="you@company.com">
+                    </div>
+                    <div>
+                        <label for="phone" class="block font-sans text-sm font-medium text-[#1a1a1a] mb-2">Phone Number</label>
+                        <input type="tel" id="phone" name="phone"
+                               class="w-full font-sans text-base px-4 py-3 border border-gray-300 rounded-none bg-white text-[#1a1a1a] placeholder-gray-400 focus:outline-none focus:border-[#0f2e22] focus:ring-0 transition-colors"
+                               placeholder="(Optional)">
+                    </div>
+                    <div>
+                        <label for="organization" class="block font-sans text-sm font-medium text-[#1a1a1a] mb-2">Organization</label>
+                        <input type="text" id="organization" name="organization"
+                               class="w-full font-sans text-base px-4 py-3 border border-gray-300 rounded-none bg-white text-[#1a1a1a] placeholder-gray-400 focus:outline-none focus:border-[#0f2e22] focus:ring-0 transition-colors"
+                               placeholder="Firm or family office name">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="message" class="block font-sans text-sm font-medium text-[#1a1a1a] mb-2">Message <span class="text-red-600">*</span></label>
+                    <textarea id="message" name="message" rows="6" required
+                              class="w-full font-sans text-base px-4 py-3 border border-gray-300 rounded-none bg-white text-[#1a1a1a] placeholder-gray-400 focus:outline-none focus:border-[#0f2e22] focus:ring-0 transition-colors resize-vertical"
+                              placeholder="Tell us about your interest in Vanier Capital — distribution list, portfolio updates, or general partnership questions."></textarea>
+                </div>
+
+                <div class="flex items-start gap-3">
+                    <input type="checkbox" id="privacy" name="privacy" required
+                           class="mt-1 w-4 h-4 border border-gray-300 rounded-none text-[#0f2e22] focus:ring-0 focus:ring-offset-0">
+                    <label for="privacy" class="font-sans text-sm text-gray-600">
+                        I agree to the <a href="/privacy-policy" target="_blank" class="text-[#0f2e22] underline">Privacy Policy</a> and <a href="/terms-of-service" target="_blank" class="text-[#0f2e22] underline">Terms of Service</a> <span class="text-red-600">*</span>
+                    </label>
+                </div>
+
+                <div>
+                    <button type="submit"
+                            class="font-sans text-sm font-bold uppercase tracking-wider text-white bg-[#0f2e22] px-10 py-4 rounded-none hover:bg-[#1a1a1a] transition-colors">
+                        Submit Investor Inquiry
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</section>
+
+<!-- ═══════════════ INVESTOR RELATIONS FAQ ═══════════════ -->
+<section class="bg-[#f9f8f6] border-t border-[#0f2e22]/10">
+    <div class="max-w-3xl mx-auto px-8 md:px-16 pt-24 pb-16">
+        <h2 class="font-serif text-3xl text-[#0f2e22] border-b border-[#0f2e22]/20 pb-4 mb-8">Frequently Asked Questions</h2>
+
+        <details class="group border-b border-gray-200 [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex cursor-pointer items-center justify-between py-5 font-sans text-sm font-bold uppercase tracking-widest text-[#1a1a1a] hover:text-[#0f2e22] transition-colors">
+                <span>What are your reporting and communication standards?</span>
+                <span class="transition group-open:rotate-180 shrink-0 ml-4">
+                    <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="square" stroke-linejoin="miter" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                </span>
+            </summary>
+            <p class="font-sans text-gray-600 leading-relaxed pb-6 pr-8 text-sm">
+                Members of our private distribution list receive quarterly portfolio updates including operational metrics, market commentary, and acquisition activity. As we formalize future partnership structures, reporting cadence and depth will be outlined in the applicable offering documents.
+            </p>
+        </details>
+
+        <details class="group border-b border-gray-200 [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex cursor-pointer items-center justify-between py-5 font-sans text-sm font-bold uppercase tracking-widest text-[#1a1a1a] hover:text-[#0f2e22] transition-colors">
+                <span>What are the requirements to partner with Vanier Capital?</span>
+                <span class="transition group-open:rotate-180 shrink-0 ml-4">
+                    <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="square" stroke-linejoin="miter" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                </span>
+            </summary>
+            <p class="font-sans text-gray-600 leading-relaxed pb-6 pr-8 text-sm">
+                Vanier Capital is currently self-funded and not accepting outside capital. We maintain a private distribution list for individuals who want to follow our progress and be notified when future partnership opportunities become available. You can join by submitting an inquiry through our <a href="/investor-club/apply" class="text-[#0f2e22] underline hover:no-underline">Distribution List</a> page.
+            </p>
+        </details>
+
+
+
+    </div>
+</section>
+
+<!-- ═══════════════ CTA BLOCK ═══════════════ -->
+<section class="bg-white border-t border-[#0f2e22]/10">
+    <div class="max-w-screen-xl mx-auto px-8 md:px-16 py-20 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <div>
+            <h2 class="font-serif text-3xl md:text-4xl text-[#0f2e22] mb-4">Investment Strategy</h2>
+            <p class="font-sans text-lg text-gray-600 leading-relaxed">Review our disciplined approach to sourcing, underwriting, and managing real estate assets in the Columbus, Georgia market.</p>
+        </div>
+        <div class="flex justify-start md:justify-end">
+            <a href="/strategy" class="font-sans text-sm font-bold uppercase tracking-wider text-white bg-[#0f2e22] px-10 py-4 rounded-none hover:bg-[#1a1a1a] transition-colors">View Strategy</a>
+        </div>
+    </div>
+</section>
+
+<%- include('partials/footer') %>

@@ -3,14 +3,14 @@
 import express from 'express';
 import { logger } from '../../config/logger.js';
 import Property from '../../models/Property.js';
-import Testimonial from '../../models/Testimonials.js';
+// Testimonial import REMOVED: feature eradicated
 import BlogPost from '../../models/BlogPost.js';
 import AdminLog from '../../models/AdminLog.js';
-import NewsletterSubscriber from '../../models/NewsletterSubscriber.js';
 import { logAdminAction } from '../../utils/helpers.js';
 import AdminUser from '../../models/AdminUser.js';
 import Contact from '../../models/Contacts.js';
 import Inquiry from '../../models/Inquiry.js';
+import Applicant from '../../models/Applicant.js';
 import DailyMetric from '../../models/DailyMetric.js';
 
 // Export a function that accepts csrfProtection middleware
@@ -20,14 +20,14 @@ export default (csrfProtection) => {
     const router = express.Router();
 
     // GET /admin/dashboard
-    // This route is protected by the 'isAdmin' middleware applied in app.js
+    // This route is protected by the requireAdminClerk middleware applied in app.js
     // Apply csrfProtection middleware if you ever add POST forms to the dashboard
     router.get('/', csrfProtection, async (req, res, next) => {
         logger.debug(`[Dashboard Route] GET / request received from user: ${req.adminUser?.username || 'Unknown'}, IP: ${req.ip}`);
 
-        // Double-check if user info is present (should be guaranteed by isAdmin middleware)
+        // Double-check if user info is present (should be guaranteed by requireAdminClerk middleware)
         if (!req.adminUser || !req.adminUser.userId) {
-            logger.error('[Dashboard Route] CRITICAL: req.adminUser not found after isAdmin middleware. Forcing logout.');
+            logger.error('[Dashboard Route] CRITICAL: req.adminUser not found after auth middleware. Forcing logout.');
             req.flash('error', 'Authentication issue. Please log in again.');
             return res.redirect('/admin/login');
         }
@@ -36,21 +36,18 @@ export default (csrfProtection) => {
             // Fetch data for dashboard summary concurrently
             logger.debug('[Dashboard Route] Fetching dashboard counts, team, and recent logs...');
             const [
-                projectCount,
-                testimonialCount,
+                propertyCount,
                 blogPostCount,
                 draftPostCount,
-                totalSubscribers,
                 recentLogs,
                 teamUsers,
                 postsMissingFeatured,
-                staleDraftsCount
+                staleDraftsCount,
+                applicantCount
             ] = await Promise.all([
                 Property.countDocuments().exec().catch(err => { logger.warn('Failed to count properties', err); return null; }),
-                Testimonial.countDocuments({ isVisible: true }).exec().catch(err => { logger.warn('Failed to count testimonials', err); return null; }),
                 BlogPost.countDocuments({ isPublished: true }).exec().catch(err => { logger.warn('Failed to count published posts', err); return null; }),
                 BlogPost.countDocuments({ isPublished: false }).exec().catch(err => { logger.warn('Failed to count draft posts', err); return null; }),
-                NewsletterSubscriber.countDocuments({ status: 'Subscribed' }).exec().catch(err => { logger.warn('Failed to count subscribers', err); return 0; }),
                 AdminLog.find()
                     .sort({ createdAt: -1 })
                     .limit(25)
@@ -61,24 +58,24 @@ export default (csrfProtection) => {
                 AdminUser.find({}, 'username fullName role avatarUrl').sort({ createdAt: 1 }).lean().catch(err => { logger.warn('Failed to fetch admin users', err); return []; }),
                 // Content health counts
                 BlogPost.countDocuments({ $or: [ { featuredImage: { $exists: false } }, { featuredImage: null }, { featuredImage: '' } ] }).exec().catch(err => { logger.warn('Failed to count posts missing featured image', err); return 0; }),
-                BlogPost.countDocuments({ isPublished: false, createdAt: { $lt: new Date(Date.now() - 30*24*60*60*1000) } }).exec().catch(err => { logger.warn('Failed to count stale drafts', err); return 0; })
+                BlogPost.countDocuments({ isPublished: false, createdAt: { $lt: new Date(Date.now() - 30*24*60*60*1000) } }).exec().catch(err => { logger.warn('Failed to count stale drafts', err); return 0; }),
+                Applicant.countDocuments().exec().catch(err => { logger.warn('Failed to count applicants', err); return 0; })
             ]);
 
-            logger.debug('[Dashboard Route] Data fetching complete.', { projectCount, testimonialCount, blogPostCount, draftPostCount, totalSubscribers, logCount: recentLogs?.length ?? 0, teamSize: teamUsers?.length ?? 0 });
+            logger.debug('[Dashboard Route] Data fetching complete.', { propertyCount, blogPostCount, draftPostCount, logCount: recentLogs?.length ?? 0, teamSize: teamUsers?.length ?? 0 });
 
             // Render the dashboard view
-            res.render('admin/dashboard', {
+            return res.render('admin/dashboard', {
                 pageTitle: `Welcome back, ${req.adminUser.fullName || req.adminUser.username}!`,
                 path: '/admin/dashboard', // For active navigation link
                 // Counts (will be null if fetch failed, view handles this)
-                projectCount,
-                testimonialCount,
+                propertyCount,
                 blogPostCount,
                 draftPostCount,
-                totalSubscribers,
                 // Recent Logs
                 recentLogs: recentLogs || [], // Pass logs or empty array
                 teamUsers: teamUsers || [],
+                applicantCount,
                 contentHealth: {
                     postsMissingFeatured: postsMissingFeatured || 0,
                     staleDrafts: staleDraftsCount || 0,
@@ -103,41 +100,16 @@ export default (csrfProtection) => {
     // Lightweight API endpoints to power dashboard widgets and skeleton loaders
     router.get('/api/stats', async (req, res) => {
         try {
-            const [projectCount, published, drafts, subs, testimonials] = await Promise.all([
+            const [propertyCount, published, drafts, applicants] = await Promise.all([
                 Property.countDocuments().exec(),
                 BlogPost.countDocuments({ isPublished: true }).exec(),
                 BlogPost.countDocuments({ isPublished: false }).exec(),
-                NewsletterSubscriber.countDocuments({ status: 'Subscribed' }).exec(),
-                Testimonial.countDocuments({ isVisible: true }).exec()
+                Applicant.countDocuments().exec()
             ]);
             // New inquiries count for widget
             const newInquiries = await Inquiry.countDocuments({ status: 'New' }).exec().catch(() => 0);
-            res.json({ projectCount, blogPostCount: published, draftPostCount: drafts, totalSubscribers: subs, testimonialCount: testimonials, newInquiries });
-        } catch (e) { res.status(500).json({ error: 'Failed to load stats' }); }
-    });
-
-    router.get('/api/subscribers/last-30-days', async (req, res) => {
-        try {
-            const thirtyDaysAgo = new Date();
-            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29);
-            const agg = await NewsletterSubscriber.aggregate([
-                { $match: { createdAt: { $gte: new Date(thirtyDaysAgo.setHours(0,0,0,0)) } } },
-                { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } }, count: { $sum: 1 } } },
-                { $sort: { _id: 1 } }
-            ]);
-            // Normalize to include all days
-            const labels = [];
-            const countsMap = new Map(agg.map(r => [r._id, r.count]));
-            const today = new Date();
-            for (let i = 29; i >= 0; i--) {
-                const d = new Date(today);
-                d.setDate(today.getDate() - i);
-                const key = d.toISOString().slice(0,10);
-                labels.push(key);
-            }
-            const data = labels.map(k => countsMap.get(k) || 0);
-            res.json({ labels, data });
-        } catch (e) { res.status(500).json({ error: 'Failed to load subscriber growth' }); }
+            return res.json({ propertyCount, blogPostCount: published, draftPostCount: drafts, newInquiries, applicantCount: applicants });
+        } catch (e) { return res.status(500).json({ error: 'Failed to load stats' }); }
     });
 
     router.get('/api/posts/pipeline', async (req, res) => {
@@ -146,8 +118,8 @@ export default (csrfProtection) => {
                 BlogPost.countDocuments({ isPublished: true }).exec(),
                 BlogPost.countDocuments({ isPublished: false }).exec()
             ]);
-            res.json({ published, drafts });
-        } catch (e) { res.status(500).json({ error: 'Failed to load pipeline' }); }
+            return res.json({ published, drafts });
+        } catch (e) { return res.status(500).json({ error: 'Failed to load pipeline' }); }
     });
 
     router.get('/api/health', async (req, res) => {
@@ -156,8 +128,8 @@ export default (csrfProtection) => {
                 BlogPost.countDocuments({ $or: [ { featuredImage: { $exists: false } }, { featuredImage: null }, { featuredImage: '' } ] }).exec(),
                 BlogPost.countDocuments({ isPublished: false, createdAt: { $lt: new Date(Date.now() - 30*24*60*60*1000) } }).exec()
             ]);
-            res.json({ postsMissingFeatured: missingFeatured, staleDrafts });
-        } catch (e) { res.status(500).json({ error: 'Failed to load content health' }); }
+            return res.json({ postsMissingFeatured: missingFeatured, staleDrafts });
+        } catch (e) { return res.status(500).json({ error: 'Failed to load content health' }); }
     });
 
     // Blog views in last 30 days from DailyMetric('blog_views')
@@ -178,8 +150,8 @@ export default (csrfProtection) => {
                 labels.push(key);
             }
             const data = labels.map(k => dataMap.get(k) || 0);
-            res.json({ labels, data });
-        } catch (e) { res.status(500).json({ error: 'Failed to load blog views' }); }
+            return res.json({ labels, data });
+        } catch (e) { return res.status(500).json({ error: 'Failed to load blog views' }); }
     });
 
     // Contact forms submitted in last 30 days (by createdAt)
@@ -203,8 +175,8 @@ export default (csrfProtection) => {
                 labels.push(key);
             }
             const data = labels.map(k => countsMap.get(k) || 0);
-            res.json({ labels, data });
-        } catch (e) { res.status(500).json({ error: 'Failed to load contacts metric' }); }
+            return res.json({ labels, data });
+        } catch (e) { return res.status(500).json({ error: 'Failed to load contacts metric' }); }
     });
 
     // Quick Start: create a draft blog post and redirect to editor

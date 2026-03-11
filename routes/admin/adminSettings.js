@@ -9,7 +9,7 @@ export default (csrfProtection) => {
   // GET settings hub
   router.get('/', csrfProtection, async (req, res, next) => {
     try {
-      res.render('admin/settings/index', {
+      return res.render('admin/settings/index', {
         pageTitle: 'Settings',
         path: '/admin/settings'
       });
@@ -22,19 +22,21 @@ export default (csrfProtection) => {
   // GET KPI manager
   router.get('/kpi', csrfProtection, async (req, res, next) => {
     try {
-      const [occupancy, capRate, aum] = await Promise.all([
-        Settings.findOne({ key: 'occupancyRate' }).lean(),
-        Settings.findOne({ key: 'capRate' }).lean(),
-        Settings.findOne({ key: 'aum' }).lean()
-      ]);
-      res.render('admin/settings/kpi', {
+      const allSettings = await Settings.find({}).lean();
+      const map = {};
+      allSettings.forEach(s => { map[s.key] = s.valueString || ''; });
+      return res.render('admin/settings/kpi', {
         pageTitle: 'KPI Manager',
         path: '/admin/settings/kpi',
         csrfToken: req.csrfToken(),
         settings: {
-          occupancyRate: occupancy?.valueString ?? '',
-          capRate: capRate?.valueString ?? '',
-          aum: aum?.valueString ?? ''
+          occupancyRate: map.occupancyRate || '',
+          capRate: map.capRate || '',
+          aum: map.aum || '',
+          firmInceptionYear: map.firmInceptionYear || '',
+          maintenanceResponse: map.maintenanceResponse || '',
+          avgResidentTenure: map.avgResidentTenure || '',
+          rentCollectionRate: map.rentCollectionRate || '',
         },
         errorMessages: [],
         successMessage: req.flash('success')
@@ -46,13 +48,17 @@ export default (csrfProtection) => {
   });
 
   // Redirect GET /kpi/save to /kpi to prevent 404s on refresh
-  router.get('/kpi/save', (req, res) => res.redirect('/admin/settings/kpi'));
+  router.get('/kpi/save', (req, res) => { return res.redirect('/admin/settings/kpi'); });
 
   // POST KPI save
   router.post('/kpi/save', csrfProtection, [
     body('occupancyRate').optional({ checkFalsy: true }).trim(),
     body('capRate').optional({ checkFalsy: true }).trim(),
     body('aum').optional({ checkFalsy: true }).trim(),
+    body('firmInceptionYear').optional({ checkFalsy: true }).trim(),
+    body('maintenanceResponse').optional({ checkFalsy: true }).trim(),
+    body('avgResidentTenure').optional({ checkFalsy: true }).trim(),
+    body('rentCollectionRate').optional({ checkFalsy: true }).trim(),
   ], async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -61,7 +67,11 @@ export default (csrfProtection) => {
         settings: {
           occupancyRate: req.body.occupancyRate,
           capRate: req.body.capRate,
-          aum: req.body.aum
+          aum: req.body.aum,
+          firmInceptionYear: req.body.firmInceptionYear,
+          maintenanceResponse: req.body.maintenanceResponse,
+          avgResidentTenure: req.body.avgResidentTenure,
+          rentCollectionRate: req.body.rentCollectionRate,
         }, errorMessages: errors.array(), successMessage: null
       });
     }
@@ -69,7 +79,11 @@ export default (csrfProtection) => {
       const updates = [
         { key: 'occupancyRate', label: 'Occupancy Rate', valueString: req.body.occupancyRate },
         { key: 'capRate', label: 'Portfolio Cap Rate', valueString: req.body.capRate },
-        { key: 'aum', label: 'Assets Under Management', valueString: req.body.aum }
+        { key: 'aum', label: 'Assets Under Management', valueString: req.body.aum },
+        { key: 'firmInceptionYear', label: 'Firm Inception Year', valueString: req.body.firmInceptionYear },
+        { key: 'maintenanceResponse', label: 'Maintenance Response Time', valueString: req.body.maintenanceResponse },
+        { key: 'avgResidentTenure', label: 'Avg. Resident Tenure', valueString: req.body.avgResidentTenure },
+        { key: 'rentCollectionRate', label: 'Rent Collection Rate', valueString: req.body.rentCollectionRate },
       ];
       await Promise.all(updates.map(u => Settings.updateOne(
         { key: u.key },
@@ -77,7 +91,7 @@ export default (csrfProtection) => {
         { upsert: true }
       )));
       req.flash('success', 'KPI statistics updated.');
-      res.redirect('/admin/settings/kpi');
+      return res.redirect('/admin/settings/kpi');
     } catch (e) {
       logger.error('[Admin Settings] Failed updating KPIs', { message: e.message });
       next(e);
@@ -89,7 +103,7 @@ export default (csrfProtection) => {
     try {
       const AdminUser = (await import('../../models/AdminUser.js')).default;
       const teamUsers = await AdminUser.find({}, 'username fullName role avatarUrl').sort({ createdAt: 1 }).lean();
-      res.render('admin/settings/team', {
+      return res.render('admin/settings/team', {
         pageTitle: 'Team Management',
         path: '/admin/settings/team',
         csrfToken: req.csrfToken(),

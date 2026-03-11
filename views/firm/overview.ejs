@@ -1,0 +1,69 @@
+<!-- views/firm/overview.ejs -->
+<%- include('../partials/header', {
+    pageTitle: pageTitle,
+    pageDescription: pageDescription,
+    path: path
+}) %>
+
+<!-- Hero -->
+<section class="bg-[#0f2e22] pt-32 pb-20 px-8 md:px-16">
+    <div class="max-w-screen-xl mx-auto">
+        <span class="font-sans text-sm font-bold text-white/60 uppercase tracking-widest block mb-4">The Firm</span>
+        <h1 class="font-serif text-5xl md:text-6xl text-white tracking-tight mb-6">Disciplined Capital.<br/>Durable Returns.</h1>
+        <p class="font-sans text-xl text-white/80 max-w-3xl leading-relaxed">Vanier Capital is a specialized real estate private equity firm focused on building long-term, risk-adjusted wealth through the strategic acquisition and rigorous operation of residential assets.</p>
+    </div>
+</section>
+
+<!-- Genesis & Military Pedigree -->
+<section class="max-w-screen-xl mx-auto px-8 md:px-16 py-24 grid grid-cols-1 md:grid-cols-12 gap-16 border-b border-[#0f2e22]/10">
+    <div class="md:col-span-4">
+        <h2 class="font-serif text-3xl text-[#0f2e22]">A Foundation<br/>of Discipline</h2>
+    </div>
+    <div class="md:col-span-8">
+        <div class="prose max-w-none font-sans text-lg text-gray-700 leading-relaxed">
+            <p class="mb-6">Vanier Capital was founded with a singular conviction: that institutional underwriting, paired with resident-focused operations, can consistently out-perform the market while establishing an asymmetric hedge against downside risk.</p>
+            <p>Anchored by a partnership forged at the United States Military Academy and the Massachusetts Institute of Technology (MIT), we do not chase speculative trends. Every capital deployment decision is guided by advanced quantitative modeling, conservative leverage assumptions, and an engineering-grade approach to property operations.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Track Record Metrics -->
+<section class="bg-[#0f2e22] text-white py-16 px-8 md:px-16">
+    <div class="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 divide-y md:divide-y-0 md:divide-x divide-white/20">
+        <div class="flex flex-col md:pl-8 first:pl-0 pt-8 md:pt-0">
+            <span class="font-serif text-5xl md:text-6xl text-white mb-2"><%= (typeof siteSettings !== 'undefined' && siteSettings.aum) ? siteSettings.aum : '$1M+' %></span>
+            <span class="font-sans text-xs font-bold uppercase tracking-widest text-white/60">Assets Under Management</span>
+        </div>
+        <div class="flex flex-col md:pl-8 pt-8 md:pt-0">
+            <span class="font-serif text-5xl md:text-6xl text-white mb-2"><%= (typeof siteSettings !== 'undefined' && siteSettings.occupancyRate) ? siteSettings.occupancyRate : '96%' %></span>
+            <span class="font-sans text-xs font-bold uppercase tracking-widest text-white/60">Portfolio Occupancy</span>
+        </div>
+        <div class="flex flex-col md:pl-8 pt-8 md:pt-0">
+            <span class="font-serif text-5xl md:text-6xl text-white mb-2"><%= (typeof siteSettings !== 'undefined' && siteSettings.firmInceptionYear) ? siteSettings.firmInceptionYear : '2025' %></span>
+            <span class="font-sans text-xs font-bold uppercase tracking-widest text-white/60">Firm Inception &amp; Cash Flow</span>
+        </div>
+    </div>
+</section>
+
+<!-- Mission & Philosophy -->
+<section id="philosophy" class="bg-[#f9f8f6] py-24 px-8 md:px-16">
+    <div class="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
+        <div class="border-t-2 border-[#0f2e22] pt-6">
+            <h3 class="font-serif text-3xl text-[#0f2e22] mb-4">Our Mission</h3>
+            <p class="font-sans text-lg text-gray-700 leading-relaxed">To acquire and operate residential communities that generate resilient, yielding cash flow while elevating the resident experience through frictionless, tech-enabled stewardship.</p>
+        </div>
+        <div class="border-t-2 border-[#0f2e22] pt-6">
+            <h3 class="font-serif text-3xl text-[#0f2e22] mb-4">Our Vision</h3>
+            <p class="font-sans text-lg text-gray-700 leading-relaxed">To build a scalable portfolio recognized for operational stability, strict financial transparency, and long-term value creation—acting as the premier fiduciary for capital partners seeking durable real estate returns.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Leadership CTA -->
+<section class="max-w-screen-xl mx-auto px-8 md:px-16 py-24 text-center">
+    <h2 class="font-serif text-4xl text-[#0f2e22] mb-6">Meet the Partnership</h2>
+    <p class="font-sans text-lg text-gray-600 mb-8 max-w-2xl mx-auto">Learn about the operators, quantitative analysts, and capital allocators driving our disciplined investment strategy.</p>
+    <a href="/firm/leadership" class="inline-block font-sans text-sm font-bold uppercase tracking-widest text-white bg-[#0f2e22] border border-[#0f2e22] px-8 py-4 hover:bg-[#1a1a1a] transition-colors">View Leadership</a>
+</section>
+
+<%- include('../partials/footer') %>

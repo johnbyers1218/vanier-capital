@@ -1,44 +1,182 @@
+<%# views/admin/login.ejs — Local admin login with Clerk Google OAuth %>
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Admin Login</title>
-        <link rel="stylesheet" href="/css/admin-style.css" />
-    </head>
-    <body class="min-h-screen bg-[#111] text-gray-100">
-        <div class="max-w-md mx-auto py-10">
-            <h1 class="text-2xl font-semibold mb-6">Admin Login</h1>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin Sign In | Vanier Capital</title>
+    <link rel="icon" href="/images/vanier-logo.svg" sizes="any">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f8f6;
+            color: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-container {
+            width: 100%;
+            max-width: 520px;
+            padding: 0 24px;
+        }
+        .login-card {
+            background: #fff;
+            border: 1px solid rgba(15, 46, 34, 0.12);
+            padding: 48px 32px 32px;
+            border-radius: 0;
+        }
+        .brand {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .brand-name {
+            font-family: 'Merriweather', serif;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #0f2e22;
+        }
+        .brand-sub {
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: rgba(15, 46, 34, 0.5);
+            margin-top: 6px;
+        }
+        .divider {
+            width: 40px;
+            height: 1px;
+            background: rgba(15, 46, 34, 0.2);
+            margin: 24px auto;
+        }
+        .login-heading {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: rgba(26, 26, 26, 0.5);
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .error-msg {
+            background: rgba(220, 38, 38, 0.08);
+            border-left: 3px solid #dc2626;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            color: #991b1b;
+        }
+        #sign-in-widget {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 120px;
+            width: 100%;
+        }
+        /* Ensure the Clerk root box fills and centers within the card */
+        #sign-in-widget > div {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        /* Remove Clerk card's built-in padding/shadow so it inherits our card style */
+        #sign-in-widget .cl-card,
+        #sign-in-widget .cl-rootBox {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-shadow: none !important;
+            border: none !important;
+            border-radius: 0 !important;
+        }
+        .loading-state {
+            text-align: center;
+            padding: 32px 0;
+            font-size: 12px;
+            color: rgba(26, 26, 26, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        .footer-note {
+            text-align: center;
+            margin-top: 32px;
+            font-size: 11px;
+            color: rgba(26, 26, 26, 0.35);
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="brand">
+                <div class="brand-name">Vanier</div>
+                <div class="brand-sub">Capital</div>
+            </div>
+            <div class="divider"></div>
+            <div class="login-heading">Administrative Access</div>
 
-            <% if (errorMessage && errorMessage.length) { %>
-                <% errorMessage.forEach(msg => { %>
-                    <div class="mb-4 rounded border-l-4 border-red-500 bg-red-900/30 text-red-200 px-3 py-2 text-sm" role="alert">
-                        <%= msg %>
-                    </div>
-                <% }) %>
+            <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
+                <div class="error-msg"><%= error %></div>
             <% } %>
 
-            <% if (successMessage && successMessage.length) { %>
-                <% successMessage.forEach(msg => { %>
-                    <div class="mb-4 rounded border-l-4 border-green-500 bg-green-900/30 text-green-200 px-3 py-2 text-sm" role="alert">
-                        <%= msg %>
-                    </div>
-                <% }) %>
-            <% } %>
-
-            <form action="/admin/login" method="POST" class="space-y-4">
-                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
-
-                <div>
-                    <label for="username" class="block text-sm font-medium">Username</label>
-                    <input id="username" name="username" type="text" required autofocus class="mt-1 w-full rounded-md bg-[#1a1a1a] border border-neutral-700 px-3 py-2" />
-                </div>
-                <div>
-                    <label for="password" class="block text-sm font-medium">Password</label>
-                    <input id="password" name="password" type="password" required class="mt-1 w-full rounded-md bg-[#1a1a1a] border border-neutral-700 px-3 py-2" />
-                </div>
-                <button type="submit" class="w-full bg-[#0b4d3a] hover:bg-[#093d2d] text-white font-semibold px-4 py-2 rounded-md">Login</button>
-            </form>
+            <%# Clerk Sign-In widget mounts here %>
+            <div id="sign-in-widget">
+                <div class="loading-state">Loading authentication…</div>
+            </div>
         </div>
-    </body>
+        <div class="footer-note">&copy; <%= new Date().getFullYear() %> Vanier Capital, LLC</div>
+    </div>
+
+    <%# Clerk Frontend SDK — loaded from Clerk FAPI (includes UI components) %>
+    <script
+        async
+        crossorigin="anonymous"
+        data-clerk-publishable-key="<%= clerkPublishableKey %>"
+        src="https://secure-macaque-46.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+        type="text/javascript"
+    ></script>
+    <script>
+        window.addEventListener('load', async function () {
+            await window.Clerk.load();
+
+            // If already signed in, redirect straight to dashboard
+            if (window.Clerk.user) {
+                window.location.href = '/admin/dashboard';
+                return;
+            }
+
+            // Poll until Clerk UI components are ready before mounting
+            const interval = setInterval(() => {
+                if (window.Clerk && window.Clerk.isReady()) {
+                    clearInterval(interval);
+                    const signInDiv = document.getElementById('sign-in-widget');
+                    signInDiv.innerHTML = ''; // clear loading state
+                    window.Clerk.mountSignIn(signInDiv, {
+                        appearance: {
+                            variables: { colorPrimary: '#0f2e22' },
+                            elements: {
+                                card: 'shadow-none border-0',
+                                rootBox: 'w-full',
+                                formButtonPrimary: 'bg-[#0f2e22] hover:bg-[#1a4a38] rounded-none uppercase tracking-widest text-xs font-bold',
+                            }
+                        },
+                        redirectUrl: '/admin/dashboard',
+                        afterSignInUrl: '/admin/dashboard',
+                    });
+                }
+            }, 100);
+        });
+    </script>
+</body>
 </html>

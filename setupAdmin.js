@@ -31,7 +31,6 @@ if (process.env.NODE_ENV === 'development') {
 
 // --- Configuration Variables ---
 const initialUsername = process.env.INITIAL_ADMIN_USER;
-const initialPassword = process.env.INITIAL_ADMIN_PASS;
 const initialFullName = process.env.INITIAL_ADMIN_FULLNAME;
 const initialRole = 'admin';
 const mongoURI = process.env.MONGODB_URI;
@@ -41,7 +40,8 @@ if (!initialUsername || !mongoURI) {
     (logger || console).error('[setupAdmin] Error: Missing required environment variables: INITIAL_ADMIN_USER, MONGODB_URI.');
     process.exit(1);
 }
-// Password and FullName are validated later, only if creating a new user.
+// FullName is validated later, only if creating a new user.
+// Note: Clerk is the sole Identity Provider — no local passwords are stored.
 
 // --- Helper Function for Confirmation Prompt ---
 const askConfirmation = (prompt) => {
@@ -83,23 +83,16 @@ async function runSetup() {
             }
         } else {
             (logger || console).info(`[setupAdmin] Admin user '${initialUsername}' does not exist. Proceeding with new user creation.`);
-            if (!initialPassword || !initialFullName) {
-                (logger || console).error('[setupAdmin] Error: For new user creation, INITIAL_ADMIN_PASS and INITIAL_ADMIN_FULLNAME are required.');
-                if (mongoose.connection.readyState === 1) await mongoose.connection.close();
-                process.exit(1);
-            }
-            if (initialPassword.length < 12) {
-                (logger || console).error('[setupAdmin] Error: Initial admin password for NEW user must be at least 12 characters long.');
+            if (!initialFullName) {
+                (logger || console).error('[setupAdmin] Error: For new user creation, INITIAL_ADMIN_FULLNAME is required.');
                 if (mongoose.connection.readyState === 1) await mongoose.connection.close();
                 process.exit(1);
             }
 
-            // No interactive confirmation needed when run on Heroku. It will proceed if user doesn't exist.
-            // For local runs, you could add back the askConfirmation if you uncomment the NODE_ENV=development block above.
+            // Clerk handles authentication — no local password is stored.
             (logger || console).info(`[setupAdmin] Creating NEW admin user '${initialUsername}'...`);
             const admin = new AdminUser({
                 username: initialUsername,
-                password: initialPassword,
                 fullName: initialFullName,
                 role: initialRole,
             });

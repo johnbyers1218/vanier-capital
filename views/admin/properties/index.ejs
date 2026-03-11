@@ -1,12 +1,12 @@
 <%# views/admin/properties/index.ejs %>
-<%# Admin page to list and manage properties %>
+<%# Admin page to list and manage portfolio track record %>
 
-<%- include('../partials/header', { pageTitle: 'Manage Properties' }) %>
+<%- include('../partials/header', { pageTitle: 'Manage Portfolio Track Record' }) %>
 
 <div class="flex items-start justify-between mb-6">
     <div>
-        <h2 class="text-2xl font-bold text-gray-100">Manage Properties</h2>
-        <p class="text-gray-400 mt-1">Create, edit, and manage your property portfolio.</p>
+        <h2 class="text-2xl font-bold text-[#1a1a1a]">Portfolio Track Record</h2>
+        <p class="text-gray-600 mt-1">Create, edit, and manage portfolio assets and case studies.</p>
                 <%- include('../partials/pillToggle', {
                         basePath: '/admin/properties',
                         paramName: 'status',
@@ -19,45 +19,49 @@
                 }) %>
     </div>
     <div>
-        <a href="/admin/properties/new" class="inline-flex items-center gap-2 bg-primary text-white font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-            <i class="fas fa-plus"></i> Add New Property
+        <a href="/admin/properties/new" class="inline-flex items-center gap-2 bg-[#0f2e22] text-white font-bold py-3 px-6 border border-[#0f2e22] hover:bg-[#1a1a1a] uppercase tracking-widest text-xs transition">
+            <i class="fas fa-plus"></i> Add New Asset
         </a>
     </div>
 </div>
 
 <div>
     <% if (properties && properties.length > 0) { %>
-        <div class="overflow-x-auto bg-[#1a1a1a] rounded-lg shadow-md border border-neutral-700">
-            <table class="min-w-full divide-y divide-neutral-700">
-                <thead class="bg-[#1a1a1a]/60">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Title</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Property Type</th>
-                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">For Rent</th>
-                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">Featured</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Created</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Last Updated</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
+        <div class="overflow-x-auto bg-white border border-[#0f2e22]/20">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-[#f9f8f6] border-y border-[#0f2e22]/20">
+                        <th class="px-6 py-3 text-left text-[#1a1a1a] font-sans text-xs font-bold uppercase tracking-widest">Title</th>
+                        <th class="px-6 py-3 text-left text-[#1a1a1a] font-sans text-xs font-bold uppercase tracking-widest">Status</th>
+                        <th class="px-6 py-3 text-left text-[#1a1a1a] font-sans text-xs font-bold uppercase tracking-widest">Strategy</th>
+                        <th class="px-6 py-3 text-left text-[#1a1a1a] font-sans text-xs font-bold uppercase tracking-widest">Asset Class</th>
+                        <th class="px-6 py-3 text-center text-[#1a1a1a] font-sans text-xs font-bold uppercase tracking-widest">Doors</th>
+                        <th class="px-6 py-3 text-center text-[#1a1a1a] font-sans text-xs font-bold uppercase tracking-widest">Target IRR</th>
+                        <th class="px-6 py-3 text-center text-[#1a1a1a] font-sans text-xs font-bold uppercase tracking-widest">Featured</th>
+                        <th class="px-6 py-3 text-center text-[#1a1a1a] font-sans text-xs font-bold uppercase tracking-widest">Visible</th>
+                        <th class="px-6 py-3 text-left text-[#1a1a1a] font-sans text-xs font-bold uppercase tracking-widest">Updated</th>
+                        <th class="px-6 py-3 text-right text-[#1a1a1a] font-sans text-xs font-bold uppercase tracking-widest">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="bg-[#1a1a1a] divide-y divide-neutral-700">
+                <tbody>
                     <% properties.forEach(property => { %>
-                        <tr class="hover:bg-[#1a1a1a]/70">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100"><%= property.title %></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                                <% if (property.propertyType) { %>
-                                    <%= property.propertyType %>
+                        <tr class="bg-white border-b border-gray-200 text-[#1a1a1a] hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#1a1a1a]"><%= property.title %></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                <% if (property.status) { %>
+                                    <span class="inline-block font-sans text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 border
+                                        <%= property.status === 'Stabilized & Yielding' ? 'border-green-700 text-green-700' :
+                                           property.status === 'Active Sourcing' ? 'border-amber-600 text-amber-600' :
+                                           'border-gray-500 text-gray-500' %>
+                                    "><%= property.status %></span>
                                 <% } else { %>
-                                    <span class="text-gray-500">—</span>
+                                    <span class="text-gray-400">—</span>
                                 <% } %>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
-                                <% if (property.isAvailableForRent) { %>
-                                    <i class="fas fa-check-circle text-green-400" title="Available For Rent"></i>
-                                <% } else { %>
-                                    <i class="fas fa-times-circle text-gray-500" title="Not For Rent"></i>
-                                <% } %>
-                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600"><%= property.strategy || '—' %></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600"><%= property.assetClass || '—' %></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-600"><%= property.doors || '—' %></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-600"><%= property.targetIRR || '—' %></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
                                 <% if (property.isFeatured) { %>
                                     <i class="fas fa-check-circle text-green-400" title="Featured"></i>
@@ -65,20 +69,20 @@
                                     <i class="fas fa-times-circle text-gray-500" title="Not Featured"></i>
                                 <% } %>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400"><%= property.createdAt ? new Date(property.createdAt).toLocaleDateString() : '-' %></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400"><%= property.updatedAt ? new Date(property.updatedAt).toLocaleDateString() : '-' %></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                                <% if (property.isPubliclyVisible) { %>
+                                    <i class="fas fa-eye text-green-400" title="Publicly Visible"></i>
+                                <% } else { %>
+                                    <i class="fas fa-eye-slash text-gray-400" title="Hidden"></i>
+                                <% } %>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= property.updatedAt ? new Date(property.updatedAt).toLocaleDateString() : '-' %></td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
-                                <div class="inline-flex items-center gap-2">
-                                    <a href="/admin/properties/edit/<%= property._id %>" class="inline-flex items-center gap-1 bg-neutral-700 text-gray-100 font-semibold py-1.5 px-3 rounded-lg border border-neutral-600 shadow-sm hover:bg-neutral-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary" title="Edit Property">
-                                        <i class="fas fa-edit"></i>
-                                        <span>Edit</span>
-                                    </a>
-                                    <form action="/admin/properties/delete/<%= property._id %>" method="POST" class="delete-form inline-block">
+                                <div class="inline-flex items-center gap-3">
+                                    <a href="/admin/properties/edit/<%= property._id %>" class="font-sans text-[10px] font-bold uppercase tracking-widest text-[#0f2e22] border border-[#0f2e22] px-3 py-1.5 hover:bg-[#0f2e22] hover:text-white transition-colors" title="Edit Asset">Edit</a>
+                                    <form action="/admin/properties/delete/<%= property._id %>" method="POST" class="inline m-0 p-0" onsubmit="return confirm('Are you sure you want to delete this portfolio asset? This action cannot be undone.');">
                                         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                        <button type="submit" class="inline-flex items-center gap-1 bg-danger text-white font-semibold py-1.5 px-3 rounded-lg shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-danger delete-btn" title="Delete Property">
-                                            <i class="fas fa-trash-alt"></i>
-                                            <span>Delete</span>
-                                        </button>
+                                        <button type="submit" class="font-sans text-[10px] font-bold uppercase tracking-widest text-red-800 border border-red-800 px-3 py-1.5 hover:bg-red-800 hover:text-white transition-colors cursor-pointer">Delete</button>
                                     </form>
                                 </div>
                             </td>
@@ -88,29 +92,20 @@
             </table>
         </div>
     <% } else { %>
-        <div class="bg-[#1a1a1a] rounded-lg shadow-md border border-neutral-700 p-8 text-center">
-            <div class="mx-auto mb-3 h-12 w-12 rounded-full bg-neutral-700 flex items-center justify-center text-gray-300">
+        <div class="bg-white border border-[#0f2e22]/20 p-8 text-center">
+            <div class="mx-auto mb-3 h-12 w-12 bg-[#f9f8f6] flex items-center justify-center text-gray-400">
                 <i class="fas fa-building"></i>
             </div>
-            <h3 class="text-lg font-semibold text-gray-100">No Properties Yet</h3>
-            <p class="text-gray-400 mt-1">Get started by adding your first property.</p>
+            <h3 class="text-lg font-semibold text-[#1a1a1a]">No Portfolio Assets Yet</h3>
+            <p class="text-gray-600 mt-1">Get started by adding your first portfolio asset.</p>
             <div class="mt-6">
-                <a href="/admin/properties/new" class="inline-flex items-center gap-2 bg-primary text-white font-semibold py-2 px-4 rounded-lg shadow-sm hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                    <i class="fas fa-plus"></i> Add New Property
+                <a href="/admin/properties/new" class="inline-flex items-center gap-2 bg-[#0f2e22] text-white font-bold py-3 px-6 border border-[#0f2e22] hover:bg-[#1a1a1a] uppercase tracking-widest text-xs transition">
+                    <i class="fas fa-plus"></i> Add New Asset
                 </a>
             </div>
         </div>
     <% } %>
 </div>
-<script>
-// Remove inline delete confirmation, use delegated event listener
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.delete-form .delete-btn').forEach(function(btn) {
-        btn.addEventListener('click', function(e) {
-            if (!confirm('Are you sure you want to delete this property? This action cannot be undone.')) {
-                e.preventDefault();
-            }
-        });
-    });
-});
-</script>
+
+<%- include('../partials/footer') %>
+

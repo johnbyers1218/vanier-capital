@@ -1,0 +1,222 @@
+<%- include('../partials/header', {
+    pageTitle: pageTitle,
+    pageDescription: pageDescription,
+    path: path,
+    isHeroPage: true
+}) %>
+
+<!-- ═══════════════ HERO — DEEP EVERGREEN ═══════════════ -->
+<section class="bg-[#0f2e22] pt-32 pb-16">
+    <div class="max-w-[1200px] mx-auto px-8 md:px-16">
+        <span class="font-sans text-xs font-bold text-white/40 uppercase tracking-[0.3em] block mb-6">Partner Vetting &amp; Distribution List</span>
+        <h1 class="font-serif text-4xl md:text-5xl text-white tracking-tight mb-6">Partner Vetting &amp;<br/>Distribution List.</h1>
+        <p class="font-sans text-lg text-white/60 max-w-2xl leading-relaxed">Vanier Capital is currently in its Phase&nbsp;I Seed stage. Approved accredited investors will be added to our private distribution list to receive our Quarterly Macro &amp; Performance Reports as we build toward our formal Fund&nbsp;I launch.</p>
+    </div>
+</section>
+
+<!-- ═══════════════ FORM BODY ═══════════════ -->
+<section class="bg-[#f9f8f6]">
+    <div class="max-w-[1200px] mx-auto px-8 md:px-16 py-20">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+
+            <!-- Left Column — The Form (span 7) -->
+            <div class="lg:col-span-7">
+                <div class="bg-white border border-[#0f2e22]/20 p-10 md:p-14">
+
+                    <!-- Form Header -->
+                    <div class="border-b border-[#0f2e22]/10 pb-8 mb-10">
+                        <h2 class="font-serif text-3xl text-[#0f2e22] mb-3">Accredited Investor Application</h2>
+                        <p class="font-sans text-sm text-gray-500 leading-relaxed">All fields marked with an asterisk (<span class="text-red-600">*</span>) are required. Information submitted is treated as confidential under our <a href="/privacy-policy" class="underline text-[#0f2e22] hover:text-[#1a1a1a]">Privacy Policy</a>.</p>
+                    </div>
+
+                    <!-- Form -->
+                    <form id="investor-apply-form" class="space-y-8" novalidate>
+                        <% if (typeof ref !== 'undefined' && ref) { %>
+                        <input type="hidden" name="ref" value="<%= ref %>">
+                        <% } %>
+
+                        <!-- Full Name -->
+                        <div>
+                            <label for="fullName" class="block font-sans text-xs font-bold uppercase tracking-widest text-[#1a1a1a] mb-2">Full Legal Name <span class="text-red-600">*</span></label>
+                            <input type="text" id="fullName" name="fullName" required autocomplete="name" class="w-full border border-[#0f2e22]/20 bg-white p-3 rounded-none font-sans text-sm text-[#1a1a1a] focus:outline-none focus:ring-2 focus:ring-[#0f2e22] focus:border-[#0f2e22] transition-colors" placeholder="As it appears on legal documents">
+                        </div>
+
+                        <!-- Email -->
+                        <div>
+                            <label for="email" class="block font-sans text-xs font-bold uppercase tracking-widest text-[#1a1a1a] mb-2">Corporate Email <span class="text-red-600">*</span></label>
+                            <input type="email" id="email" name="email" required autocomplete="email" class="w-full border border-[#0f2e22]/20 bg-white p-3 rounded-none font-sans text-sm text-[#1a1a1a] focus:outline-none focus:ring-2 focus:ring-[#0f2e22] focus:border-[#0f2e22] transition-colors" placeholder="investor@firm.com">
+                        </div>
+
+                        <!-- Phone -->
+                        <div>
+                            <label for="phone" class="block font-sans text-xs font-bold uppercase tracking-widest text-[#1a1a1a] mb-2">Phone <span class="text-gray-400 font-normal normal-case tracking-normal">(Optional)</span></label>
+                            <input type="tel" id="phone" name="phone" autocomplete="tel" class="w-full border border-[#0f2e22]/20 bg-white p-3 rounded-none font-sans text-sm text-[#1a1a1a] focus:outline-none focus:ring-2 focus:ring-[#0f2e22] focus:border-[#0f2e22] transition-colors" placeholder="+1 (555) 000-0000">
+                        </div>
+
+                        <!-- City / State -->
+                        <div>
+                            <label for="cityState" class="block font-sans text-xs font-bold uppercase tracking-widest text-[#1a1a1a] mb-2">City &amp; State <span class="text-red-600">*</span></label>
+                            <input type="text" id="cityState" name="cityState" required class="w-full border border-[#0f2e22]/20 bg-white p-3 rounded-none font-sans text-sm text-[#1a1a1a] focus:outline-none focus:ring-2 focus:ring-[#0f2e22] focus:border-[#0f2e22] transition-colors" placeholder="Atlanta, GA">
+                        </div>
+
+                        <!-- Investor Type -->
+                        <div>
+                            <label for="investorType" class="block font-sans text-xs font-bold uppercase tracking-widest text-[#1a1a1a] mb-2">Investor Classification <span class="text-red-600">*</span></label>
+                            <select id="investorType" name="investorType" required class="w-full border border-[#0f2e22]/20 bg-white p-3 rounded-none font-sans text-sm text-[#1a1a1a] focus:outline-none focus:ring-2 focus:ring-[#0f2e22] focus:border-[#0f2e22] transition-colors appearance-none">
+                                <option value="" disabled selected>Select classification&hellip;</option>
+                                <option value="individual">Individual Investor</option>
+                                <option value="family-office">Family Office</option>
+                                <option value="ria">Registered Investment Advisor (RIA)</option>
+                                <option value="institutional">Institutional Investor</option>
+                                <option value="other">Other Qualified Purchaser</option>
+                            </select>
+                        </div>
+
+                        <!-- Capital Interest -->
+                        <div>
+                            <label for="capitalInterest" class="block font-sans text-xs font-bold uppercase tracking-widest text-[#1a1a1a] mb-2">Anticipated Capital Commitment</label>
+                            <select id="capitalInterest" name="capitalInterest" class="w-full border border-[#0f2e22]/20 bg-white p-3 rounded-none font-sans text-sm text-[#1a1a1a] focus:outline-none focus:ring-2 focus:ring-[#0f2e22] focus:border-[#0f2e22] transition-colors appearance-none">
+                                <option value="Prefer not to disclose" selected>Prefer not to disclose</option>
+                                <option value="$10,000 – $50,000">$10,000 &ndash; $50,000</option>
+                                <option value="$50,000 – $100,000">$50,000 &ndash; $100,000</option>
+                                <option value="$100,000 – $250,000">$100,000 &ndash; $250,000</option>
+                                <option value="Above $250,000">Above $250,000</option>
+                            </select>
+                        </div>
+
+                        <!-- Notes -->
+                        <div>
+                            <label for="notes" class="block font-sans text-xs font-bold uppercase tracking-widest text-[#1a1a1a] mb-2">Investment Background <span class="text-gray-400 font-normal normal-case tracking-normal">(Optional)</span></label>
+                            <textarea id="notes" name="notes" rows="4" maxlength="3000" class="w-full border border-[#0f2e22]/20 bg-white p-3 rounded-none font-sans text-sm text-[#1a1a1a] focus:outline-none focus:ring-2 focus:ring-[#0f2e22] focus:border-[#0f2e22] transition-colors resize-none" placeholder="Brief description of your investment experience, current RE holdings, or fund allocation objectives."></textarea>
+                        </div>
+
+                        <!-- Accreditation Attestation -->
+                        <div class="border border-[#0f2e22]/10 bg-[#f9f8f6] p-6">
+                            <div class="flex items-start gap-4">
+                                <input type="checkbox" id="accredited" name="accredited" value="yes" required class="mt-1 w-4 h-4 border-2 border-[#0f2e22]/30 rounded-none accent-[#0f2e22] shrink-0 cursor-pointer">
+                                <label for="accredited" class="font-sans text-sm text-[#1a1a1a] leading-relaxed cursor-pointer">
+                                    <span class="font-bold">Accreditation Attestation</span> <span class="text-red-600">*</span><br>
+                                    I hereby confirm that I am an &ldquo;Accredited Investor&rdquo; as defined by Rule&nbsp;501 of Regulation&nbsp;D promulgated under the Securities Act of 1933, as amended. I understand that Vanier Capital, LLC may request supporting documentation to verify my accreditation status prior to granting access to confidential investment materials.
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Error / Success Messages -->
+                        <div id="form-messages" class="hidden"></div>
+
+                        <!-- Submit -->
+                        <button type="submit" id="submit-btn" class="w-full flex items-center justify-center gap-3 font-sans text-sm font-bold uppercase tracking-widest text-white bg-[#0f2e22] border border-[#0f2e22] px-6 py-4 hover:bg-[#1a1a1a] transition-colors cursor-pointer rounded-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" class="w-4 h-4 shrink-0"><rect x="5" y="11" width="14" height="11" /><path d="M8 11V7a4 4 0 1 1 8 0v4" /></svg>
+                            <span>Submit Application</span>
+                        </button>
+
+                        <p class="font-sans text-[11px] text-gray-400 text-center leading-relaxed">By submitting this application you consent to Vanier Capital&rsquo;s <a href="/privacy-policy" class="underline hover:text-[#0f2e22]">Privacy Policy</a> and <a href="/terms-of-service" class="underline hover:text-[#0f2e22]">Terms of Service</a>. This form does not constitute an offer to sell, or a solicitation of an offer to buy, any security.</p>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Column — Context Sidebar (span 5) -->
+            <div class="lg:col-span-5">
+                <div class="sticky top-32 space-y-10">
+
+                    <!-- What You Gain -->
+                    <div>
+                        <h3 class="font-serif text-2xl text-[#0f2e22] mb-6">Distribution List Inclusions</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-start gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#0f2e22" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" class="w-5 h-5 shrink-0 mt-0.5"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
+                                <span class="font-sans text-sm text-gray-700">Quarterly Macro-Economic &amp; Market Updates</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#0f2e22" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" class="w-5 h-5 shrink-0 mt-0.5"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
+                                <span class="font-sans text-sm text-gray-700">Detailed portfolio performance and variance reports</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#0f2e22" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" class="w-5 h-5 shrink-0 mt-0.5"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
+                                <span class="font-sans text-sm text-gray-700">Early notifications of future private placement offerings (Fund/SPV)</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Process -->
+                    <div class="border border-[#0f2e22]/10 bg-white">
+                        <div class="bg-[#0f2e22] px-6 py-4">
+                            <h3 class="font-serif text-lg text-white font-semibold m-0">Verification Process</h3>
+                        </div>
+                        <ul class="divide-y divide-[#0f2e22]/10">
+                            <li class="px-6 py-4">
+                                <p class="font-sans text-xs uppercase tracking-widest text-[#1a1a1a]/40 mb-1">Step 01</p>
+                                <p class="font-sans text-sm font-medium text-[#1a1a1a]">Submit this application</p>
+                            </li>
+                            <li class="px-6 py-4">
+                                <p class="font-sans text-xs uppercase tracking-widest text-[#1a1a1a]/40 mb-1">Step 02</p>
+                                <p class="font-sans text-sm font-medium text-[#1a1a1a]">IR team reviews within 48 hours</p>
+                            </li>
+                            <li class="px-6 py-4">
+                                <p class="font-sans text-xs uppercase tracking-widest text-[#1a1a1a]/40 mb-1">Step 03</p>
+                                <p class="font-sans text-sm font-medium text-[#1a1a1a]">Accreditation documentation requested</p>
+                            </li>
+                            <li class="px-6 py-4">
+                                <p class="font-sans text-xs uppercase tracking-widest text-[#1a1a1a]/40 mb-1">Step 04</p>
+                                <p class="font-sans text-sm font-medium text-[#1a1a1a]">Added to private distribution list</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Regulatory Note -->
+                    <div class="border-l-2 border-[#0f2e22] pl-6">
+                        <p class="font-sans text-xs text-gray-500 leading-relaxed">In accordance with SEC Regulation D, Rule 506(b) and 506(c), Vanier Capital may require third-party verification of accredited investor status before granting access to offering materials. Submission of this form does not guarantee access or constitute an offer of securities.</p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ FORM SUBMISSION JS ═══════════════ -->
+<script>
+(function() {
+    const form = document.getElementById('investor-apply-form');
+    const btn = document.getElementById('submit-btn');
+    const msgBox = document.getElementById('form-messages');
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        btn.disabled = true;
+        btn.innerHTML = '<span>Submitting&hellip;</span>';
+        msgBox.className = 'hidden';
+
+        const fd = new FormData(form);
+        const body = {};
+        fd.forEach((v, k) => { body[k] = v; });
+
+        try {
+            const res = await fetch('/api/investor-club/apply', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            const data = await res.json();
+
+            if (res.ok && data.success) {
+                window.location.href = '/investor-club/request-received';
+            } else {
+                const msg = data.message || 'Please correct the highlighted fields and try again.';
+                msgBox.className = 'border border-red-300 bg-red-50 text-red-800 p-4 font-sans text-sm';
+                msgBox.textContent = msg;
+                btn.disabled = false;
+                btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" class="w-4 h-4 shrink-0"><rect x="5" y="11" width="14" height="11" /><path d="M8 11V7a4 4 0 1 1 8 0v4" /></svg><span>Submit Application</span>';
+            }
+        } catch (err) {
+            msgBox.className = 'border border-red-300 bg-red-50 text-red-800 p-4 font-sans text-sm';
+            msgBox.textContent = 'A network error occurred. Please try again.';
+            btn.disabled = false;
+            btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" class="w-4 h-4 shrink-0"><rect x="5" y="11" width="14" height="11" /><path d="M8 11V7a4 4 0 1 1 8 0v4" /></svg><span>Submit Application</span>';
+        }
+    });
+})();
+</script>
+
+<%- include('../partials/footer') %>

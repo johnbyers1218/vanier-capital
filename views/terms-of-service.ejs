@@ -1,86 +1,115 @@
 <%# views/terms-of-service.ejs %>
 <%- include('partials/header', {
     pageTitle: 'Terms of Service - Vanier Capital',
-    pageDescription: 'Read the Vanier Capital Terms of Service governing the use of our website and services.',
+    pageDescription: 'Terms of Service governing the use of the Vanier Capital website. Intended for sophisticated institutional users and accredited investors.',
     path: '/terms-of-service'
 }) %>
 
-<section class="legal-hero">
-    <div class="container">
-        <h1>Terms of Service</h1>
-        <p class="legal-updated">Last Updated: <%= typeof lastUpdated !== 'undefined' ? lastUpdated : 'May 15, 2025' %></p>
+<section class="pt-32 pb-16 px-8 md:px-16 bg-[#0f2e22] text-white">
+    <div class="max-w-screen-xl mx-auto">
+        <span class="font-sans text-sm font-bold text-white/60 uppercase tracking-widest block mb-4">Legal</span>
+        <h1 class="font-serif text-5xl md:text-6xl text-white tracking-tight mb-6">Terms of Service</h1>
+        <p class="font-sans text-sm text-white/50 uppercase tracking-widest">Effective Date: <%= typeof lastUpdated !== 'undefined' ? lastUpdated : 'March 9, 2026' %></p>
     </div>
 </section>
 
-<section class="section legal-content">
-    <div class="container legal-doc">
-        <article class="legal-main" id="legal-main">
+<section class="max-w-screen-xl mx-auto px-8 md:px-16 py-20">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+        <article class="lg:col-span-8 space-y-12" id="legal-main">
 
-        <p>Please read these Terms of Service ("Terms", "Terms of Service") carefully before using the vaniercapital.com website (the "Service") operated by Vanier Capital ("us", "we", or "our").</p>
-        <p>Your access to and use of the Service is conditioned upon your acceptance of and compliance with these Terms. These Terms apply to all visitors, users and others who wish to access or use the Service. By accessing or using the Service you agree to be bound by these Terms. If you disagree with any part of the terms then you do not have permission to access the Service.</p>
+            <div>
+                <p class="font-sans text-sm text-gray-700 leading-relaxed mb-4">Please read these Terms of Service ("Terms") carefully before using the vaniercapital.com website (the "Site") operated by Vanier Capital, LLC ("Vanier Capital," "the Firm," "we," "us," or "our"). Your access to and use of the Site is conditioned upon your acceptance of and compliance with these Terms.</p>
+                <p class="font-sans text-sm text-gray-700 leading-relaxed">By accessing or using the Site, you represent that you have read, understood, and agree to be bound by these Terms. If you do not agree with any part of these Terms, you must discontinue use of the Site immediately.</p>
+            </div>
 
-        <h2>1. Intellectual Property</h2>
-        <p>The Service and its original content (excluding content provided by users or linked third-party sites), features and functionality are and will remain the exclusive property of Vanier Capital and its licensors. The Service is protected by copyright, trademark, and other laws of both the United States and foreign countries. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of Vanier Capital.</p>
+            <div>
+                <h2 class="font-serif text-3xl text-[#0f2e22] mb-6">No Offer or Advice</h2>
+                <p class="font-sans text-sm text-gray-700 leading-relaxed mb-4">Nothing on this Site constitutes an offer to sell, a solicitation of an offer to buy, or a recommendation of any security, investment product, or investment strategy. No information presented on this Site—including but not limited to descriptions of investment strategies, portfolio assets, financial metrics, or projected returns—should be construed as investment advice, financial advice, tax advice, or legal advice.</p>
+                <p class="font-sans text-sm text-gray-700 leading-relaxed mb-4">Any investment in a fund or vehicle managed by Vanier Capital will be made solely pursuant to the relevant offering documents (including a Private Placement Memorandum, Limited Partnership Agreement, and Subscription Agreement), which will be furnished to qualified prospective investors upon request and after appropriate suitability determinations.</p>
+                <p class="font-sans text-sm text-gray-700 leading-relaxed">You should consult your own financial advisor, legal counsel, and tax advisor before making any investment decision. Past performance is not indicative of future results, and there can be no assurance that any investment will achieve its objectives or avoid losses.</p>
+            </div>
 
-        <h2>2. Use of Our Service</h2>
-        <p>You may use our Service only for lawful purposes and in accordance with these Terms. You agree not to use the Service:</p>
-        <ul>
-            <li>In any way that violates any applicable national or international law or regulation.</li>
-            <li>For the purpose of exploiting, harming, or attempting to exploit or harm minors in any way by exposing them to inappropriate content or otherwise.</li>
-            <li>To transmit, or procure the sending of, any advertising or promotional material, including any "junk mail", "chain letter", "spam", or any other similar solicitation.</li>
-            <li>To impersonate or attempt to impersonate Vanier Capital, a Vanier Capital employee, another user, or any other person or entity.</li>
-            <li>In any way that infringes upon the rights of others, or in any way is illegal, threatening, fraudulent, or harmful, or in connection with any unlawful, illegal, fraudulent, or harmful purpose or activity.</li>
-            <li>To engage in any other conduct that restricts or inhibits anyone's use or enjoyment of the Service, or which, as determined by us, may harm or offend Vanier Capital or users of the Service or expose them to liability.</li>
-        </ul>
-        <p>Additionally, you agree not to:</p>
-        <ul>
-            <li>Use the Service in any manner that could disable, overburden, damage, or impair the Service or interfere with any other party's use of the Service.</li>
-            <li>Use any robot, spider, or other automatic device, process, or means to access the Service for any purpose, including monitoring or copying any of the material on the Service.</li>
-            <li>Introduce any viruses, trojan horses, worms, logic bombs, or other material which is malicious or technologically harmful.</li>
-            <li>Attempt to gain unauthorized access to, interfere with, damage, or disrupt any parts of the Service, the server on which the Service is stored, or any server, computer, or database connected to the Service.</li>
-        </ul>
+            <div>
+                <h2 class="font-serif text-3xl text-[#0f2e22] mb-6">Intended Audience &amp; Qualified Users</h2>
+                <p class="font-sans text-sm text-gray-700 leading-relaxed mb-4">This Site is intended for informational purposes and is directed at sophisticated institutional investors, family offices, registered investment advisors, and individuals who qualify as "accredited investors" as defined under Regulation D of the U.S. Securities Act of 1933, as amended.</p>
+                <p class="font-sans text-sm text-gray-700 leading-relaxed">Nothing on this Site is directed at, or intended for distribution to, any person or entity in any jurisdiction where such distribution would be contrary to local law or regulation. Users are responsible for ensuring compliance with the laws of their respective jurisdictions.</p>
+            </div>
 
-        <h2>3. Links to Other Web Sites</h2>
-        <p>Our Service may contain links to third-party web sites or services that are not owned or controlled by Vanier Capital. Vanier Capital has no control over, and assumes no responsibility for the content, privacy policies, or practices of any third-party web sites or services. We do not warrant the offerings of any of these entities/individuals or their websites.</p>
-        <p>You acknowledge and agree that Vanier Capital shall not be responsible or liable, directly or indirectly, for any damage or loss caused or alleged to be caused by or in connection with use of or reliance on any such content, goods or services available on or through any such third party web sites or services. We strongly advise you to read the terms and conditions and privacy policies of any third-party web sites or services that you visit.</p>
+            <div>
+                <h2 class="font-serif text-3xl text-[#0f2e22] mb-6">Forward-Looking Statements</h2>
+                <p class="font-sans text-sm text-gray-700 leading-relaxed mb-4">This Site may contain forward-looking statements, including but not limited to projections regarding investment returns, market conditions, portfolio performance, target IRR, equity multiples, occupancy rates, and operational metrics. These statements are based on the Firm's current expectations, estimates, and assumptions and are subject to significant risks, uncertainties, and contingencies.</p>
+                <p class="font-sans text-sm text-gray-700 leading-relaxed mb-4">Forward-looking statements are identified by words such as "target," "projected," "expected," "anticipated," "estimated," "pipeline," "planned," or similar expressions. Such statements are inherently speculative and should not be relied upon as guarantees of future performance.</p>
+                <p class="font-sans text-sm text-gray-700 leading-relaxed">Actual results may differ materially from those expressed or implied in any forward-looking statement due to a variety of factors, including changes in economic conditions, interest rates, real estate markets, regulatory environments, and other risks described in the applicable offering documents. Vanier Capital undertakes no obligation to update any forward-looking statement to reflect events or circumstances after the date on which the statement is made.</p>
+            </div>
 
-        <h2>4. Disclaimer of Warranties; Limitation of Liability</h2>
-        <p>The Service is provided on an "AS IS" and "AS AVAILABLE" basis. Vanier Capital makes no representations or warranties of any kind, express or implied, as to the operation of their services, or the information, content or materials included therein. You expressly agree that your use of these services, their content, and any services or items obtained from us is at your sole risk.</p>
-        <p>Neither Vanier Capital nor any person associated with Vanier Capital makes any warranty or representation with respect to the completeness, security, reliability, quality, accuracy, or availability of the services. Without limiting the foregoing, neither Vanier Capital nor anyone associated with Vanier Capital represents or warrants that the services, their content, or any services or items obtained through the services will be accurate, reliable, error-free, or uninterrupted, that defects will be corrected, that the services or the server that makes it available are free of viruses or other harmful components or that the services or any services or items obtained through the services will otherwise meet your needs or expectations.</p>
-        <p>Vanier Capital hereby disclaims all warranties of any kind, whether express or implied, statutory, or otherwise, including but not limited to any warranties of merchantability, non-infringement, and fitness for particular purpose.</p>
-        <p>In no event will Vanier Capital, its affiliates, or their licensors, service providers, employees, agents, officers, or directors be liable for damages of any kind, under any legal theory, arising out of or in connection with your use, or inability to use, the Service, any websites linked to it, any content on the Service or such other websites, including any direct, indirect, special, incidental, consequential, or punitive damages, including but not limited to, personal injury, pain and suffering, emotional distress, loss of revenue, loss of profits, loss of business or anticipated savings, loss of use, loss of goodwill, loss of data, and whether caused by tort (including negligence), breach of contract, or otherwise, even if foreseeable.</p>
+            <div>
+                <h2 class="font-serif text-3xl text-[#0f2e22] mb-6">1. Intellectual Property</h2>
+                <p class="font-sans text-sm text-gray-700 leading-relaxed">The Site and its original content, features, and functionality—including all text, graphics, logos, images, data compilations, and software—are and shall remain the exclusive property of Vanier Capital, LLC and its licensors. The Site is protected by copyright, trademark, and other intellectual property laws of the United States and foreign jurisdictions. Our trademarks and trade dress may not be used in connection with any product or service without the prior written consent of Vanier Capital.</p>
+            </div>
 
-        <h2>5. Indemnification</h2>
-        <p>You agree to defend, indemnify and hold harmless Vanier Capital and its licensee and licensors, and their employees, contractors, agents, officers and directors, from and against any and all claims, damages, obligations, losses, liabilities, costs or debt, and expenses (including but not limited to attorney's fees), resulting from or arising out of a) your use and access of the Service, or b) a breach of these Terms.</p>
+            <div>
+                <h2 class="font-serif text-3xl text-[#0f2e22] mb-6">2. Permitted Use</h2>
+                <p class="font-sans text-sm text-gray-700 leading-relaxed mb-4">You may use this Site only for lawful purposes and in accordance with these Terms. You agree not to:</p>
+                <ul class="space-y-2 border-l-2 border-[#0f2e22] pl-6">
+                    <li class="font-sans text-sm text-[#1a1a1a]">Use the Site in any way that violates any applicable federal, state, local, or international law or regulation</li>
+                    <li class="font-sans text-sm text-[#1a1a1a]">Transmit any advertising, promotional material, spam, or other unsolicited communication</li>
+                    <li class="font-sans text-sm text-[#1a1a1a]">Impersonate or attempt to impersonate Vanier Capital, its employees, or any other person or entity</li>
+                    <li class="font-sans text-sm text-[#1a1a1a]">Use any automated device, robot, spider, or process to access, monitor, or copy any portion of the Site</li>
+                    <li class="font-sans text-sm text-[#1a1a1a]">Introduce viruses, trojan horses, worms, or other material that is malicious or technologically harmful</li>
+                    <li class="font-sans text-sm text-[#1a1a1a]">Attempt to gain unauthorized access to any part of the Site, the server on which it is stored, or any connected system</li>
+                    <li class="font-sans text-sm text-[#1a1a1a]">Use the Site in any manner that could disable, overburden, or impair its functionality or interfere with any other party's use</li>
+                </ul>
+            </div>
 
-        <h2>6. Governing Law</h2>
-        <p>These Terms shall be governed and construed in accordance with the laws of the State of Georgia, United States, without regard to its conflict of law provisions.</p>
-        <p>Our failure to enforce any right or provision of these Terms will not be considered a waiver of those rights. If any provision of these Terms is held to be invalid or unenforceable by a court, the remaining provisions of these Terms will remain in effect. These Terms constitute the entire agreement between us regarding our Service, and supersede and replace any prior agreements we might have had between us regarding the Service.</p>
+            <div>
+                <h2 class="font-serif text-3xl text-[#0f2e22] mb-6">3. Third-Party Links</h2>
+                <p class="font-sans text-sm text-gray-700 leading-relaxed">This Site may contain links to third-party websites or services that are not owned or controlled by Vanier Capital. We have no control over, and assume no responsibility for, the content, privacy policies, or practices of any third-party websites. You acknowledge and agree that Vanier Capital shall not be responsible or liable for any damage or loss arising from your use of or reliance on any such third-party content or services.</p>
+            </div>
 
-        <h2>7. Changes to Service and Terms</h2>
-        <p>We reserve the right to withdraw or amend our Service, and any service or material we provide via the Service, in our sole discretion without notice. We will not be liable if for any reason all or any part of the Service is unavailable at any time or for any period.</p>
-        <p>We may revise and update these Terms of Service from time to time in our sole discretion. All changes are effective immediately when we post them. Your continued use of the Service following the posting of revised Terms of Service means that you accept and agree to the changes. You are expected to check this page frequently so you are aware of any changes, as they are binding on you.</p>
+            <div>
+                <h2 class="font-serif text-3xl text-[#0f2e22] mb-6">4. Disclaimer of Warranties</h2>
+                <p class="font-sans text-sm text-gray-700 leading-relaxed mb-4">THE SITE IS PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS WITHOUT ANY WARRANTIES OF ANY KIND, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE. VANIER CAPITAL SPECIFICALLY DISCLAIMS ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.</p>
+                <p class="font-sans text-sm text-gray-700 leading-relaxed">Neither Vanier Capital nor any person associated with the Firm makes any warranty or representation with respect to the completeness, security, reliability, quality, accuracy, or availability of the Site or any information contained herein. Without limiting the foregoing, no representation is made that the Site will be uninterrupted, error-free, or free of viruses or other harmful components.</p>
+            </div>
 
-                <section id="contact-us" class="legal-cta" aria-labelledby="legal-cta-title">
-                    <div class="cta-head">
-                        <svg class="cta-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
-                            <path fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/>
-                            <path fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" d="M9.09 9a3 3 0 1 1 4.21 2.74c-.86.4-1.3.72-1.3 1.76V14"/>
-                            <circle cx="12" cy="17" r=".9" fill="currentColor"/>
-                        </svg>
-                        <h2 id="legal-cta-title">Need Further Clarification?</h2>
-                    </div>
-                    <p>Our team is ready to provide the information you need.</p>
-                    <div class="cta-actions">
-                        <a href="/contact" class="btn-primary" aria-label="Contact our team about terms questions">Contact Our Team</a>
-                    </div>
-                </section>
+            <div>
+                <h2 class="font-serif text-3xl text-[#0f2e22] mb-6">5. Limitation of Liability</h2>
+                <p class="font-sans text-sm text-gray-700 leading-relaxed">IN NO EVENT SHALL VANIER CAPITAL, ITS AFFILIATES, OFFICERS, DIRECTORS, EMPLOYEES, AGENTS, OR LICENSORS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO LOSS OF PROFITS, LOSS OF DATA, LOSS OF GOODWILL, PERSONAL INJURY, OR ANY OTHER DAMAGES ARISING OUT OF OR IN CONNECTION WITH YOUR USE OF, OR INABILITY TO USE, THE SITE, REGARDLESS OF THE THEORY OF LIABILITY (CONTRACT, TORT, STRICT LIABILITY, OR OTHERWISE), EVEN IF VANIER CAPITAL HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
+            </div>
+
+            <div>
+                <h2 class="font-serif text-3xl text-[#0f2e22] mb-6">6. Indemnification</h2>
+                <p class="font-sans text-sm text-gray-700 leading-relaxed">You agree to defend, indemnify, and hold harmless Vanier Capital, its affiliates, and their respective officers, directors, employees, contractors, and agents from and against any and all claims, damages, obligations, losses, liabilities, costs, or expenses (including reasonable attorneys' fees) arising from: (a) your use and access of the Site; (b) your violation of any provision of these Terms; or (c) your violation of any third-party right, including any intellectual property, privacy, or proprietary right.</p>
+            </div>
+
+            <div>
+                <h2 class="font-serif text-3xl text-[#0f2e22] mb-6">7. Governing Law &amp; Jurisdiction</h2>
+                <p class="font-sans text-sm text-gray-700 leading-relaxed mb-4">These Terms shall be governed by and construed in accordance with the laws of the State of Georgia, United States, without regard to its conflict of law provisions. Any dispute arising out of or relating to these Terms or your use of the Site shall be subject to the exclusive jurisdiction of the state and federal courts located in the State of Georgia.</p>
+                <p class="font-sans text-sm text-gray-700 leading-relaxed">Our failure to enforce any right or provision of these Terms will not constitute a waiver of such right or provision. If any provision of these Terms is held to be invalid or unenforceable, the remaining provisions shall remain in full force and effect.</p>
+            </div>
+
+            <div>
+                <h2 class="font-serif text-3xl text-[#0f2e22] mb-6">8. Modifications</h2>
+                <p class="font-sans text-sm text-gray-700 leading-relaxed">We reserve the right to modify these Terms at any time in our sole discretion. Revised Terms will be posted on this page with an updated effective date. Your continued use of the Site following the posting of revised Terms constitutes acceptance of the changes. You are expected to review this page periodically to remain aware of any modifications.</p>
+            </div>
+
+            <div class="border-t border-[#0f2e22]/20 pt-12" id="contact-us">
+                <h2 class="font-serif text-3xl text-[#0f2e22] mb-6">Contact</h2>
+                <p class="font-sans text-sm text-gray-700 leading-relaxed mb-4">For questions regarding these Terms of Service, contact:</p>
+                <div class="border-l-2 border-[#0f2e22] pl-6">
+                    <p class="font-sans text-sm text-[#1a1a1a] font-bold">Vanier Capital, LLC</p>
+                    <p class="font-sans text-sm text-gray-700">Email: <a href="mailto:info@vaniercapital.com" class="text-[#0f2e22] font-bold hover:underline">info@vaniercapital.com</a></p>
+                </div>
+            </div>
+
         </article>
-    <aside class="legal-toc toc-numbered" aria-label="Secondary">
-            <div class="toc-title">On this page</div>
-            <nav aria-label="Table of contents">
-                <ul id="legal-toc-list"></ul>
-            </nav>
+        <aside class="lg:col-span-4 hidden lg:block" aria-label="Secondary">
+            <div class="sticky top-32">
+                <div class="font-sans text-xs font-bold text-[#1a1a1a] uppercase tracking-widest mb-4">On This Page</div>
+                <nav aria-label="Table of contents">
+                    <ul id="legal-toc-list" class="space-y-2 border-l border-[#0f2e22]/20 pl-4"></ul>
+                </nav>
+            </div>
         </aside>
     </div>
 </section>

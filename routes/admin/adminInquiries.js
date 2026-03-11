@@ -7,12 +7,17 @@ export default (csrfProtection) => {
   const router = express.Router();
 
   // List page with optional filter ?status=New|Viewed|Responded
+  // Defaults to general_inquiry type; use ?type=investor_lead for distribution leads
   router.get('/', csrfProtection, async (req, res, next) => {
     try {
       const status = (req.query.status || '').toString();
-      const filter = status ? { status } : {};
+      const inquiryType = (req.query.type || 'general_inquiry').toString();
+      const filter = {};
+      if (status) filter.status = status;
+      filter.inquiryType = inquiryType;
       const inquiries = await Inquiry.find(filter).sort({ createdAt: -1 }).lean();
-      res.render('admin/inquiries/index', { pageTitle: 'Inquiries', path: '/admin/inquiries', inquiries, status });
+      const pageTitle = inquiryType === 'investor_lead' ? 'Distribution List Leads' : 'General Inquiries';
+      return res.render('admin/inquiries/index', { pageTitle, path: '/admin/inquiries', inquiries, status, inquiryType });
     } catch (e) { next(e); }
   });
 
@@ -26,7 +31,7 @@ export default (csrfProtection) => {
         try { await Inquiry.updateOne({ _id: id }, { $set: { status: 'Viewed' } }); } catch {}
         inquiry.status = 'Viewed';
       }
-      res.render('admin/inquiries/detail', { pageTitle: 'Inquiry Detail', path: '/admin/inquiries', inquiry, csrfToken: req.csrfToken() });
+      return res.render('admin/inquiries/detail', { pageTitle: 'Inquiry Detail', path: '/admin/inquiries', inquiry, csrfToken: req.csrfToken() });
     } catch (e) { next(e); }
   });
 
@@ -35,7 +40,7 @@ export default (csrfProtection) => {
     try {
       const id = req.params.id;
       await Inquiry.updateOne({ _id: id }, { $set: { status: 'Responded' } });
-      res.redirect(`/admin/inquiries/${id}`);
+      return res.redirect(`/admin/inquiries/${id}`);
     } catch (e) { next(e); }
   });
 

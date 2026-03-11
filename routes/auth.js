@@ -1,6 +1,6 @@
 import express from 'express';
 import { logger } from '../config/logger.js';
-import { clerkClient } from '@clerk/clerk-sdk-node';
+import { clerkClient, getAuth } from '@clerk/express';
 export default (csrfProtection) => { 
   const router = express.Router();
 
@@ -13,29 +13,30 @@ export default (csrfProtection) => {
     });
   });
 
-  // Render Clerk Sign-In page (with server-side fast-path if already signed in as admin)
+  // Render Clerk Sign-In page — redirect to the new branded /sign-in page
   router.get('/sign-in', async (req, res, next) => {
     try {
       const redirectTo = typeof req.query.redirectTo === 'string' && req.query.redirectTo.trim() ? req.query.redirectTo : '/admin/dashboard';
       const useClerk = process.env.USE_CLERK === '1';
 
-      if (useClerk && req.auth?.sessionId && req.auth?.userId) {
-        try {
-          const user = await clerkClient.users.getUser(req.auth.userId);
-          const role = user?.publicMetadata?.role || user?.privateMetadata?.role;
-          if (role === 'admin') {
-            logger.debug('[auth/sign-in] Already signed in as admin, redirecting.', { redirectTo });
-            return res.redirect(302, redirectTo);
+      if (useClerk) {
+        const { userId, sessionId } = getAuth(req);
+        if (sessionId && userId) {
+          try {
+            const user = await clerkClient.users.getUser(userId);
+            const role = user?.publicMetadata?.role || user?.privateMetadata?.role;
+            if (role === 'admin') {
+              logger.debug('[auth/sign-in] Already signed in as admin, redirecting.', { redirectTo });
+              return res.redirect(302, redirectTo);
+            }
+          } catch (e) {
+            logger.warn('[auth/sign-in] Clerk user lookup failed; falling back to redirect.', { message: e?.message });
           }
-        } catch (e) {
-          logger.warn('[auth/sign-in] Clerk user lookup failed; falling back to render.', { message: e?.message });
         }
       }
 
-      return res.render('auth/sign-in', {
-        pageTitle: 'Sign In',
-        clerkPublishableKey: process.env.CLERK_PUBLISHABLE_KEY
-      });
+      // Redirect to the new branded sign-in page
+      return res.redirect(`/sign-in?redirectTo=${encodeURIComponent(redirectTo)}`);
     } catch (err) {
       return next(err);
     }

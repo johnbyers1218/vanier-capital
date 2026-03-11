@@ -1,0 +1,231 @@
+<!-- views/contact-acquisitions.ejs -->
+<%# Dedicated Acquisitions Contact Page %>
+
+<%- include('partials/header', {
+    pageTitle: 'Acquisitions - Vanier Capital',
+    pageDescription: 'Reach the Vanier Capital acquisitions team to discuss off-market opportunities and property dispositions in the Columbus, Georgia market.',
+    path: '/contact',
+    isHeroPage: true
+}) %>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="bg-[#0f2e22] pt-32 pb-20 px-8 md:px-16">
+    <div class="max-w-screen-xl mx-auto">
+        <p class="font-sans text-xs font-bold uppercase tracking-widest text-white/50 mb-4">Connect</p>
+        <h1 class="font-serif text-5xl md:text-6xl text-white tracking-tight mb-6">Acquisitions.</h1>
+        <p class="font-sans text-xl text-white/80 max-w-3xl leading-relaxed">Submit off-market opportunities or discuss property dispositions with our acquisitions team. We are actively acquiring in Columbus, Georgia.</p>
+    </div>
+</section>
+
+<!-- ═══════════════ MAIN CONTENT ═══════════════ -->
+<section class="bg-white">
+    <div class="max-w-screen-xl mx-auto px-8 md:px-16 py-20 grid grid-cols-1 md:grid-cols-12 gap-16">
+
+        <!-- LEFT COLUMN: Acquisitions Overview -->
+        <div class="md:col-span-4">
+            <h2 class="font-serif text-2xl text-[#0f2e22] mb-8">Deal Flow</h2>
+
+            <div class="space-y-10">
+                <div class="border-t border-[#0f2e22]/20 pt-6">
+                    <h3 class="font-serif text-lg text-[#1a1a1a] mb-2">Direct Contact</h3>
+                    <p class="font-sans text-sm text-gray-500 mb-3">For off-market submissions, broker inquiries, and disposition opportunities in the Columbus, GA market.</p>
+                    <a href="mailto:acquisitions@vaniercapital.com" class="font-sans text-sm text-[#0f2e22] hover:underline block mb-1">acquisitions@vaniercapital.com</a>
+                </div>
+
+                <div class="border-t border-[#0f2e22]/20 pt-6">
+                    <h3 class="font-serif text-lg text-[#1a1a1a] mb-2">What We Acquire</h3>
+                    <ul class="font-sans text-sm text-gray-600 space-y-2">
+                        <li class="flex items-start gap-2"><span class="text-[#0f2e22] mt-0.5">—</span> Single-family rentals (SFR)</li>
+                        <li class="flex items-start gap-2"><span class="text-[#0f2e22] mt-0.5">—</span> Small multifamily (Duplex / Triplex / Quadplex)</li>
+                        <li class="flex items-start gap-2"><span class="text-[#0f2e22] mt-0.5">—</span> Value-add properties ($300k – $800k)</li>
+                        <li class="flex items-start gap-2"><span class="text-[#0f2e22] mt-0.5">—</span> Columbus, Georgia MSA exclusively</li>
+                    </ul>
+                </div>
+
+                <div class="border-t border-[#0f2e22]/20 pt-6">
+                    <h3 class="font-serif text-lg text-[#1a1a1a] mb-2">Submission Guidelines</h3>
+                    <p class="font-sans text-sm text-gray-600 leading-relaxed">Please include property type, location, unit count (if applicable), asking price or guidance, and any relevant financials or marketing materials.</p>
+                </div>
+
+                <div class="border-t border-[#0f2e22]/20 pt-6">
+                    <h3 class="font-serif text-lg text-[#1a1a1a] mb-2">Other Departments</h3>
+                    <ul class="font-sans text-sm space-y-2">
+                        <li><a href="/contact/investor-relations" class="text-[#0f2e22] hover:underline">Investor Relations &rarr;</a></li>
+                        <li><a href="/contact" class="text-[#0f2e22] hover:underline">General Inquiries &rarr;</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Form -->
+        <div class="md:col-span-8">
+            <h2 class="font-serif text-2xl text-[#0f2e22] mb-8">Deal Submission</h2>
+
+            <div id="contact-form-message" class="mb-6"></div>
+
+            <form id="contact-form" class="space-y-6">
+                <input type="hidden" id="requestedMeeting" name="requestedMeeting" value="false" />
+                <input type="hidden" id="subject" name="subject" value="Acquisitions" />
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="name" class="block font-sans text-sm font-medium text-[#1a1a1a] mb-2">Full Name <span class="text-red-600">*</span></label>
+                        <input type="text" id="name" name="name" required
+                               class="w-full font-sans text-base px-4 py-3 border border-gray-300 rounded-none bg-white text-[#1a1a1a] placeholder-gray-400 focus:outline-none focus:border-[#0f2e22] focus:ring-0 transition-colors"
+                               placeholder="Enter your full name">
+                    </div>
+                    <div>
+                        <label for="email" class="block font-sans text-sm font-medium text-[#1a1a1a] mb-2">Email Address <span class="text-red-600">*</span></label>
+                        <input type="email" id="email" name="email" required
+                               class="w-full font-sans text-base px-4 py-3 border border-gray-300 rounded-none bg-white text-[#1a1a1a] placeholder-gray-400 focus:outline-none focus:border-[#0f2e22] focus:ring-0 transition-colors"
+                               placeholder="you@company.com">
+                    </div>
+                    <div>
+                        <label for="phone" class="block font-sans text-sm font-medium text-[#1a1a1a] mb-2">Phone Number</label>
+                        <input type="tel" id="phone" name="phone"
+                               class="w-full font-sans text-base px-4 py-3 border border-gray-300 rounded-none bg-white text-[#1a1a1a] placeholder-gray-400 focus:outline-none focus:border-[#0f2e22] focus:ring-0 transition-colors"
+                               placeholder="(Optional)">
+                    </div>
+                    <div>
+                        <label for="organization" class="block font-sans text-sm font-medium text-[#1a1a1a] mb-2">Organization</label>
+                        <input type="text" id="organization" name="organization"
+                               class="w-full font-sans text-base px-4 py-3 border border-gray-300 rounded-none bg-white text-[#1a1a1a] placeholder-gray-400 focus:outline-none focus:border-[#0f2e22] focus:ring-0 transition-colors"
+                               placeholder="Brokerage or firm name">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="propertyType" class="block font-sans text-sm font-medium text-[#1a1a1a] mb-2">Property Type</label>
+                    <select id="propertyType" name="propertyType"
+                            class="w-full font-sans text-base px-4 py-3 border border-gray-300 rounded-none bg-white text-[#1a1a1a] focus:outline-none focus:border-[#0f2e22] focus:ring-0 transition-colors">
+                        <option value="">Select property type</option>
+                        <option value="sfr">Single-Family Rental</option>
+                        <option value="duplex-quadplex">Duplex / Triplex / Quadplex</option>
+                        <option value="small-portfolio">Small Portfolio</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="location" class="block font-sans text-sm font-medium text-[#1a1a1a] mb-2">Property Location</label>
+                        <input type="text" id="location" name="location"
+                               class="w-full font-sans text-base px-4 py-3 border border-gray-300 rounded-none bg-white text-[#1a1a1a] placeholder-gray-400 focus:outline-none focus:border-[#0f2e22] focus:ring-0 transition-colors"
+                               placeholder="City, State">
+                    </div>
+                    <div>
+                        <label for="askingPrice" class="block font-sans text-sm font-medium text-[#1a1a1a] mb-2">Asking Price / Guidance</label>
+                        <input type="text" id="askingPrice" name="askingPrice"
+                               class="w-full font-sans text-base px-4 py-3 border border-gray-300 rounded-none bg-white text-[#1a1a1a] placeholder-gray-400 focus:outline-none focus:border-[#0f2e22] focus:ring-0 transition-colors"
+                               placeholder="$0,000,000">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="message" class="block font-sans text-sm font-medium text-[#1a1a1a] mb-2">Deal Summary <span class="text-red-600">*</span></label>
+                    <textarea id="message" name="message" rows="6" required
+                              class="w-full font-sans text-base px-4 py-3 border border-gray-300 rounded-none bg-white text-[#1a1a1a] placeholder-gray-400 focus:outline-none focus:border-[#0f2e22] focus:ring-0 transition-colors resize-vertical"
+                              placeholder="Include property type, unit count, location, current NOI, and any relevant context for the deal."></textarea>
+                </div>
+
+                <div class="flex items-start gap-3">
+                    <input type="checkbox" id="privacy" name="privacy" required
+                           class="mt-1 w-4 h-4 border border-gray-300 rounded-none text-[#0f2e22] focus:ring-0 focus:ring-offset-0">
+                    <label for="privacy" class="font-sans text-sm text-gray-600">
+                        I agree to the <a href="/privacy-policy" target="_blank" class="text-[#0f2e22] underline">Privacy Policy</a> and <a href="/terms-of-service" target="_blank" class="text-[#0f2e22] underline">Terms of Service</a> <span class="text-red-600">*</span>
+                    </label>
+                </div>
+
+                <div>
+                    <button type="submit"
+                            class="font-sans text-sm font-bold uppercase tracking-wider text-white bg-[#0f2e22] px-10 py-4 rounded-none hover:bg-[#1a1a1a] transition-colors">
+                        Submit Deal
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</section>
+
+<!-- ═══════════════ ACQUISITIONS FAQ ═══════════════ -->
+<section class="bg-[#f9f8f6] border-t border-[#0f2e22]/10">
+    <div class="max-w-3xl mx-auto px-8 md:px-16 pt-24 pb-16">
+        <h2 class="font-serif text-3xl text-[#0f2e22] border-b border-[#0f2e22]/20 pb-4 mb-8">Frequently Asked Questions</h2>
+
+        <details class="group border-b border-gray-200 [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex cursor-pointer items-center justify-between py-5 font-sans text-sm font-bold uppercase tracking-widest text-[#1a1a1a] hover:text-[#0f2e22] transition-colors">
+                <span>Do you honor broker protections on off-market submissions?</span>
+                <span class="transition group-open:rotate-180 shrink-0 ml-4">
+                    <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="square" stroke-linejoin="miter" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                </span>
+            </summary>
+            <p class="font-sans text-gray-600 leading-relaxed pb-6 pr-8 text-sm">
+                Absolutely. We regard brokers as essential strategic partners in our sourcing process. Vanier Capital strictly honors all broker protections and recognizes standard fee agreements on every unlisted opportunity submitted to our acquisitions team.
+            </p>
+        </details>
+
+        <details class="group border-b border-gray-200 [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex cursor-pointer items-center justify-between py-5 font-sans text-sm font-bold uppercase tracking-widest text-[#1a1a1a] hover:text-[#0f2e22] transition-colors">
+                <span>What is your typical underwriting and closing timeline?</span>
+                <span class="transition group-open:rotate-180 shrink-0 ml-4">
+                    <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="square" stroke-linejoin="miter" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                </span>
+            </summary>
+            <p class="font-sans text-gray-600 leading-relaxed pb-6 pr-8 text-sm">
+                Leveraging disciplined underwriting criteria, we typically provide initial feedback on a complete offering memorandum or deal summary within 48 hours. Upon execution of a letter of intent, we target a 30-day due diligence period followed by a 15-day close.
+            </p>
+        </details>
+
+        <details class="group border-b border-gray-200 [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex cursor-pointer items-center justify-between py-5 font-sans text-sm font-bold uppercase tracking-widest text-[#1a1a1a] hover:text-[#0f2e22] transition-colors">
+                <span>Do you evaluate properties outside of Columbus, Georgia?</span>
+                <span class="transition group-open:rotate-180 shrink-0 ml-4">
+                    <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="square" stroke-linejoin="miter" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                </span>
+            </summary>
+            <p class="font-sans text-gray-600 leading-relaxed pb-6 pr-8 text-sm">
+                No. Our current acquisition mandate is strictly focused on aggregating density within the Columbus, Georgia metropolitan area. Concentrating our portfolio in a single market allows us to maintain hands-on operational oversight and leverage our established vendor network.
+            </p>
+        </details>
+
+        <details class="group border-b border-gray-200 [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex cursor-pointer items-center justify-between py-5 font-sans text-sm font-bold uppercase tracking-widest text-[#1a1a1a] hover:text-[#0f2e22] transition-colors">
+                <span>What information should be included in an initial deal submission?</span>
+                <span class="transition group-open:rotate-180 shrink-0 ml-4">
+                    <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="square" stroke-linejoin="miter" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                </span>
+            </summary>
+            <p class="font-sans text-gray-600 leading-relaxed pb-6 pr-8 text-sm">
+                At minimum, please provide the property type, location, unit count (if applicable), asking price or pricing guidance, and trailing-twelve-month financials. An offering memorandum, rent roll, and T-12 operating statement will accelerate our review.
+            </p>
+        </details>
+
+        <details class="group border-b border-gray-200 [&_summary::-webkit-details-marker]:hidden">
+            <summary class="flex cursor-pointer items-center justify-between py-5 font-sans text-sm font-bold uppercase tracking-widest text-[#1a1a1a] hover:text-[#0f2e22] transition-colors">
+                <span>What asset classes fall outside your acquisition mandate?</span>
+                <span class="transition group-open:rotate-180 shrink-0 ml-4">
+                    <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="square" stroke-linejoin="miter" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                </span>
+            </summary>
+            <p class="font-sans text-gray-600 leading-relaxed pb-6 pr-8 text-sm">
+                We do not currently pursue ground-up development, commercial properties, large-cap multifamily (100+ units), hospitality, senior living, or student housing. Our mandate is focused exclusively on single-family rentals and small multifamily (2–4 units) within the Columbus, Georgia market.
+            </p>
+        </details>
+    </div>
+</section>
+
+<!-- ═══════════════ CTA BLOCK ═══════════════ -->
+<section class="bg-white border-t border-[#0f2e22]/10">
+    <div class="max-w-screen-xl mx-auto px-8 md:px-16 py-20 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <div>
+            <h2 class="font-serif text-3xl md:text-4xl text-[#0f2e22] mb-4">Current Portfolio</h2>
+            <p class="font-sans text-lg text-gray-600 leading-relaxed">Explore our existing holdings in the Columbus, Georgia market to understand our acquisition criteria and asset management approach.</p>
+        </div>
+        <div class="flex justify-start md:justify-end">
+            <a href="/portfolio" class="font-sans text-sm font-bold uppercase tracking-wider text-white bg-[#0f2e22] px-10 py-4 rounded-none hover:bg-[#1a1a1a] transition-colors">View Portfolio</a>
+        </div>
+    </div>
+</section>
+
+<%- include('partials/footer') %>

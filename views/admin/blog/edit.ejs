@@ -1,7 +1,7 @@
 <%# views/admin/blog/edit.ejs %>
 <%# Two-column editor layout with settings sidebar & enhanced UX %>
 
-<%- include('../partials/header', { pageTitle: editing ? 'Edit Article' : 'Add New Article' }) %>
+<%- include('../partials/header', { pageTitle: editing ? 'Edit Perspective' : 'Add New Perspective' }) %>
 
 <style>
   /* Two-column editor layout */
@@ -9,33 +9,33 @@
   .editor-title { text-align: center; margin: 1.25rem 0 1.75rem; }
   .editor-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.25rem; align-items: start; }
   @media (max-width: 1024px) { .editor-grid { grid-template-columns: 1fr; } }
-  .editor-card { background: var(--card-bg, #1f1f1f); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 1rem; }
+  .editor-card { background: #ffffff; border: 1px solid rgba(15,46,34,0.2); border-radius: 0; padding: 1rem; }
   .editor-main .form-group { margin-bottom: 1rem; }
-  .editor-sidebar details { border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; background: rgba(255,255,255,0.02); }
+  .editor-sidebar details { border: 1px solid rgba(15,46,34,0.2); border-radius: 0; background: #ffffff; }
   .editor-sidebar details + details { margin-top: 0.75rem; }
-  .editor-sidebar summary { cursor: pointer; list-style: none; padding: 0.85rem 1rem; font-weight: 600; display: flex; align-items: center; justify-content: space-between; }
+  .editor-sidebar summary { cursor: pointer; list-style: none; padding: 0.85rem 1rem; font-weight: 600; display: flex; align-items: center; justify-content: space-between; color: #1a1a1a; }
   .editor-sidebar summary::-webkit-details-marker { display: none; }
   .editor-sidebar .panel-body { padding: 0.5rem 1rem 1rem; }
-  .muted { color: var(--gray-text, #aaa); font-size: 0.9em; }
+  .muted { color: #6b7280; font-size: 0.9em; }
   .toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.5rem; }
   .toggle-label { margin-left: 0.5rem; font-size: 0.95em; }
 
   /* Buttons hierarchy */
   .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-top: 1.25rem; }
-  .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; border-radius: 8px; text-decoration: none; border: 1px solid transparent; font-weight: 600; }
-  .btn-primary { background: #0b4d3a; color: white; border-color: #0b4d3a; }
-  .btn-secondary-outline { background: transparent; color: #cbd5e1; border-color: rgba(148,163,184,0.35); }
-  .btn-secondary-outline:hover { background: rgba(148,163,184,0.08); }
+  .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; border-radius: 0; text-decoration: none; border: 1px solid transparent; font-weight: 600; }
+  .btn-primary { background: #0f2e22; color: white; border-color: #0f2e22; }
+  .btn-secondary-outline { background: #ffffff; color: #0f2e22; border-color: rgba(15,46,34,0.2); }
+  .btn-secondary-outline:hover { background: #f9f8f6; }
   .btn-danger { background: rgba(239,68,68,0.1); color: #ef4444; border-color: rgba(239,68,68,0.35); padding: 0.35rem 0.6rem; font-size: 0.85em; }
 
   /* Image preview */
-  .image-preview img { max-width: 320px; max-height: 220px; border-radius: 6px; display:block; }
+  .image-preview img { max-width: 320px; max-height: 220px; border-radius: 0; display:block; }
 
   /* Choices overrides moved to admin-style.css */
 </style>
 
 <div class="editor-container">
-  <h2 class="editor-title"><%= editing ? 'Edit Article' : 'Add New Article' %></h2>
+  <h2 class="editor-title" style="color: #1a1a1a;"><%= editing ? 'Edit Perspective' : 'Add New Perspective' %></h2>
 
   <% if (typeof errorMessages !== 'undefined' && errorMessages && errorMessages.length > 0) { %>
     <div class="validation-errors editor-card" role="alert" aria-live="polite">
@@ -51,7 +51,18 @@
       <!-- Left: Main Content -->
       <div class="editor-main editor-card" aria-label="Main editor">
         <div class="form-group">
-          <label for="title">Post Title <span style="color:#dc3545">*</span></label>
+          <label for="publicationType">Publication Type <span style="color:#dc3545">*</span></label>
+          <select id="publicationType" name="publicationType" style="border-radius:0; border:1px solid rgba(15,46,34,0.2); padding:0.5rem 0.75rem; width:100%; font-size:0.95rem; outline:none;" onfocus="this.style.boxShadow='0 0 0 2px #0f2e22'" onblur="this.style.boxShadow='none'">
+            <% const pubTypes = ['Market Research', 'Case Studies', 'Firm Updates']; %>
+            <% pubTypes.forEach(function(pt) { %>
+              <option value="<%= pt %>" <%= (post && post.publicationType === pt) ? 'selected' : '' %>><%= pt %></option>
+            <% }); %>
+          </select>
+          <small class="muted">Classifies this publication for public filtering and the research index.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="title">Publication Title <span style="color:#dc3545">*</span></label>
           <input type="text" id="title" name="title" value="<%= post && post.title ? post.title : '' %>" required maxlength="200">
         </div>
 
@@ -63,7 +74,7 @@
 
         <div class="form-group">
           <label for="blog-content-editor">Content <span style="color:#dc3545">*</span></label>
-          <textarea id="blog-content-editor" name="content" class="richtext-editor" style="visibility:hidden; min-height: 500px;" required minlength="50"><%= post && post.content ? post.content : '' %></textarea>
+          <textarea id="blog-content-editor" name="content" class="richtext-editor" style="visibility:hidden; min-height: 500px;"><%= post && post.content ? post.content : '' %></textarea>
           <small class="muted">Use the editor toolbar for formatting. <a href="/AUTHORING_GUIDE.md" target="_blank" rel="noopener noreferrer">Authoring Guide</a></small>
         </div>
       </div>
@@ -79,10 +90,10 @@
                   <input type="checkbox" id="isPublished" name="isPublished" value="true" <%= (post && post.isPublished) ? 'checked' : '' %>>
                   <span class="slider"></span>
                 </label>
-                <label for="isPublished" class="toggle-label">Publish this post?</label>
+                <label for="isPublished" class="toggle-label">Publish this publication?</label>
               </div>
             </div>
-            <div class="muted" style="margin-bottom:0.5rem;">Make the post visible on the public blog.</div>
+            <div class="muted" style="margin-bottom:0.5rem;">Make the publication visible on the public Perspectives index.</div>
 
             <div class="toggle-row">
               <div>
@@ -90,10 +101,10 @@
                   <input type="checkbox" id="isFeatured" name="isFeatured" value="true" <%= (post && post.isFeatured) ? 'checked' : '' %>>
                   <span class="slider"></span>
                 </label>
-                <label for="isFeatured" class="toggle-label">Feature this post?</label>
+                <label for="isFeatured" class="toggle-label">Feature this publication?</label>
               </div>
             </div>
-            <div class="muted" style="margin-bottom:0.75rem;">Featured posts can appear in spotlight sections.</div>
+            <div class="muted" style="margin-bottom:0.75rem;">Featured publications can appear in spotlight sections.</div>
 
             <div class="form-group" style="margin-top:0.5rem;">
               <label for="authorDisplayName">Author Display Name (Public)</label>
@@ -108,26 +119,6 @@
               <small class="muted">Automatically increments on public views.</small>
             </div>
             <% } %>
-          </div>
-        </details>
-
-        <details class="editor-card" open>
-          <summary>Categories</summary>
-          <div class="panel-body">
-            <div class="form-group">
-              <label for="categories" class="muted" style="display:block; margin-bottom:0.25rem;">Select one or more categories</label>
-              <select id="categories" name="categories" multiple size="6">
-                <% if (typeof categories !== 'undefined' && categories && categories.length) { %>
-                  <% const selected = new Set((post && post.categories ? post.categories.map(String) : [])); %>
-                  <% categories.forEach(c => { %>
-                    <option value="<%= c._id %>" <%= selected.has(String(c._id)) ? 'selected' : '' %>><%= c.name %></option>
-                  <% }) %>
-                <% } else { %>
-                  <option disabled>No categories yet. Create in Admin > Categories.</option>
-                <% } %>
-              </select>
-              <small class="muted">Search and select; selected items appear as removable pills.</small>
-            </div>
           </div>
         </details>
 
@@ -154,13 +145,37 @@
         </details>
 
         <details class="editor-card" open>
+          <summary>Attached Document (PDF)</summary>
+          <div class="panel-body">
+            <div class="form-group">
+              <label for="pdfDocumentFile">Upload PDF</label>
+              <input type="file" id="pdfDocumentFile" name="pdfDocumentFile" accept="application/pdf" style="border-radius:0;">
+              <small class="muted">Upload a Quarterly Letter, research memo, or report. Max 10 MB.</small>
+              <div id="pdfUploadStatus" class="muted" style="margin-top:6px;"></div>
+            </div>
+            <div class="form-group">
+              <label for="pdfDocumentUrl">PDF Document URL</label>
+              <input type="url" id="pdfDocumentUrl" name="pdfDocumentUrl" value="<%= post && post.pdfDocumentUrl ? post.pdfDocumentUrl : '' %>" placeholder="Auto-populated by upload or enter URL manually" style="border-radius:0; border:1px solid rgba(15,46,34,0.2);">
+              <small class="muted">Direct link to the PDF. Populated automatically on upload.</small>
+            </div>
+            <% if (post && post.pdfDocumentUrl) { %>
+              <div class="form-group" style="margin-top:0.5rem;">
+                <a href="<%= post.pdfDocumentUrl %>" target="_blank" rel="noopener noreferrer" class="btn btn-secondary-outline" style="font-size:0.85em;">
+                  <i class="fas fa-file-pdf"></i> View Current PDF
+                </a>
+              </div>
+            <% } %>
+          </div>
+        </details>
+
+        <details class="editor-card" open>
           <summary>Excerpt</summary>
           <div class="panel-body">
             <div class="form-group">
               <label for="excerpt">Excerpt / Summary <span style="color:#dc3545">*</span></label>
               <textarea id="excerpt" name="excerpt" rows="4" maxlength="250" required oninput="document.getElementById('excerptCounter').textContent = this.value.length + '/250'"><%= post && post.excerpt ? post.excerpt : '' %></textarea>
               <div class="muted" style="display:flex;justify-content:space-between;">
-                <small>Short summary for blog listing (max 250 chars).</small>
+                <small>Short summary for the publication index (max 250 chars).</small>
                 <small id="excerptCounter"><%= post && post.excerpt ? post.excerpt.length : 0 %>/250</small>
               </div>
             </div>
@@ -171,7 +186,7 @@
 
     <div class="actions admin-btn-group">
       <button type="submit" class="admin-btn">
-        <i class="fas fa-save"></i><span><%= editing ? 'Update Post' : 'Save New Post' %></span>
+        <i class="fas fa-save"></i><span><%= editing ? 'Update Publication' : 'Publish Perspective' %></span>
       </button>
       <% if (editing && post && post.isPublished && post.slug) { %>
         <a href="/blog/<%= post.slug %>" target="_blank" class="admin-btn admin-btn--ghost">
@@ -184,24 +199,6 @@
 </div>
 
 <script src="https://cdn.tiny.cloud/1/<%= typeof tinymceApiKey !== 'undefined' ? tinymceApiKey : 'no-api-key' %>/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-<!-- Self-hosted Choices.js CSS/JS for enhanced categories multi-select -->
-<link rel="stylesheet" href="/vendor/choices/choices.min.css" />
-<script src="/vendor/choices/choices.min.js"></script>
-<!-- Override Choices.js styles for higher contrast (must come AFTER vendor CSS) -->
-<style>
-  .choices__inner { background:#ffffff; color:#111; border:1px solid #444; min-height:42px; }
-  .choices__input { color:#111 !important; }
-  .choices__list--dropdown { background:#ffffff; border:1px solid #444; }
-  .choices__list--dropdown .choices__item { color:#111 !important; font-weight:500; }
-  .choices__list--dropdown .choices__item.is-highlighted { background:#e5e7eb; color:#111 !important; }
-  .choices__list--dropdown .choices__item.is-selected { background:#2563eb; color:#fff !important; }
-  .choices__list--multiple .choices__item { background:#2563eb; border:1px solid #1d4ed8; color:#fff; font-weight:500; }
-  .choices__list--multiple .choices__item.is-highlighted { background:#1d4ed8; border-color:#1e40af; }
-  .choices.is-focused .choices__inner { box-shadow:0 0 0 3px rgba(37,99,235,0.35); }
-  body.dark .choices__inner, body.dark .choices__list--dropdown { background:#ffffff; color:#111; }
-  body.dark .choices__list--dropdown .choices__item.is-selected { background:#2563eb; color:#fff !important; }
-</style>
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     // --- TinyMCE Initialization ---
@@ -218,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
             promotion: false,
             plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount codesample',
             toolbar: 'undo redo | blocks | bold italic underline strikethrough | link image media table | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | styles | code codesample | preview fullscreen | help',
-            content_style: 'body { font-family:Montserrat,Arial,sans-serif; font-size:16px; line-height: 1.7; color: #ccc; background-color: #2d2d2d; } a { color: #00a8e8; } code { background-color: rgba(255,255,255,0.1); padding: 0.1em 0.3em; border-radius: 3px; } pre code { background-color: transparent; padding: 0;} .callout,.info,.warning,.tip{padding:1rem 1.125rem;border-radius:.5rem;margin:1rem 0;border:1px solid transparent}.callout{background:rgba(0,168,232,.08);border-color:rgba(0,168,232,.35)}.info{background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.35)}.warning{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.4)}.tip{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.4)} .callout-title{font-weight:700;margin-bottom:.25rem}',
+            content_style: 'body { font-family:Montserrat,Arial,sans-serif; font-size:16px; line-height: 1.7; color: #1a1a1a; background-color: #ffffff; } a { color: #0f2e22; } code { background-color: rgba(0,0,0,0.06); padding: 0.1em 0.3em; border-radius: 3px; } pre code { background-color: transparent; padding: 0;} .callout,.info,.warning,.tip{padding:1rem 1.125rem;border-radius:.5rem;margin:1rem 0;border:1px solid transparent}.callout{background:rgba(0,168,232,.08);border-color:rgba(0,168,232,.35)}.info{background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.35)}.warning{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.4)}.tip{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.4)} .callout-title{font-weight:700;margin-bottom:.25rem}',
             style_formats: [
                 { title: 'Callout', block: 'div', classes: 'callout', wrapper: true },
                 { title: 'Info', block: 'div', classes: 'info', wrapper: true },
@@ -229,8 +226,8 @@ document.addEventListener('DOMContentLoaded', () => {
             height: 600,
             menubar: false,
             statusbar: true,
-            skin: (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'oxide-dark' : 'oxide',
-            content_css: (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'default',
+            skin: 'oxide',
+            content_css: 'default',
             images_upload_url: '/admin/blog/upload-image', // For in-content images
             images_upload_credentials: true,
             automatic_uploads: true,
@@ -274,23 +271,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, 5000);
 
-    // --- Enhanced Categories (Choices.js) ---
-    const categoriesSelect = document.getElementById('categories');
-    if (categoriesSelect && window.Choices) {
-      try {
-        const choices = new Choices(categoriesSelect, {
-          removeItemButton: true,
-          shouldSort: false,
-          searchPlaceholderValue: 'Search categories…',
-          placeholder: true,
-          placeholderValue: 'Select categories',
-          itemSelectText: ''
-        });
-        // Keep reference if needed later
-        window.__categoriesChoices = choices;
-      } catch (e) { console.warn('Choices.js init failed:', e); }
-    }
-
     // --- Cover Image Upload Logic ---
     const coverImageFileInput = document.getElementById('coverImageFile');
     const featuredImageInput = document.getElementById('featuredImage'); // The URL input field
@@ -298,6 +278,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const uploadStatusDiv = document.getElementById('coverImageUploadStatus');
     const removeCoverImageBtn = document.getElementById('removeCoverImageBtn'); // For initially loaded image
     const form = document.getElementById('blogPostForm'); // Get the form element
+
+    // --- TinyMCE Sync on Submit (prevents "click Save twice" bug) ---
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (typeof tinymce !== 'undefined') {
+                tinymce.triggerSave();
+            }
+            // Validate content client-side since we removed `required` from the hidden textarea
+            const contentField = document.getElementById('blog-content-editor');
+            if (contentField && contentField.value.trim().length < 50) {
+                e.preventDefault();
+                alert('Content is required and must be at least 50 characters.');
+                return false;
+            }
+        });
+    }
 
     function attachRemoveListenerToNewButton() {
         const newRemoveBtn = document.getElementById('newRemoveCoverImageBtn');
@@ -373,6 +369,62 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!form) console.warn("Blog form with ID 'blogPostForm' not found for cover image uploader.");
         if (!coverImageFileInput) console.warn("File input 'coverImageFile' for blog not found.");
         // ...existing code...
+    }
+
+    // --- PDF Document Upload Logic ---
+    const pdfFileInput = document.getElementById('pdfDocumentFile');
+    const pdfUrlInput = document.getElementById('pdfDocumentUrl');
+    const pdfUploadStatus = document.getElementById('pdfUploadStatus');
+
+    if (pdfFileInput && pdfUrlInput && pdfUploadStatus && form) {
+        pdfFileInput.addEventListener('change', async function(event) {
+            const file = event.target.files[0];
+            if (!file) { pdfUploadStatus.textContent = ''; return; }
+            if (file.type !== 'application/pdf') {
+                pdfUploadStatus.textContent = 'Invalid file type. Only PDF files allowed.';
+                pdfUploadStatus.style.color = 'var(--danger-color)';
+                return;
+            }
+            if (file.size > 10 * 1024 * 1024) {
+                pdfUploadStatus.textContent = 'File too large. Max 10 MB.';
+                pdfUploadStatus.style.color = 'var(--danger-color)';
+                return;
+            }
+
+            pdfUploadStatus.textContent = 'Uploading PDF...';
+            pdfUploadStatus.style.color = 'var(--gray-text)';
+
+            const formData = new FormData();
+            formData.append('pdfDocumentFile', file);
+            const csrfToken = form.querySelector('input[name="_csrf"]')?.value;
+
+            if (!csrfToken) {
+                pdfUploadStatus.textContent = 'Error: Missing security token. Please refresh.';
+                pdfUploadStatus.style.color = 'var(--danger-color)';
+                return;
+            }
+
+            try {
+                const response = await fetch('/admin/blog/upload-pdf', {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'CSRF-Token': csrfToken }
+                });
+                const result = await response.json();
+                if (response.ok && result.success && result.location) {
+                    pdfUrlInput.value = result.location;
+                    pdfUploadStatus.textContent = 'PDF uploaded successfully!';
+                    pdfUploadStatus.style.color = 'var(--success-color)';
+                } else {
+                    pdfUploadStatus.textContent = `Upload failed: ${result.message || 'Server error'}`;
+                    pdfUploadStatus.style.color = 'var(--danger-color)';
+                }
+            } catch (error) {
+                console.error('PDF upload error:', error);
+                pdfUploadStatus.textContent = 'Upload network error. See console.';
+                pdfUploadStatus.style.color = 'var(--danger-color)';
+            }
+        });
     }
 });
 </script>

@@ -2,21 +2,21 @@
 
 <div class="space-y-6">
 	<form action="/admin/search" method="get" class="flex items-center gap-2">
-		<input type="search" name="q" value="<%= q || '' %>" placeholder="Search..." class="w-full px-3 py-2 rounded-md bg-neutral-700 text-gray-100 placeholder-gray-400 border border-neutral-600 focus:outline-none focus:ring-2 focus:ring-primary" />
-		<button class="px-3 py-2 rounded-md bg-primary text-white">Search</button>
+		<input type="search" name="q" value="<%= q || '' %>" placeholder="Search..." class="w-full px-3 py-2 bg-white text-[#1a1a1a] placeholder-gray-400 border border-[#0f2e22]/20 focus:outline-none focus:border-[#0f2e22]" />
+		<button class="px-4 py-2 bg-[#0f2e22] text-white font-bold text-xs uppercase tracking-widest border border-[#0f2e22] hover:bg-[#1a1a1a]">Search</button>
 	</form>
 
 	<% if ((results||[]).length === 0) { %>
-		<p class="text-gray-400">No results.</p>
+		<p class="text-gray-500">No results.</p>
 	<% } else { %>
-		<ul class="divide-y divide-neutral-800 rounded-md border border-neutral-800">
+		<ul class="divide-y divide-[#0f2e22]/10 border border-[#0f2e22]/20 bg-white">
 			<% results.forEach(function(r){ %>
-				<li class="p-3 flex items-center justify-between">
+				<li class="p-3 flex items-center justify-between hover:bg-[#f9f8f6]">
 					<div>
-						<div class="text-xs text-gray-400"><%= r.type %></div>
-						<div class="font-medium"><%= r.title %></div>
+						<div class="text-xs text-gray-500 font-bold uppercase tracking-widest"><%= r.type %></div>
+						<div class="font-medium text-[#1a1a1a]"><%= r.title %></div>
 					</div>
-					<a href="<%= r.href %>" class="text-primary hover:underline">Open</a>
+					<a href="<%= r.href %>" class="text-[#0f2e22] font-bold text-xs uppercase tracking-widest hover:underline">Open</a>
 				</li>
 			<% }) %>
 		</ul>

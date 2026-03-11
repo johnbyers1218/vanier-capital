@@ -1,56 +1,93 @@
 ﻿<%- include('partials/header', {
     pageTitle: pageTitle,
     pageDescription: pageDescription,
-    path: path
+    path: path,
+    isHeroPage: true
 }) %>
 
-<section class="section portfolio-hero" style="background-color: #f1f5f9; color: #1e293b; padding: 4rem 0;">
-    <div class="container">
-        <div class="section-header" style="text-align: center;">
-            <h1 class="section-title" style="color: #1e293b; font-family: 'Merriweather', serif; font-size: 2.5rem; margin-bottom: 1rem;">Our Portfolio</h1>
-            <p class="section-description" style="color: #64748b; max-width: 700px; margin: 0 auto;">A disciplined collection of high-performing assets delivering durable cash flow and long-term appreciation.</p>
-        </div>
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="bg-[#0f2e22] pt-32 pb-20 px-8 md:px-16">
+    <div class="max-w-[1200px] mx-auto">
+        <p class="font-sans text-xs font-bold uppercase tracking-widest text-white/50 mb-4">Portfolio Track Record</p>
+        <h1 class="font-serif text-5xl md:text-6xl text-white tracking-tight mb-6">Representative Assets.</h1>
+        <p class="font-sans text-xl text-white/80 max-w-2xl leading-relaxed">A curated selection of our stabilized and value-add residential assets, demonstrating our disciplined approach to capital stewardship and operational execution.</p>
     </div>
 </section>
 
-<section class="section" style="background-color: #f8fafc; padding: 4rem 0;">
-    <div class="container">
-        
-        <!-- Portfolio Grid -->
-        <div id="properties-grid-container" class="grid-container grid-3-col" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem;">
-            
-            <% if (properties && properties.length > 0) { %>
-                <% properties.forEach(property => { %>
-                    <div class="content-card project-card" style="background: white; border-radius: 0.75rem; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
-                        <div style="aspect-ratio: 16/9; background: #e2e8f0; position: relative; overflow: hidden;">
-                            <img src="<%= property.image %>" alt="<%= property.title %>" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://placehold.co/600x400/0b4d3a/ffffff?text=<%= encodeURIComponent(property.title) %>'">
-                            <div style="position: absolute; top: 1rem; right: 1rem; background: rgba(11, 77, 58, 0.9); color: white; padding: 0.25rem 0.75rem; border-radius: 0.25rem; font-size: 0.875rem; font-weight: 600;">Residential</div>
-                        </div>
-                        <div style="padding: 1.5rem;">
-                            <h3 style="font-family: 'Merriweather', serif; font-size: 1.25rem; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;"><%= property.title %></h3>
-                            <p style="color: #64748b; font-size: 0.875rem; margin-bottom: 0.5rem;"><i class="fas fa-map-marker-alt" style="color: #0b4d3a; margin-right: 0.5rem;"></i><%= property.address || property.location %></p>
-                            <p style="color: #475569; font-size: 0.95rem; line-height: 1.5; margin-bottom: 1rem;"><%= property.summary %></p>
-                            
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; border-top: 1px solid #e2e8f0; padding-top: 1rem; margin-top: 1rem;">
-                                <% if (property.metrics) { %>
-                                    <% property.metrics.forEach(metric => { %>
-                                        <div>
-                                            <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;"><%= metric.label %></div>
-                                            <div style="font-size: 1.125rem; font-weight: 600; color: <%= metric.highlight ? '#0b4d3a' : '#0f172a' %>;"><%= metric.value %></div>
-                                        </div>
-                                    <% }); %>
-                                <% } %>
-                            </div>
-                        </div>
-                    </div>
-                <% }); %>
-            <% } else { %>
-                <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
-                    <p>No properties currently listed.</p>
-                </div>
-            <% } %>
+<!-- ═══════════════ ASSET PROFILES ═══════════════ -->
+<section class="bg-[#f9f8f6]">
+    <div class="max-w-[1200px] mx-auto px-8 md:px-16 py-20 divide-y divide-[#0f2e22]/10">
 
+        <% const portfolioAssets = (properties || []).filter(p => p.assetClass); %>
+        <% if (portfolioAssets.length === 0) { %>
+        <div class="py-16 text-center">
+            <p class="font-sans text-lg text-gray-500">Portfolio assets are being prepared. Check back soon.</p>
         </div>
+        <% } %>
+        <% portfolioAssets.forEach(function(property, idx) { %>
+        <article class="grid grid-cols-1 lg:grid-cols-12 gap-10 py-16 <%= idx === 0 ? 'pt-0' : '' %>">
+
+            <!-- Image (Span 4 — Constrained) -->
+            <div class="lg:col-span-4">
+                <a href="/portfolio/<%= property.slug %>" class="block">
+                    <div class="aspect-[4/3] bg-gray-200 overflow-hidden border border-gray-200">
+                        <img
+                            src="<%= property.image %>"
+                            alt="<%= property.title %>"
+                            class="w-full h-full object-cover rounded-none grayscale transform-gpu backface-hidden will-change-transform"
+                            loading="<%= idx === 0 ? 'eager' : 'lazy' %>"
+                            onerror="this.src='https://placehold.co/600x450/0f2e22/ffffff?text=<%= encodeURIComponent(property.title) %>'"
+                        >
+                    </div>
+                </a>
+            </div>
+
+            <!-- Content (Span 8) -->
+            <div class="lg:col-span-8 flex flex-col pt-2 lg:pt-0">
+                <span class="font-sans text-sm font-bold text-[#1a1a1a]/50 uppercase tracking-widest mb-3"><%= property.subtitle || '' %><% if (property.subtitle && property.strategy) { %> | <% } %><%= property.strategy || '' %></span>
+                <a href="/portfolio/<%= property.slug %>" class="hover:text-[#1a1a1a] transition-colors"><h2 class="font-serif text-3xl text-[#0f2e22] mb-4"><%= property.portfolioName || property.title %></h2></a>
+                <p class="font-sans text-lg text-gray-700 leading-relaxed mb-8"><%= property.summary || property.excerpt || '' %></p>
+
+                <div class="grid grid-cols-3 gap-6 border-t border-[#0f2e22]/10 pt-6 mt-auto">
+                    <% if (property.doors) { %>
+                    <div>
+                        <p class="font-sans text-xs uppercase tracking-widest text-[#1a1a1a]/40 mb-1">Doors</p>
+                        <p class="font-serif text-lg font-semibold text-[#0f2e22]"><%= property.doors %></p>
+                    </div>
+                    <% } %>
+                    <% if (property.occupancy) { %>
+                    <div>
+                        <p class="font-sans text-xs uppercase tracking-widest text-[#1a1a1a]/40 mb-1">Occupancy</p>
+                        <p class="font-serif text-lg font-semibold text-[#0f2e22]"><%= property.occupancy %></p>
+                    </div>
+                    <% } %>
+                    <% if (property.targetIRR) { %>
+                    <div>
+                        <p class="font-sans text-xs uppercase tracking-widest text-[#1a1a1a]/40 mb-1">Target IRR</p>
+                        <p class="font-serif text-lg font-semibold text-[#0f2e22]"><%= property.targetIRR %></p>
+                    </div>
+                    <% } %>
+                </div>
+
+                <div class="mt-8">
+                    <a href="/portfolio/<%= property.slug %>" class="font-sans text-sm font-bold uppercase tracking-widest text-[#0f2e22] border-b border-[#0f2e22] pb-1 hover:text-[#1a1a1a] hover:border-[#1a1a1a] transition-all">View Case Study &rarr;</a>
+                </div>
+            </div>
+
+        </article>
+        <% }); %>
+
+    </div>
+</section>
+
+<!-- ═══════════════ CTA BLOCK ═══════════════ -->
+<section class="bg-[#0f2e22]">
+    <div class="max-w-[1200px] mx-auto px-8 md:px-16 py-20 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+        <div>
+            <h2 class="font-serif text-3xl md:text-4xl text-white mb-3">Explore Our Approach.</h2>
+            <p class="font-sans text-lg text-white/70 max-w-xl">Learn more about our investment strategy, underwriting discipline, and how we create value across our portfolio.</p>
+        </div>
+        <a href="/strategy" class="inline-block font-sans text-sm font-bold text-[#0f2e22] bg-white px-10 py-4 uppercase tracking-wider hover:bg-[#f9f8f6] transition-colors rounded-none whitespace-nowrap">Investment Strategy</a>
     </div>
 </section>
 

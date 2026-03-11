@@ -1,0 +1,92 @@
+<!-- views/firm/stewardship.ejs -->
+<%- include('../partials/header', {
+    pageTitle: pageTitle,
+    pageDescription: pageDescription,
+    path: path
+}) %>
+
+<!-- Hero — Deep Evergreen -->
+<section class="bg-[#0f2e22] pt-32 pb-20 px-8 md:px-16">
+  <div class="max-w-screen-xl mx-auto">
+    <span class="font-sans text-sm font-bold text-white/60 uppercase tracking-widest block mb-4">Stewardship</span>
+    <h1 class="font-serif text-5xl md:text-6xl text-white tracking-tight mb-6">Operational Excellence.</h1>
+    <p class="font-sans text-xl text-white/80 max-w-3xl leading-relaxed">We believe that exceptional stewardship—disciplined operations, lifecycle asset management, and frictionless resident experiences—is the foundation of downside protection and durable yield.</p>
+  </div>
+</section>
+
+<!-- Core Pillars — Editorial Grid, No Icons -->
+<section class="max-w-screen-xl mx-auto px-8 md:px-16 py-20 grid grid-cols-1 md:grid-cols-3 gap-16 border-b border-[#0f2e22]/10">
+  <div class="border-t-2 border-[#0f2e22] pt-6">
+    <h3 class="font-serif text-2xl text-[#1a1a1a] mb-4">Capital Preservation</h3>
+    <p class="font-sans text-gray-600 leading-relaxed">Every operational decision is evaluated through the lens of downside protection. We mandate strict preventive CapEx modeling and prioritize cash flow stability over speculative, high-risk upside.</p>
+  </div>
+  <div class="border-t-2 border-[#0f2e22] pt-6">
+    <h3 class="font-serif text-2xl text-[#1a1a1a] mb-4">Lifecycle Management</h3>
+    <p class="font-sans text-gray-600 leading-relaxed">We continuously reinvest in our physical assets. By executing rigorous preventive maintenance schedules, we protect our cost basis and significantly reduce long-term operational drag.</p>
+  </div>
+  <div class="border-t-2 border-[#0f2e22] pt-6">
+    <h3 class="font-serif text-2xl text-[#1a1a1a] mb-4">Yield Optimization</h3>
+    <p class="font-sans text-gray-600 leading-relaxed">Frictionless resident experiences directly translate to institutional stability. By prioritizing operational responsiveness and transparency, we maximize resident retention and minimize turnover costs.</p>
+  </div>
+</section>
+
+<!-- Operational Framework — Warm Beige, 2x2 Grid -->
+<section class="bg-[#f9f8f6]">
+  <div class="max-w-screen-xl mx-auto px-8 md:px-16 pt-20 pb-12">
+    <h2 class="font-serif text-4xl text-[#0f2e22] mb-4">Our Operational Framework</h2>
+    <p class="font-sans text-lg text-gray-700 max-w-2xl">Military-grade systems and standard operating procedures (SOPs) that ensure consistent, scalable execution across the portfolio.</p>
+  </div>
+  <div class="max-w-screen-xl mx-auto px-8 md:px-16 pb-20 grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="bg-white border border-[#0f2e22]/20 p-10">
+      <span class="font-sans text-xs font-bold text-gray-400 block mb-4">01</span>
+      <h3 class="font-serif text-2xl text-[#0f2e22] mb-3">Procurement & Vendor SOPs</h3>
+      <p class="font-sans text-gray-600">Curated relationships with vetted contractors, structured bidding processes, and strict performance-based accountability ensure on-time, on-budget execution.</p>
+    </div>
+    <div class="bg-white border border-[#0f2e22]/20 p-10">
+      <span class="font-sans text-xs font-bold text-gray-400 block mb-4">02</span>
+      <h3 class="font-serif text-2xl text-[#0f2e22] mb-3">Financial Controls</h3>
+      <p class="font-sans text-gray-600">Rigorous zero-based budgeting, automated monthly variance analysis, and institutional-grade reporting maintain absolute financial transparency.</p>
+    </div>
+    <div class="bg-white border border-[#0f2e22]/20 p-10">
+      <span class="font-sans text-xs font-bold text-gray-400 block mb-4">03</span>
+      <h3 class="font-serif text-2xl text-[#0f2e22] mb-3">Proprietary Tech Stack</h3>
+      <p class="font-sans text-gray-600">API-driven property management software, automated rent collection, and proprietary data models built by our quantitative team streamline overhead.</p>
+    </div>
+    <div class="bg-white border border-[#0f2e22]/20 p-10">
+      <span class="font-sans text-xs font-bold text-gray-400 block mb-4">04</span>
+      <h3 class="font-serif text-2xl text-[#0f2e22] mb-3">Compliance & Risk</h3>
+      <p class="font-sans text-gray-600">Aggressive insurance procurement, standardized lease enforcement, and proactive regulatory compliance insulate the portfolio from legal and physical exposure.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Execution by the Numbers -->
+<section class="max-w-screen-xl mx-auto px-8 md:px-16 py-24">
+  <h2 class="font-serif text-3xl text-[#0f2e22] border-b border-[#0f2e22]/20 pb-6 mb-12">Execution by the Numbers</h2>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-12">
+    <div class="flex flex-col">
+      <span class="font-serif text-6xl text-[#1a1a1a] mb-2"><%= (typeof siteSettings !== 'undefined' && siteSettings.occupancyRate) ? siteSettings.occupancyRate : '96%' %></span>
+      <span class="font-sans text-xs font-bold uppercase tracking-widest text-gray-500">Portfolio Occupancy</span>
+    </div>
+    <div class="flex flex-col">
+      <span class="font-serif text-6xl text-[#1a1a1a] mb-2"><%= (typeof siteSettings !== 'undefined' && siteSettings.maintenanceResponse) ? siteSettings.maintenanceResponse : '<24hr' %></span>
+      <span class="font-sans text-xs font-bold uppercase tracking-widest text-gray-500">Maintenance Response</span>
+    </div>
+    <div class="flex flex-col">
+      <span class="font-serif text-6xl text-[#1a1a1a] mb-2"><%= (typeof siteSettings !== 'undefined' && siteSettings.avgResidentTenure) ? siteSettings.avgResidentTenure : '18mo' %></span>
+      <span class="font-sans text-xs font-bold uppercase tracking-widest text-gray-500">Avg. Resident Tenure</span>
+    </div>
+    <div class="flex flex-col">
+      <span class="font-serif text-6xl text-[#1a1a1a] mb-2"><%= (typeof siteSettings !== 'undefined' && siteSettings.rentCollectionRate) ? siteSettings.rentCollectionRate : '98%' %></span>
+      <span class="font-sans text-xs font-bold uppercase tracking-widest text-gray-500">Rent Collection Rate</span>
+    </div>
+  </div>
+</section>
+
+<!-- CTA — Institutional -->
+<section class="bg-[#0f2e22] text-white py-24 text-center px-8">
+  <h2 class="font-serif text-4xl mb-6">Review Our Track Record</h2>
+  <a href="/portfolio" class="inline-block font-sans text-sm font-bold uppercase tracking-widest text-[#0f2e22] bg-white px-8 py-4 hover:bg-[#f9f8f6] transition-colors border border-white">View Portfolio</a>
+</section>
+
+<%- include('../partials/footer') %>

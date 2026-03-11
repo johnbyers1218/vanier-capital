@@ -1,0 +1,130 @@
+<%- include('../partials/header', { pageTitle: 'Investor Inbox' }) %>
+
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between border-b border-[#0f2e22]/20 pb-4">
+    <div>
+      <h1 class="text-2xl font-bold text-[#1a1a1a]">Investor Inbox</h1>
+      <p class="text-gray-500 text-sm mt-1">Centralized communications with all LP accounts.</p>
+    </div>
+  </div>
+
+  <% if (typeof successMessage !== 'undefined' && successMessage && successMessage.length) { %>
+    <div class="bg-green-50 border-l-4 border-green-500 text-green-800 p-4"><%= successMessage %></div>
+  <% } %>
+  <% if (typeof errorMessage !== 'undefined' && errorMessage && errorMessage.length) { %>
+    <div class="border border-red-300 bg-red-50 text-red-800 p-4"><%= errorMessage %></div>
+  <% } %>
+
+  <% if (!investors || investors.length === 0) { %>
+    <div class="bg-white border border-[#0f2e22]/20 p-12 text-center">
+      <p class="text-gray-500">No investor accounts found. <a href="/admin/investors/new" class="text-[#0f2e22] font-bold hover:underline">Create one</a> to begin.</p>
+    </div>
+  <% } else { %>
+
+  <!-- 2-Column Layout -->
+  <div class="grid grid-cols-12 gap-0 border border-[#0f2e22]/20 bg-white" style="min-height: 600px;">
+
+    <!-- Left Column: LP Account List (4 cols) -->
+    <div class="col-span-4 border-r border-[#0f2e22]/20 overflow-y-auto" style="max-height: 700px;">
+      <div class="px-4 py-3 border-b border-[#0f2e22]/20 bg-[#f9f8f6]">
+        <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">Accounts (<%= investors.length %>)</span>
+      </div>
+      <% investors.forEach(inv => { %>
+        <a href="/admin/inbox?lp=<%= inv._id %>"
+           class="block px-4 py-4 border-b border-gray-200 hover:bg-[#f9f8f6] transition-colors <%= selectedId === String(inv._id) ? 'bg-[#f9f8f6] border-l-4 border-l-[#0f2e22]' : '' %>">
+          <div class="flex items-center justify-between">
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-[#1a1a1a] truncate"><%= inv.investorName %></p>
+              <p class="text-xs text-gray-500 truncate"><%= inv.entityName || inv.entityType || '—' %></p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0 ml-2">
+              <% if (inv.unreadCount > 0) { %>
+                <span class="inline-flex items-center justify-center w-5 h-5 bg-[#0f2e22] text-white text-[10px] font-bold"><%= inv.unreadCount %></span>
+              <% } %>
+              <% if (inv.totalMessages > 0) { %>
+                <span class="text-[10px] text-gray-400"><%= inv.totalMessages %></span>
+              <% } %>
+            </div>
+          </div>
+          <% if (inv.lastMessage) { %>
+            <p class="text-[10px] text-gray-400 mt-1"><%= new Date(inv.lastMessage).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %></p>
+          <% } %>
+        </a>
+      <% }) %>
+    </div>
+
+    <!-- Right Column: Thread + Reply (8 cols) -->
+    <div class="col-span-8 flex flex-col">
+
+      <% if (!selectedInvestor) { %>
+        <div class="flex-1 flex items-center justify-center">
+          <p class="text-gray-400 text-sm">Select an investor to view the conversation thread.</p>
+        </div>
+      <% } else { %>
+
+        <!-- Thread Header -->
+        <div class="px-6 py-4 border-b border-[#0f2e22]/20 bg-[#f9f8f6] flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-bold text-[#1a1a1a]"><%= selectedInvestor.investorName %></h2>
+            <p class="text-xs text-gray-500"><%= selectedInvestor.entityName || '' %> · <%= selectedInvestor.accreditationStatus || 'Pending' %></p>
+          </div>
+          <a href="/admin/investors/manage/<%= selectedInvestor._id %>" class="text-xs font-bold text-[#0f2e22] uppercase tracking-widest hover:underline">Manage Account &rarr;</a>
+        </div>
+
+        <!-- Messages -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-0" style="max-height: 400px;" id="messageThread">
+          <% if (messages && messages.length > 0) { %>
+            <% messages.forEach(msg => { %>
+              <div class="<%= msg.sender === 'Admin' ? 'bg-[#f9f8f6] border border-[#0f2e22]/10' : 'bg-white border border-gray-200' %> p-6 mb-4">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs font-bold uppercase tracking-widest <%= msg.sender === 'Admin' ? 'text-[#0f2e22]' : 'text-gray-600' %>"><%= msg.sender === 'Admin' ? 'General Partner' : selectedInvestor.investorName %></span>
+                  <span class="text-xs text-gray-400"><%= msg.createdAt ? new Date(msg.createdAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) : '' %></span>
+                </div>
+                <p class="text-sm font-semibold text-[#1a1a1a] mb-1"><%= msg.subject %></p>
+                <p class="text-sm <%= msg.sender === 'Admin' ? 'text-[#1a1a1a]' : 'text-gray-700' %> leading-relaxed whitespace-pre-line"><%= msg.body %></p>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <div class="text-center py-12">
+              <p class="text-gray-400 text-sm">No messages yet. Send the first message below.</p>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- Reply Form -->
+        <div class="border-t border-[#0f2e22]/20 p-6 bg-white">
+          <form method="POST" action="/admin/inbox/<%= selectedInvestor._id %>/reply">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <div class="mb-4">
+              <label for="replySubject" class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Subject</label>
+              <input type="text" id="replySubject" name="subject" required placeholder="e.g. Re: Q1 Distribution Inquiry" class="w-full border border-[#0f2e22]/20 bg-white text-[#1a1a1a] placeholder-gray-400 px-4 py-3 focus:outline-none focus:border-[#0f2e22]">
+            </div>
+            <div class="mb-4">
+              <label for="replyBody" class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Message</label>
+              <textarea id="replyBody" name="body" rows="4" required placeholder="Type your reply..." class="w-full border border-[#0f2e22]/20 bg-white text-[#1a1a1a] placeholder-gray-400 px-4 py-3 focus:outline-none focus:border-[#0f2e22]"></textarea>
+            </div>
+            <div class="flex justify-end">
+              <button type="submit" class="bg-[#0f2e22] text-white font-bold px-6 py-3 border border-[#0f2e22] hover:bg-[#1a1a1a] text-xs uppercase tracking-widest">
+                <i class="fas fa-paper-plane"></i> Send Reply
+              </button>
+            </div>
+          </form>
+        </div>
+
+      <% } /* end selectedInvestor */ %>
+    </div>
+  </div>
+
+  <% } /* end investors check */ %>
+</div>
+
+<script>
+// Auto-scroll message thread to bottom
+document.addEventListener('DOMContentLoaded', function() {
+    var thread = document.getElementById('messageThread');
+    if (thread) { thread.scrollTop = thread.scrollHeight; }
+});
+</script>
+
+<%- include('../partials/footer') %>

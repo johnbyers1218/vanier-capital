@@ -1,0 +1,67 @@
+<%- include('../partials/header', {
+    pageTitle: pageTitle,
+    pageDescription: pageDescription,
+    path: path,
+    isHeroPage: true
+}) %>
+
+<!-- ═══════════════ HERO — DEEP EVERGREEN ═══════════════ -->
+<section class="bg-[#0f2e22] pt-32 pb-16">
+    <div class="max-w-[1200px] mx-auto px-8 md:px-16 text-center">
+        <!-- Checkmark Icon -->
+        <div class="inline-flex items-center justify-center w-16 h-16 border-2 border-white/30 mb-8">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter" class="w-8 h-8"><path d="M20 6L9 17l-5-5" /></svg>
+        </div>
+        <h1 class="font-serif text-4xl md:text-5xl text-white tracking-tight mb-6">Application Received.</h1>
+        <p class="font-sans text-lg text-white/60 max-w-2xl mx-auto leading-relaxed">Your investor accreditation request has been logged and forwarded to our Investor Relations team for review.</p>
+    </div>
+</section>
+
+<!-- ═══════════════ CONFIRMATION BODY ═══════════════ -->
+<section class="bg-[#f9f8f6]">
+    <div class="max-w-[700px] mx-auto px-8 md:px-16 py-20">
+
+        <div class="bg-white border border-[#0f2e22]/20 p-10 md:p-14">
+
+            <h2 class="font-serif text-2xl text-[#0f2e22] mb-6">What Happens Next</h2>
+
+            <div class="space-y-6 mb-10">
+                <div class="flex items-start gap-4">
+                    <span class="font-serif text-2xl font-bold text-[#0f2e22]/20 leading-none mt-0.5">01</span>
+                    <div>
+                        <p class="font-sans text-sm font-bold text-[#1a1a1a] mb-1">Internal Review</p>
+                        <p class="font-sans text-sm text-gray-600 leading-relaxed">A member of the investment team will review your credentials and verify the information provided. This typically occurs within <strong>48 business hours</strong>.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-4">
+                    <span class="font-serif text-2xl font-bold text-[#0f2e22]/20 leading-none mt-0.5">02</span>
+                    <div>
+                        <p class="font-sans text-sm font-bold text-[#1a1a1a] mb-1">Accreditation Verification</p>
+                        <p class="font-sans text-sm text-gray-600 leading-relaxed">You may be contacted to provide supporting documentation per SEC Regulation D, Rule 501. This may include a CPA letter, broker-dealer verification, or other standard documentation.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-4">
+                    <span class="font-serif text-2xl font-bold text-[#0f2e22]/20 leading-none mt-0.5">03</span>
+                    <div>
+                        <p class="font-sans text-sm font-bold text-[#1a1a1a] mb-1">Data Room Access</p>
+                        <p class="font-sans text-sm text-gray-600 leading-relaxed">Upon successful verification, you will receive secure credentials for the Vanier Capital investor data room, including access to offering memoranda, financial models, and capital account reporting.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-[#0f2e22]/10 pt-8">
+                <p class="font-sans text-sm text-gray-600 leading-relaxed mb-6">For immediate inquiries, contact our Investor Relations team directly:</p>
+                <p class="font-sans text-sm font-bold text-[#0f2e22] mb-6">ir@vaniercapital.com</p>
+                <a href="/portfolio" class="inline-block font-sans text-sm font-bold uppercase tracking-widest text-[#0f2e22] border border-[#0f2e22] px-8 py-3 hover:bg-[#0f2e22] hover:text-white transition-colors rounded-none no-underline">Return to Portfolio</a>
+            </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <p class="font-sans text-[11px] text-gray-400 text-center mt-8 leading-relaxed max-w-lg mx-auto">Submission of an application does not guarantee access to investment materials, constitute an offer to sell, or constitute a solicitation of an offer to buy any security. All investment decisions are subject to completion of applicable subscription documentation.</p>
+
+    </div>
+</section>
+
+<%- include('../partials/footer') %>

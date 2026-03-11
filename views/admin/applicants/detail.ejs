@@ -1,0 +1,185 @@
+<%- include('../partials/header', { pageTitle: applicant.fullName + ' — Applicant' }) %>
+
+<div class="space-y-6">
+  <!-- Breadcrumb + Header -->
+  <div class="border-b border-[#0f2e22]/20 pb-4">
+    <nav class="mb-3">
+      <ol class="flex items-center space-x-2 font-sans text-xs text-gray-400">
+        <li><a href="/admin/applicants" class="hover:text-[#0f2e22] transition-colors">Applicants</a></li>
+        <li class="select-none">/</li>
+        <li class="text-[#1a1a1a] font-medium"><%= applicant.fullName %></li>
+      </ol>
+    </nav>
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-bold text-[#1a1a1a]"><%= applicant.fullName %></h1>
+      <%
+        const statusColors = {
+          'New': 'bg-blue-100 text-blue-800',
+          'Contacted': 'bg-yellow-100 text-yellow-800',
+          'Qualified': 'bg-green-100 text-green-800',
+          'Closed': 'bg-gray-100 text-gray-600',
+          'Archived': 'bg-gray-100 text-gray-400'
+        };
+        const sc = statusColors[applicant.status] || 'bg-gray-100 text-gray-600';
+      %>
+      <span class="inline-block text-[10px] font-bold uppercase tracking-widest px-3 py-1 <%= sc %>"><%= applicant.status %></span>
+    </div>
+  </div>
+
+  <% if (typeof successMessage !== 'undefined' && successMessage && successMessage.length) { %>
+    <div class="bg-green-50 border-l-4 border-green-500 text-green-800 p-4 text-sm"><%= successMessage %></div>
+  <% } %>
+  <% if (typeof errorMessage !== 'undefined' && errorMessage && errorMessage.length) { %>
+    <div class="border border-red-300 bg-red-50 text-red-800 p-4 text-sm"><%= errorMessage %></div>
+  <% } %>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- Left Column — Applicant Data (span 8) -->
+    <div class="lg:col-span-8 space-y-6">
+
+      <!-- Contact Information -->
+      <div class="bg-white border border-[#0f2e22]/20">
+        <div class="bg-[#0f2e22] px-6 py-3">
+          <h2 class="font-sans text-xs font-bold uppercase tracking-widest text-white">Contact Information</h2>
+        </div>
+        <div class="divide-y divide-gray-200">
+          <div class="grid grid-cols-3 px-6 py-3">
+            <span class="font-sans text-xs uppercase tracking-widest text-gray-400">Full Name</span>
+            <span class="col-span-2 font-sans text-sm font-medium text-[#1a1a1a]"><%= applicant.fullName %></span>
+          </div>
+          <div class="grid grid-cols-3 px-6 py-3">
+            <span class="font-sans text-xs uppercase tracking-widest text-gray-400">Email</span>
+            <span class="col-span-2 font-sans text-sm text-[#1a1a1a]"><a href="mailto:<%= applicant.email %>" class="text-[#0f2e22] hover:underline"><%= applicant.email %></a></span>
+          </div>
+          <div class="grid grid-cols-3 px-6 py-3">
+            <span class="font-sans text-xs uppercase tracking-widest text-gray-400">Phone</span>
+            <span class="col-span-2 font-sans text-sm text-[#1a1a1a]"><%= applicant.phone || '—' %></span>
+          </div>
+          <div class="grid grid-cols-3 px-6 py-3">
+            <span class="font-sans text-xs uppercase tracking-widest text-gray-400">City / State</span>
+            <span class="col-span-2 font-sans text-sm text-[#1a1a1a]"><%= applicant.cityState %></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Investment Profile -->
+      <div class="bg-white border border-[#0f2e22]/20">
+        <div class="bg-[#0f2e22] px-6 py-3">
+          <h2 class="font-sans text-xs font-bold uppercase tracking-widest text-white">Investment Profile</h2>
+        </div>
+        <div class="divide-y divide-gray-200">
+          <div class="grid grid-cols-3 px-6 py-3">
+            <span class="font-sans text-xs uppercase tracking-widest text-gray-400">Investor Type</span>
+            <span class="col-span-2 font-sans text-sm font-medium text-[#1a1a1a] uppercase"><%= applicant.investorType %></span>
+          </div>
+          <div class="grid grid-cols-3 px-6 py-3">
+            <span class="font-sans text-xs uppercase tracking-widest text-gray-400">Capital Interest</span>
+            <span class="col-span-2 font-sans text-sm text-[#1a1a1a]"><%= applicant.capitalInterest || 'Not disclosed' %></span>
+          </div>
+          <div class="grid grid-cols-3 px-6 py-3">
+            <span class="font-sans text-xs uppercase tracking-widest text-gray-400">Accredited</span>
+            <span class="col-span-2">
+              <% if (applicant.accredited) { %>
+                <span class="inline-block bg-green-100 text-green-800 text-[10px] font-bold uppercase tracking-widest px-2 py-1">Attested Yes</span>
+              <% } else { %>
+                <span class="inline-block bg-red-100 text-red-800 text-[10px] font-bold uppercase tracking-widest px-2 py-1">Not Attested</span>
+              <% } %>
+            </span>
+          </div>
+          <div class="grid grid-cols-3 px-6 py-3">
+            <span class="font-sans text-xs uppercase tracking-widest text-gray-400">Source</span>
+            <span class="col-span-2 font-sans text-xs text-gray-500"><%= applicant.source || '—' %></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <% if (applicant.notes) { %>
+      <div class="bg-white border border-[#0f2e22]/20">
+        <div class="bg-[#0f2e22] px-6 py-3">
+          <h2 class="font-sans text-xs font-bold uppercase tracking-widest text-white">Applicant Notes</h2>
+        </div>
+        <div class="px-6 py-4">
+          <p class="font-sans text-sm text-gray-700 leading-relaxed whitespace-pre-line"><%= applicant.notes %></p>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Metadata -->
+      <div class="bg-white border border-[#0f2e22]/20">
+        <div class="px-6 py-3 border-b border-gray-200">
+          <h2 class="font-sans text-xs font-bold uppercase tracking-widest text-gray-400">Metadata</h2>
+        </div>
+        <div class="divide-y divide-gray-200">
+          <div class="grid grid-cols-3 px-6 py-3">
+            <span class="font-sans text-xs uppercase tracking-widest text-gray-400">Submitted</span>
+            <span class="col-span-2 font-sans text-xs text-gray-500"><%= new Date(applicant.createdAt).toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' }) %></span>
+          </div>
+          <% if (applicant.ip) { %>
+          <div class="grid grid-cols-3 px-6 py-3">
+            <span class="font-sans text-xs uppercase tracking-widest text-gray-400">IP Address</span>
+            <span class="col-span-2 font-sans text-xs text-gray-500 font-mono"><%= applicant.ip %></span>
+          </div>
+          <% } %>
+          <% if (applicant.userAgent) { %>
+          <div class="grid grid-cols-3 px-6 py-3">
+            <span class="font-sans text-xs uppercase tracking-widest text-gray-400">User Agent</span>
+            <span class="col-span-2 font-sans text-[10px] text-gray-400 break-all"><%= applicant.userAgent %></span>
+          </div>
+          <% } %>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Column — Actions (span 4) -->
+    <div class="lg:col-span-4 space-y-6">
+
+      <!-- Update Status -->
+      <div class="bg-white border border-[#0f2e22]/20">
+        <div class="bg-[#0f2e22] px-6 py-3">
+          <h2 class="font-sans text-xs font-bold uppercase tracking-widest text-white">Update Status</h2>
+        </div>
+        <form action="/admin/applicants/<%= applicant._id %>/status" method="POST" class="px-6 py-4 space-y-4">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <select name="status" class="w-full border border-[#0f2e22]/20 bg-white p-2 rounded-none font-sans text-sm text-[#1a1a1a] focus:outline-none focus:ring-2 focus:ring-[#0f2e22] transition-colors">
+            <% ['New','Contacted','Qualified','Closed','Archived'].forEach(function(s) { %>
+              <option value="<%= s %>" <%= applicant.status === s ? 'selected' : '' %>><%= s %></option>
+            <% }); %>
+          </select>
+          <button type="submit" class="w-full font-sans text-xs font-bold uppercase tracking-widest text-white bg-[#0f2e22] border border-[#0f2e22] px-4 py-3 hover:bg-[#1a1a1a] transition-colors cursor-pointer rounded-none">Save Status</button>
+        </form>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="bg-white border border-[#0f2e22]/20">
+        <div class="px-6 py-3 border-b border-gray-200">
+          <h2 class="font-sans text-xs font-bold uppercase tracking-widest text-gray-400">Quick Actions</h2>
+        </div>
+        <div class="px-6 py-4 space-y-3">
+          <a href="mailto:<%= applicant.email %>?subject=Vanier%20Capital%20—%20Investor%20Application%20Follow-Up" class="block w-full text-center font-sans text-xs font-bold uppercase tracking-widest text-[#0f2e22] border border-[#0f2e22] px-4 py-3 hover:bg-[#0f2e22] hover:text-white transition-colors no-underline">
+            Email Applicant
+          </a>
+          <a href="/admin/investors/new" class="block w-full text-center font-sans text-xs font-bold uppercase tracking-widest text-white bg-[#0f2e22] border border-[#0f2e22] px-4 py-3 hover:bg-[#1a1a1a] transition-colors no-underline">
+            Create LP Account &rarr;
+          </a>
+        </div>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="bg-white border border-red-200">
+        <div class="px-6 py-3 border-b border-red-200">
+          <h2 class="font-sans text-xs font-bold uppercase tracking-widest text-red-600">Danger Zone</h2>
+        </div>
+        <form action="/admin/applicants/<%= applicant._id %>/delete" method="POST" class="px-6 py-4" onsubmit="return confirm('Permanently delete this applicant? This cannot be undone.');">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button type="submit" class="w-full font-sans text-xs font-bold uppercase tracking-widest text-red-600 border border-red-300 px-4 py-3 hover:bg-red-50 transition-colors cursor-pointer rounded-none bg-white">Delete Applicant</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

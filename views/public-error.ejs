@@ -1,49 +1,31 @@
 <!-- views/public-error.ejs -->
-<!-- Simplified version for debugging EJS compilation errors -->
 
 <%
-    // Basic variable setting - simplified defaults
     const errStatusCode = typeof status !== 'undefined' ? status : 500;
     const displayTitle = typeof pageTitle !== 'undefined' ? pageTitle : 'Error';
-    const displayMessage = typeof message !== 'undefined' ? message : 'An error occurred.';
-    // Note: Complex title/message logic based on status code removed for now
+    const displayMessage = typeof message !== 'undefined' ? message : 'An unexpected error occurred.';
 %>
 
 <%- include('partials/header', { pageTitle: `Error ${errStatusCode}`, path: '/error' }) %>
 
-<!-- Simplified Error Content -->
-<section class="section error-section" style="padding: 4rem 0;">
-    <div class="container error-content-wrapper">
-        <div class="error-container">
-            <!-- Minimal Icon Logic -->
-            <div class="error-icon">
-                 <i class="fas fa-exclamation-triangle"></i> <!-- Default Error Icon -->
-            </div>
+<!-- Error — Institutional -->
+<section class="bg-[#f9f8f6] pt-32 pb-24 px-8 md:px-16">
+    <div class="max-w-screen-xl mx-auto text-center">
+        <span class="font-serif text-[8rem] md:text-[10rem] leading-none text-[#0f2e22]/10 block mb-4"><%= errStatusCode %></span>
+        <h2 class="font-serif text-3xl md:text-4xl text-[#1a1a1a] mb-4"><%= displayTitle %></h2>
+        <p class="font-sans text-lg text-gray-600 max-w-xl mx-auto mb-8">
+            <%= displayMessage %>
+        </p>
 
-            <!-- Basic Title and Message Output -->
-            <h2 class="error-message"><%= displayTitle %> (<%= errStatusCode %>)</h2>
-            <p class="error-description">
-                <%= displayMessage %>
-            </p>
+        <% if (process.env.NODE_ENV !== 'production' && typeof error !== 'undefined' && error && error.stack) { %>
+            <pre class="text-left bg-[#1a1a1a] text-gray-300 font-mono text-xs p-6 max-w-2xl mx-auto mb-12 overflow-auto max-h-40 border border-[#0f2e22]/20"><%= error.stack %></pre>
+        <% } %>
 
-            <!-- Stack Trace (Development Only - Simplified Check) -->
-            <% if (process.env.NODE_ENV !== 'production' && typeof error !== 'undefined' && error && error.stack) { %>
-                <pre class="error-stack-trace" style="max-height: 150px;"><%= error.stack %></pre>
-            <% } %>
-
-            <!-- Actions -->
-            <div class="error-actions">
-                 <a href="javascript:history.back()" class="cta-button secondary-btn">
-                     <i class="fas fa-arrow-left"></i> Go Back
-                 </a>
-                <a href="/" class="cta-button primary-btn">
-                    <i class="fas fa-home"></i> Return to Homepage
-                </a>
-            </div>
+        <div class="flex flex-wrap items-center justify-center gap-6">
+            <a href="javascript:history.back()" class="inline-block bg-transparent text-[#0f2e22] font-sans text-sm font-bold uppercase tracking-widest px-10 py-4 border border-[#0f2e22] hover:bg-[#0f2e22] hover:text-white transition-colors">Go Back</a>
+            <a href="/" class="inline-block bg-[#0f2e22] text-white font-sans text-sm font-bold uppercase tracking-widest px-10 py-4 border border-[#0f2e22] hover:bg-transparent hover:text-[#0f2e22] transition-colors">Return to Homepage</a>
         </div>
     </div>
 </section>
 
 <%- include('partials/footer') %>
-
-<!-- Styles should be in style.css -->

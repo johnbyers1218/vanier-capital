@@ -13,7 +13,6 @@ import session from 'express-session';
 import flash from 'connect-flash';
 import MongoStore from 'connect-mongo';
 import csrf from 'csurf';
-// import morgan from 'morgan';
 import { logger, httpLoggerMiddleware } from './config/logger.js';
 import { escapeHtml, decodeHtmlEntities } from './utils/helpers.js';
 import publicRoutes from './routes/publicRoutes.js';
@@ -22,21 +21,15 @@ import apiContactRoutes from './routes/apiContact.js';
 import apiInquiriesRoutes from './routes/apiInquiries.js';
 import adminDashboardRoutes from './routes/admin/adminDashboard.js';
 import adminPropertyRoutes from './routes/admin/adminProperties.js';
-import adminTestimonialRoutes from './routes/admin/adminTestimonials.js';
 import adminBlogRoutes from './routes/admin/adminBlog.js';
-// import adminNewslettersRoutes from './routes/admin/adminNewsletters.js';
-// import adminSubscriberRoutes from './routes/admin/adminSubscribers.js';
 import adminSettingsRoutes from './routes/admin/adminSettings.js';
-import adminCategoriesRoutes from './routes/admin/adminCategories.js';
-import adminMarketsRoutes from './routes/admin/adminMarkets.js';
 import adminSearchRoutes from './routes/admin/adminSearch.js';
 import adminInquiriesRoutes from './routes/admin/adminInquiries.js';
-// import { startNewsletterScheduler } from './services/newsletterScheduler.js';
-import authRoutes from './routes/auth.js';
+import adminApplicantRoutes from './routes/admin/adminApplicants.js';
 import adminAuthRoutes from './routes/admin/adminAuth.js';
-import isAdmin from './middleware/isAdmin.js';
 import requireAdminClerk from './middleware/requireAdminClerk.js';
-import { ClerkExpressWithAuth } from '@clerk/clerk-sdk-node';
+import globalLocals from './middleware/globalLocals.js';
+import { clerkMiddleware } from '@clerk/express';
 
 
 process.on('unhandledRejection', (reason, promise) => {
@@ -109,12 +102,6 @@ app.use(compression({
     return compression.filter(req, res);
   }
 }));
-
-
-// Serve authoring guide (raw markdown)
-app.get('/AUTHORING_GUIDE.md', (req, res) => {
-  res.sendFile(path.join(currentDirname, 'AUTHORING_GUIDE.md'));
-});
 
 
 // Mount dynamic sitemap route for SEO
@@ -202,10 +189,10 @@ logger.debug('[INIT] Applied httpLoggerMiddleware.');
 logger.debug('[INIT] Applying helmet...');
 const cspDirectives = {
   defaultSrc: ["'self'"],
-  scriptSrc: ["'self'", "'unsafe-inline'","https://*.clerk.accounts.dev", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud", "https://www.googletagmanager.com", "https://calendar.google.com", "https://apis.google.com","https://www.gstatic.com", "https://unpkg.com", "https://cdn.jsdelivr.net"],
-  styleSrc: ["'self'", "'unsafe-inline'", "https://*.clerk.accounts.dev", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud", "https://calendar.google.com","https://apis.google.com", "https://unpkg.com"],
+  scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud", "https://www.googletagmanager.com", "https://calendar.google.com", "https://apis.google.com","https://www.gstatic.com", "https://unpkg.com", "https://cdn.jsdelivr.net", "https://*.clerk.accounts.dev", "https://*.clerk.com"],
+  styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud", "https://calendar.google.com","https://apis.google.com", "https://unpkg.com", "https://*.clerk.accounts.dev", "https://*.clerk.com"],
   fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
-  imgSrc: ["'self'", "data:", "blob:", "https://res.cloudinary.com", "https:", "https://apis.google.com", "https://*.clerk.accounts.dev","https://img.clerk.com"],
+  imgSrc: ["'self'", "data:", "blob:", "https://res.cloudinary.com", "https:", "https://apis.google.com", "https://img.clerk.com"],
   connectSrc: [
     "'self'",
     "https://*.tiny.cloud",
@@ -214,10 +201,10 @@ const cspDirectives = {
     "https://*.googletagmanager.com",
     "https://calendar.google.com",
     "https://apis.google.com",
-    "https://api.clerk.com",
-    "https://*.clerk.accounts.dev"
+    "https://*.clerk.accounts.dev",
+    "https://*.clerk.com"
   ],
-  frameSrc: ["'self'", "https://*.tiny.cloud", "https://calendar.google.com","https://accounts.google.com", "https://*.clerk.accounts.dev"],
+  frameSrc: ["'self'", "https://*.tiny.cloud", "https://calendar.google.com","https://accounts.google.com", "https://*.clerk.accounts.dev", "https://clerk.com", "https://*.clerk.com"],
   scriptSrcAttr: ["'unsafe-inline'"],
   workerSrc: ["'self'", "blob:"],
   objectSrc: ["'none'"],
@@ -235,6 +222,8 @@ const cspDirectives = {
   const directiveKeys = Object.keys(cspDirectives);
   directiveKeys.forEach(key => {
     const arr = cspDirectives[key];
+    // Never inject origins into objectSrc — 'none' must remain the sole value.
+    if (key === 'objectSrc') return;
     if (Array.isArray(arr) && !arr.includes(normalized)) {
       arr.push(normalized);
     }
@@ -395,6 +384,30 @@ logger.debug('[INIT] Applying flash middleware...');
 app.use(flash());
 logger.debug('[INIT] Applied flash middleware.');
 
+// --- Clerk global middleware ---
+// clerkMiddleware() reads the session JWT from cookies/headers and populates req.auth.
+// Must run before any route that calls getAuth() or requireAuth().
+if (process.env.NODE_ENV !== 'test') {
+  app.use(clerkMiddleware());
+  logger.info('[AUTH] Clerk clerkMiddleware() applied globally.');
+
+  // --- Clerk handshake guard ---
+  // clerkMiddleware() may send a 307 redirect (handshake) to establish session cookies.
+  // When that happens, res is already ended (writableEnded === true).
+  // Without this guard, downstream middleware (siteSettings, globalLocals) and route
+  // handlers will attempt to set headers / render, causing ERR_HTTP_HEADERS_SENT.
+  app.use((req, res, next) => {
+    if (res.writableEnded || res.headersSent) {
+      logger.debug(`[CLERK GUARD] Response already sent for ${req.method} ${req.originalUrl} — skipping downstream middleware.`);
+      return; // Do NOT call next(); the response is already committed.
+    }
+    next();
+  });
+  logger.info('[AUTH] Clerk handshake guard middleware applied.');
+} else {
+  logger.info('[AUTH] Test mode — skipping clerkMiddleware().');
+}
+
 logger.debug('[INIT] Setting up CSRF protection (to be applied by routes)...');
 // In test, bypass CSRF but still provide a csrfToken() shim so routes rendering forms don't break
 const csrfProtection = process.env.NODE_ENV === 'test'
@@ -419,16 +432,42 @@ app.use((req, res, next) => {
 });
 logger.debug('[INIT] Applied custom locals middleware.');
 
-// --- Optional Clerk Auth Wiring ---
-// Enable by setting USE_CLERK=1; keeps legacy auth by default
-// Force legacy auth in test to keep integration tests deterministic
-const useClerk = process.env.USE_CLERK === '1' && !isTestEnv;
-if (useClerk) {
-  logger.info('[AUTH] USE_CLERK=1 detected. Applying Clerk withAuth middleware.');
-  app.use(ClerkExpressWithAuth());
-} else {
-  logger.info('[AUTH] Using legacy session-based admin auth (isAdmin middleware).');
-}
+// --- Global siteSettings injection (KPI Engine) ---
+// Makes all Settings key-value pairs available to every EJS template via res.locals.siteSettings
+// Cached in-memory for 60 seconds to avoid per-request DB queries
+import Settings from './models/Settings.js';
+let _siteSettingsCache = {};
+let _siteSettingsCacheTs = 0;
+const SITE_SETTINGS_TTL = 60_000; // 60 seconds
+
+app.use(async (req, res, next) => {
+    try {
+        const now = Date.now();
+        if (now - _siteSettingsCacheTs > SITE_SETTINGS_TTL && mongoose.connection.readyState === 1) {
+            const allSettings = await Settings.find({}).lean();
+            _siteSettingsCache = allSettings.reduce((acc, s) => {
+                acc[s.key] = s.valueString || s.valueNumber || '';
+                return acc;
+            }, {});
+            _siteSettingsCacheTs = now;
+        }
+        res.locals.siteSettings = _siteSettingsCache;
+    } catch {
+        res.locals.siteSettings = _siteSettingsCache;
+    }
+    next();
+});
+logger.debug('[INIT] Applied global siteSettings middleware (60s cache).');
+
+// --- Global portfolio nav data injection (for header mega menu) ---
+app.use(globalLocals);
+logger.debug('[INIT] Applied global portfolio nav locals middleware (60s cache).');
+
+// --- Admin Auth: @clerk/express (clerkMiddleware global + requireAuth per-route) ---
+// clerkMiddleware() is applied globally above.
+// requireAdminClerk uses requireAuth() from @clerk/express to protect /admin routes.
+// Public sign-ups are disabled in the Clerk dashboard — any authenticated user is authorized.
+logger.info('[AUTH] Using Clerk-based admin auth (requireAdminClerk middleware).');
 
 // NOTE: Deliberately mount static files AFTER public routes so that dynamic routes like /sitemap.xml aren't overridden by a static file
 logger.debug('[INIT] Deferring static file serving until after routers...');
@@ -446,25 +485,18 @@ logger.debug('[INIT] Applied API rate limiter.');
 
 // --- Mount Routers ---
 logger.debug('[INIT] Mounting routers...');
-const adminGuard = useClerk ? requireAdminClerk : isAdmin;
+const adminGuard = requireAdminClerk;
 app.use('/', publicRoutes);
 app.use('/api', apiPublicRoutes);
 app.use('/api', apiContactRoutes);
 app.use('/api', apiInquiriesRoutes);
 app.use('/admin/dashboard', adminGuard, adminDashboardRoutes(csrfProtection));
 app.use('/admin/properties', adminGuard, adminPropertyRoutes(csrfProtection));
-// app.use('/admin/clients', adminGuard, adminClientRoutes(csrfProtection));
-app.use('/admin/testimonials', adminGuard, adminTestimonialRoutes(csrfProtection));
 app.use('/admin/blog', adminGuard, adminBlogRoutes(csrfProtection));
-app.use('/admin/categories', adminGuard, adminCategoriesRoutes(csrfProtection));
-app.use('/admin/markets', adminGuard, adminMarketsRoutes(csrfProtection));
-// app.use('/admin/services', adminGuard, adminServicesRoutes(csrfProtection));
 app.use('/admin/inquiries', adminGuard, adminInquiriesRoutes(csrfProtection));
-// app.use('/admin/newsletters', adminGuard, adminNewslettersRoutes(csrfProtection));
-// app.use('/admin/subscribers', adminGuard, adminSubscriberRoutes(csrfProtection));
+app.use('/admin/applicants', adminGuard, adminApplicantRoutes(csrfProtection));
 app.use('/admin/settings', adminGuard, adminSettingsRoutes(csrfProtection));
 app.use('/admin/search', adminGuard, adminSearchRoutes(csrfProtection));
-app.use('/auth', authRoutes(csrfProtection));
 logger.debug('[INIT] Routers mounted.');
 
 logger.debug('[INIT] Applying static file serving...');
@@ -481,20 +513,20 @@ app.use(express.static(path.join(currentDirname, 'public'), {
 }));
 logger.debug('[INIT] Applied static file serving.');
 
-// --- Redirect legacy admin login to Clerk sign-in when Clerk is enabled ---
-if (useClerk) {
-  app.get('/admin/login', (req, res) => {
-  const redirectTo = encodeURIComponent('/admin/dashboard');
-  res.redirect(302, `/auth/sign-in?redirectTo=${redirectTo}`);
-  });
-} else {
-  // Mount legacy admin auth endpoints when Clerk is disabled (default in tests)
-  app.use('/admin', adminAuthRoutes(csrfProtection));
-}
+// Mount Clerk-based admin auth endpoints (login + logout — not guarded by requireAuth)
+app.use('/admin', adminAuthRoutes(csrfProtection));
+
+// Clerk sign-in entry point — redirects unauthenticated users to Clerk Hosted UI
+app.get('/sign-in', (req, res) => {
+  const clerkSignInUrl = process.env.CLERK_SIGN_IN_URL || 'https://accounts.clerk.dev/sign-in';
+  const redirectTo = req.query.redirectTo || '/admin/dashboard';
+  res.redirect(`${clerkSignInUrl}?redirect_url=${encodeURIComponent(redirectTo)}`);
+});
 
 // --- Error Handling Middleware ---
 logger.debug('[INIT] Setting up error handlers...');
 app.use((req, res, next) => { // 404 Handler
+  if (res.writableEnded || res.headersSent) return; // Clerk handshake already sent response
   logger.warn(`404 Not Found: ${req.method} ${req.originalUrl} from IP: ${req.ip}`);
   res.status(404).render('404', { pageTitle: 'Page Not Found (404)', path: req.originalUrl });
 });
@@ -512,7 +544,7 @@ app.use((err, req, res, next) => { // Global Error Handler
   const statusCode = err.status || 500;
   const isProduction = process.env.NODE_ENV === 'production';
   const responseMessage = (isProduction && statusCode >=500) ? 'Internal Server Error' : err.message;
-  if(res.headersSent) return next(err);
+  if(res.headersSent || res.writableEnded) return next(err);
   if(req.originalUrl.startsWith('/api/')) return res.status(statusCode).json({success: false, message: responseMessage});
   const errorView = req.originalUrl.startsWith('/admin/') ? 'admin/error' : 'public-error';
   try {
@@ -649,15 +681,6 @@ async function startApp() {
     process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
     // 4. Start background schedulers after server is running
-    /*
-    if (typeof startNewsletterScheduler === 'function' && (!isTestEnv && !isSmokeEnv)) {
-      try {
-        startNewsletterScheduler();
-      } catch (e) {
-        logger.warn('[INIT] Newsletter scheduler failed to start.', { message: e.message });
-      }
-    }
-    */
 
     logger.info('[STARTUP] Application fully initialized and ready');
   } catch (error) {

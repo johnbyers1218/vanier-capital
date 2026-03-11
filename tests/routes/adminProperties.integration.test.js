@@ -43,17 +43,15 @@ describe('Admin Properties CRUD (in-memory DB)', () => {
       await mongoose.connect(process.env.MONGODB_URI);
     }
     await AdminUser.create({ username: 'admin', password: 'averylongsecurepw', role: 'admin', fullName: 'Admin' });
-    const client = await Client.create({ name: 'Acme Co', logoUrl: 'https://example.com/logo.png' });
-
-    server = app.listen(0);
-    await AdminUser.create({ username: 'admin', password: 'averylongsecurepw', role: 'admin', fullName: 'Admin' });
 
     server = app.listen(0);
     agent = request.agent(server);
-    const loginPage = await agent.get('/admin/login');
-    const csrf = extractCsrf(loginPage.text);
-    await agent.post('/admin/login').type('form').send({ _csrf: csrf, username: 'admin', password: 'averylongsecurepw' });
-  }, 30000);er && server.close) await new Promise((resolve) => server.close(resolve));
+    // With BYPASS_AUTH=1, just establish a session for CSRF support.
+    await agent.get('/admin/dashboard');
+  }, 30000);
+
+  afterAll(async () => {
+    if (server && server.close) await new Promise((resolve) => server.close(resolve));
     await mongoose.connection.close().catch(() => {});
     if (mongoServer) await mongoServer.stop();
   });

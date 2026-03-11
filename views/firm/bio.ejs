@@ -1,0 +1,124 @@
+<!-- views/firm/bio.ejs -->
+<%# Individual Partner Profile — Institutional Layout %>
+
+<%- include('../partials/header', {
+    pageTitle: pageTitle,
+    pageDescription: pageDescription,
+    path: path,
+    isHeroPage: true
+}) %>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="bg-[#0f2e22] pt-32 pb-12 px-8 md:px-16">
+    <div class="max-w-screen-xl mx-auto">
+        <nav class="font-sans text-sm text-white/40 mb-8">
+            <a href="/firm/overview" class="hover:text-white/70 transition-colors">Firm</a>
+            <span class="mx-2">/</span>
+            <a href="/firm/leadership" class="hover:text-white/70 transition-colors">Leadership</a>
+            <span class="mx-2">/</span>
+            <span class="text-white/70"><%= member.fullName %></span>
+        </nav>
+        <p class="font-sans text-xs font-bold uppercase tracking-widest text-white/50 mb-4"><%= member.role %></p>
+        <h1 class="font-serif text-5xl md:text-6xl text-white tracking-tight"><%= member.fullName %></h1>
+    </div>
+</section>
+
+<!-- ═══════════════ BIO SECTION ═══════════════ -->
+<section class="bg-white">
+    <div class="max-w-screen-xl mx-auto px-8 md:px-16 py-20">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+
+            <!-- Left: Portrait -->
+            <div class="lg:col-span-4">
+                <div class="aspect-[3/4] bg-[#f9f8f6] overflow-hidden">
+                    <img
+                        src="<%= member.avatarUrl %>"
+                        alt="<%= member.fullName %>"
+                        loading="eager"
+                        class="w-full h-full object-cover object-top rounded-none"
+                    >
+                </div>
+            </div>
+
+            <!-- Right: Content -->
+            <div class="lg:col-span-8">
+
+                <!-- Bio -->
+                <div class="mb-16">
+                    <% member.bio.split('\n\n').forEach(paragraph => { %>
+                        <p class="font-sans text-lg text-gray-700 leading-relaxed mb-6"><%= paragraph %></p>
+                    <% }) %>
+                </div>
+
+                <!-- Education & Focus -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 border-t border-[#0f2e22]/20 pt-12">
+                    <div>
+                        <h3 class="font-sans text-xs font-bold uppercase tracking-widest text-gray-500 mb-4">Education</h3>
+                        <% (Array.isArray(member.education) ? member.education : [member.education]).forEach(deg => { %>
+                            <p class="font-sans text-base text-[#1a1a1a] mb-1"><%= deg %></p>
+                        <% }) %>
+                    </div>
+                    <div>
+                        <h3 class="font-sans text-xs font-bold uppercase tracking-widest text-gray-500 mb-4">Areas of Focus</h3>
+                        <ul class="space-y-2">
+                            <% member.focus.forEach(area => { %>
+                                <li class="font-sans text-base text-[#1a1a1a] flex items-start gap-2">
+                                    <span class="text-[#0f2e22] mt-0.5">—</span> <%= area %>
+                                </li>
+                            <% }) %>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Back to Leadership -->
+                <div class="mt-16 pt-8 border-t border-[#0f2e22]/20">
+                    <a href="/firm/leadership" class="font-sans text-sm font-bold text-[#0f2e22] uppercase tracking-wider hover:underline">&larr; All Partners</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ OTHER PARTNERS ═══════════════ -->
+<section class="bg-[#f9f8f6] border-t border-[#0f2e22]/10">
+    <div class="max-w-screen-xl mx-auto px-8 md:px-16 py-20">
+        <h2 class="font-serif text-2xl text-[#0f2e22] mb-10">Other Partners</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <%
+                const otherPartners = {
+                    'matthew-moellering': { name: 'Matthew Moellering', role: 'Partner, Chief Executive Officer', img: '/images/MoeBW.png' },
+                    'logan-mayfield': { name: 'Logan Mayfield', role: 'Partner, Chief Operating Officer', img: '/images/LoganBW.png' },
+                    'john-byers': { name: 'John Byers', role: 'Partner, Chief Investment Officer', img: '/images/JohnBW.png' }
+                };
+                const otherSlugs = Object.keys(otherPartners).filter(s => s !== member.slug);
+            %>
+            <% otherSlugs.forEach(slug => { const m = otherPartners[slug]; %>
+                <a href="/firm/leadership/<%= slug %>" class="group grid grid-cols-12 gap-6 items-center">
+                    <div class="col-span-3">
+                        <div class="aspect-square bg-[#f9f8f6] overflow-hidden">
+                            <img src="<%= m.img %>" alt="<%= m.name %>" class="w-full h-full object-cover object-top transform-gpu backface-hidden will-change-transform rounded-none">
+                        </div>
+                    </div>
+                    <div class="col-span-9">
+                        <h3 class="font-serif text-xl text-[#1a1a1a] group-hover:text-[#0f2e22] transition-colors"><%= m.name %></h3>
+                        <p class="font-sans text-sm text-gray-500 uppercase tracking-wider mt-1"><%= m.role %></p>
+                    </div>
+                </a>
+            <% }) %>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ CTA BLOCK ═══════════════ -->
+<section class="bg-[#0f2e22]">
+    <div class="max-w-screen-xl mx-auto px-8 md:px-16 py-20 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+        <div>
+            <h2 class="font-serif text-3xl md:text-4xl text-white mb-3">Contact Our Team.</h2>
+            <p class="font-sans text-lg text-white/70 max-w-xl">Reach out to discuss our investment approach, portfolio performance, or general inquiries.</p>
+        </div>
+        <a href="/contact" class="inline-block font-sans text-sm font-bold text-[#0f2e22] bg-white px-10 py-4 uppercase tracking-wider hover:bg-[#f9f8f6] transition-colors rounded-none whitespace-nowrap">Get in Touch</a>
+    </div>
+</section>
+
+<%- include('../partials/footer') %>

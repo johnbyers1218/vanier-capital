@@ -1,15 +1,62 @@
-# Add any other sensitive files like downloaded service account keys if not in .env
+# =========================================
+# Vanier Capital — .gitignore
+# =========================================
+
+# ----- Dependencies -----
 node_modules/
-.env*
-.env.production
-.env.development
-*.log
+
+# ----- Environment & Secrets -----
+.env
+.env.*
+!.env.example
 key.pem
 cert.pem
 service-account-key.json
+
+# ----- Logs -----
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-# Add any other OS-specific or editor-specific files (e.g., .DS_Store, .vscode/)
+
+# ----- Testing & Coverage -----
+coverage/
+.nyc_output/
+test-results/
+
+# ----- Database Dumps & Backups (PII risk) -----
+dump/
+dump-*/
+*.bak
+*.bson
+*.sqlite
+
+# ----- Build Artifacts -----
+tailwind-debug-content.html
+
+# ----- AI & Code Analysis -----
+repomix-output.xml
+repomix-output.txt
+repomix-output.md
+.cursor/
+.copilot/
+
+# ----- OS Generated -----
 .DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ----- Editor / IDE -----
 .vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ----- Node Runtime -----
+.npm/
+*.pid
+*.seed
+*.pid.lock

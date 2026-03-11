@@ -1,13 +1,13 @@
 <%# views/admin/properties/edit.ejs %>
-<%# Form for adding or editing a property with Rich Text Editor & Cover Image Upload %>
+<%# Form for adding or editing a Portfolio Track Record asset %>
 
-<%- include('../partials/header', { pageTitle: editing ? 'Edit Property' : 'Add New Property' }) %>
+<%- include('../partials/header', { pageTitle: editing ? 'Edit Portfolio Asset' : 'Add New Portfolio Asset' }) %>
 
 <div class="admin-form-container">
-    <h2><%= editing ? 'Edit Property' : 'Add New Property' %></h2>
+    <h2><%= editing ? 'Edit Portfolio Asset' : 'Add New Portfolio Asset' %></h2>
 
-    <div class="info-panel" style="margin: 12px 0 20px 0; padding: 12px 14px; border: 1px solid #374151; border-radius: 8px; background: #111827; color: #d1d5db;">
-        <strong style="color:#93c5fd;">Tip:</strong> Properties use curated Property Types and optional rental details to help power the public listings.
+    <div class="info-panel" style="margin: 12px 0 20px 0; padding: 12px 14px; border: 1px solid rgba(15,46,34,0.2); background: rgba(15,46,34,0.05); color: #4b5563;">
+        <strong style="color:#0f2e22;">Portfolio Track Record</strong> — Each entry represents a macro portfolio strategy or asset aggregation (e.g., "Columbus SFR Portfolio"). Not individual addresses.
     </div>
 
     <% const __errorMap = (typeof errorMap !== 'undefined' && errorMap) ? errorMap : {}; %>
@@ -29,190 +29,255 @@
     <form action="<%= editing ? '/admin/properties/edit/' + property._id : '/admin/properties' %>" method="POST" class="admin-form" id="propertyForm" enctype="multipart/form-data">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-        <div class="form-group <%= __errorMap.title ? 'has-error' : '' %>">
-            <label for="title" class="<%= __errorMap.title ? 'label-error' : '' %>">Property Title <span style="color: #dc3545;">*</span></label>
-            <input type="text" id="title" name="title" value="<%= property && property.title ? property.title : '' %>" required maxlength="150" class="<%= __errorMap.title ? 'input-error' : '' %>">
-            <% if (__errorMap.title) { %><div class="field-error"><%= __errorMap.title[0] %></div><% } %>
-        </div>
+        <%# ══════════ SECTION: IDENTITY ══════════ %>
+        <fieldset style="border: 1px solid rgba(15,46,34,0.15); padding: 20px; margin-bottom: 24px;">
+            <legend style="font-weight: 700; color: #0f2e22; text-transform: uppercase; font-size: 11px; letter-spacing: 0.1em; padding: 0 8px;">Identity</legend>
 
-    <div class="form-group <%= __errorMap.slug ? 'has-error' : '' %>">
-            <label for="slug">URL Slug</label>
-            <input type="text" id="slug" name="slug" value="<%= property && property.slug ? property.slug : '' %>" maxlength="200" pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$" placeholder="auto-generated-if-blank-from-title" class="<%= __errorMap.slug ? 'input-error' : '' %>">
-            <small>URL-friendly ID. Leave blank to auto-generate from title. Unique, lowercase, numbers, hyphens only.</small>
-            <% if (__errorMap.slug) { %><div class="field-error"><%= __errorMap.slug[0] %></div><% } %>
-        </div>
-
-        <%# ****** PROPERTY PHOTOS SECTION ****** %>
-        <div class="form-group">
-            <label for="image">Cover Photo (Optional)</label>
-            <% if (property && property.image) { %>
-                <div style="margin-bottom: 10px;">
-                    <img src="<%= property.image %>" alt="Current Cover" style="max-width: 200px; border-radius: 4px;">
-                    <input type="hidden" name="image" value="<%= property.image %>">
-                    <p style="font-size: 0.9em; color: #9ca3af;">Current Cover Photo</p>
-                </div>
-            <% } %>
-            <input type="file" id="image" name="image" accept="image/*">
-            <small>Upload a new file to replace the current cover photo. This photo will be used on homepage cards.</small>
-            <% if (__errorMap.image) { %><div class="field-error"><%= __errorMap.image[0] %></div><% } %>
-        </div>
-
-        <div class="form-group">
-            <label for="galleryImages">Property Gallery Photos</label>
-            <input type="file" id="galleryImages" name="galleryImages" multiple accept="image/*">
-            <small>Select multiple photos to add to the gallery.</small>
-            
-            <% if (property && property.galleryImages && property.galleryImages.length > 0) { %>
-                <div style="margin-top: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;">
-                    <% property.galleryImages.forEach((img, index) => { %>
-                        <div style="border: 1px solid #374151; padding: 5px; border-radius: 4px; background: #1f2937;">
-                            <img src="<%= img %>" alt="Gallery Image" style="width: 100%; height: 100px; object-fit: cover; border-radius: 2px;">
-                            <div style="margin-top: 5px;">
-                                <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;">
-                                    <input type="checkbox" name="galleryImages" value="<%= img %>" checked style="margin-right: 5px;">
-                                    Keep
-                                </label>
-                            </div>
-                        </div>
-                    <% }); %>
-                </div>
-            <% } %>
-        </div>
-        <%# ****** END PROPERTY PHOTOS SECTION ****** %>
-
-        <div class="form-group <%= __errorMap.description ? 'has-error' : '' %>">
-            <label for="property-description-editor">Full Description / Case Study</label>
-            <textarea id="property-description-editor" name="description" class="richtext-editor <%= __errorMap.description ? 'input-error' : '' %>" style="visibility: hidden; min-height: 400px;"><%= property && property.description ? property.description : '' %></textarea>
-            <small>Detailed property information. Use the editor for formatting. <a href="/AUTHORING_GUIDE.md" target="_blank" rel="noopener noreferrer">Authoring Guide</a></small>
-            <% if (__errorMap.description) { %><div class="field-error"><%= __errorMap.description[0] %></div><% } %>
-        </div>
-
-        <div class="form-group <%= __errorMap.excerpt ? 'has-error' : '' %>">
-            <label for="propertyExcerpt">Excerpt / Summary</label>
-            <textarea id="propertyExcerpt" name="excerpt" rows="3" maxlength="250" oninput="document.getElementById('propertyExcerptCounter').textContent = this.value.length + '/250'"><%= property && property.excerpt ? property.excerpt : '' %></textarea>
-            <div class="muted" style="display:flex;justify-content:space-between;">
-                <small>Appears on cards and previews (max 250 chars).</small>
-                <small id="propertyExcerptCounter"><%= property && property.excerpt ? property.excerpt.length : 0 %>/250</small>
+            <div class="form-group <%= __errorMap.title ? 'has-error' : '' %>">
+                <label for="title" class="<%= __errorMap.title ? 'label-error' : '' %>">Asset Title <span style="color: #dc3545;">*</span></label>
+                <input type="text" id="title" name="title" value="<%= property && property.title ? property.title : '' %>" required maxlength="150" class="<%= __errorMap.title ? 'input-error' : '' %>" placeholder="e.g. Columbus SFR Portfolio">
+                <% if (__errorMap.title) { %><div class="field-error"><%= __errorMap.title[0] %></div><% } %>
             </div>
-            <% if (__errorMap.excerpt) { %><div class="field-error"><%= __errorMap.excerpt[0] %></div><% } %>
-        </div>
 
-        <div class="form-group">
-            <label for="link">Property Link (Optional)</label>
-            <input type="url" id="link" name="link" value="<%= property && property.link ? property.link : '' %>" placeholder="https://example.com">
-            <small>External link to the live property or case study.</small>
-        </div>
+            <div class="form-group">
+                <label for="portfolioName">Portfolio Name</label>
+                <input type="text" id="portfolioName" name="portfolioName" value="<%= property && property.portfolioName ? property.portfolioName : '' %>" maxlength="200" placeholder="e.g. Columbus SFR Portfolio">
+                <small>Display name on public portfolio page (falls back to Title).</small>
+            </div>
 
-        <div class="form-group">
-            <label for="propertyType">Property Type</label>
-            <select id="propertyType" name="propertyType">
-                <option value="">Select Type...</option>
-                <% const types = ['Multifamily', 'Single Family', 'Industrial', 'Office', 'Retail', 'Hospitality', 'Mixed-Use', 'Land', 'Special Purpose']; %>
-                <% types.forEach(type => { %>
-                    <option value="<%= type %>" <%= (property && property.propertyType === type) ? 'selected' : '' %>><%= type %></option>
-                <% }); %>
-            </select>
-        </div>
+            <div class="form-group">
+                <label for="subtitle">Subtitle / Eyebrow</label>
+                <input type="text" id="subtitle" name="subtitle" value="<%= property && property.subtitle ? property.subtitle : '' %>" maxlength="200" placeholder="e.g. Columbus, GA MSA | Core-Plus">
+                <small>Appears above the title on tear sheets.</small>
+            </div>
 
-        <div class="form-group">
-            <label for="value">Property Value (AUM)</label>
-            <input type="number" id="value" name="value" value="<%= property && property.value ? property.value : '' %>" placeholder="e.g. 1500000">
-        </div>
+            <div class="form-group <%= __errorMap.slug ? 'has-error' : '' %>">
+                <label for="slug">URL Slug</label>
+                <input type="text" id="slug" name="slug" value="<%= property && property.slug ? property.slug : '' %>" maxlength="200" pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$" placeholder="auto-generated-if-blank" class="<%= __errorMap.slug ? 'input-error' : '' %>">
+                <small>URL-friendly ID. Leave blank to auto-generate from title.</small>
+                <% if (__errorMap.slug) { %><div class="field-error"><%= __errorMap.slug[0] %></div><% } %>
+            </div>
 
-        <div class="form-group">
-            <label for="monthlyRent">Monthly Rent</label>
-            <input type="number" id="monthlyRent" name="monthlyRent" value="<%= property && property.monthlyRent ? property.monthlyRent : '' %>" placeholder="e.g. 1200">
-        </div>
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" name="status">
+                    <option value="">Select Status...</option>
+                    <% const statuses = ['Active Sourcing', 'Stabilized & Yielding', 'Realized / Exited']; %>
+                    <% statuses.forEach(s => { %>
+                        <option value="<%= s %>" <%= (property && property.status === s) ? 'selected' : '' %>><%= s %></option>
+                    <% }); %>
+                </select>
+            </div>
 
-        <div class="form-group">
-            <label for="ltv">Loan-to-Value (LTV)</label>
-            <input type="text" id="ltv" name="ltv" value="<%= property && property.ltv ? property.ltv : '' %>" placeholder="e.g. 75%">
-        </div>
+            <div class="form-group">
+                <label for="lifecycle">Lifecycle</label>
+                <select id="lifecycle" name="lifecycle">
+                    <option value="Holding" <%= (property && property.lifecycle === 'Holding') || (!property || !property.lifecycle) ? 'selected' : '' %>>Holding</option>
+                    <option value="Pipeline" <%= (property && property.lifecycle === 'Pipeline') ? 'selected' : '' %>>Pipeline</option>
+                </select>
+                <small>Controls header nav grouping: "Current Holdings" vs "Pipeline".</small>
+            </div>
+        </fieldset>
 
-        <div class="form-group">
-            <label for="noi">Net Operating Income (NOI)</label>
-            <input type="number" id="noi" name="noi" value="<%= property && property.noi ? property.noi : '' %>" placeholder="e.g. 25000">
-        </div>
+        <%# ══════════ SECTION: COVER PHOTO ══════════ %>
+        <fieldset style="border: 1px solid rgba(15,46,34,0.15); padding: 20px; margin-bottom: 24px;">
+            <legend style="font-weight: 700; color: #0f2e22; text-transform: uppercase; font-size: 11px; letter-spacing: 0.1em; padding: 0 8px;">Cover Photo</legend>
 
-        <div class="form-group">
-            <label for="capRate">Cap Rate</label>
-            <input type="text" id="capRate" name="capRate" value="<%= property && property.capRate ? property.capRate : '' %>" placeholder="e.g. 7.5%">
-        </div>
+            <div class="form-group">
+                <label for="image">Cover Photo (Optional)</label>
+                <% if (property && property.image) { %>
+                    <div style="margin-bottom: 10px;">
+                        <img src="<%= property.image %>" alt="Current Cover" style="max-width: 200px;">
+                        <input type="hidden" name="image" value="<%= property.image %>">
+                        <p style="font-size: 0.9em; color: #6b7280;">Current Cover Photo</p>
+                    </div>
+                <% } %>
+                <input type="file" id="image" name="image" accept="image/*">
+                <small>Upload a new file to replace the current cover photo.</small>
+            </div>
 
-        <div class="form-group">
-            <label for="bedrooms">Bedrooms</label>
-            <input type="number" id="bedrooms" name="bedrooms" value="<%= property && property.bedrooms ? property.bedrooms : '' %>" placeholder="e.g. 3">
-        </div>
+            <div class="form-group">
+                <label for="galleryImages">Gallery Photos</label>
+                <input type="file" id="galleryImages" name="galleryImages" multiple accept="image/*">
+                <small>Select multiple photos to add to the gallery.</small>
+                <% if (property && property.galleryImages && property.galleryImages.length > 0) { %>
+                    <div style="margin-top: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;">
+                        <% property.galleryImages.forEach((img, index) => { %>
+                            <div style="border: 1px solid rgba(15,46,34,0.2); padding: 5px; background: #f9f8f6;">
+                                <img src="<%= img %>" alt="Gallery Image" style="width: 100%; height: 100px; object-fit: cover;">
+                                <div style="margin-top: 5px;">
+                                    <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer; color: #1a1a1a;">
+                                        <input type="checkbox" name="galleryImages" value="<%= img %>" checked style="margin-right: 5px;"> Keep
+                                    </label>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } %>
+            </div>
+        </fieldset>
 
-        <div class="form-group">
-            <label for="bathrooms">Bathrooms</label>
-            <input type="number" id="bathrooms" name="bathrooms" value="<%= property && property.bathrooms ? property.bathrooms : '' %>" placeholder="e.g. 2" step="0.5">
-        </div>
+        <%# ══════════ SECTION: METRICS ══════════ %>
+        <fieldset style="border: 1px solid rgba(15,46,34,0.15); padding: 20px; margin-bottom: 24px;">
+            <legend style="font-weight: 700; color: #0f2e22; text-transform: uppercase; font-size: 11px; letter-spacing: 0.1em; padding: 0 8px;">Metrics</legend>
 
-        <div class="form-group">
-            <label for="sqft">Square Footage</label>
-            <input type="number" id="sqft" name="sqft" value="<%= property && property.sqft ? property.sqft : '' %>" placeholder="e.g. 1500">
-        </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px;">
+                <div class="form-group">
+                    <label for="doors">Doors / Units</label>
+                    <input type="number" id="doors" name="doors" value="<%= property && property.doors ? property.doors : '' %>" placeholder="e.g. 7">
+                </div>
 
-        <div class="checkbox-group">
-            <label class="checkbox-container">
-                <input type="checkbox" name="isAvailableForRent" id="isAvailableForRent" <%= property && property.isAvailableForRent ? 'checked' : '' %>>
-                <span class="checkmark"></span>
-                Available For Rent (Currently Vacant)
-            </label>
-        </div>
+                <div class="form-group">
+                    <label for="occupancy">Blended Occupancy</label>
+                    <input type="text" id="occupancy" name="occupancy" value="<%= property && property.occupancy ? property.occupancy : '' %>" placeholder="e.g. 98%">
+                    <small>Portfolio-wide stabilized occupancy.</small>
+                </div>
 
-        <div class="form-group" id="rentalApplicationUrlGroup" style="display: none;">
-            <label for="rentalApplicationUrl">Rental Application Link</label>
-            <input type="url" id="rentalApplicationUrl" name="rentalApplicationUrl" value="<%= property && property.rentalApplicationUrl ? property.rentalApplicationUrl : '' %>" placeholder="https://apply.example.com">
-            <small>Shown as an “Apply Here” button on the For Rent page.</small>
-        </div>
+                <div class="form-group">
+                    <label for="strategy">Strategy</label>
+                    <input type="text" id="strategy" name="strategy" value="<%= property && property.strategy ? property.strategy : '' %>" placeholder="e.g. SFR Aggregation">
+                </div>
 
-        <div class="checkbox-group">
-            <label class="checkbox-container">
-                <input type="checkbox" name="isFeatured" <%= property && property.isFeatured ? 'checked' : '' %>>
-                <span class="checkmark"></span>
-                Featured Property (Show at top of lists)
-            </label>
-        </div>
+                <div class="form-group">
+                    <label for="assetClass">Asset Class</label>
+                    <input type="text" id="assetClass" name="assetClass" value="<%= property && property.assetClass ? property.assetClass : '' %>" placeholder="e.g. Single-Family Residential">
+                </div>
 
-        <div class="checkbox-group">
-            <label class="checkbox-container">
-                <input type="checkbox" name="isFeaturedOnHomepage" <%= property && property.isFeaturedOnHomepage ? 'checked' : '' %>>
-                <span class="checkmark"></span>
-                Show on Homepage
-            </label>
-        </div>
+                <div class="form-group">
+                    <label for="holdPeriod">Hold Period</label>
+                    <input type="text" id="holdPeriod" name="holdPeriod" value="<%= property && property.holdPeriod ? property.holdPeriod : '' %>" placeholder="e.g. Long-Term">
+                </div>
+            </div>
+        </fieldset>
 
-        <div class="checkbox-group">
-            <label class="checkbox-container">
-                <input type="checkbox" name="isPubliclyVisible" <%= (property && property.isPubliclyVisible !== false) ? 'checked' : '' %>>
-                <span class="checkmark"></span>
-                Publicly Visible (Uncheck to hide from visitors)
-            </label>
-        </div>
+        <%# ══════════ SECTION: FINANCIALS ══════════ %>
+        <fieldset style="border: 1px solid rgba(15,46,34,0.15); padding: 20px; margin-bottom: 24px;">
+            <legend style="font-weight: 700; color: #0f2e22; text-transform: uppercase; font-size: 11px; letter-spacing: 0.1em; padding: 0 8px;">Portfolio Financials</legend>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px;">
+                <div class="form-group">
+                    <label for="acquisitionBasis">Acquisition Basis ($)</label>
+                    <input type="text" id="acquisitionBasis" name="acquisitionBasis" value="<%= property && property.acquisitionBasis ? property.acquisitionBasis : '' %>" placeholder="e.g. $485,000">
+                    <small>Total purchase price + closing costs.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="capexDeployed">CapEx Deployed ($)</label>
+                    <input type="text" id="capexDeployed" name="capexDeployed" value="<%= property && property.capexDeployed ? property.capexDeployed : '' %>" placeholder="e.g. $127,000">
+                    <small>Total renovation dollars deployed to date.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="currentNOI">Current NOI ($)</label>
+                    <input type="text" id="currentNOI" name="currentNOI" value="<%= property && property.currentNOI ? property.currentNOI : '' %>" placeholder="e.g. $62,400">
+                    <small>Net Operating Income (annualized).</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="targetIRR">Target IRR (%)</label>
+                    <input type="text" id="targetIRR" name="targetIRR" value="<%= property && property.targetIRR ? property.targetIRR : '' %>" placeholder="e.g. 15%+">
+                    <small>Primary value-story metric.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="cashOnCashYield">Yield on Cost (%)</label>
+                    <input type="text" id="cashOnCashYield" name="cashOnCashYield" value="<%= property && property.cashOnCashYield ? property.cashOnCashYield : '' %>" placeholder="e.g. 10.2%">
+                    <small>Proves value manufacture through CapEx.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="developmentSpread">Development Spread (bps)</label>
+                    <input type="text" id="developmentSpread" name="developmentSpread" value="<%= property && property.developmentSpread ? property.developmentSpread : '' %>" placeholder="e.g. 250 bps">
+                    <small>Delta between Yield on Cost and Market Cap Rate.</small>
+                </div>
+            </div>
+        </fieldset>
+
+        <%# ══════════ SECTION: NARRATIVE ══════════ %>
+        <fieldset style="border: 1px solid rgba(15,46,34,0.15); padding: 20px; margin-bottom: 24px;">
+            <legend style="font-weight: 700; color: #0f2e22; text-transform: uppercase; font-size: 11px; letter-spacing: 0.1em; padding: 0 8px;">Narrative</legend>
+
+            <div class="form-group">
+                <label for="summary">Summary</label>
+                <textarea id="summary" name="summary" rows="3" placeholder="Short overview for the portfolio index listing..."><%= property && property.summary ? property.summary : '' %></textarea>
+                <small>Appears on portfolio listing cards.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="thesis">The Investment Thesis</label>
+                <textarea id="thesis" name="thesis" rows="6" placeholder="Why this deal? What is the macro-level thesis driving the acquisition and value-add strategy?"><%= property && property.thesis ? property.thesis : '' %></textarea>
+                <small>Long-form investment thesis for the case study tear sheet.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="execution">Operational Execution</label>
+                <textarea id="execution" name="execution" rows="6" placeholder="How was value manufactured? CapEx execution, operational turnaround, and results achieved."><%= property && property.execution ? property.execution : '' %></textarea>
+                <small>Operational execution narrative — CapEx deployment, NOI growth, stabilization milestones.</small>
+            </div>
+
+            <div class="form-group <%= __errorMap.excerpt ? 'has-error' : '' %>">
+                <label for="propertyExcerpt">Excerpt / Card Summary</label>
+                <textarea id="propertyExcerpt" name="excerpt" rows="3" maxlength="250" oninput="document.getElementById('propertyExcerptCounter').textContent = this.value.length + '/250'"><%= property && property.excerpt ? property.excerpt : '' %></textarea>
+                <div class="muted" style="display:flex;justify-content:space-between;">
+                    <small>Homepage cards (max 250 chars).</small>
+                    <small id="propertyExcerptCounter"><%= property && property.excerpt ? property.excerpt.length : 0 %>/250</small>
+                </div>
+                <% if (__errorMap.excerpt) { %><div class="field-error"><%= __errorMap.excerpt[0] %></div><% } %>
+            </div>
+
+            <div class="form-group <%= __errorMap.description ? 'has-error' : '' %>">
+                <label for="property-description-editor">Extended Case Study (Rich Text)</label>
+                <textarea id="property-description-editor" name="description" class="richtext-editor <%= __errorMap.description ? 'input-error' : '' %>" style="visibility: hidden; min-height: 400px;"><%= property && property.description ? property.description : '' %></textarea>
+                <small>Optional rich-text body content for extended case studies.</small>
+                <% if (__errorMap.description) { %><div class="field-error"><%= __errorMap.description[0] %></div><% } %>
+            </div>
+        </fieldset>
+
+        <%# ══════════ SECTION: VISIBILITY ══════════ %>
+        <fieldset style="border: 1px solid rgba(15,46,34,0.15); padding: 20px; margin-bottom: 24px;">
+            <legend style="font-weight: 700; color: #0f2e22; text-transform: uppercase; font-size: 11px; letter-spacing: 0.1em; padding: 0 8px;">Visibility</legend>
+
+            <div class="checkbox-group">
+                <label class="checkbox-container">
+                    <input type="checkbox" name="isFeatured" <%= property && property.isFeatured ? 'checked' : '' %>>
+                    <span class="checkmark"></span>
+                    Featured Asset (Show at top of lists)
+                </label>
+            </div>
+
+            <div class="checkbox-group">
+                <label class="checkbox-container">
+                    <input type="checkbox" name="isFeaturedOnHomepage" <%= property && property.isFeaturedOnHomepage ? 'checked' : '' %>>
+                    <span class="checkmark"></span>
+                    Show on Homepage
+                </label>
+            </div>
+
+            <div class="checkbox-group">
+                <label class="checkbox-container">
+                    <input type="checkbox" name="isPubliclyVisible" <%= (property && property.isPubliclyVisible !== false) ? 'checked' : '' %>>
+                    <span class="checkmark"></span>
+                    Publicly Visible (Uncheck to hide from visitors)
+                </label>
+            </div>
+        </fieldset>
 
         <div class="form-actions">
             <a href="/admin/properties" class="btn-secondary">Cancel</a>
-            <button type="submit" class="btn-primary"><%= editing ? 'Update Property' : 'Create Property' %></button>
+            <button type="submit" class="btn-primary"><%= editing ? 'Update Portfolio Asset' : 'Create Portfolio Asset' %></button>
         </div>
     </form>
 </div>
 
 <%- include('../partials/tinymce-setup', { selector: '.richtext-editor', apiKey: tinymceApiKey }) %>
-<%- include('../partials/footer') %>
-
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const rentCheckbox = document.getElementById('isAvailableForRent');
-        const rentalLinkGroup = document.getElementById('rentalApplicationUrlGroup');
-        const toggleRentalLink = () => {
-            if (!rentCheckbox || !rentalLinkGroup) return;
-            rentalLinkGroup.style.display = rentCheckbox.checked ? 'block' : 'none';
-        };
-        toggleRentalLink();
-        if (rentCheckbox) {
-            rentCheckbox.addEventListener('change', toggleRentalLink);
-        }
-    });
+document.addEventListener('DOMContentLoaded', function() {
+    var form = document.getElementById('propertyForm');
+    if (form) {
+        form.addEventListener('submit', function() {
+            if (typeof tinymce !== 'undefined') { tinymce.triggerSave(); }
+        });
+    }
+});
 </script>
+<%- include('../partials/footer') %>

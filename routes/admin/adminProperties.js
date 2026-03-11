@@ -1,4 +1,4 @@
-// routes/admin/adminProperties.js (Renamed from adminProjects.js)
+// routes/admin/adminProperties.js
 
 import express from 'express';
 import { body, param, validationResult } from 'express-validator';
@@ -43,7 +43,7 @@ export default (csrfProtection) => {
     const propertyValidationRules = [
         body('title', 'Property title must be 3-150 characters and unique.')
             .trim().isLength({ min: 3, max: 150 })
-            .custom(async (value, { req }) => { // Check title uniqueness
+            .custom(async (value, { req }) => {
                 const query = { title: value };
                 if (req.params.id) { query._id = { $ne: req.params.id }; }
                 const existingProperty = await Property.findOne(query).lean();
@@ -53,7 +53,7 @@ export default (csrfProtection) => {
         body('slug', 'Slug format invalid. Leave blank to auto-generate. Must be unique.')
             .optional({ checkFalsy: true }).trim().isSlug().isLength({ max: 200 })
             .custom(async (value, { req }) => {
-                if (!value) return true; // Allow empty for auto-generation
+                if (!value) return true;
                 const query = { slug: value };
                 if (req.params.id) { query._id = { $ne: req.params.id }; }
                 const existingProperty = await Property.findOne(query).lean();
@@ -78,8 +78,6 @@ export default (csrfProtection) => {
             })
             .escape(),
         body('image').optional({ checkFalsy: true }).trim(),
-        body('link', 'Property Link must be a valid URL (starting with http or https).')
-            .optional({ checkFalsy: true }).trim().isURL(),
         body('isFeatured', 'Featured status must be a boolean value.')
             .customSanitizer(v => (v === undefined ? 'false' : (v === 'on' ? 'true' : String(v))))
             .isIn(['true','false'])
@@ -88,25 +86,32 @@ export default (csrfProtection) => {
             .customSanitizer(v => (v === undefined ? 'false' : (v === 'on' ? 'true' : String(v))))
             .isIn(['true','false'])
             .toBoolean(),
-        body('propertyType').optional({ checkFalsy: true }).trim(),
-        body('ltv').optional({ checkFalsy: true }).trim(),
-        numericField('value'),
-        numericField('monthlyRent'),
-        numericField('noi'),
-        body('capRate').optional({ checkFalsy: true }).trim(),
-        numericField('bedrooms'),
-        numericField('bathrooms'),
-        numericField('sqft'),
-        body('isAvailableForRent', 'Available for rent status must be a boolean value.')
-            .customSanitizer(v => (v === undefined ? 'false' : (v === 'on' ? 'true' : String(v))))
-            .isIn(['true','false'])
-            .toBoolean(),
-        body('rentalApplicationUrl', 'Rental application link must be a valid URL (starting with http or https).')
-            .optional({ checkFalsy: true }).trim().isURL(),
         body('isFeaturedOnHomepage', 'Homepage feature status must be a boolean value.')
             .customSanitizer(v => (v === undefined ? 'false' : (v === 'on' ? 'true' : String(v))))
             .isIn(['true','false'])
-            .toBoolean()
+            .toBoolean(),
+        // Identity
+        body('portfolioName').optional({ checkFalsy: true }).trim(),
+        body('subtitle').optional({ checkFalsy: true }).trim(),
+        // Metrics
+        body('doors').optional({ checkFalsy: true }).customSanitizer(normalizeNumericInput).isNumeric().toFloat(),
+        body('occupancy').optional({ checkFalsy: true }).trim(),
+        body('strategy').optional({ checkFalsy: true }).trim(),
+        body('assetClass').optional({ checkFalsy: true }).trim(),
+        body('status').optional({ checkFalsy: true }).trim(),
+        body('lifecycle').optional({ checkFalsy: true }).trim().isIn(['Holding', 'Pipeline', '']),
+        body('holdPeriod').optional({ checkFalsy: true }).trim(),
+        body('targetIRR').optional({ checkFalsy: true }).trim(),
+        // Financials
+        body('acquisitionBasis').optional({ checkFalsy: true }).trim(),
+        body('capexDeployed').optional({ checkFalsy: true }).trim(),
+        body('currentNOI').optional({ checkFalsy: true }).trim(),
+        body('cashOnCashYield').optional({ checkFalsy: true }).trim(),
+        body('developmentSpread').optional({ checkFalsy: true }).trim(),
+        // Narrative
+        body('summary').optional({ checkFalsy: true }).trim(),
+        body('thesis').optional({ checkFalsy: true }).trim(),
+        body('execution').optional({ checkFalsy: true }).trim(),
     ];
 
     router.post(
@@ -128,8 +133,8 @@ export default (csrfProtection) => {
             const properties = await Property.find(filter)
                 .sort({ createdAt: -1 })
                 .lean();
-            res.render('admin/properties/index', {
-                properties, pageTitle: 'Manage Properties', path: '/admin/properties', csrfToken: req.csrfToken(), status
+            return res.render('admin/properties/index', {
+                properties, pageTitle: 'Manage Portfolio Track Record', path: '/admin/properties', csrfToken: req.csrfToken(), status
             });
         } catch (err) {
             logger.error('[Admin Properties] Error fetching property list:', err);
@@ -141,7 +146,7 @@ export default (csrfProtection) => {
     router.get('/new', csrfProtection, async (req, res, next) => {
         logger.debug(`[Admin Properties] GET /new - Request from user: ${req.adminUser.username}`);
         try {
-            res.render('admin/properties/edit', {
+            return res.render('admin/properties/edit', {
                 property: { isPubliclyVisible: true }, // Default new to public
                 editing: false, pageTitle: 'Add New Property', path: '/admin/properties',
                 csrfToken: req.csrfToken(), errorMessages: [], errorMap: {},
@@ -199,21 +204,27 @@ export default (csrfProtection) => {
             excerpt: req.body.excerpt,
             image: imageUrl, 
             galleryImages: galleryUrls,
-            link: req.body.link,
             isFeatured: !!req.body.isFeatured,
             isPubliclyVisible: !!req.body.isPubliclyVisible,
             isFeaturedOnHomepage: !!req.body.isFeaturedOnHomepage,
-            propertyType: req.body.propertyType,
-            value: req.body.value,
-            monthlyRent: req.body.monthlyRent,
-            ltv: req.body.ltv,
-            noi: req.body.noi,
-            capRate: req.body.capRate,
-            bedrooms: req.body.bedrooms,
-            bathrooms: req.body.bathrooms,
-            sqft: req.body.sqft,
-            isAvailableForRent: !!req.body.isAvailableForRent,
-            rentalApplicationUrl: req.body.rentalApplicationUrl
+            portfolioName: req.body.portfolioName,
+            subtitle: req.body.subtitle,
+            doors: req.body.doors,
+            occupancy: req.body.occupancy,
+            strategy: req.body.strategy,
+            assetClass: req.body.assetClass,
+            status: req.body.status,
+            lifecycle: req.body.lifecycle,
+            holdPeriod: req.body.holdPeriod,
+            targetIRR: req.body.targetIRR,
+            acquisitionBasis: req.body.acquisitionBasis,
+            capexDeployed: req.body.capexDeployed,
+            currentNOI: req.body.currentNOI,
+            cashOnCashYield: req.body.cashOnCashYield,
+            developmentSpread: req.body.developmentSpread,
+            summary: req.body.summary,
+            thesis: req.body.thesis,
+            execution: req.body.execution,
         };
 
         if (!errors.isEmpty()) {
@@ -225,7 +236,7 @@ export default (csrfProtection) => {
             }, {});
             return res.status(422).render('admin/properties/edit', {
                 property: propertyDataForRender,
-                editing: false, pageTitle: 'Add New Property (Errors)',
+                editing: false, pageTitle: 'Add New Portfolio Asset (Errors)',
                 path: '/admin/properties', csrfToken: req.csrfToken(), errorMessages: errors.array(), errorMap,
                 tinymceApiKey: process.env.TINYMCE_API_KEY || 'no-api-key'
             });
@@ -241,27 +252,33 @@ export default (csrfProtection) => {
                     excerpt: req.body.excerpt,
                     image: imageUrl,
                     galleryImages: galleryUrls,
-                    link: req.body.link,
                     isFeatured: !!req.body.isFeatured,
                     isPubliclyVisible: !!req.body.isPubliclyVisible,
                     isFeaturedOnHomepage: !!req.body.isFeaturedOnHomepage,
-                    propertyType: req.body.propertyType,
-                    value: req.body.value,
-                    monthlyRent: req.body.monthlyRent,
-                    ltv: req.body.ltv,
-                    noi: req.body.noi,
-                    capRate: req.body.capRate,
-                    bedrooms: req.body.bedrooms,
-                    bathrooms: req.body.bathrooms,
-                    sqft: req.body.sqft,
-                    isAvailableForRent: !!req.body.isAvailableForRent,
-                    rentalApplicationUrl: req.body.rentalApplicationUrl
+                    portfolioName: req.body.portfolioName,
+                    subtitle: req.body.subtitle,
+                    doors: req.body.doors,
+                    occupancy: req.body.occupancy,
+                    strategy: req.body.strategy,
+                    assetClass: req.body.assetClass,
+                    status: req.body.status,
+                    lifecycle: req.body.lifecycle,
+                    holdPeriod: req.body.holdPeriod,
+                    targetIRR: req.body.targetIRR,
+                    acquisitionBasis: req.body.acquisitionBasis,
+                    capexDeployed: req.body.capexDeployed,
+                    currentNOI: req.body.currentNOI,
+                    cashOnCashYield: req.body.cashOnCashYield,
+                    developmentSpread: req.body.developmentSpread,
+                    summary: req.body.summary,
+                    thesis: req.body.thesis,
+                    execution: req.body.execution,
                 });
                 await newProperty.save();
                 await logAdminAction(req.adminUser.userId, req.adminUser.username, 'create_property', `Title: ${newProperty.title}`, req.ip);
                 logger.info(`[Admin Properties] New property created: '${newProperty.title}' by ${req.adminUser.username}`);
                 req.flash('success', 'Property created successfully!');
-                res.redirect('/admin/properties');
+                return res.redirect('/admin/properties');
             } catch (err) {
                 logger.error(`[Admin Properties] Error saving new property:`, { error: err.message, stack: err.stack });
                 const errorMessagesList = [{ msg: err.message || 'Server error saving property.' }];
@@ -271,7 +288,7 @@ export default (csrfProtection) => {
                 }
                 return res.status(err.code === 11000 ? 409 : 500).render('admin/properties/edit', {
                     property: propertyDataForRender,
-                    editing: false, pageTitle: 'Add New Property (Error)',
+                    editing: false, pageTitle: 'Add New Portfolio Asset (Error)',
                     path: '/admin/properties', csrfToken: req.csrfToken(), errorMessages: errorMessagesList, errorMap: {},
                     tinymceApiKey: process.env.TINYMCE_API_KEY || 'no-api-key'
                 });
@@ -293,7 +310,7 @@ export default (csrfProtection) => {
                 ...property
             };
 
-            res.render('admin/properties/edit', {
+            return res.render('admin/properties/edit', {
                 property: propertyDataForForm,
                 editing: true, pageTitle: 'Edit Property',
                 path: '/admin/properties', csrfToken: req.csrfToken(), errorMessages: [], errorMap: {},
@@ -354,20 +371,26 @@ export default (csrfProtection) => {
             excerpt: req.body.excerpt,
             image: imageUrl,
             galleryImages: galleryUrls,
-            link: req.body.link,
             isFeatured: !!req.body.isFeatured, isPubliclyVisible: !!req.body.isPubliclyVisible,
             isFeaturedOnHomepage: !!req.body.isFeaturedOnHomepage,
-            propertyType: req.body.propertyType,
-            value: req.body.value,
-            monthlyRent: req.body.monthlyRent,
-            ltv: req.body.ltv,
-            noi: req.body.noi,
-            capRate: req.body.capRate,
-            bedrooms: req.body.bedrooms,
-            bathrooms: req.body.bathrooms,
-            sqft: req.body.sqft,
-            isAvailableForRent: !!req.body.isAvailableForRent,
-            rentalApplicationUrl: req.body.rentalApplicationUrl
+            portfolioName: req.body.portfolioName,
+            subtitle: req.body.subtitle,
+            doors: req.body.doors,
+            occupancy: req.body.occupancy,
+            strategy: req.body.strategy,
+            assetClass: req.body.assetClass,
+            status: req.body.status,
+            lifecycle: req.body.lifecycle,
+            holdPeriod: req.body.holdPeriod,
+            targetIRR: req.body.targetIRR,
+            acquisitionBasis: req.body.acquisitionBasis,
+            capexDeployed: req.body.capexDeployed,
+            currentNOI: req.body.currentNOI,
+            cashOnCashYield: req.body.cashOnCashYield,
+            developmentSpread: req.body.developmentSpread,
+            summary: req.body.summary,
+            thesis: req.body.thesis,
+            execution: req.body.execution,
         };
 
 
@@ -397,21 +420,27 @@ export default (csrfProtection) => {
                 excerpt: req.body.excerpt,
                 image: imageUrl,
                 galleryImages: galleryUrls,
-                link: req.body.link,
                 isFeatured: !!req.body.isFeatured,
                 isPubliclyVisible: !!req.body.isPubliclyVisible,
                 isFeaturedOnHomepage: !!req.body.isFeaturedOnHomepage,
-                propertyType: req.body.propertyType,
-                value: req.body.value,
-                monthlyRent: req.body.monthlyRent,
-                ltv: req.body.ltv,
-                noi: req.body.noi,
-                capRate: req.body.capRate,
-                bedrooms: req.body.bedrooms,
-                bathrooms: req.body.bathrooms,
-                sqft: req.body.sqft,
-                isAvailableForRent: !!req.body.isAvailableForRent,
-                rentalApplicationUrl: req.body.rentalApplicationUrl
+                portfolioName: req.body.portfolioName,
+                subtitle: req.body.subtitle,
+                doors: req.body.doors,
+                occupancy: req.body.occupancy,
+                strategy: req.body.strategy,
+                assetClass: req.body.assetClass,
+                status: req.body.status,
+                lifecycle: req.body.lifecycle,
+                holdPeriod: req.body.holdPeriod,
+                targetIRR: req.body.targetIRR,
+                acquisitionBasis: req.body.acquisitionBasis,
+                capexDeployed: req.body.capexDeployed,
+                currentNOI: req.body.currentNOI,
+                cashOnCashYield: req.body.cashOnCashYield,
+                developmentSpread: req.body.developmentSpread,
+                summary: req.body.summary,
+                thesis: req.body.thesis,
+                execution: req.body.execution,
             };
             const updatedProperty = await Property.findByIdAndUpdate(
                 propertyId,
@@ -426,7 +455,7 @@ export default (csrfProtection) => {
             await logAdminAction(req.adminUser.userId, req.adminUser.username, 'update_property', `ID: ${propertyId}, Title: ${updatedProperty.title}`, req.ip);
             logger.info(`[Admin Properties] Property updated: '${updatedProperty.title}' by ${req.adminUser.username}`);
             req.flash('success', 'Property updated successfully!');
-            res.redirect('/admin/properties');
+            return res.redirect('/admin/properties');
         } catch (err) {
             logger.error(`[Admin Properties] Error updating property ID ${propertyId}:`, { error: err.message, stack: err.stack });
              const errorMessagesList = [{ msg: err.message || 'Server error updating property.' }];
@@ -455,7 +484,7 @@ export default (csrfProtection) => {
                 logger.info(`[Admin Properties] Property deleted: '${deletedProperty.title}' by ${req.adminUser.username}`);
                 req.flash('success', 'Property deleted successfully.');
             }
-            res.redirect('/admin/properties');
+            return res.redirect('/admin/properties');
         } catch (err) {
             logger.error(`[Admin Properties] Error deleting property ${propertyId}:`, err);
             next(err);

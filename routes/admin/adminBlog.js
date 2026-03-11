@@ -104,7 +104,12 @@ export default (csrfProtection) => {
             return [];
         }),
         body('categories.*', 'Each category id must be a valid Mongo ObjectId.')
-            .optional({ nullable: true, checkFalsy: true }).isMongoId()
+            .optional({ nullable: true, checkFalsy: true }).isMongoId(),
+        body('publicationType', 'Invalid publication type.')
+            .optional({ checkFalsy: true }).trim()
+            .isIn(['Market Research', 'Case Studies', 'Firm Updates']),
+        body('pdfDocumentUrl', 'PDF Document URL must be a valid URL.')
+            .optional({ checkFalsy: true }).trim().isURL()
     ];
 
     // --- Image Upload Route ---
@@ -166,6 +171,67 @@ export default (csrfProtection) => {
     );
     // ****** END ENDPOINT ******
 
+    // ****** ENDPOINT FOR PDF DOCUMENT UPLOAD ******
+    const pdfFilter = (req, file, cb) => {
+        if (file.mimetype === 'application/pdf') {
+            cb(null, true);
+        } else {
+            cb(new Error('Invalid file type. Only PDF files allowed.'), false);
+        }
+    };
+    const pdfUpload = multer({
+        storage: multer.memoryStorage(),
+        limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit for PDFs
+        fileFilter: pdfFilter
+    });
+
+    router.post(
+        '/upload-pdf',
+        csrfProtection,
+        pdfUpload.single('pdfDocumentFile'),
+        async (req, res, next) => {
+            if (!req.file) {
+                return res.status(400).json({ success: false, message: 'No PDF file received.' });
+            }
+            if (!cloudinary.config().cloud_name) {
+                logger.error('PDF Upload: Cloudinary not configured.');
+                return res.status(500).json({ success: false, message: 'File storage not configured.' });
+            }
+            logger.info(`Processing PDF upload: ${req.file.originalname}, User: ${req.adminUser.username}`);
+            try {
+                const uploadPromise = new Promise((resolve, reject) => {
+                    const uploadStream = cloudinary.uploader.upload_stream(
+                        { folder: 'fnd_automations_pdfs', resource_type: 'raw' },
+                        (error, result) => {
+                            if (error || !result?.secure_url) {
+                                logger.error('Cloudinary PDF Upload Error:', error || 'Missing secure_url');
+                                return reject(error || new Error('Cloudinary upload failed.'));
+                            }
+                            resolve(result);
+                        }
+                    );
+                    uploadStream.end(req.file.buffer);
+                });
+                const result = await uploadPromise;
+                await logAdminAction(req.adminUser.userId, req.adminUser.username, 'upload_pdf', `File: ${req.file.originalname}, URL: ${result.secure_url}`, req.ip);
+                logger.info(`PDF uploaded: ${result.secure_url}, User: ${req.adminUser.username}`);
+                res.status(200).json({ success: true, location: result.secure_url });
+            } catch (error) {
+                logger.error('Error during PDF Cloudinary upload:', { error: error.message });
+                res.status(500).json({ success: false, message: `Server error: ${error.message}` });
+            }
+        },
+        (error, req, res, next) => {
+            if (error instanceof multer.MulterError) {
+                return res.status(400).json({ success: false, message: `File upload error: ${error.message}. Max 10MB.` });
+            } else if (error) {
+                return res.status(400).json({ success: false, message: error.message || 'Invalid file type.' });
+            }
+            next();
+        }
+    );
+    // ****** END PDF ENDPOINT ******
+
     // --- Blog Post CRUD Routes ---
 
     // GET /admin/blog - List Posts
@@ -188,7 +254,7 @@ export default (csrfProtection) => {
                                        .sort(sortObj)
                                        .lean();
             logger.debug(`[Admin Blog] Found ${posts.length} posts to list. sort=${sort} order=${order} status=${status}`);
-            res.render('admin/blog/index', {
+            return res.render('admin/blog/index', {
                 posts,
                 pageTitle: 'Manage Blog Posts',
                 path: '/admin/blog',
@@ -209,7 +275,7 @@ export default (csrfProtection) => {
         // Pre-fill authorDisplayName with the current admin's full name (or username as fallback)
         const defaultAuthorName = req.adminUser.fullName || req.adminUser.username;
     const categories = await Category.find({ isActive: true }).sort({ name: 1 }).lean();
-        res.render('admin/blog/edit', {
+        return res.render('admin/blog/edit', {
             post: { authorDisplayName: defaultAuthorName }, // Initialize post object for the form
             editing: false,
             pageTitle: 'Add New Blog Post',
@@ -233,6 +299,8 @@ export default (csrfProtection) => {
              content: req.body.content, featuredImage: req.body.featuredImage,
              authorDisplayName: req.body.authorDisplayName, // Keep submitted value
          isPublished: !!req.body.isPublished,
+         publicationType: req.body.publicationType || 'Market Research',
+         pdfDocumentUrl: req.body.pdfDocumentUrl || '',
          categories: Array.isArray(req.body.categories) ? req.body.categories : (req.body.categories ? [req.body.categories] : [])
         };
         const currentAdminNameForForm = req.adminUser.fullName || req.adminUser.username;
@@ -293,6 +361,8 @@ export default (csrfProtection) => {
                 authorDisplayName: finalAuthorDisplayName, // Name to be displayed publicly
                 featuredImage: req.body.featuredImage || null,
                 categories: categoryIds,
+                publicationType: req.body.publicationType || 'Market Research',
+                pdfDocumentUrl: req.body.pdfDocumentUrl || null,
                 isPublished: !!req.body.isPublished,
                 publishedDate: (!!req.body.isPublished ? new Date() : null)
             });
@@ -306,7 +376,7 @@ export default (csrfProtection) => {
             logger.info(`[Admin Blog] New post '${newPost.title}' created by ${req.adminUser.username}, Display Author: ${newPost.authorDisplayName}`);
 
             req.flash('success', 'Blog post created successfully!');
-            res.redirect('/admin/blog');
+            return res.redirect('/admin/blog');
 
         } catch (err) {
             logger.error(`[Admin Blog] Error saving new post by ${req.adminUser.username}:`, { error: err.message, stack: err.stack });
@@ -350,7 +420,7 @@ export default (csrfProtection) => {
             };
 
             const categories = await Category.find({ isActive: true }).sort({ name: 1 }).lean();
-            res.render('admin/blog/edit', {
+            return res.render('admin/blog/edit', {
                 post: postDataForForm,
                 editing: true,
                 pageTitle: 'Edit Blog Post',
@@ -380,6 +450,8 @@ export default (csrfProtection) => {
             authorDisplayName: req.body.authorDisplayName, // Keep submitted value
             isPublished: !!req.body.isPublished,
             isFeatured: !!req.body.isFeatured,
+            publicationType: req.body.publicationType || 'Market Research',
+            pdfDocumentUrl: req.body.pdfDocumentUrl || '',
             categories: Array.isArray(req.body.categories) ? req.body.categories : (req.body.categories ? [req.body.categories] : [])
         };
 
@@ -428,7 +500,9 @@ export default (csrfProtection) => {
                  title: req.body.title, slug: finalSlug, excerpt: req.body.excerpt,
                       content: cleanHtmlContent, featuredImage: req.body.featuredImage || null,
                   isPublished: !!req.body.isPublished,
-              isFeatured: !!req.body.isFeatured
+              isFeatured: !!req.body.isFeatured,
+              publicationType: req.body.publicationType || 'Market Research',
+              pdfDocumentUrl: req.body.pdfDocumentUrl || null
             };
 
                         // categories
@@ -477,7 +551,7 @@ export default (csrfProtection) => {
             logger.info(`[Admin Blog] Post '${updatedPost.title}' (ID: ${postId}) updated by ${req.adminUser.username}, Display Author: ${updatedPost.authorDisplayName}`);
 
             req.flash('success', 'Blog post updated successfully!');
-            res.redirect('/admin/blog');
+            return res.redirect('/admin/blog');
 
         } catch (err) {
             logger.error(`[Admin Blog] Error updating post ID ${postId} by ${req.adminUser.username}:`, { error: err.message, stack: err.stack });
@@ -519,11 +593,11 @@ export default (csrfProtection) => {
                 logger.info(`[Admin Blog] Post deleted: '${deletedPost.title}' (ID: ${postId}) by ${req.adminUser.username}`);
                 req.flash('success', 'Blog post deleted successfully!');
             }
-            res.redirect('/admin/blog');
+            return res.redirect('/admin/blog');
         } catch (err) {
              logger.error(`[Admin Blog] Error deleting post ID ${postId} by ${req.adminUser.username}:`, { error: err.message, stack: err.stack });
              req.flash('error', 'An error occurred while trying to delete the blog post.');
-             res.redirect('/admin/blog');
+             return res.redirect('/admin/blog');
         }
     });
 

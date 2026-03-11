@@ -1,76 +1,94 @@
 // middleware/requireAdminClerk.js
-import { ClerkExpressRequireAuth, clerkClient } from '@clerk/clerk-sdk-node';
+// Clerk admin auth middleware — uses @clerk/express.
+// Public sign-ups are disabled in the Clerk dashboard, so any authenticated
+// Clerk user is implicitly authorized.  No local email whitelist needed.
+import { requireAuth, clerkClient, getAuth } from '@clerk/express';
 import { logger } from '../config/logger.js';
+import mongoose from 'mongoose';
 
-// Composed middleware: requires a valid Clerk session, then enforces role === 'admin'
-// ...existing code...
+// Stable ObjectId for test bypass — generated once at module load so it's consistent across requests.
+const TEST_ADMIN_OID = new mongoose.Types.ObjectId().toString();
 
 const requireAdminClerk = [
+  // Step 0: Test bypass OR Clerk's requireAuth()
   (req, res, next) => {
-    console.log('requireAdminClerk check:', process.env.NODE_ENV, process.env.BYPASS_AUTH);
-    if (process.env.NODE_ENV === 'test' && process.env.BYPASS_AUTH === '1') {
-      req.auth = { userId: 'test_admin', sessionId: 'test_session' };
-      return next();
-    }
-    return ClerkExpressRequireAuth()(req, res, next);
-  },
-  async (req, res, next) => {
-    if (process.env.NODE_ENV === 'test' && process.env.BYPASS_AUTH === '1') {
-      res.locals.currentUser = { role: 'admin', fullName: 'Test Admin' };
-      return next();
-    }
-    try {
-      // Step 1: Debug logging to diagnose redirect loop
-      const authInfo = {
-        hasAuth: Boolean(req.auth),
-        sessionId: req.auth?.sessionId,
-        userId: req.auth?.userId,
-      };
-  // logger.debug('--- requireAdminClerk Middleware Check ---');
-  // logger.debug('Session ID:', authInfo.sessionId);
-  // logger.debug('User ID:', authInfo.userId);
-      try { logger.debug('[requireAdminClerk] auth snapshot', authInfo); } catch {}
+    // Guard: If Clerk's global clerkMiddleware() already sent a response
+    // (e.g., a 307 handshake redirect), bail out immediately.
+    if (res.writableEnded || res.headersSent) return;
 
-      const userId = req.auth?.userId;
+    if (process.env.NODE_ENV === 'test' && process.env.BYPASS_AUTH === '1') {
+      // Simulate Clerk auth object for tests
+      req.auth = { userId: TEST_ADMIN_OID, sessionId: 'test_session' };
+      return next();
+    }
+    // requireAuth() throws / redirects when no valid session exists.
+    // clerkMiddleware() must be mounted globally BEFORE this runs.
+    // Redirect unauthenticated users to our local login page (not Clerk's hosted portal).
+    return requireAuth({ signInUrl: '/admin/login' })(req, res, next);
+  },
+
+  // Step 1: Hydrate req.adminUser / res.locals for downstream routes & views
+  async (req, res, next) => {
+    // Guard: If Clerk's requireAuth() already sent a response (e.g., handshake redirect),
+    // bail out immediately to avoid ERR_HTTP_HEADERS_SENT.
+    if (res.headersSent) return;
+
+    if (process.env.NODE_ENV === 'test' && process.env.BYPASS_AUTH === '1') {
+      const testAdminUser = {
+        userId: TEST_ADMIN_OID,
+        id: TEST_ADMIN_OID,
+        username: 'test_user',
+        fullName: 'Test Admin',
+        email: 'test@example.com',
+        role: 'admin',
+        avatarUrl: null,
+      };
+      res.locals.currentUser = testAdminUser;
+      res.locals.adminUser = testAdminUser;
+      req.adminUser = testAdminUser;
+      res.locals.isAuthenticated = true;
+      return next();
+    }
+
+    try {
+      const { userId } = getAuth(req);
       if (!userId) {
-        try { logger.warn('[requireAdminClerk] Missing userId; treating as unauthorized'); } catch {}
-        return res.status(401).render('admin/error', { pageTitle: 'Unauthorized', status: 401, message: 'Not signed in.' });
+        // Shouldn't happen after requireAuth(), but defensive
+        logger.warn('[requireAdminClerk] No userId after requireAuth; redirecting.');
+        return res.redirect('/sign-in?redirectTo=' + encodeURIComponent(req.originalUrl || '/admin/dashboard'));
       }
 
       const user = await clerkClient.users.getUser(userId);
-      const role = user?.publicMetadata?.role || user?.privateMetadata?.role;
-  // logger.debug('User Role:', role);
-      try { logger.debug('[requireAdminClerk] user role', { role }); } catch {}
-      if (!req.auth?.sessionId) {
-        try { logger.warn('[requireAdminClerk] No sessionId present despite userId; unauthorized'); } catch {}
-        return res.status(401).render('admin/error', { pageTitle: 'Unauthorized', status: 401, message: 'No active session.' });
-      }
-      if (role !== 'admin') {
-        try { logger.warn('[requireAdminClerk] Forbidden: role is not admin', { role }); } catch {}
-        return res.status(403).render('admin/error', { pageTitle: 'Forbidden', status: 403, message: 'Admin role required.' });
-      }
-      // Expose user info to templates AND provide legacy-compatible object for existing controllers
-      const primaryEmail = (user?.emailAddresses && Array.isArray(user.emailAddresses) && user.emailAddresses[0]?.emailAddress) ? user.emailAddresses[0].emailAddress : null;
-      const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.username || 'Admin';
-      const legacyAdminUser = {
-        // Legacy fields expected by existing routes/views
-        userId: userId,
-        id: userId, // keep both for safety
+      const primaryEmail =
+        user?.emailAddresses?.[0]?.emailAddress || null;
+      const fullName =
+        [user?.firstName, user?.lastName].filter(Boolean).join(' ') ||
+        user?.username ||
+        'Admin';
+
+      const adminUser = {
+        userId,
+        id: userId,
         username: user?.username || primaryEmail || 'admin',
-        fullName: fullName,
+        fullName,
         email: primaryEmail,
-        role: role,
-        avatarUrl: user?.imageUrl || null
+        role: 'admin', // implicitly authorized — sign-ups disabled in Clerk
+        avatarUrl: user?.imageUrl || null,
       };
-      res.locals.adminUser = legacyAdminUser;
-      req.adminUser = legacyAdminUser; // Backward compatibility for existing routes/views expecting req.adminUser
+
+      res.locals.adminUser = adminUser;
+      res.locals.currentUser = adminUser;
+      req.adminUser = adminUser;
       res.locals.isAuthenticated = true;
+
       return next();
     } catch (err) {
-  try { logger.error('[requireAdminClerk] Error in middleware', { message: err?.message }); } catch {}
+      logger.error('[requireAdminClerk] Error hydrating admin user', {
+        message: err?.message,
+      });
       return next(err);
     }
-  }
+  },
 ];
 
 export default requireAdminClerk;

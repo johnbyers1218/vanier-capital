@@ -1,36 +1,79 @@
 <%- include('../partials/header', { pageTitle: 'Team Management' }) %>
 
-<div class="max-w-4xl mx-auto space-y-6">
-  <div class="rounded-lg border border-neutral-700 bg-[#1a1a1a] p-6">
-    <h2 class="text-xl font-semibold text-gray-100 mb-4">Team Members</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <% (teamUsers || []).forEach(function(u){ %>
-        <div class="flex items-center gap-3 p-3 rounded-md border border-neutral-700 bg-[#1a1a1a]/40">
-          <div class="w-12 h-12 rounded-full overflow-hidden bg-neutral-700 flex items-center justify-center text-gray-300">
-            <% if (u.avatarUrl) { %>
-              <img src="<%= u.avatarUrl %>" alt="<%= u.fullName || u.username %>" class="w-full h-full object-cover" />
-            <% } else { %>
-              <i class="fas fa-user"></i>
-            <% } %>
-          </div>
-          <div class="min-w-0">
-            <div class="font-medium truncate"><%= u.fullName || u.username %></div>
-            <div class="text-xs text-gray-400 uppercase tracking-wide"><%= u.role %></div>
-          </div>
-        </div>
-      <% }) %>
-      <% if (!teamUsers || teamUsers.length === 0) { %>
-        <p class="text-gray-400">No team members found.</p>
-      <% } %>
+<div class="max-w-5xl mx-auto space-y-6">
+  <!-- Header Bar -->
+  <div class="flex items-center justify-between border-b border-[#0f2e22]/20 pb-4">
+    <div>
+      <h1 class="text-2xl font-bold text-[#1a1a1a]">Team Management</h1>
+      <p class="text-gray-500 text-sm mt-1">Administrative users and access control.</p>
     </div>
-    <div class="mt-4 text-sm text-gray-400">Role editing UI can be added here (promote/demote), and avatar can be updated if necessary.</div>
+    <div class="flex items-center gap-3">
+      <button type="button" disabled class="bg-[#0f2e22] text-white uppercase tracking-widest text-xs font-bold px-6 py-3 border border-[#0f2e22] opacity-50 cursor-not-allowed" title="Coming soon — Clerk integration">
+        <i class="fas fa-user-plus"></i> Invite Team Member (Clerk)
+      </button>
+      <a href="/admin/settings" class="inline-flex items-center gap-2 bg-white text-[#0f2e22] font-bold py-2.5 px-5 border border-[#0f2e22]/20 hover:bg-[#f9f8f6] text-xs uppercase tracking-widest">
+        <i class="fas fa-arrow-left"></i> Back
+      </a>
+    </div>
   </div>
 
-  <div class="flex items-center justify-end gap-3">
-    <a href="/admin/settings" class="inline-flex items-center gap-2 bg-transparent text-gray-100 font-semibold py-2.5 px-5 rounded-md border border-gray-500 hover:bg-neutral-700">
-      <i class="fas fa-arrow-left"></i>
-      Back to Settings
-    </a>
+  <!-- Team Table -->
+  <div class="bg-white border border-[#0f2e22]/20">
+    <table class="w-full text-left">
+      <thead>
+        <tr class="bg-[#f9f8f6] border-b border-[#0f2e22]/20">
+          <th class="px-6 py-4 text-[#1a1a1a] font-sans text-xs font-bold uppercase tracking-widest">User</th>
+          <th class="px-6 py-4 text-[#1a1a1a] font-sans text-xs font-bold uppercase tracking-widest">Role</th>
+          <th class="px-6 py-4 text-[#1a1a1a] font-sans text-xs font-bold uppercase tracking-widest">Last Login</th>
+          <th class="px-6 py-4 text-[#1a1a1a] font-sans text-xs font-bold uppercase tracking-widest text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% (teamUsers || []).forEach(function(u){ %>
+          <tr class="bg-white border-b border-gray-200 hover:bg-gray-50">
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 overflow-hidden bg-gray-200 flex items-center justify-center text-gray-500 shrink-0">
+                  <% if (u.avatarUrl) { %>
+                    <img src="<%= u.avatarUrl %>" alt="<%= u.fullName || u.username %>" class="w-full h-full object-cover">
+                  <% } else { %>
+                    <i class="fas fa-user text-sm"></i>
+                  <% } %>
+                </div>
+                <div class="min-w-0">
+                  <p class="font-semibold text-[#1a1a1a] truncate"><%= u.fullName || u.username %></p>
+                  <p class="text-xs text-gray-500"><%= u.username %></p>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <span class="inline-block px-3 py-1 text-xs font-bold uppercase tracking-widest border <%= u.role === 'admin' ? 'bg-[#0f2e22]/5 text-[#0f2e22] border-[#0f2e22]/20' : 'bg-gray-100 text-gray-600 border-gray-200' %>"><%= u.role %></span>
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-600">
+              <% if (u.lastLogin) { %>
+                <%= new Date(u.lastLogin).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %>
+                <span class="text-xs text-gray-400 ml-1"><%= new Date(u.lastLogin).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) %></span>
+              <% } else { %>
+                <span class="text-gray-400">Never</span>
+              <% } %>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <button type="button" disabled class="text-xs text-[#0f2e22] font-bold uppercase tracking-widest hover:underline opacity-50 cursor-not-allowed" title="Coming soon">Edit Role</button>
+            </td>
+          </tr>
+        <% }) %>
+        <% if (!teamUsers || teamUsers.length === 0) { %>
+          <tr>
+            <td colspan="4" class="px-6 py-12 text-center text-gray-500">No team members found.</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Info Box -->
+  <div class="bg-[#0f2e22]/5 border border-[#0f2e22]/20 p-4">
+    <p class="text-xs text-gray-600"><strong class="text-[#1a1a1a]">Note:</strong> Role editing and team invitations will be available after Clerk SSO integration. Currently, team members are managed via the database directly.</p>
   </div>
 </div>
 
