@@ -29,6 +29,7 @@ const PropertySchema = new mongoose.Schema({
     currentNOI: { type: String, trim: true }, // e.g. "$62,400"
     cashOnCashYield: { type: String, trim: true }, // e.g. "10.2%"
     developmentSpread: { type: String, trim: true }, // e.g. "250 bps" — delta between Yield on Cost and Market Cap Rate
+    unrealizedIrr: { type: String, trim: true }, // e.g. "22.4%" — current unrealized internal rate of return
 
     // ── Narrative ─────────────────────────────────────────────────────────────
     summary: { type: String, trim: true }, // Short overview for index cards

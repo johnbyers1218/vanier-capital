@@ -38,41 +38,41 @@
 <!-- ═══════════════ METRICS GRID ═══════════════ -->
 <section class="bg-white border-t border-[#0f2e22]/10">
     <div class="max-w-[1200px] mx-auto px-6 md:px-16 py-8 md:py-12">
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 md:gap-10">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 md:gap-10">
             <% if (asset.doors) { %>
             <div>
                 <p class="font-sans text-[10px] uppercase tracking-widest text-[#1a1a1a]/40 mb-2">Doors</p>
-                <p class="font-serif text-2xl md:text-4xl text-[#0f2e22]"><%= asset.doors %></p>
+                <p class="font-serif text-xl md:text-2xl text-[#0f2e22] whitespace-nowrap"><%= asset.doors %></p>
             </div>
             <% } %>
             <% if (asset.occupancy) { %>
             <div>
                 <p class="font-sans text-[10px] uppercase tracking-widest text-[#1a1a1a]/40 mb-2">Occupancy</p>
-                <p class="font-serif text-2xl md:text-4xl text-[#0f2e22]"><%= asset.occupancy %></p>
+                <p class="font-serif text-xl md:text-2xl text-[#0f2e22] whitespace-nowrap"><%= asset.occupancy %></p>
             </div>
             <% } %>
             <% if (asset.strategy) { %>
             <div>
                 <p class="font-sans text-[10px] uppercase tracking-widest text-[#1a1a1a]/40 mb-2">Strategy</p>
-                <p class="font-serif text-2xl md:text-4xl text-[#0f2e22]"><%= asset.strategy %></p>
+                <p class="font-serif text-xl md:text-2xl text-[#0f2e22] whitespace-nowrap"><%= asset.strategy %></p>
             </div>
             <% } %>
             <% if (asset.assetClass) { %>
             <div>
                 <p class="font-sans text-[10px] uppercase tracking-widest text-[#1a1a1a]/40 mb-2">Asset Class</p>
-                <p class="font-serif text-2xl md:text-4xl text-[#0f2e22]"><%= asset.assetClass %></p>
+                <p class="font-serif text-xl md:text-2xl text-[#0f2e22] whitespace-nowrap"><%= asset.assetClass %></p>
             </div>
             <% } %>
             <% if (asset.status) { %>
             <div>
                 <p class="font-sans text-[10px] uppercase tracking-widest text-[#1a1a1a]/40 mb-2">Status</p>
-                <p class="font-serif text-2xl md:text-4xl text-[#0f2e22]"><%= asset.status %></p>
+                <p class="font-serif text-xl md:text-2xl text-[#0f2e22] whitespace-nowrap"><%= asset.status %></p>
             </div>
             <% } %>
             <% if (asset.holdPeriod) { %>
             <div>
                 <p class="font-sans text-[10px] uppercase tracking-widest text-[#1a1a1a]/40 mb-2">Hold Period</p>
-                <p class="font-serif text-2xl md:text-4xl text-[#0f2e22]"><%= asset.holdPeriod %></p>
+                <p class="font-serif text-xl md:text-2xl text-[#0f2e22] whitespace-nowrap"><%= asset.holdPeriod %></p>
             </div>
             <% } %>
         </div>
@@ -99,12 +99,12 @@
             <div class="prose max-w-none font-sans text-lg text-gray-700 leading-relaxed">
 
                 <% if (asset.thesis) { %>
-                <h3 class="font-serif text-2xl text-[#0f2e22] mb-4 mt-0">Investment Thesis</h3>
+                <h3 class="font-serif text-2xl text-[#0f2e22] mb-4 mt-0 pb-3 border-b border-[#0f2e22]/10">Investment Thesis</h3>
                 <p class="mb-10 whitespace-pre-line"><%= asset.thesis %></p>
                 <% } %>
 
                 <% if (asset.execution) { %>
-                <h3 class="font-serif text-2xl text-[#0f2e22] mb-4">Operational Execution</h3>
+                <h3 class="font-serif text-2xl text-[#0f2e22] mb-4 pb-3 border-b border-[#0f2e22]/10">Operational Execution</h3>
                 <p class="mb-0 whitespace-pre-line"><%= asset.execution %></p>
                 <% } %>
 
@@ -125,32 +125,44 @@
                 </div>
                 <ul class="divide-y divide-[#0f2e22]/10">
                     <% if (asset.acquisitionBasis) { %>
-                    <li class="px-6 py-4">
-                        <p class="font-sans text-xs uppercase tracking-widest text-[#1a1a1a]/40 mb-1">Acquisition Basis</p>
-                        <p class="font-sans text-sm font-medium text-[#1a1a1a]"><%= asset.acquisitionBasis %></p>
+                    <li class="px-6 py-5">
+                        <p class="font-sans text-[10px] uppercase tracking-widest text-[#1a1a1a]/40 mb-2">Acquisition Basis</p>
+                        <p class="font-serif text-xl font-semibold text-[#0f2e22]"><%= asset.acquisitionBasis %></p>
                     </li>
                     <% } %>
                     <% if (asset.capexDeployed) { %>
-                    <li class="px-6 py-4">
-                        <p class="font-sans text-xs uppercase tracking-widest text-[#1a1a1a]/40 mb-1">CapEx Deployed</p>
-                        <p class="font-sans text-sm font-medium text-[#1a1a1a]"><%= asset.capexDeployed %></p>
+                    <li class="px-6 py-5">
+                        <p class="font-sans text-[10px] uppercase tracking-widest text-[#1a1a1a]/40 mb-2">CapEx Deployed</p>
+                        <p class="font-serif text-xl font-semibold text-[#0f2e22]"><%= asset.capexDeployed %></p>
                     </li>
                     <% } %>
                     <% if (asset.currentNOI) { %>
-                    <li class="px-6 py-4">
-                        <p class="font-sans text-xs uppercase tracking-widest text-[#1a1a1a]/40 mb-1">Current NOI</p>
-                        <p class="font-sans text-sm font-medium text-[#1a1a1a]"><%= asset.currentNOI %></p>
+                    <li class="px-6 py-5">
+                        <p class="font-sans text-[10px] uppercase tracking-widest text-[#1a1a1a]/40 mb-2">Current NOI</p>
+                        <p class="font-serif text-xl font-semibold text-[#0f2e22]"><%= asset.currentNOI %></p>
                     </li>
                     <% } %>
                     <% if (asset.cashOnCashYield) { %>
-                    <li class="px-6 py-4">
-                        <p class="font-sans text-xs uppercase tracking-widest text-[#1a1a1a]/40 mb-1">Cash-on-Cash Yield</p>
-                        <p class="font-sans text-sm font-medium text-[#1a1a1a]"><%= asset.cashOnCashYield %></p>
+                    <li class="px-6 py-5">
+                        <p class="font-sans text-[10px] uppercase tracking-widest text-[#1a1a1a]/40 mb-2">Yield on Cost</p>
+                        <p class="font-serif text-xl font-semibold text-[#0f2e22]"><%= asset.cashOnCashYield %></p>
+                    </li>
+                    <% } %>
+                    <% if (asset.developmentSpread) { %>
+                    <li class="px-6 py-5">
+                        <p class="font-sans text-[10px] uppercase tracking-widest text-[#1a1a1a]/40 mb-2">Development Spread</p>
+                        <p class="font-serif text-xl font-semibold text-[#0f2e22]"><%= asset.developmentSpread %></p>
+                    </li>
+                    <% } %>
+                    <% if (asset.unrealizedIrr) { %>
+                    <li class="px-6 py-5">
+                        <p class="font-sans text-[10px] uppercase tracking-widest text-[#1a1a1a]/40 mb-2">Unrealized IRR</p>
+                        <p class="font-serif text-2xl font-semibold text-[#0f2e22]"><%= asset.unrealizedIrr %></p>
                     </li>
                     <% } %>
                     <% if (asset.targetIRR) { %>
-                    <li class="px-6 py-4">
-                        <p class="font-sans text-xs uppercase tracking-widest text-[#1a1a1a]/40 mb-1">Target IRR</p>
+                    <li class="px-6 py-5">
+                        <p class="font-sans text-[10px] uppercase tracking-widest text-[#1a1a1a]/40 mb-2">Target IRR</p>
                         <p class="font-serif text-2xl font-semibold text-[#0f2e22]"><%= asset.targetIRR %></p>
                     </li>
                     <% } %>
@@ -186,17 +198,6 @@
             <p class="font-sans text-xs text-gray-500 leading-relaxed mb-3">The information presented herein reflects historical performance of specific assets or strategies and may not be representative of current or future investments. Financial metrics shown are based on internal calculations and have not been independently audited. Target returns are forward-looking estimates and are not guaranteed.</p>
             <p class="font-sans text-xs text-gray-500 leading-relaxed">Vanier Capital LLC does not provide tax, legal, or accounting advice. Prospective investors should consult their own advisors regarding the suitability of any investment. Securities offered, if any, are available only to accredited investors as defined under Regulation D of the Securities Act of 1933.</p>
         </div>
-    </div>
-</section>
-
-<!-- ═══════════════ CTA — EXPLORE APPROACH ═══════════════ -->
-<section class="bg-slate-50 border-t border-[#0f2e22]/10">
-    <div class="max-w-[1200px] mx-auto px-6 md:px-16 py-14 md:py-20 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
-        <div>
-            <h2 class="font-serif text-3xl md:text-4xl text-[#0f2e22] mb-3">Explore Our Approach.</h2>
-            <p class="font-sans text-lg text-gray-600 max-w-xl">Learn more about our investment strategy, underwriting discipline, and how we create value across our portfolio.</p>
-        </div>
-        <a href="/strategy" class="inline-block font-sans text-sm font-bold text-white bg-[#0f2e22] px-10 py-4 uppercase tracking-wider hover:bg-[#1a3a2a] transition-colors rounded-none whitespace-nowrap">Investment Strategy</a>
     </div>
 </section>
 

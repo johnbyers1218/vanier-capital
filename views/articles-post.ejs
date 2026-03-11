@@ -7,6 +7,7 @@
     "@context": "https://schema.org",
     "@type": "Article",
     "headline": post.title,
+    "alternativeHeadline": post.subtitle || undefined,
     "description": pageDescription,
     "datePublished": post.publishedDate || undefined,
     "dateModified": post.updatedAt || post.publishedDate || undefined,
@@ -46,11 +47,16 @@
         </div>
 
         <!-- Title -->
-        <h1 class="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[#0f2e22] tracking-tight leading-tight mb-6"><%= decodeHtmlEntities(post.title) %></h1>
+        <h1 class="font-serif text-4xl lg:text-5xl text-[#0f2e22] font-bold tracking-tight leading-tight mb-4"><%= decodeHtmlEntities(post.title) %></h1>
+
+        <!-- Subtitle -->
+        <% if (post.subtitle) { %>
+        <p class="font-serif text-xl lg:text-2xl text-gray-500 italic font-light tracking-wide border-t border-[#0f2e22]/10 pt-6 mt-6"><%= post.subtitle %></p>
+        <% } %>
 
         <!-- Author Line -->
         <% const authorDisplay = post.author || 'Vanier Capital'; %>
-        <p class="font-sans text-base text-gray-500">By <span class="text-[#1a1a1a] font-medium"><%= authorDisplay %></span> &mdash; Vanier Capital Investment Team</p>
+        <p class="font-sans text-base text-gray-500 mt-6">By <span class="text-[#1a1a1a] font-medium"><%= authorDisplay %></span> &mdash; Vanier Capital Investment Team</p>
     </div>
 </section>
 

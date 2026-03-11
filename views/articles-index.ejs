@@ -63,31 +63,47 @@
 <% } %>
 
 <!-- ═══════════════ ARTICLE FEED ═══════════════ -->
-<section class="bg-white">
+<section class="bg-[#f9f8f6]">
     <div class="max-w-screen-xl mx-auto px-4 md:px-16 py-10 md:py-16" id="article-grid">
         <% if ((posts && posts.length > 0) || (featuredOverride && featuredOverride.length > 0)) { %>
 
             <% const featuredSlugs = (featuredOverride || []).map(p => p.slug); %>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             <% (posts || []).forEach((post) => { %>
                 <% if (featuredSlugs.includes(post.slug)) { return; } %>
-                <div class="group border-b border-[#0f2e22]/20 py-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-[#f9f8f6] transition-colors px-4 -mx-4" data-categories="<%= post.categories && post.categories.length ? post.categories.map(c => c.slug).join(',') : '' %>">
-                    <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-8 flex-1 min-w-0">
-                        <span class="font-sans text-xs font-bold uppercase tracking-widest text-gray-400 w-28 shrink-0">
-                            <%= post.publishedDate ? post.publishedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '' %>
-                        </span>
-                        <% if (post.categories && post.categories.length) { %>
-                            <span class="font-sans text-xs font-bold uppercase tracking-widest text-[#0f2e22] bg-[#0f2e22]/5 px-3 py-1 w-max shrink-0"><%= post.categories[0].name %></span>
-                        <% } else { %>
-                            <span class="font-sans text-xs font-bold uppercase tracking-widest text-[#0f2e22] bg-[#0f2e22]/5 px-3 py-1 w-max shrink-0">Market Research</span>
-                        <% } %>
-                        <a href="/blog/<%= post.slug %>" class="font-serif text-xl md:text-2xl text-[#1a1a1a] group-hover:text-[#0f2e22] transition-colors mt-2 md:mt-0 truncate"><%= decodeHtmlEntities(post.title) %></a>
+                <a href="/blog/<%= post.slug %>" class="group flex flex-col h-full bg-white border border-[#0f2e22]/10 hover:border-[#0f2e22]/30 transition-colors" data-categories="<%= post.categories && post.categories.length ? post.categories.map(c => c.slug).join(',') : '' %>">
+                    <% if (post.featuredImage) { %>
+                    <div class="aspect-[16/9] overflow-hidden">
+                        <img src="<%= post.featuredImage %>" alt="" loading="lazy" decoding="async" class="w-full h-full object-cover rounded-none group-hover:scale-[1.02] transition-transform duration-500">
                     </div>
-                    <a href="/blog/<%= post.slug %>" class="hidden md:inline-flex font-sans text-xs font-bold uppercase tracking-widest text-[#0f2e22] border border-[#0f2e22] px-6 py-3 hover:bg-[#0f2e22] hover:text-white transition-colors shrink-0 ml-8">Read Report</a>
-                </div>
+                    <% } %>
+                    <div class="flex flex-col flex-1 p-6">
+                        <div class="flex items-center gap-3 mb-4">
+                            <% if (post.publicationType) { %>
+                                <span class="font-sans text-[10px] font-bold uppercase tracking-widest text-[#0f2e22] bg-[#0f2e22]/5 px-2.5 py-1"><%= post.publicationType %></span>
+                            <% } else if (post.categories && post.categories.length) { %>
+                                <span class="font-sans text-[10px] font-bold uppercase tracking-widest text-[#0f2e22] bg-[#0f2e22]/5 px-2.5 py-1"><%= post.categories[0].name %></span>
+                            <% } else { %>
+                                <span class="font-sans text-[10px] font-bold uppercase tracking-widest text-[#0f2e22] bg-[#0f2e22]/5 px-2.5 py-1">Market Research</span>
+                            <% } %>
+                            <span class="font-sans text-xs text-gray-400">
+                                <%= post.publishedDate ? post.publishedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '' %>
+                            </span>
+                        </div>
+                        <h3 class="font-serif text-xl text-[#0f2e22] leading-tight mb-3 group-hover:text-[#1a3a2a] transition-colors"><%= typeof decodeHtmlEntities === 'function' ? decodeHtmlEntities(post.title) : post.title %></h3>
+                        <% if (post.excerpt) { %>
+                        <p class="font-sans text-sm text-gray-600 leading-relaxed flex-1"><%= post.excerpt.length > 150 ? post.excerpt.substring(0, 150) + '…' : post.excerpt %></p>
+                        <% } %>
+                        <div class="mt-4 pt-4 border-t border-[#0f2e22]/5">
+                            <span class="font-sans text-xs font-bold uppercase tracking-widest text-[#0f2e22]">Read Report &rarr;</span>
+                        </div>
+                    </div>
+                </a>
             <% }) %>
+            </div>
 
             <!-- Pagination -->
-            <div class="border-t border-[#0f2e22]/20 pt-10">
+            <div class="border-t border-[#0f2e22]/20 pt-10 mt-10">
                 <%- include('partials/pagination', { currentPage, hasNextPage, hasPreviousPage, nextPage, previousPage, lastPage, baseUrl: (typeof baseUrl !== 'undefined' ? baseUrl : '/blog'), categoryQuery: (typeof perspectivesBaseUrl !== 'undefined' ? null : (typeof categoryQuery !== 'undefined' ? categoryQuery : null)) }) %>
             </div>
 

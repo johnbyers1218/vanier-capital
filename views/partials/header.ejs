@@ -102,8 +102,8 @@
                         <!-- Col 3: Featured Card -->
                         <% if (typeof latestFirmUpdate !== 'undefined' && latestFirmUpdate) { %>
                         <div class="col-span-3 bg-[#f9f8f6] p-5">
-                            <p class="text-xs font-bold tracking-[0.15em] text-gray-500 uppercase mb-3">Featured</p>
-                            <a href="/perspectives/<%= latestFirmUpdate.slug %>" class="block group/card">
+                            <p class="text-xs font-bold tracking-[0.15em] text-gray-500 uppercase mb-3">Latest Firm Update</p>
+                            <a href="/blog/<%= latestFirmUpdate.slug %>" class="block group/card">
                                 <% if (latestFirmUpdate.featuredImage) { %>
                                 <img src="<%= latestFirmUpdate.featuredImage %>" alt="<%= latestFirmUpdate.title %>" class="h-32 w-full object-cover mb-3">
                                 <% } else { %>
@@ -256,16 +256,16 @@
                         </div>
                         <div class="col-span-6 flex flex-col space-y-4 pt-1">
                             <a href="/investors" class="text-base font-medium text-[#1a1a1a] hover:text-[#0f2e22] transition-colors block py-1 border-b border-gray-100 pb-3">Capital Partnerships</a>
-                            <a href="/contact/investor-relations" class="text-base font-medium text-[#1a1a1a] hover:text-[#0f2e22] transition-colors block py-1">Join Distribution List</a>
+                            <a href="/investor-club/apply" class="text-base font-medium text-[#1a1a1a] hover:text-[#0f2e22] transition-colors block py-1">Join Distribution List</a>
                             <a href="/investors/disclosures" class="text-base font-medium text-[#1a1a1a] hover:text-[#0f2e22] transition-colors block py-1">Regulatory Disclosures &amp; Roadmap</a>
                         </div>
                         <div class="col-span-3 bg-[#0f2e22] p-5 flex flex-col justify-between">
                             <div>
-                                <p class="text-xs font-bold tracking-[0.15em] text-white/60 uppercase mb-3">Investor Relations</p>
-                                <h4 class="font-serif text-lg font-semibold text-white mb-2">Establish a Relationship</h4>
-                                <p class="text-sm text-white/70 font-sans leading-relaxed mb-4">Join our private distribution list to receive quarterly updates and be notified of future partnership opportunities.</p>
+                                <p class="text-xs font-bold tracking-[0.15em] text-white/60 uppercase mb-3">Private Placements</p>
+                                <h4 class="font-serif text-lg font-semibold text-white mb-2">Work Toward Partnership</h4>
+                                <p class="text-sm text-white/70 font-sans leading-relaxed mb-4">We are currently focused on Phase&nbsp;I portfolio stabilization. Complete our vetting form to receive quarterly research and be first notified of future private placement opportunities.</p>
                             </div>
-                            <a href="/contact/investor-relations" class="inline-block text-center text-sm font-bold uppercase tracking-wider bg-white text-[#0f2e22] px-5 py-3 hover:bg-[#f9f8f6] transition-colors">Contact Investor Relations</a>
+                            <a href="/investor-club/apply" class="inline-block text-center text-sm font-bold uppercase tracking-wider bg-white text-[#0f2e22] px-5 py-3 hover:bg-[#f9f8f6] transition-colors">Investor Vetting Form</a>
                         </div>
                     </div>
                 </div>
@@ -322,7 +322,7 @@
             <a href="/investors" class="font-serif text-base font-bold uppercase tracking-[0.12em] text-white py-4 hover:text-white/80 block <%= path && path.startsWith('/investor') ? 'text-white' : '' %>">Investors</a>
             <div class="pl-4 pb-3 flex flex-col gap-1">
                 <a href="/investors" class="font-sans text-sm text-white/80 py-1.5 hover:text-white block">Capital Partnerships</a>
-                <a href="/contact/investor-relations" class="font-sans text-sm text-white/80 py-1.5 hover:text-white block">Join Distribution List</a>
+                <a href="/investor-club/apply" class="font-sans text-sm text-white/80 py-1.5 hover:text-white block">Join Distribution List</a>
                 <a href="/investors/disclosures" class="font-sans text-sm text-white/80 py-1.5 hover:text-white block">Disclosures</a>
             </div>
         </div>

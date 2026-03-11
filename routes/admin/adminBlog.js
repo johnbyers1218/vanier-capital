@@ -294,7 +294,7 @@ export default (csrfProtection) => {
 
         // Data for re-rendering form in case of error
     const postDataForRender = {
-             title: req.body.title, slug: req.body.slug, excerpt: req.body.excerpt,
+             title: req.body.title, subtitle: req.body.subtitle, slug: req.body.slug, excerpt: req.body.excerpt,
              content: req.body.content, featuredImage: req.body.featuredImage,
              author: req.body.author,
          isPublished: !!req.body.isPublished,
@@ -347,6 +347,7 @@ export default (csrfProtection) => {
                 : (req.body.categories ? [req.body.categories] : []);
             const newPost = new BlogPost({
                 title: req.body.title,
+                subtitle: req.body.subtitle || null,
                 slug: finalSlug,
                 excerpt: req.body.excerpt,
                 content: cleanHtmlContent,
@@ -425,7 +426,7 @@ export default (csrfProtection) => {
 
         // Data for re-rendering form in case of error
         const postDataForRender = {
-            _id: postId, title: req.body.title, slug: req.body.slug, excerpt: req.body.excerpt,
+            _id: postId, title: req.body.title, subtitle: req.body.subtitle, slug: req.body.slug, excerpt: req.body.excerpt,
             content: req.body.content, featuredImage: req.body.featuredImage,
             author: req.body.author,
             isPublished: !!req.body.isPublished,
@@ -474,7 +475,7 @@ export default (csrfProtection) => {
 
             // Prepare the final update data object for BlogPost model
                     const updateData = {
-                 title: req.body.title, slug: finalSlug, excerpt: req.body.excerpt,
+                 title: req.body.title, subtitle: req.body.subtitle || null, slug: finalSlug, excerpt: req.body.excerpt,
                       content: cleanHtmlContent, featuredImage: req.body.featuredImage || null,
                   isPublished: !!req.body.isPublished,
               isFeatured: !!req.body.isFeatured,

@@ -13,6 +13,11 @@ const BlogPostSchema = new Schema({
         unique: true, // Creates a unique index automatically
         maxlength: [200, 'Blog post title cannot exceed 200 characters.']
     },
+    subtitle: {
+        type: String,
+        trim: true,
+        maxlength: [300, 'Subtitle cannot exceed 300 characters.']
+    },
     slug: {
         type: String,
         required: [true, 'Slug is required.'],
