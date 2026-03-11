@@ -136,7 +136,7 @@
                             <div>
                                 <p class="text-xs font-bold tracking-[0.15em] text-white/60 uppercase mb-3">Value-Add Execution</p>
                                 <h4 class="font-serif text-lg font-semibold text-white mb-2">Operational Alpha</h4>
-                                <p class="text-sm text-white/70 font-sans leading-relaxed mb-4">We acquire middle-market residential assets and execute highly efficient renovations to force appreciation, maintain a critical cost-basis advantage, and secure resilient long-term rental yield.</p>
+                                <p class="text-sm text-emerald-50 font-sans leading-relaxed mb-4">Executing highly efficient renovations to force appreciation, maintain a strict cost-basis advantage, and secure resilient long-term yield.</p>
                             </div>
                             <a href="/strategies" class="inline-block text-center text-sm font-bold uppercase tracking-wider bg-white text-[#0f2e22] px-5 py-3 hover:bg-[#f9f8f6] transition-colors">View Strategy</a>
                         </div>
@@ -203,7 +203,7 @@
                         </div>
                         <% if (typeof latestMarketResearch !== 'undefined' && latestMarketResearch) { %>
                         <div class="col-span-3 bg-[#f9f8f6] p-5">
-                            <p class="text-xs font-bold tracking-[0.15em] text-gray-500 uppercase mb-3">Latest Insight</p>
+                            <p class="text-xs font-bold tracking-[0.15em] text-gray-500 uppercase mb-3">Featured Report</p>
                             <a href="/blog/<%= latestMarketResearch.slug %>" class="block group/card">
                                 <% if (latestMarketResearch.featuredImage) { %>
                                 <img src="<%= latestMarketResearch.featuredImage %>" alt="<%= latestMarketResearch.title %>" class="h-32 w-full object-cover mb-3">
@@ -212,6 +212,7 @@
                                 <% } %>
                                 <h4 class="font-serif text-lg font-semibold text-[#1a1a1a] group-hover/card:text-[#0f2e22] transition-colors"><%= latestMarketResearch.title %></h4>
                             </a>
+                            <a href="/blog/<%= latestMarketResearch.slug %>" class="inline-block font-sans text-xs font-bold text-[#0f2e22] uppercase tracking-widest mt-3 hover:underline">Read Report &rarr;</a>
                         </div>
                         <% } %>
                     </div>

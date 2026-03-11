@@ -13,6 +13,7 @@ const PropertySchema = new mongoose.Schema({
     isFeaturedOnHomepage: { type: Boolean, default: false, index: true },
     isPubliclyVisible: { type: Boolean, default: true },
     lifecycle: { type: String, enum: ['Holding', 'Pipeline', ''], default: 'Holding', trim: true },
+    badgeText: { type: String, trim: true, maxlength: 200 }, // e.g. "Phase I Seed Asset — Closed to Capital"
 
     // ── Macro Metrics ─────────────────────────────────────────────────────────
     doors: { type: Number }, // Total door/unit count
@@ -30,6 +31,8 @@ const PropertySchema = new mongoose.Schema({
     cashOnCashYield: { type: String, trim: true }, // e.g. "10.2%"
     developmentSpread: { type: String, trim: true }, // e.g. "250 bps" — delta between Yield on Cost and Market Cap Rate
     unrealizedIrr: { type: String, trim: true }, // e.g. "22.4%" — current unrealized internal rate of return
+    actualIrr: { type: String, trim: true }, // e.g. "18.7%" — actual IRR (realized or current unrealized)
+    isRealized: { type: Boolean, default: false }, // true = asset has been sold/exited
 
     // ── Narrative ─────────────────────────────────────────────────────────────
     summary: { type: String, trim: true }, // Short overview for index cards

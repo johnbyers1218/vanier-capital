@@ -55,8 +55,21 @@
         <% } %>
 
         <!-- Author Line -->
-        <% const authorDisplay = post.author || 'Vanier Capital'; %>
-        <p class="font-sans text-base text-gray-500 mt-6">By <span class="text-[#1a1a1a] font-medium"><%= authorDisplay %></span> &mdash; Vanier Capital Investment Team</p>
+        <% 
+            const authorRaw = post.author || 'Vanier Capital';
+            // Split "John Byers, Partner & Chief Investment Officer" into name + title
+            const authorCommaIdx = authorRaw.indexOf(',');
+            let authorName, authorTitle;
+            if (authorCommaIdx > -1) {
+                authorName = authorRaw.substring(0, authorCommaIdx).trim();
+                authorTitle = authorRaw.substring(authorCommaIdx + 1).trim().replace(/\s*&\s*/g, ' & ');
+            } else {
+                authorName = authorRaw;
+                authorTitle = null;
+            }
+            const authorDisplay = authorName;
+        %>
+        <p class="font-sans text-base text-gray-500 mt-6">By <span class="text-[#1a1a1a] font-medium"><%= authorName %></span><% if (authorTitle) { %> &mdash; <%= authorTitle %><% } %></p>
     </div>
 </section>
 
@@ -97,9 +110,9 @@
         <!-- Author Block -->
         <div class="border-t border-[#0f2e22]/20 pt-8">
             <p class="font-sans text-base text-gray-600">
-                By <span class="font-medium text-[#1a1a1a]"><%= authorDisplay %></span>
+                By <span class="font-medium text-[#1a1a1a]"><%= authorName %></span><% if (authorTitle) { %> &mdash; <%= authorTitle %><% } %>
             </p>
-            <p class="font-sans text-base text-gray-500 mt-2">Real estate investment and asset management specialist at Vanier Capital.</p>
+            <p class="font-sans text-base text-gray-500 mt-2">Vanier Capital Investment Team</p>
         </div>
     </div>
 </section>

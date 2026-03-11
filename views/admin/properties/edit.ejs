@@ -77,6 +77,12 @@
                 </select>
                 <small>Controls header nav grouping: "Current Holdings" vs "Pipeline".</small>
             </div>
+
+            <div class="form-group">
+                <label for="badgeText">Badge Text</label>
+                <input type="text" id="badgeText" name="badgeText" value="<%= property && property.badgeText ? property.badgeText : '' %>" maxlength="200" placeholder="e.g., Phase I Seed Asset — Closed to Capital">
+                <small>Optional badge displayed above the title on the detail page. Leave blank to hide.</small>
+            </div>
         </fieldset>
 
         <%# ══════════ SECTION: COVER PHOTO ══════════ %>
@@ -129,8 +135,8 @@
 
                 <div class="form-group">
                     <label for="occupancy">Blended Occupancy</label>
-                    <input type="text" id="occupancy" name="occupancy" value="<%= property && property.occupancy ? property.occupancy : '' %>" placeholder="e.g. 98%">
-                    <small>Portfolio-wide stabilized occupancy.</small>
+                    <input type="text" id="occupancy" name="occupancy" value="<%= property && property.occupancy ? property.occupancy : '' %>" placeholder='e.g., "86%" or "TBD"'>
+                    <small>Portfolio-wide stabilized occupancy. Include the % sign for numerical values.</small>
                 </div>
 
                 <div class="form-group">
@@ -195,6 +201,23 @@
                     <label for="unrealizedIrr">Unrealized IRR (%)</label>
                     <input type="text" id="unrealizedIrr" name="unrealizedIrr" value="<%= property && property.unrealizedIrr ? property.unrealizedIrr : '' %>" placeholder="e.g. 22.4%">
                     <small>Current unrealized internal rate of return.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="actualIrr">Actual IRR (%)</label>
+                    <input type="text" id="actualIrr" name="actualIrr" value="<%= property && property.actualIrr ? property.actualIrr : '' %>" placeholder="e.g. 18.7%">
+                    <small>Realized IRR (if exited) or current performance IRR. Displayed dynamically based on realization status.</small>
+                </div>
+            </div>
+
+            <div style="margin-top: 12px; padding: 12px 14px; border: 1px solid rgba(15,46,34,0.2); background: rgba(15,46,34,0.05);">
+                <div class="checkbox-group" style="margin: 0;">
+                    <label class="checkbox-container" style="margin: 0;">
+                        <input type="checkbox" name="isRealized" <%= property && property.isRealized ? 'checked' : '' %>>
+                        <span class="checkmark"></span>
+                        <strong>Asset Realized (Exited)</strong>
+                    </label>
+                    <small style="display: block; margin-top: 6px; color: #6b7280;">Check if the holding has been sold/exited. Leave unchecked for active holdings. Controls whether "Actual IRR" displays as "Realized IRR" or "Current Unrealized IRR" on the public tear sheet.</small>
                 </div>
             </div>
         </fieldset>
