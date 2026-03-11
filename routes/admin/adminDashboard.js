@@ -7,7 +7,6 @@ import Property from '../../models/Property.js';
 import BlogPost from '../../models/BlogPost.js';
 import AdminLog from '../../models/AdminLog.js';
 import { logAdminAction } from '../../utils/helpers.js';
-import AdminUser from '../../models/AdminUser.js';
 import Contact from '../../models/Contacts.js';
 import Inquiry from '../../models/Inquiry.js';
 import Applicant from '../../models/Applicant.js';
@@ -51,11 +50,18 @@ export default (csrfProtection) => {
                 AdminLog.find()
                     .sort({ createdAt: -1 })
                     .limit(25)
-                    .populate('adminUser', 'username fullName avatarUrl')
                     .lean()
                     .exec()
                     .catch(err => { logger.warn('Failed to fetch recent admin logs', err); return []; }),
-                AdminUser.find({}, 'username fullName role avatarUrl').sort({ createdAt: 1 }).lean().catch(err => { logger.warn('Failed to fetch admin users', err); return []; }),
+                // Clerk-only auth: show the current session admin (AdminUser model removed)
+                Promise.resolve(
+                    req.adminUser ? [{
+                        username: req.adminUser.username || req.adminUser.email || 'admin',
+                        fullName: req.adminUser.fullName || req.adminUser.username || 'Administrator',
+                        role: req.adminUser.role || 'admin',
+                        avatarUrl: req.adminUser.avatarUrl || null,
+                    }] : []
+                ),
                 // Content health counts
                 BlogPost.countDocuments({ $or: [ { featuredImage: { $exists: false } }, { featuredImage: null }, { featuredImage: '' } ] }).exec().catch(err => { logger.warn('Failed to count posts missing featured image', err); return 0; }),
                 BlogPost.countDocuments({ isPublished: false, createdAt: { $lt: new Date(Date.now() - 30*24*60*60*1000) } }).exec().catch(err => { logger.warn('Failed to count stale drafts', err); return 0; }),
@@ -201,8 +207,7 @@ export default (csrfProtection) => {
                 // Provide a long enough default body to satisfy validation (>= 50 chars)
                 content: '<p>Draft created via Quick Start. Begin writing your content here. You can replace this placeholder text.</p>',
                 excerpt: 'Draft created via Quick Start. Add a short summary here to replace this placeholder.',
-                author: req.adminUser.userId,
-                authorDisplayName: (req.adminUser.fullName || req.adminUser.username || '').toString(),
+                author: 'Vanier Capital',
                 isPublished: false
             });
             await logAdminAction(req.adminUser.userId, req.adminUser.username, 'create_blog_draft_quick', `Title: ${title}`, req.ip);

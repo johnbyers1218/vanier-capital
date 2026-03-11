@@ -31,7 +31,7 @@ router.get('/', async (req, res, next) => { // Make route async
     logger.debug(`Rendering view 'index' for path: ${req.originalUrl}`);
     // In SMOKE mode, skip DB queries to avoid Mongoose buffering timeouts and render fast
     if (isSmoke) {
-        console.log('[Homepage] SMOKE MODE ACTIVE - Returning default stats');
+        logger.info('[Homepage] SMOKE MODE ACTIVE - Returning default stats');
         return res.render('index', {
             pageTitle: 'Vanier Capital | Real Estate Investment & Asset Management',
             pageDescription: 'Vanier Capital is a real estate investment firm focused on building long-term, risk-adjusted returns through strategic acquisition and disciplined management.',
@@ -62,18 +62,23 @@ router.get('/', async (req, res, next) => { // Make route async
             unitsManaged: '7+'
         };
         try {
-            const [targetIrrSet, capSet, aumSet, propertyCount] = await Promise.all([
+            const [targetIrrSet, capSet, aumSet, totalUnitsSet, propertyCount] = await Promise.all([
                 Settings.findOne({ key: 'targetIrr' }).lean(),
                 Settings.findOne({ key: 'capRate' }).lean(),
                 Settings.findOne({ key: 'aum' }).lean(),
+                Settings.findOne({ key: 'totalUnits' }).lean(),
                 Property.countDocuments({})
             ]);
             if (targetIrrSet && targetIrrSet.valueString) managedStats.targetIrr = targetIrrSet.valueString;
             if (capSet && capSet.valueString) managedStats.capRate = capSet.valueString;
             if (aumSet && aumSet.valueString) managedStats.aum = aumSet.valueString;
             
-            // Calculate Units Managed (Property Count)
-            if (propertyCount) managedStats.unitsManaged = `${propertyCount}+`;
+            // Total Units: prefer admin-set value, fall back to property count
+            if (totalUnitsSet && totalUnitsSet.valueString) {
+                managedStats.unitsManaged = totalUnitsSet.valueString;
+            } else if (propertyCount) {
+                managedStats.unitsManaged = `${propertyCount}+`;
+            }
             
             logger.debug('[Homepage] Managed Stats:', managedStats);
         } catch (err) {
@@ -434,13 +439,11 @@ router.get('/blog', async (req, res, next) => {
         // Build a unique set of contributor display names from published posts
         const contributorDocs = await BlogPost.find(
             { isPublished: true },
-            { authorDisplayName: 1, author: 1 }
-        ).populate('author', 'fullName username').lean();
+            { author: 1 }
+        ).lean();
         const nameSet = new Set();
         for (const d of (contributorDocs || [])) {
-            const displayName = (d.authorDisplayName && d.authorDisplayName.trim())
-                || (d.author && (d.author.fullName || d.author.username))
-                || '';
+            const displayName = (d.author && d.author.trim()) || '';
             const norm = String(displayName).trim().toLowerCase();
             if (norm) nameSet.add(norm);
         }
@@ -481,7 +484,6 @@ router.get('/blog', async (req, res, next) => {
        }
 
     let posts = await BlogPost.find(mainListQuery)
-                                     .populate('author', 'username fullName') // Populate author username only
                                      .populate('categories', 'name slug')
                                      .sort({ publishedDate: -1 })    // Sort by newest published
                                      .skip((page - 1) * postsPerPage)
@@ -608,12 +610,11 @@ async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeadi
         // Contributors
         const contributorDocs = await BlogPost.find(
             { isPublished: true },
-            { authorDisplayName: 1, author: 1 }
-        ).populate('author', 'fullName username').lean();
+            { author: 1 }
+        ).lean();
         const nameSet = new Set();
         for (const d of (contributorDocs || [])) {
-            const displayName = (d.authorDisplayName && d.authorDisplayName.trim())
-                || (d.author && (d.author.fullName || d.author.username)) || '';
+            const displayName = (d.author && d.author.trim()) || '';
             const norm = String(displayName).trim().toLowerCase();
             if (norm) nameSet.add(norm);
         }
@@ -651,7 +652,6 @@ async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeadi
         }
 
         let posts = await BlogPost.find(mainListQuery)
-            .populate('author', 'username fullName')
             .populate('categories', 'name slug')
             .sort({ publishedDate: -1 })
             .skip((page - 1) * postsPerPage)
@@ -746,7 +746,6 @@ router.get('/blog/:slug', async (req, res, next) => {
 
     // Find the current post
     const post = await BlogPost.findOne({ slug: slug, isPublished: true })
-                   .populate('author', 'username fullName title bio avatarUrl linkedinUrl twitterUrl') // Populate profile fields
                    .lean(); // Use lean for performance
 
         if (!post) {
@@ -863,6 +862,7 @@ router.get('/investor-club/apply', (req, res) => {
         pageTitle: 'Investor Accreditation — Vanier Capital',
         pageDescription: 'Request access to the Vanier Capital secure data room. Restricted to accredited investors under SEC Regulation D.',
         path: '/investor-club/apply',
+        robotsMeta: 'noindex, nofollow',
         ref: req.query.ref || ''
     });
 });
@@ -931,8 +931,8 @@ router.get('/sitemap.xml', async (req, res) => {
             '/perspectives/case-studies',
             '/perspectives/firm-updates',
             '/contact/investor-relations',
-            '/contact/acquisitions',
-            '/investor-club/apply'
+            '/contact/acquisitions'
+            // '/investor-club/apply' — REMOVED: SEC 506(b) general solicitation risk
         ];
 
         // Blog posts and blog pagination

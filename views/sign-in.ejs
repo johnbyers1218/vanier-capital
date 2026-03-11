@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= pageTitle %></title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" href="/images/vanier-logo.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #f9f8f6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+        .signin-container {
+            width: 100%;
+            max-width: 420px;
+        }
+        .signin-card {
+            background-color: #ffffff;
+            border: 1px solid rgba(15, 46, 34, 0.2);
+            padding: 2.5rem 2.5rem;
+        }
+        .logo-block {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .logo-text {
+            font-family: 'Merriweather', serif;
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #0f2e22;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+        .divider {
+            width: 40px;
+            height: 1px;
+            background-color: #0f2e22;
+            margin: 0.75rem auto 0;
+            opacity: 0.3;
+        }
+        .section-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.625rem;
+            font-weight: 700;
+            color: #0f2e22;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            opacity: 0.6;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-label {
+            display: block;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            color: #1a1a1a;
+            background-color: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 0;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+        .form-input:focus {
+            border-color: #0f2e22;
+            box-shadow: 0 0 0 1px #0f2e22;
+        }
+        .form-input::placeholder {
+            color: #9ca3af;
+        }
+        .error-message {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            font-size: 0.75rem;
+            padding: 0.625rem 0.75rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background-color: #0f2e22;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 0;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+            margin-top: 0.5rem;
+        }
+        .submit-btn:hover {
+            background-color: #1a1a1a;
+        }
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            vertical-align: middle;
+            margin-right: 0.5rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .footer-note {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.6875rem;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+        .footer-note a {
+            color: #0f2e22;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .footer-note a:hover {
+            text-decoration: underline;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.6875rem;
+            color: #6b7280;
+            text-decoration: none;
+            letter-spacing: 0.05em;
+        }
+        .back-link:hover {
+            color: #0f2e22;
+        }
+    </style>
+</head>
+<body>
+    <div class="signin-container">
+        <div class="signin-card">
+            <!-- Branding -->
+            <div class="logo-block">
+                <div class="logo-text">Vanier Capital</div>
+                <div class="divider"></div>
+            </div>
+
+            <div class="section-label">Secure Investor Access</div>
+
+            <!-- Error display -->
+            <div id="error-message" class="error-message"></div>
+
+            <!-- Sign-in form -->
+            <form id="custom-signin-form" autocomplete="on">
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="form-input"
+                        placeholder="investor@example.com"
+                        required
+                        autocomplete="email"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="form-input"
+                        placeholder="••••••••"
+                        required
+                        autocomplete="current-password"
+                    >
+                </div>
+
+                <button type="submit" id="submit-btn" class="submit-btn">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="footer-note">
+                Access restricted to authorized partners.<br>
+                Contact <a href="mailto:ir@vaniercapital.com">ir@vaniercapital.com</a> for credentials.
+            </div>
+        </div>
+
+        <a href="/" class="back-link">&larr; Return to Vanier Capital</a>
+    </div>
+
+    <!-- Headless Clerk JS Authentication -->
+    <script>
+        (function() {
+            const clerkPubKey = '<%= clerkPublishableKey %>';
+            const redirectTo = '<%= redirectTo %>';
+
+            if (!clerkPubKey) {
+                console.error('[SignIn] CLERK_PUBLISHABLE_KEY is missing.');
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = (typeof clerkFapiUrl !== 'undefined' && clerkFapiUrl ? clerkFapiUrl : 'https://secure-macaque-46.clerk.accounts.dev') + '/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
+            script.async = true;
+            script.crossOrigin = 'anonymous';
+            script.setAttribute('data-clerk-publishable-key', clerkPubKey);
+            document.body.appendChild(script);
+
+            script.addEventListener('load', async function() {
+                try {
+                    await window.Clerk.load();
+
+                    // If already signed in, redirect immediately
+                    if (window.Clerk.user) {
+                        window.location.replace(redirectTo);
+                        return;
+                    }
+
+                    const form = document.getElementById('custom-signin-form');
+                    const errorDiv = document.getElementById('error-message');
+                    const submitBtn = document.getElementById('submit-btn');
+
+                    form.addEventListener('submit', async function(e) {
+                        e.preventDefault();
+                        errorDiv.style.display = 'none';
+                        errorDiv.textContent = '';
+
+                        const email = document.getElementById('email').value.trim();
+                        const password = document.getElementById('password').value;
+
+                        if (!email || !password) {
+                            errorDiv.textContent = 'Please enter both email and password.';
+                            errorDiv.style.display = 'block';
+                            return;
+                        }
+
+                        // Disable button and show spinner
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<span class="spinner"></span>Authenticating...';
+
+                        try {
+                            const result = await window.Clerk.client.signIn.create({
+                                identifier: email,
+                                password: password,
+                            });
+
+                            if (result.status === 'complete') {
+                                await window.Clerk.setActive({ session: result.createdSessionId });
+                                window.location.href = redirectTo;
+                            } else if (result.status === 'needs_second_factor') {
+                                errorDiv.textContent = 'Two-factor authentication required. Please contact IR at ir@vaniercapital.com.';
+                                errorDiv.style.display = 'block';
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = 'Sign In';
+                            } else {
+                                errorDiv.textContent = 'Additional verification required. Please contact IR at ir@vaniercapital.com.';
+                                errorDiv.style.display = 'block';
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = 'Sign In';
+                            }
+                        } catch (err) {
+                            console.error('[SignIn] Authentication error:', err);
+                            const message = (err.errors && err.errors.length > 0)
+                                ? err.errors[0].longMessage || err.errors[0].message
+                                : 'Invalid credentials. Please try again.';
+                            errorDiv.textContent = message;
+                            errorDiv.style.display = 'block';
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = 'Sign In';
+                        }
+                    });
+                } catch (loadErr) {
+                    console.error('[SignIn] Clerk failed to load:', loadErr);
+                }
+            });
+
+            script.addEventListener('error', function() {
+                console.error('[SignIn] Failed to load Clerk JS SDK.');
+            });
+        })();
+    </script>
+</body>
+</html>

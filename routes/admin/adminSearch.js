@@ -15,7 +15,7 @@ export default (csrfProtection) => {
 			const regex = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
 			const [properties, posts] = await Promise.all([
 				Property.find({ $or: [{ title: regex }, { slug: regex }] }).select('title slug').limit(20).lean(),
-				BlogPost.find({ $or: [{ title: regex }, { slug: regex }, { authorDisplayName: regex }] }).select('title slug isPublished').limit(20).lean()
+				BlogPost.find({ $or: [{ title: regex }, { slug: regex }, { author: regex }] }).select('title slug isPublished').limit(20).lean()
 			]);
 			const results = [];
 			properties.forEach(p => results.push({ type: 'Property', title: p.title, href: `/admin/properties/edit/${p._id}` }));

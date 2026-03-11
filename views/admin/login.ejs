@@ -147,41 +147,64 @@
         type="text/javascript"
     ></script>
     <script>
-        // Official Clerk CDN pattern: wait for the page to load, then
-        // await Clerk.load() which resolves once the SDK is fully ready.
+        // Wait for the Clerk SDK script to load, then initialize.
         window.addEventListener('load', async function () {
-            // Clerk.load() is safe to call multiple times; it no-ops if already loaded.
-            // Pass signInForceRedirectUrl so the SDK knows where to navigate after sign-in.
-            await window.Clerk.load({
-                signInForceRedirectUrl: '/admin/dashboard',
-                signInFallbackRedirectUrl: '/admin/dashboard',
-                afterSignOutUrl: '/admin/login',
-            });
+            try {
+                // Clerk.load() initialises the SDK. Keep options minimal —
+                // redirect URLs are set per-component via mountSignIn() below,
+                // and via CLERK_* env vars read by @clerk/express on the server.
+                await window.Clerk.load({
+                    signInUrl: '/admin/login',
+                    signUpUrl: '/admin/login',
+                    signInForceRedirectUrl: '/admin/dashboard',
+                    signInFallbackRedirectUrl: '/admin/dashboard',
+                    afterSignOutUrl: '/admin/login',
+                    routerPush: function (to) { window.location.href = to; },
+                    routerReplace: function (to) { window.location.replace(to); },
+                });
 
-            // If the user is already signed in (session cookie valid),
-            // immediately redirect to the dashboard instead of showing the form.
-            if (window.Clerk.user) {
-                window.location.replace('/admin/dashboard');
-                return;
-            }
+                // If the user is already signed in (session cookie valid),
+                // redirect to the dashboard immediately.
+                if (window.Clerk.user) {
+                    window.location.replace('/admin/dashboard');
+                    return;
+                }
 
-            var signInDiv = document.getElementById('sign-in-widget');
-            if (!signInDiv) return;
-            signInDiv.innerHTML = ''; // clear "Loading authentication…"
+                // Mount the Clerk SignIn component.
+                var signInDiv = document.getElementById('sign-in-widget');
+                if (!signInDiv) return;
+                signInDiv.innerHTML = '';
 
-            window.Clerk.mountSignIn(signInDiv, {
-                appearance: {
-                    variables: { colorPrimary: '#0f2e22' },
-                    elements: {
-                        card: 'shadow-none border-0',
-                        rootBox: 'w-full',
-                        formButtonPrimary: 'bg-[#0f2e22] hover:bg-[#1a4a38] rounded-none uppercase tracking-widest text-xs font-bold',
+                window.Clerk.mountSignIn(signInDiv, {
+                    appearance: {
+                        variables: { colorPrimary: '#0f2e22' },
+                        elements: {
+                            card: 'shadow-none border-0',
+                            rootBox: 'w-full',
+                            formButtonPrimary: 'bg-[#0f2e22] hover:bg-[#1a4a38] rounded-none uppercase tracking-widest text-xs font-bold',
+                        }
+                    },
+                    // These redirect URLs are what the SDK uses after OAuth
+                    // callback is processed by handleRedirectCallback internally.
+                    forceRedirectUrl: '/admin/dashboard',
+                    fallbackRedirectUrl: '/admin/dashboard',
+                    signUpUrl: '/admin/login',
+                });
+
+                // Listen for the user becoming authenticated (e.g. after the
+                // SDK processes the OAuth callback silently). This is the
+                // safety net that guarantees navigation to the dashboard.
+                window.Clerk.addListener(function (emission) {
+                    if (emission.user) {
+                        window.location.replace('/admin/dashboard');
                     }
-                },
-                forceRedirectUrl: '/admin/dashboard',
-                fallbackRedirectUrl: '/admin/dashboard',
-                signUpUrl: '/admin/login',
-            });
+                });
+
+            } catch (err) {
+                console.error('[Clerk] Failed to load:', err);
+                var el = document.getElementById('sign-in-widget');
+                if (el) el.innerHTML = '<p style="color:#991b1b;text-align:center;">Authentication service unavailable. Please refresh.</p>';
+            }
         });
     </script>
 </body>

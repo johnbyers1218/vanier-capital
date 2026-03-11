@@ -39,7 +39,7 @@ const contactAndScheduleValidationRules = [
 router.post('/contact', contactAndScheduleValidationRules, async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        logger.warn(`Contact form validation errors IP ${req.ip}:`, { errors: errors.array(), body: req.body });
+        logger.warn(`Contact form validation errors IP ${req.ip}:`, { errors: errors.array(), failedFields: errors.array().map(e => e.param) });
         return res.status(400).json({
             success: false,
             message: "Validation failed. Please check the fields.",

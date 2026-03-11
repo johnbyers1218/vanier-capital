@@ -187,9 +187,11 @@
                 <% if (typeof recentLogs !== 'undefined' && recentLogs && recentLogs.length > 0) { %>
                     <ul class="divide-y divide-gray-200 max-h-[450px] overflow-y-auto" id="activityList">
                         <% recentLogs.forEach(function(log){
-                            var actor = log.adminUser || {};
-                            var name = actor.fullName || actor.username || 'System';
-                            var avatar = actor.avatarUrl;
+                            // adminUser is now a Clerk userId string (AdminUser model removed)
+                            // Extract actor name from details field: "User 'username'. ..."
+                            var actorMatch = (log.details || '').match(/^User '([^']+)'\./);
+                            var name = actorMatch ? actorMatch[1] : 'Admin';
+                            var avatar = null;
                             // Extract a readable detail without username prefixes or query strings
                             var detail = (log.details || '').replace(/User '\w+'.\s*/, '').replace(/\?.*$/, '');
                             var ts = log.createdAt ? new Date(log.createdAt) : null;
@@ -207,7 +209,7 @@
                             var titleMatch = detail.match(/Title:\s*([^,]+)/);
                             var title = titleMatch ? titleMatch[1].trim() : detail || log.action;
                         %>
-                        <li class="flex items-start gap-4 px-4 py-3 text-sm bg-white" data-actor="<%= actor.username || '' %>">
+                        <li class="flex items-start gap-4 px-4 py-3 text-sm bg-white" data-actor="<%= name %>">
                             <div class="w-9 h-9 overflow-hidden bg-gray-200 flex items-center justify-center shrink-0">
                                 <% if (avatar) { %>
                                     <img src="<%= avatar %>" alt="<%= name %>" class="w-full h-full object-cover" />

@@ -440,9 +440,10 @@ describe('Auth Guard — Unauthenticated Rejection', () => {
     const res = { writableEnded: false, headersSent: false };
     const next = (err) => {
       expect(err).toBeUndefined();
-      // req.auth should be populated
-      expect(req.auth).toBeDefined();
-      expect(req.auth.userId).toBeDefined();
+      // req.auth should be a function (mock for getAuth() compatibility)
+      expect(typeof req.auth).toBe('function');
+      const authResult = req.auth();
+      expect(authResult.userId).toBeDefined();
       done();
     };
     mw(req, res, next);
@@ -450,7 +451,7 @@ describe('Auth Guard — Unauthenticated Rejection', () => {
 
   it('Step 1 should populate req.adminUser in test bypass', (done) => {
     const mw = (requireAdminClerk.default || requireAdminClerk)[1];
-    const req = { auth: { userId: 'test123' } };
+    const req = { auth: () => ({ userId: 'test123' }) };
     const res = { headersSent: false, locals: {} };
     const next = (err) => {
       expect(err).toBeUndefined();
@@ -531,10 +532,11 @@ describe('Login Page — Already Authenticated Redirect', () => {
 // ═══════════════════════════════════════════════════════════════════════════
 describe('Navigation Redirects', () => {
 
-  it('GET /sign-in should redirect to Clerk hosted sign-in URL', async () => {
+  it('GET /sign-in should redirect to sign-in page', async () => {
     const res = await agent.get('/sign-in');
     expect(res.status).toBe(302);
-    expect(res.headers.location).toContain('sign-in');
+    // Redirects to CLERK_SIGN_IN_URL (our local /admin/login) or Clerk hosted sign-in
+    expect(res.headers.location).toContain('login');
   });
 
   it('GET /sign-in?redirectTo=/admin/dashboard should include redirect param', async () => {

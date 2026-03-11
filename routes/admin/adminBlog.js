@@ -1,10 +1,9 @@
-// routes/admin/adminBlog.js (ESM Version - COMPLETE with authorDisplayName)
+// routes/admin/adminBlog.js (ESM Version)
 
 
 import express from 'express';
 import { body, param, validationResult } from 'express-validator';
 import BlogPost from '../../models/BlogPost.js';
-import AdminUser from '../../models/AdminUser.js';
 import { logger } from '../../config/logger.js';
 import { validateMongoId, checkMongoIdValidation } from '../../middleware/validateMongoId.js';
 import { logAdminAction } from '../../utils/helpers.js';
@@ -86,11 +85,15 @@ export default (csrfProtection) => {
             .escape(),
         body('content', 'Blog content must be at least 50 characters.')
             .trim().isLength({ min: 50 }), // Raw HTML, sanitize later
-        body('authorDisplayName', 'Author Display Name cannot exceed 100 characters.')
-            .optional({ checkFalsy: true }) // It's optional, will default if blank
+        body('author', 'Author is required.')
             .trim()
-            .isLength({ max: 100 })
+            .notEmpty()
+            .isLength({ max: 150 })
             .escape(),
+        body('publishedAt', 'Publication date must be a valid date.')
+            .optional({ checkFalsy: true })
+            .isISO8601()
+            .toDate(),
         body('featuredImage', 'Featured Image must be a valid URL.')
             .optional({ checkFalsy: true }).trim().isURL(),
     // No legacy tags; curated categories only
@@ -143,10 +146,10 @@ export default (csrfProtection) => {
                 const result = await uploadPromise;
                 await logAdminAction(req.adminUser.userId, req.adminUser.username, 'upload_image', `File: ${req.file.originalname}, URL: ${result.secure_url}`, req.ip);
                 logger.info(`Blog Image uploaded: ${result.secure_url}, User: ${req.adminUser.username}`);
-                res.status(200).json({ location: result.secure_url });
+                return res.status(200).json({ location: result.secure_url });
             } catch (error) {
                 logger.error('Error during blog image Cloudinary upload:', { error: error.message });
-                res.status(500).json({ error: { message: `Server error: ${error.message}` } });
+                return res.status(500).json({ error: { message: `Server error: ${error.message}` } });
             }
         },
          (error, req, res, next) => { // Multer-specific error handling
@@ -215,10 +218,10 @@ export default (csrfProtection) => {
                 const result = await uploadPromise;
                 await logAdminAction(req.adminUser.userId, req.adminUser.username, 'upload_pdf', `File: ${req.file.originalname}, URL: ${result.secure_url}`, req.ip);
                 logger.info(`PDF uploaded: ${result.secure_url}, User: ${req.adminUser.username}`);
-                res.status(200).json({ success: true, location: result.secure_url });
+                return res.status(200).json({ success: true, location: result.secure_url });
             } catch (error) {
                 logger.error('Error during PDF Cloudinary upload:', { error: error.message });
-                res.status(500).json({ success: false, message: `Server error: ${error.message}` });
+                return res.status(500).json({ success: false, message: `Server error: ${error.message}` });
             }
         },
         (error, req, res, next) => {
@@ -250,7 +253,6 @@ export default (csrfProtection) => {
             const sortObj = { [sort]: order === 'asc' ? 1 : -1 };
 
             const posts = await BlogPost.find(filter)
-                                       .populate('author', 'username fullName')
                                        .sort(sortObj)
                                        .lean();
             logger.debug(`[Admin Blog] Found ${posts.length} posts to list. sort=${sort} order=${order} status=${status}`);
@@ -272,18 +274,15 @@ export default (csrfProtection) => {
     // GET /admin/blog/new - Display Add Form
     router.get('/new', csrfProtection, async (req, res) => {
         logger.debug(`[Admin Blog] GET /new - Form request from user: ${req.adminUser.username}, IP: ${req.ip}`);
-        // Pre-fill authorDisplayName with the current admin's full name (or username as fallback)
-        const defaultAuthorName = req.adminUser.fullName || req.adminUser.username;
     const categories = await Category.find({ isActive: true }).sort({ name: 1 }).lean();
         return res.render('admin/blog/edit', {
-            post: { authorDisplayName: defaultAuthorName }, // Initialize post object for the form
+            post: {}, // Empty post object for the form
             editing: false,
             pageTitle: 'Add New Blog Post',
             path: '/admin/blog',
             csrfToken: req.csrfToken(),
             errorMessages: [],
             tinymceApiKey: process.env.TINYMCE_API_KEY || 'no-api-key',
-            currentAdminFullName: defaultAuthorName, // For placeholder text in the form
             categories
         });
     });
@@ -297,10 +296,11 @@ export default (csrfProtection) => {
     const postDataForRender = {
              title: req.body.title, slug: req.body.slug, excerpt: req.body.excerpt,
              content: req.body.content, featuredImage: req.body.featuredImage,
-             authorDisplayName: req.body.authorDisplayName, // Keep submitted value
+             author: req.body.author,
          isPublished: !!req.body.isPublished,
          publicationType: req.body.publicationType || 'Market Research',
          pdfDocumentUrl: req.body.pdfDocumentUrl || '',
+         publishedAt: req.body.publishedAt || '',
          categories: Array.isArray(req.body.categories) ? req.body.categories : (req.body.categories ? [req.body.categories] : [])
         };
         const currentAdminNameForForm = req.adminUser.fullName || req.adminUser.username;
@@ -312,7 +312,7 @@ export default (csrfProtection) => {
                 slug: req.body.slug,
                 excerptLength: req.body.excerpt?.length,
                 contentLength: req.body.content?.length,
-                authorDisplayName: req.body.authorDisplayName,
+                author: req.body.author,
                 categories: postDataForRender.categories,
                 isPublished: !!req.body.isPublished
             };
@@ -323,7 +323,6 @@ export default (csrfProtection) => {
                 editing: false, pageTitle: 'Add New Blog Post (Errors)', path: '/admin/blog',
                 csrfToken: req.csrfToken(), errorMessages: errors.array(),
                 tinymceApiKey: process.env.TINYMCE_API_KEY || 'no-api-key',
-                currentAdminFullName: currentAdminNameForForm,
                 categories
             });
         }
@@ -343,12 +342,6 @@ export default (csrfProtection) => {
             }
             if (!finalSlug) throw new Error("A valid slug is required.");
 
-            // Determine authorDisplayName: use provided, else default to logged-in admin's name
-            let finalAuthorDisplayName = req.body.authorDisplayName?.trim();
-            if (!finalAuthorDisplayName) {
-                finalAuthorDisplayName = req.adminUser.fullName || req.adminUser.username;
-            }
-
             const categoryIds = Array.isArray(req.body.categories)
                 ? req.body.categories
                 : (req.body.categories ? [req.body.categories] : []);
@@ -357,23 +350,23 @@ export default (csrfProtection) => {
                 slug: finalSlug,
                 excerpt: req.body.excerpt,
                 content: cleanHtmlContent,
-                author: req.adminUser.userId, // Actual creator (AdminUser ObjectId)
-                authorDisplayName: finalAuthorDisplayName, // Name to be displayed publicly
+                author: req.body.author, // String — selected from hardcoded dropdown
                 featuredImage: req.body.featuredImage || null,
                 categories: categoryIds,
                 publicationType: req.body.publicationType || 'Market Research',
                 pdfDocumentUrl: req.body.pdfDocumentUrl || null,
                 isPublished: !!req.body.isPublished,
-                publishedDate: (!!req.body.isPublished ? new Date() : null)
+                publishedDate: (!!req.body.isPublished ? new Date() : null),
+                publishedAt: req.body.publishedAt || new Date()
             });
 
             await newPost.save();
 
             await logAdminAction(
                 req.adminUser.userId, req.adminUser.username,
-                'create_blog_post', `Title: ${newPost.title}, Display Author: ${newPost.authorDisplayName}`, req.ip
+                'create_blog_post', `Title: ${newPost.title}, Author: ${newPost.author}`, req.ip
             );
-            logger.info(`[Admin Blog] New post '${newPost.title}' created by ${req.adminUser.username}, Display Author: ${newPost.authorDisplayName}`);
+            logger.info(`[Admin Blog] New post '${newPost.title}' created by ${req.adminUser.username}, Author: ${newPost.author}`);
 
             req.flash('success', 'Blog post created successfully!');
             return res.redirect('/admin/blog');
@@ -391,7 +384,6 @@ export default (csrfProtection) => {
                 editing: false, pageTitle: 'Add New Blog Post (Error)', path: '/admin/blog',
                 csrfToken: req.csrfToken(), errorMessages: errorMessagesList,
                 tinymceApiKey: process.env.TINYMCE_API_KEY || 'no-api-key',
-                currentAdminFullName: currentAdminNameForForm,
                 categories
             });
         }
@@ -402,33 +394,21 @@ export default (csrfProtection) => {
         const postId = req.params.id;
         logger.debug(`[Admin Blog] GET /edit/:id - Request for ID: ${postId} by ${req.adminUser.username}, IP: ${req.ip}`);
         try {
-            // Populate the 'author' field to get fullName and username for defaulting authorDisplayName
-            const post = await BlogPost.findById(postId).populate('author', 'username fullName').lean();
+            const post = await BlogPost.findById(postId).lean();
             if (!post) {
                 req.flash('error', 'Blog post not found.');
                 return res.redirect('/admin/blog');
             }
 
-            // Determine the name to show in the placeholder/default for the author display name field
-            // This will be the actual author's name (creator of the post)
-            const authorForPlaceholder = post.author ? (post.author.fullName || post.author.username) : (req.adminUser.fullName || req.adminUser.username);
-
-            // Prepare data for the form. If authorDisplayName is empty, use the actual author's name for the form field.
-            const postDataForForm = {
-                ...post,
-                authorDisplayName: post.authorDisplayName || authorForPlaceholder
-            };
-
             const categories = await Category.find({ isActive: true }).sort({ name: 1 }).lean();
             return res.render('admin/blog/edit', {
-                post: postDataForForm,
+                post,
                 editing: true,
                 pageTitle: 'Edit Blog Post',
                 path: '/admin/blog',
                 csrfToken: req.csrfToken(),
                 errorMessages: [],
                 tinymceApiKey: process.env.TINYMCE_API_KEY || 'no-api-key',
-                currentAdminFullName: authorForPlaceholder, // Used for the placeholder text
                 categories
             });
         } catch (err) {
@@ -447,11 +427,12 @@ export default (csrfProtection) => {
         const postDataForRender = {
             _id: postId, title: req.body.title, slug: req.body.slug, excerpt: req.body.excerpt,
             content: req.body.content, featuredImage: req.body.featuredImage,
-            authorDisplayName: req.body.authorDisplayName, // Keep submitted value
+            author: req.body.author,
             isPublished: !!req.body.isPublished,
             isFeatured: !!req.body.isFeatured,
             publicationType: req.body.publicationType || 'Market Research',
             pdfDocumentUrl: req.body.pdfDocumentUrl || '',
+            publishedAt: req.body.publishedAt || '',
             categories: Array.isArray(req.body.categories) ? req.body.categories : (req.body.categories ? [req.body.categories] : [])
         };
 
@@ -461,22 +442,18 @@ export default (csrfProtection) => {
                 slug: req.body.slug,
                 excerptLength: req.body.excerpt?.length,
                 contentLength: req.body.content?.length,
-                authorDisplayName: req.body.authorDisplayName,
+                author: req.body.author,
                 categories: postDataForRender.categories,
                 isPublished: !!req.body.isPublished,
                 isFeatured: !!req.body.isFeatured
             };
             logger.warn(`[Admin Blog] Validation errors updating post ID ${postId}:`, { errors: errors.array(), bodySummary });
-            // Fetch the original author's name for placeholder context if re-rendering
-            const originalPost = await BlogPost.findById(postId).populate('author', 'fullName username').select('author').lean();
-            const authorForPlaceholder = originalPost && originalPost.author ? (originalPost.author.fullName || originalPost.author.username) : '';
 
             const categories = await Category.find({ isActive: true }).sort({ name: 1 }).lean();
             return res.status(422).render('admin/blog/edit', {
                 post: postDataForRender, editing: true, pageTitle: 'Edit Blog Post (Errors)', path: '/admin/blog',
                 csrfToken: req.csrfToken(), errorMessages: errors.array(),
                 tinymceApiKey: process.env.TINYMCE_API_KEY || 'no-api-key',
-                currentAdminFullName: authorForPlaceholder,
                 categories
             });
         }
@@ -502,30 +479,20 @@ export default (csrfProtection) => {
                   isPublished: !!req.body.isPublished,
               isFeatured: !!req.body.isFeatured,
               publicationType: req.body.publicationType || 'Market Research',
-              pdfDocumentUrl: req.body.pdfDocumentUrl || null
+              pdfDocumentUrl: req.body.pdfDocumentUrl || null,
+              author: req.body.author, // String from hardcoded dropdown
             };
+
+            // publishedAt — custom publication date override
+            if (req.body.publishedAt) {
+                updateData.publishedAt = req.body.publishedAt;
+            }
 
                         // categories
                         const categoryIds = Array.isArray(req.body.categories)
                                 ? req.body.categories
                                 : (req.body.categories ? [req.body.categories] : []);
                         updateData.categories = categoryIds;
-
-            // Determine the authorDisplayName for the update
-            let finalAuthorDisplayName = req.body.authorDisplayName?.trim();
-            if (!finalAuthorDisplayName) {
-                // If cleared by user, default to the *original* author's full name or username
-                const originalPost = await BlogPost.findById(postId).populate('author', 'fullName username').select('author').lean();
-                if (originalPost && originalPost.author) {
-                    finalAuthorDisplayName = originalPost.author.fullName || originalPost.author.username;
-                } else {
-                    // Fallback if somehow original author isn't found (should be rare if post exists)
-                    // Use current logged-in user as a last resort for the display name in this odd case
-                    finalAuthorDisplayName = req.adminUser.fullName || req.adminUser.username;
-                    logger.warn(`[Admin Blog] Could not find original author for post ${postId} when defaulting authorDisplayName. Using current admin's name.`);
-                }
-            }
-            updateData.authorDisplayName = finalAuthorDisplayName;
 
             // Conditionally update publishedDate
             const existingPost = await BlogPost.findById(postId).select('isPublished publishedDate').lean();
@@ -546,9 +513,9 @@ export default (csrfProtection) => {
 
             await logAdminAction(
                 req.adminUser.userId, req.adminUser.username,
-                'update_blog_post', `ID: ${postId}, Title: ${updatedPost.title}, Display Author: ${updatedPost.authorDisplayName}`, req.ip
+                'update_blog_post', `ID: ${postId}, Title: ${updatedPost.title}, Author: ${updatedPost.author}`, req.ip
             );
-            logger.info(`[Admin Blog] Post '${updatedPost.title}' (ID: ${postId}) updated by ${req.adminUser.username}, Display Author: ${updatedPost.authorDisplayName}`);
+            logger.info(`[Admin Blog] Post '${updatedPost.title}' (ID: ${postId}) updated by ${req.adminUser.username}, Author: ${updatedPost.author}`);
 
             req.flash('success', 'Blog post updated successfully!');
             return res.redirect('/admin/blog');
@@ -561,16 +528,12 @@ export default (csrfProtection) => {
                  errorMessagesList.push({ msg: `This ${duplicateField} is already in use. Please choose a different one.` });
             }
             // Fetch original author's name for placeholder if re-rendering form due to error
-            const originalPostForError = await BlogPost.findById(postId).populate('author', 'fullName username').select('author').lean();
-            const authorForPlaceholderOnError = originalPostForError && originalPostForError.author ? (originalPostForError.author.fullName || originalPostForError.author.username) : '';
-
             const categories = await Category.find({ isActive: true }).sort({ name: 1 }).lean();
             return res.status(err.code === 11000 ? 409 : 500).render('admin/blog/edit', {
                 post: postDataForRender, // Send submitted data back
                 editing: true, pageTitle: 'Edit Blog Post (Error)', path: '/admin/blog',
                 csrfToken: req.csrfToken(), errorMessages: errorMessagesList,
                 tinymceApiKey: process.env.TINYMCE_API_KEY || 'no-api-key',
-                currentAdminFullName: authorForPlaceholderOnError,
                 categories
             });
         }

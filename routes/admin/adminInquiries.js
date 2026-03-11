@@ -2,6 +2,7 @@
 import express from 'express';
 import Inquiry from '../../models/Inquiry.js';
 import { logger } from '../../config/logger.js';
+import { validateMongoId, checkMongoIdValidation } from '../../middleware/validateMongoId.js';
 
 export default (csrfProtection) => {
   const router = express.Router();
@@ -22,7 +23,7 @@ export default (csrfProtection) => {
   });
 
   // Detail page; marks New -> Viewed on load
-  router.get('/:id', csrfProtection, async (req, res, next) => {
+  router.get('/:id', validateMongoId, checkMongoIdValidation, csrfProtection, async (req, res, next) => {
     try {
       const id = req.params.id;
       const inquiry = await Inquiry.findById(id).lean();
@@ -36,7 +37,7 @@ export default (csrfProtection) => {
   });
 
   // Mark as Responded
-  router.post('/:id/responded', csrfProtection, async (req, res, next) => {
+  router.post('/:id/responded', validateMongoId, checkMongoIdValidation, csrfProtection, async (req, res, next) => {
     try {
       const id = req.params.id;
       await Inquiry.updateOne({ _id: id }, { $set: { status: 'Responded' } });

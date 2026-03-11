@@ -110,7 +110,8 @@ router.get('/properties', async (req, res, next) => {
         return res.status(200).json({ success: true, properties, pagination: { page, perPage, total, totalPages: perPage > 0 ? Math.ceil(total / perPage) : 0 }, filters });
     } catch (error) {
         logger.error('API Error fetching public properties:', { error: error.message, stack: error.stack });
-        return res.status(500).json({ success: false, message: error.message });
+        const isProduction = process.env.NODE_ENV === 'production';
+        return res.status(500).json({ success: false, message: isProduction ? 'An internal error occurred.' : error.message });
     }
 });
 
@@ -126,14 +127,13 @@ router.get('/blog/posts', async (req, res, next) => {
     try {
         const posts = await BlogPost.find(
             { isPublished: true },
-            'title slug excerpt publishedDate featuredImage author' // Projection: select only needed fields
+            'title slug excerpt publishedDate featuredImage author'
         )
-        .populate('author', 'username') // Populate author username
         .sort({ publishedDate: -1 })
         .limit(limit)
         .lean();
 
-        res.status(200).json({ success: true, posts: posts });
+        return res.status(200).json({ success: true, posts: posts });
 
     } catch(error) {
          logger.error('API Error fetching public blog posts:', error);
@@ -154,14 +154,14 @@ export default router;
 router.post(
     '/investor-club/apply',
     [
-        body('fullName').isString().trim().isLength({ min: 2, max: 120 }).withMessage('Full name required.'),
+        body('fullName').isString().trim().isLength({ min: 2, max: 120 }).escape().withMessage('Full name required.'),
         body('email').isEmail().withMessage('Valid email required.').normalizeEmail(),
-        body('cityState').isString().trim().isLength({ min: 2, max: 120 }).withMessage('City/State required.'),
+        body('cityState').isString().trim().isLength({ min: 2, max: 120 }).escape().withMessage('City/State required.'),
         body('investorType').isIn(['individual','family-office','ria','institutional','other']).withMessage('Select investor type.'),
         body('capitalInterest').optional({ values: 'falsy' }).isIn(['', '<250k','250k-500k','500k-1m','>1m']).withMessage('Invalid capital range.'),
         body('accredited').custom(v => v === 'yes').withMessage('Accredited attestation required.'),
-        body('phone').optional().isString().trim().isLength({ max: 30 }),
-        body('notes').optional().isString().trim().isLength({ max: 3000 })
+        body('phone').optional().isString().trim().isLength({ max: 30 }).escape(),
+        body('notes').optional().isString().trim().isLength({ max: 3000 }).escape()
     ],
     async (req, res) => {
         const errors = validationResult(req);

@@ -53,7 +53,7 @@ describe('Admin Blog CRUD (in-memory DB)', () => {
       content: makeLong('content'),
   excerpt: 'Short summary',
       isPublished: 'true',
-      authorDisplayName: 'Admin'
+      author: 'John Byers, Partner & Chief Investment Officer'
     });
     expect([302,303]).toContain(res.status);
     const saved = await BlogPost.findOne({ title }).lean();
@@ -64,15 +64,14 @@ describe('Admin Blog CRUD (in-memory DB)', () => {
 
   test('Read -> list includes created post', async () => {
     const title = `Post B ${Date.now()}`;
-  await BlogPost.create({ title, slug: `post-b-${Date.now()}`, content: makeLong('x'), excerpt: 'Short', author: (await AdminUser.findOne({ username: 'admin' }))._id, authorDisplayName: 'Admin', isPublished: false });
+  await BlogPost.create({ title, slug: `post-b-${Date.now()}`, content: makeLong('x'), excerpt: 'Short', author: 'Vanier Capital', isPublished: false });
     const list = await agent.get('/admin/blog');
     expect(list.status).toBe(200);
     expect(list.text).toContain(title);
   });
 
   test('Update -> modifies the document', async () => {
-    const admin = await AdminUser.findOne({ username: 'admin' });
-  const post = await BlogPost.create({ title: `Orig ${Date.now()}`, slug: `orig-${Date.now()}`, content: makeLong('y'), excerpt: 'Short', author: admin._id, authorDisplayName: 'Admin', isPublished: false });
+  const post = await BlogPost.create({ title: `Orig ${Date.now()}`, slug: `orig-${Date.now()}`, content: makeLong('y'), excerpt: 'Short', author: 'Vanier Capital', isPublished: false });
     const editPage = await agent.get(`/admin/blog/edit/${post._id}`);
     const csrf = extractCsrf(editPage.text);
     const newTitle = `Updated ${Date.now()}`;
@@ -83,7 +82,7 @@ describe('Admin Blog CRUD (in-memory DB)', () => {
   excerpt: 'Short summary',
       slug: '',
       isPublished: 'true',
-      authorDisplayName: 'Admin'
+      author: 'Vanier Capital'
     });
     expect([302,303]).toContain(upd.status);
     const fresh = await BlogPost.findById(post._id).lean();
@@ -92,8 +91,7 @@ describe('Admin Blog CRUD (in-memory DB)', () => {
   });
 
   test('Delete -> removes the document', async () => {
-    const admin = await AdminUser.findOne({ username: 'admin' });
-  const post = await BlogPost.create({ title: `Del ${Date.now()}`, slug: `del-${Date.now()}`, content: makeLong('z'), excerpt: 'Short', author: admin._id, authorDisplayName: 'Admin', isPublished: false });
+  const post = await BlogPost.create({ title: `Del ${Date.now()}`, slug: `del-${Date.now()}`, content: makeLong('z'), excerpt: 'Short', author: 'Vanier Capital', isPublished: false });
     const list = await agent.get('/admin/blog');
     const csrf = extractCsrf(list.text);
     const del = await agent.post(`/admin/blog/delete/${post._id}`).type('form').send({ _csrf: csrf });
@@ -106,8 +104,7 @@ describe('Admin Blog CRUD (in-memory DB)', () => {
     // Under BYPASS_AUTH=1 all agents get admin role — RBAC test not meaningful.
     // When Clerk is live this would be tested end-to-end with real role differentiation.
     test.skip('Editor cannot delete blog post (403)', async () => {
-      const admin = await AdminUser.findOne({ username: 'admin' });
-  const post = await BlogPost.create({ title: `Secure ${Date.now()}`, slug: `secure-${Date.now()}`, content: makeLong('s'), excerpt: 'Short', author: admin._id, authorDisplayName: 'Admin', isPublished: false });
+  const post = await BlogPost.create({ title: `Secure ${Date.now()}`, slug: `secure-${Date.now()}`, content: makeLong('s'), excerpt: 'Short', author: 'Vanier Capital', isPublished: false });
       const editorAgent = request.agent(app);
       // With BYPASS_AUTH=1, all agents get admin role from the test bypass.
       // RBAC delete-restriction tests are not meaningful under full bypass — skip Clerk login.

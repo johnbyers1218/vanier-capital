@@ -19,8 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize core UI components
     initSmartHeader();
-    initMobileNavNew();
-    initMobileNav();
+    // Mobile nav toggle handled by inline script in footer.ejs (avoids double-bind)
     setActiveNavLink();
     initFAQAccordion();
     updateCopyrightYear();
@@ -394,7 +393,7 @@ function createFeaturedProjectHtml(project) {
 // Ensure your DOMContentLoaded listener calls loadProjects, loadFeaturedProject correctly.
 document.addEventListener('DOMContentLoaded', () => {
   
-    initMobileNav();
+    // Mobile nav toggle handled by inline script in footer.ejs
     setActiveNavLink();
     initFAQAccordion();
     updateCopyrightYear();
@@ -1968,7 +1967,6 @@ function initContactAndScheduleForm() {
 
     // Prevent double-initialization (can occur due to multiple DOMContentLoaded hooks)
     if (mainForm.getAttribute('data-initialized') === '1') {
-        console.log('Contact form already initialized, skipping re-bind.');
         return;
     }
     mainForm.setAttribute('data-initialized', '1');
@@ -1981,10 +1979,8 @@ function initContactAndScheduleForm() {
         event.preventDefault();
 
         if (submitButton.disabled) {
-            console.log('Form already submitting, ignoring additional click.');
             return;
         }
-        console.log('Main form submitted. Preventing default.');
 
         submitButton.disabled = true;
         submitButton.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Sending...`;
@@ -2008,18 +2004,15 @@ function initContactAndScheduleForm() {
     formObject.requestedMeeting = hiddenRequestedMeetingInput ? (hiddenRequestedMeetingInput.value === 'true') : false;
 
 
-        console.log('Submitting combined form data:', formObject);
         let dataFromApi; // To store API response for use in finally block
 
         try {
             // NOTE: Public contact form now handled by /api/contact (not /api/contact-submission)
             dataFromApi = await fetchData('/api/contact', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
                 body: JSON.stringify(formObject)
             });
-
-            console.log('Combined form API response:', dataFromApi);
 
             if (dataFromApi.success) {
                 displayStatusMessage('contact-form-message', dataFromApi.message, true);
@@ -2064,7 +2057,6 @@ function initContactAndScheduleForm() {
             }
         }
     });
-    console.log('Combined contact and schedule form initialized.');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -2149,11 +2141,9 @@ window.faqInitialized = window.faqInitialized || false;
 
 function initFAQAccordion() {
     if (window.faqInitialized) {
-        console.log('FAQ Accordion: Already initialized, skipping...');
         return;
     }
     
-    console.log('FAQ Accordion: Starting initialization...');
     
     // Clear any existing FAQ handlers
     const existingFaqItems = document.querySelectorAll('.faq-item');
@@ -2167,7 +2157,6 @@ function initFAQAccordion() {
     });
     
     const faqItems = document.querySelectorAll('.faq-item');
-    console.log(`FAQ Accordion: Found ${faqItems.length} FAQ items`);
     
     if (!faqItems.length) {
         console.warn('FAQ Accordion: No FAQ items found');
@@ -2182,8 +2171,6 @@ function initFAQAccordion() {
             console.warn(`FAQ ${index + 1}: Missing question or answer element`);
             return;
         }
-
-        console.log(`FAQ ${index + 1}: Initializing...`);
 
         // Set unique IDs for accessibility
         const answerId = `faq-answer-${index + 1}`;
@@ -2213,7 +2200,6 @@ function initFAQAccordion() {
 
         // Toggle function with state tracking
         const toggleFAQ = (event) => {
-            console.log(`FAQ ${index + 1}: Click event received`);
             
             // Only handle specific events
             if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') {
@@ -2227,7 +2213,6 @@ function initFAQAccordion() {
 
             const currentState = question.getAttribute('aria-expanded');
             const isExpanded = currentState === 'true';
-            console.log(`FAQ ${index + 1}: Current state: ${currentState}, isExpanded: ${isExpanded}`);
 
         // Close all other FAQs first
             faqItems.forEach((otherItem, otherIndex) => {
@@ -2238,7 +2223,6 @@ function initFAQAccordion() {
                         otherQuestion.setAttribute('aria-expanded', 'false');
             otherAnswer.style.maxHeight = '0px';
             otherItem.classList.remove('is-open');
-                        console.log(`FAQ ${otherIndex + 1}: Force closed`);
                     }
                 }
             });
@@ -2255,7 +2239,6 @@ function initFAQAccordion() {
                     // Ensure we start from 0 then go to measured height
                     answer.style.maxHeight = answer.scrollHeight + 'px';
                 }
-                console.log(`FAQ ${index + 1}: Opening to ${answer.scrollHeight}px`);
             } else {
                 // Close: if maxHeight was 'none', set it to current height to enable transition to 0
                 question.setAttribute('aria-expanded', 'false');
@@ -2268,7 +2251,6 @@ function initFAQAccordion() {
                 }
                 answer.style.maxHeight = '0px';
                 item.classList.remove('is-open');
-                console.log(`FAQ ${index + 1}: Closed`);
             }
             
             return false;
@@ -2276,12 +2258,9 @@ function initFAQAccordion() {
 
         // Add single event listener with capture
         question.addEventListener('click', toggleFAQ, true);
-        
-        console.log(`FAQ ${index + 1}: Successfully initialized`);
     });
 
     window.faqInitialized = true;
-    console.log('FAQ Accordion: Initialization complete');
 }
 
 // Ensure this function is called within the main DOMContentLoaded listener in apps.js
@@ -2436,7 +2415,7 @@ function initNewsletterForm() {
                     if (lastNameEl && lastNameEl.value) bodyPayload.lastName = lastNameEl.value.trim();
                     const resp = await fetch('/api/subscribe', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
                         body: JSON.stringify(bodyPayload)
                     });
                     const data = await resp.json().catch(() => ({ success: false, message: 'Unexpected response.' }));
@@ -2701,6 +2680,9 @@ function initSmartHeader() {
     // Only manage scroll transparency if EJS told us to (homepage + hero pages)
     if (behavior === 'scroll-transparent') {
         const handleScroll = () => {
+            // Don't override colors while mobile menu is open
+            if (header.dataset.menuLocked === 'true') return;
+
             if (window.scrollY > 10) {
                 // Scrolled: solid white background
                 header.classList.remove('bg-transparent', 'text-white');

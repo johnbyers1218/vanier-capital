@@ -74,7 +74,7 @@
                                     <span class="ml-1 text-[#0f2e22]" title="Has PDF attachment"><i class="fas fa-file-pdf"></i></span>
                                 <% } %>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600"><%= post.authorDisplayName || (post.author ? (post.author.fullName || post.author.username) : 'N/A') %></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600"><%= post.author || 'N/A' %></td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
                                 <% if (post.isPublished) { %>
                                     <span class="inline-flex items-center bg-green-50 text-green-700 border border-green-300 px-2 py-1 text-xs font-bold uppercase tracking-widest">Published</span>

@@ -33,15 +33,10 @@ const BlogPostSchema = new Schema({
         maxlength: [250, 'Excerpt cannot exceed 250 characters.']
     },
     author: {
-        type: Schema.Types.ObjectId,
-        ref: 'AdminUser', // Links to the AdminUser model (ensure AdminUser model uses default export)
-        required: true
-    },
-    authorDisplayName: { // This is the name to be publicly displayed
         type: String,
         trim: true,
-        maxlength: [100, 'Author display name cannot exceed 100 characters.'],
-        default: '' // Will be populated by route logic
+        required: [true, 'Author is required.'],
+        maxlength: [150, 'Author cannot exceed 150 characters.']
     },
     isPublished: {
         type: Boolean,
@@ -49,6 +44,12 @@ const BlogPostSchema = new Schema({
     },
     publishedDate: {
         type: Date
+    },
+    // User-overridable publication date for backdating case studies / firm
+    // updates.  Falls back to publishedDate (auto-set) when not provided.
+    publishedAt: {
+        type: Date,
+        default: Date.now
     },
     featuredImage: {
         type: String,

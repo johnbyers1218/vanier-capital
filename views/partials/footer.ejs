@@ -6,8 +6,8 @@
 <!-- Site Footer                          -->
 <!-- ======================================== -->
 <footer class="bg-[#0f2e22] text-white mt-0">
-    <div class="mx-auto max-w-screen-xl px-8 md:px-16 py-16">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+    <div class="mx-auto max-w-screen-xl px-6 md:px-16 py-12 md:py-16">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
 
             <!-- Column 1: Brand -->
             <div>
@@ -63,14 +63,14 @@
 
     <!-- Footer Bottom Bar -->
     <div class="border-t border-white/10">
-        <div class="mx-auto max-w-screen-xl px-8 md:px-16 py-5 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="mx-auto max-w-screen-xl px-6 md:px-16 py-5 flex flex-col md:flex-row items-center justify-between gap-4">
             <p class="font-sans text-xs text-white/50 uppercase tracking-widest">&copy; <span id="current-year">2025</span> Vanier Capital, LLC. All Rights Reserved.</p>
             <div class="flex items-center gap-5">
                 <a href="https://www.linkedin.com/company/vanier-capital" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="font-sans text-xs text-white/50 hover:text-white transition-colors uppercase tracking-widest">LinkedIn</a>
                 <a href="https://x.com/vaniercapital" target="_blank" rel="noopener noreferrer" aria-label="X" class="font-sans text-xs text-white/50 hover:text-white transition-colors uppercase tracking-widest">X</a>
             </div>
         </div>
-        <div class="mx-auto max-w-screen-xl px-8 md:px-16 pb-6">
+        <div class="mx-auto max-w-screen-xl px-6 md:px-16 pb-6">
             <p class="text-[10px] text-white/30 leading-relaxed uppercase tracking-widest">Vanier Capital is a real estate investment and asset management firm. This website is for informational purposes only and does not constitute an offer to sell, a solicitation of an offer to buy, or a recommendation of any security or any other product or service. Information on this site is not intended as, and should not be relied upon as, investment, professional, legal, or tax advice.</p>
         </div>
     </div>
@@ -87,43 +87,77 @@
 <script src="/js/apps.js"></script>
 
 <!-- Inline script for essential immediate execution (like dynamic year) -->
+<style>body.nav-active{overflow:hidden}</style>
 <script>
  // Set Dynamic Copyright Year
  const yearSpan = document.getElementById('current-year');
  if(yearSpan) { yearSpan.textContent = new Date().getFullYear(); }
 
- // Basic Hamburger Menu Toggle Logic (RECOMMENDATION: Move to apps.js)
- // This ensures basic nav works even if apps.js has an error or is deferred
- const hamburger = document.querySelector('.hamburger');
- const navLinks = document.querySelector('.nav-links');
- const bodyForNav = document.body;
+ // Mobile Hamburger Menu Toggle
+ const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+ const mobileNav = document.getElementById('mobile-nav');
 
- if (hamburger && navLinks) {
-     if (!navLinks.id) navLinks.id = 'nav-links-list'; // Ensure ID for aria
-     hamburger.setAttribute('aria-controls', navLinks.id);
-     hamburger.setAttribute('aria-expanded', 'false');
-
-     // Ensure default mobile state is hidden
-     if (window.matchMedia('(max-width: 767px)').matches) {
-         navLinks.classList.add('hidden');
-     }
-
-     hamburger.addEventListener('click', () => {
-         const nowOpen = navLinks.classList.toggle('hidden');
-         // If hidden returned true, we just added hidden -> menu closed
-         const isOpen = !nowOpen;
+ if (mobileMenuBtn && mobileNav) {
+     mobileMenuBtn.addEventListener('click', () => {
+         const isOpen = !mobileNav.classList.contains('hidden');
          if (isOpen) {
-             navLinks.classList.remove('hidden');
-             navLinks.classList.add('flex', 'flex-col', 'gap-4', 'mt-4');
+             // Close
+             mobileNav.classList.add('hidden');
+             mobileNav.classList.remove('flex');
+             mobileMenuBtn.setAttribute('aria-expanded', 'false');
+             document.body.classList.remove('nav-active');
          } else {
-             navLinks.classList.add('hidden');
-             navLinks.classList.remove('flex', 'flex-col', 'gap-4', 'mt-4');
+             // Open
+             mobileNav.classList.remove('hidden');
+             mobileNav.classList.add('flex');
+             mobileMenuBtn.setAttribute('aria-expanded', 'true');
+             document.body.classList.add('nav-active');
          }
-         hamburger.setAttribute('aria-expanded', String(isOpen));
-         bodyForNav.classList.toggle('nav-active', isOpen);
+         // Animate hamburger lines
+         const lines = mobileMenuBtn.querySelectorAll('.hamburger-line');
+         if (lines.length === 3) {
+             lines[0].classList.toggle('translate-y-[7px]');
+             lines[0].classList.toggle('rotate-45');
+             lines[1].classList.toggle('opacity-0');
+             lines[2].classList.toggle('-translate-y-[7px]');
+             lines[2].classList.toggle('-rotate-45');
+         }
      });
- } else {
-     console.warn('Hamburger menu elements (.hamburger, .nav-links) not found for inline script.');
+
+     // Close mobile nav on window resize to desktop (lg breakpoint = 1024px)
+     window.addEventListener('resize', () => {
+         if (window.innerWidth >= 1024) {
+             mobileNav.classList.add('hidden');
+             mobileNav.classList.remove('flex');
+             mobileMenuBtn.setAttribute('aria-expanded', 'false');
+             document.body.classList.remove('nav-active');
+             const lines = mobileMenuBtn.querySelectorAll('.hamburger-line');
+             if (lines.length === 3) {
+                 lines[0].classList.remove('translate-y-[7px]', 'rotate-45');
+                 lines[1].classList.remove('opacity-0');
+                 lines[2].classList.remove('-translate-y-[7px]', '-rotate-45');
+             }
+             // Release header color lock
+             const hdr = document.getElementById('main-header');
+             if (hdr) { hdr.dataset.menuLocked = ''; window.dispatchEvent(new Event('scroll')); }
+         }
+     });
+
+     // Close mobile nav when any link inside is tapped
+     mobileNav.querySelectorAll('a').forEach(link => {
+         link.addEventListener('click', () => {
+             mobileNav.classList.add('hidden');
+             mobileNav.classList.remove('flex');
+             mobileMenuBtn.setAttribute('aria-expanded', 'false');
+             document.body.classList.remove('nav-active');
+             const lines = mobileMenuBtn.querySelectorAll('.hamburger-line');
+             if (lines.length === 3) {
+                 lines[0].classList.remove('translate-y-[7px]', 'rotate-45');
+                 lines[1].classList.remove('opacity-0');
+                 lines[2].classList.remove('-translate-y-[7px]', '-rotate-45');
+             }
+         });
+     });
  }
 </script>
 

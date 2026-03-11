@@ -7,12 +7,11 @@ const Schema = mongoose.Schema;
 // Define the schema for storing admin actions
 const AdminLogSchema = new Schema(
     {
-        // Reference to the AdminUser who performed the action
+        // Clerk userId of the admin who performed the action (AdminUser model removed)
         adminUser: {
-            type: Schema.Types.ObjectId,
-            ref: 'AdminUser', // Links to the AdminUser model
+            type: String,
             required: true,
-            index: true // Index for potentially filtering logs by user
+            index: true // Index for filtering logs by user
         },
         // Type of action performed (use consistent verbs/nouns)
         action: {

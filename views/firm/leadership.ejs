@@ -9,17 +9,17 @@
 }) %>
 
 <!-- ═══════════════ HERO ═══════════════ -->
-<section class="bg-[#0f2e22] pt-32 pb-20 px-8 md:px-16">
+<section class="bg-[#0f2e22] pt-24 md:pt-32 pb-14 md:pb-20 px-6 md:px-16">
     <div class="max-w-[1200px] mx-auto">
         <p class="font-sans text-xs font-bold uppercase tracking-widest text-white/50 mb-4">Our Firm</p>
-        <h1 class="font-serif text-5xl md:text-6xl text-white tracking-tight mb-6">Leadership.</h1>
+        <h1 class="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white tracking-tight mb-6">Leadership.</h1>
         <p class="font-sans text-xl text-white/80 max-w-3xl leading-relaxed">A partnership built on process and execution. We apply strict operational discipline and data-driven underwriting to middle-market residential real estate.</p>
     </div>
 </section>
 
 <!-- ═══════════════ PARTNER ROSTER ═══════════════ -->
 <section class="bg-white">
-    <div class="max-w-[1200px] mx-auto px-8 md:px-16 py-20 divide-y divide-[#0f2e22]/10">
+    <div class="max-w-[1200px] mx-auto px-6 md:px-16 py-12 md:py-20 divide-y divide-[#0f2e22]/10">
 
         <% (team || []).forEach((member, index) => { %>
         <!-- Partner Row: <%= member.fullName %> -->
@@ -59,9 +59,9 @@
 </section>
 
 <!-- ═══════════════ INSTITUTIONAL PEDIGREE ═══════════════ -->
-<section class="bg-[#f9f8f6] border-t border-[#0f2e22]/10">
-    <div class="max-w-[1200px] mx-auto px-8 md:px-16 py-20">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
+<section class="bg-white border-t border-[#0f2e22]/10">
+    <div class="max-w-[1200px] mx-auto px-6 md:px-16 py-12 md:py-20">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-16">
             <div>
                 <span class="font-serif text-5xl text-[#0f2e22] block mb-4">&#9670;</span>
                 <h3 class="font-serif text-lg text-[#1a1a1a] mb-2">Complete Integration</h3>
@@ -78,17 +78,6 @@
                 <p class="font-sans text-sm text-gray-600 leading-relaxed">Real estate is an equation, not a localized trade. We strip away emotion and rely on hard demographic data, supply-constraint metrics, and conservative debt modeling to protect downside risk.</p>
             </div>
         </div>
-    </div>
-</section>
-
-<!-- ═══════════════ CTA BLOCK ═══════════════ -->
-<section class="bg-[#0f2e22]">
-    <div class="max-w-[1200px] mx-auto px-8 md:px-16 py-20 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
-        <div>
-            <h2 class="font-serif text-3xl md:text-4xl text-white mb-3">Follow Our Progress.</h2>
-            <p class="font-sans text-lg text-white/70 max-w-xl">Connect with our team to join our private distribution list and receive our quarterly operational updates and market research.</p>
-        </div>
-        <a href="/investors/apply" class="inline-block font-sans text-sm font-bold text-[#0f2e22] bg-white px-10 py-4 uppercase tracking-wider hover:bg-[#f9f8f6] transition-colors rounded-none whitespace-nowrap">Join Distribution List</a>
     </div>
 </section>
 

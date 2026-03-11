@@ -79,6 +79,12 @@ if (process.env.NODE_ENV === 'development') {
 }
 //
 
+// SECURITY: Refuse to start if BYPASS_AUTH is set in production
+if (process.env.NODE_ENV === 'production' && process.env.BYPASS_AUTH === '1') {
+  console.error('FATAL: BYPASS_AUTH=1 detected in production. Refusing to start.');
+  process.exit(1);
+}
+
 // Log presence of key SendGrid env vars (booleans only, no secrets)
 try {
   const present = {
@@ -192,7 +198,7 @@ const cspDirectives = {
   scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud", "https://www.googletagmanager.com", "https://calendar.google.com", "https://apis.google.com","https://www.gstatic.com", "https://unpkg.com", "https://cdn.jsdelivr.net", "https://*.clerk.accounts.dev", "https://*.clerk.com"],
   styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud", "https://calendar.google.com","https://apis.google.com", "https://unpkg.com", "https://*.clerk.accounts.dev", "https://*.clerk.com"],
   fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
-  imgSrc: ["'self'", "data:", "blob:", "https://res.cloudinary.com", "https:", "https://apis.google.com", "https://img.clerk.com"],
+  imgSrc: ["'self'", "data:", "blob:", "https://res.cloudinary.com", "https://apis.google.com", "https://img.clerk.com", "https://www.googletagmanager.com"],
   connectSrc: [
     "'self'",
     "https://*.tiny.cloud",
@@ -202,10 +208,12 @@ const cspDirectives = {
     "https://calendar.google.com",
     "https://apis.google.com",
     "https://*.clerk.accounts.dev",
-    "https://*.clerk.com"
+    "https://*.clerk.com",
+    "https://cdn.jsdelivr.net",
+    "https://unpkg.com"
   ],
   frameSrc: ["'self'", "https://*.tiny.cloud", "https://calendar.google.com","https://accounts.google.com", "https://*.clerk.accounts.dev", "https://clerk.com", "https://*.clerk.com"],
-  scriptSrcAttr: ["'unsafe-inline'"],
+  scriptSrcAttr: [],
   workerSrc: ["'self'", "blob:"],
   objectSrc: ["'none'"],
 };
@@ -240,7 +248,7 @@ app.use(helmet({
     hsts: process.env.NODE_ENV === 'production' ? { maxAge: 63072000, includeSubDomains: true, preload: true } : false,
     referrerPolicy: { policy: 'same-origin' },
     crossOriginEmbedderPolicy: false,
-    crossOriginResourcePolicy: { policy: "cross-origin" }
+    crossOriginResourcePolicy: { policy: "same-site" }
 }));
 logger.debug('[INIT] Applied helmet.');
 
@@ -317,6 +325,12 @@ logger.debug('[INIT] Applied CORS.');
 
 
 logger.debug('[INIT] Applying body parsers...');
+// Tight body limit for public form submission endpoints (Finding 6.3 — prevent payload bombs)
+const tightBodyParser = express.json({ limit: '10kb' });
+app.use('/api/contact', tightBodyParser);
+app.use('/api/contact-submission', tightBodyParser);
+app.use('/api/investor-club', tightBodyParser);
+// Global parsers for admin/general routes
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 logger.debug('[INIT] Applied body parsers.');
@@ -376,7 +390,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false, saveUninitialized: false,
   store: sessionStore,
-  cookie: { secure: process.env.NODE_ENV === 'production', httpOnly: true, maxAge: 1000 * 60 * 60 * 2, sameSite: 'lax' }
+  cookie: { secure: process.env.NODE_ENV === 'production', httpOnly: true, maxAge: 1000 * 60 * 60 * 2, sameSite: 'strict' }
 }));
 logger.debug('[INIT] Applied session middleware.');
 
@@ -473,6 +487,42 @@ logger.info('[AUTH] Using Clerk-based admin auth (requireAdminClerk middleware).
 logger.debug('[INIT] Deferring static file serving until after routers...');
 
 logger.debug('[INIT] Applying API rate limiter...');
+
+// CSRF-equivalent protection for public API POSTs (Finding 4.1)
+// Simple form submissions bypass CORS; custom header requirement blocks them.
+const requireApiHeader = (req, res, next) => {
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+        const xRequested = req.headers['x-requested-with'];
+        if (xRequested !== 'XMLHttpRequest' && xRequested !== 'fetch') {
+            return res.status(403).json({ success: false, message: 'Forbidden: missing request header.' });
+        }
+    }
+    next();
+};
+app.use('/api', requireApiHeader);
+
+// Strict rate limiter for form submission endpoints (Finding 6.1)
+const submissionLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: { success: false, message: 'Too many submissions. Please try again later.' },
+    standardHeaders: true, legacyHeaders: false,
+});
+app.use('/api/contact', submissionLimiter);
+app.use('/api/contact-submission', submissionLimiter);
+app.use('/api/investor-club/apply', submissionLimiter);
+
+// Auth page rate limiter (Finding 6.2)
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
+    message: 'Too many login attempts. Please try again later.',
+    standardHeaders: true, legacyHeaders: false,
+});
+app.use('/admin/login', authLimiter);
+app.use('/sign-in', authLimiter);
+
+// General API rate limiter (broader)
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, max: 100,
   message: { success: false, message: 'Too many API requests from this IP, please try again later.' },
@@ -548,7 +598,7 @@ app.use((err, req, res, next) => { // Global Error Handler
   if(req.originalUrl.startsWith('/api/')) return res.status(statusCode).json({success: false, message: responseMessage});
   const errorView = req.originalUrl.startsWith('/admin/') ? 'admin/error' : 'public-error';
   try {
-    res.status(statusCode).render(errorView, {pageTitle: `Error ${statusCode}`, message: responseMessage, status: statusCode, error: !isProduction ? err : {}});
+    res.status(statusCode).render(errorView, {pageTitle: `Error ${statusCode}`, message: responseMessage, status: statusCode, error: !isProduction ? { message: err.message, stack: err.stack } : {}});
   } catch (renderError) {
     logger.error(`CRITICAL: Error rendering error page '${errorView}':`, renderError);
     res.status(statusCode).type('text/plain').send(`${isProduction ? 'Internal Server Error' : responseMessage}`);

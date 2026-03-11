@@ -26,7 +26,7 @@ export default (csrfProtection) => {
       const statusCounts = { All: 0 };
       counts.forEach(c => { statusCounts[c._id] = c.count; statusCounts.All += c.count; });
 
-      res.render('admin/applicants/index', {
+      return res.render('admin/applicants/index', {
         pageTitle: 'Investor Applicants',
         path: '/admin/applicants',
         applicants,
@@ -55,7 +55,7 @@ export default (csrfProtection) => {
         return res.redirect('/admin/applicants');
       }
 
-      res.render('admin/applicants/detail', {
+      return res.render('admin/applicants/detail', {
         pageTitle: `${applicant.fullName} — Applicant`,
         path: '/admin/applicants',
         applicant,

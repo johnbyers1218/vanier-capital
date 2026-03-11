@@ -19,9 +19,7 @@
 
     <%# Add any admin-specific JavaScript files here %>
     <%# Example: JS for a rich text editor, confirmation dialogs, etc. %>
-    <div class="text-center text-gray-400 text-xs mt-6">
-        Need formatting tips? Read the <a href="/AUTHORING_GUIDE.md" target="_blank" rel="noopener" class="text-[#0f2e22] hover:underline">Authoring Guide</a>.
-    </div>
+
     <%# <script src="/js/admin-scripts.js"></script> %>
 
     <%# Example: Confirmation for delete buttons %>
@@ -36,7 +34,13 @@
                             const makeToast = (text, type) => {
                                 const el = document.createElement('div');
                                 el.className = 'pointer-events-auto flex items-center gap-2 px-4 py-3 text-sm border ' + (type==='success' ? 'bg-green-50 text-green-800 border-green-300' : 'bg-red-50 text-red-800 border-red-300');
-                                el.innerHTML = (type==='success' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-circle"></i>') + ' <span>'+String(text)+'</span>';
+                                const icon = document.createElement('i');
+                                icon.className = type==='success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+                                const span = document.createElement('span');
+                                span.textContent = String(text);
+                                el.appendChild(icon);
+                                el.appendChild(document.createTextNode(' '));
+                                el.appendChild(span);
                                 root.appendChild(el);
                                 setTimeout(()=>{ el.style.opacity = '0'; el.style.transform = 'translateY(-6px)'; setTimeout(()=> el.remove(), 300); }, 3500);
                             };

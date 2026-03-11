@@ -33,6 +33,7 @@ export default (csrfProtection) => {
           occupancyRate: map.occupancyRate || '',
           capRate: map.capRate || '',
           aum: map.aum || '',
+          totalUnits: map.totalUnits || '',
           firmInceptionYear: map.firmInceptionYear || '',
           maintenanceResponse: map.maintenanceResponse || '',
           avgResidentTenure: map.avgResidentTenure || '',
@@ -55,6 +56,7 @@ export default (csrfProtection) => {
     body('occupancyRate').optional({ checkFalsy: true }).trim(),
     body('capRate').optional({ checkFalsy: true }).trim(),
     body('aum').optional({ checkFalsy: true }).trim(),
+    body('totalUnits').optional({ checkFalsy: true }).trim(),
     body('firmInceptionYear').optional({ checkFalsy: true }).trim(),
     body('maintenanceResponse').optional({ checkFalsy: true }).trim(),
     body('avgResidentTenure').optional({ checkFalsy: true }).trim(),
@@ -68,6 +70,7 @@ export default (csrfProtection) => {
           occupancyRate: req.body.occupancyRate,
           capRate: req.body.capRate,
           aum: req.body.aum,
+          totalUnits: req.body.totalUnits,
           firmInceptionYear: req.body.firmInceptionYear,
           maintenanceResponse: req.body.maintenanceResponse,
           avgResidentTenure: req.body.avgResidentTenure,
@@ -80,6 +83,7 @@ export default (csrfProtection) => {
         { key: 'occupancyRate', label: 'Occupancy Rate', valueString: req.body.occupancyRate },
         { key: 'capRate', label: 'Portfolio Cap Rate', valueString: req.body.capRate },
         { key: 'aum', label: 'Assets Under Management', valueString: req.body.aum },
+        { key: 'totalUnits', label: 'Total Units', valueString: req.body.totalUnits },
         { key: 'firmInceptionYear', label: 'Firm Inception Year', valueString: req.body.firmInceptionYear },
         { key: 'maintenanceResponse', label: 'Maintenance Response Time', valueString: req.body.maintenanceResponse },
         { key: 'avgResidentTenure', label: 'Avg. Resident Tenure', valueString: req.body.avgResidentTenure },
@@ -101,8 +105,15 @@ export default (csrfProtection) => {
   // GET Team management
   router.get('/team', csrfProtection, async (req, res, next) => {
     try {
-      const AdminUser = (await import('../../models/AdminUser.js')).default;
-      const teamUsers = await AdminUser.find({}, 'username fullName role avatarUrl').sort({ createdAt: 1 }).lean();
+      // Clerk-only auth: show the current session admin (AdminUser model removed)
+      const currentAdmin = res.locals.adminUser;
+      const teamUsers = currentAdmin ? [{
+        username: currentAdmin.username || currentAdmin.email || 'admin',
+        fullName: currentAdmin.fullName || currentAdmin.username || 'Administrator',
+        role: currentAdmin.role || 'admin',
+        avatarUrl: currentAdmin.avatarUrl || null,
+        lastLogin: null
+      }] : [];
       return res.render('admin/settings/team', {
         pageTitle: 'Team Management',
         path: '/admin/settings/team',

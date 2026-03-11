@@ -8,13 +8,13 @@ const router = express.Router();
 router.get('/', async (req, res) => {
 	try {
 		const [posts, properties] = await Promise.all([
-			BlogPost.find({}).select('slug updatedAt'),
-			Property.find({}).select('slug updatedAt')
+			BlogPost.find({ isPublished: true }).select('slug updatedAt'),
+			Property.find({ isPubliclyVisible: true }).select('slug updatedAt')
 		]);
 		// Prefer PUBLIC_SITE_URL then SITE_URL; normalize without trailing slash
 		const domain = (process.env.PUBLIC_SITE_URL || process.env.SITE_URL || 'https://www.vaniercapital.com').replace(/\/$/, '');
 		res.header('Content-Type', 'application/xml');
-		res.send(`<?xml version="1.0" encoding="UTF-8"?>
+		return res.send(`<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
 		<loc>${domain}/</loc>
@@ -37,7 +37,7 @@ router.get('/', async (req, res) => {
 		</url>`).join('')}
 </urlset>`);
 	} catch (err) {
-		res.status(500).send('Could not generate sitemap');
+		return res.status(500).send('Could not generate sitemap');
 	}
 });
 

@@ -1,6 +1,17 @@
 import express from 'express';
 import { logger } from '../config/logger.js';
 import { clerkClient, getAuth } from '@clerk/express';
+
+// Derive the Clerk Frontend-API domain from a publishable key.
+// pk_test_<base64>  →  decode base64 → "secure-macaque-46.clerk.accounts.dev$"
+function clerkFapiDomain(pk) {
+  if (!pk) return '';
+  try {
+    const encoded = pk.split('_')[2] || '';
+    return Buffer.from(encoded, 'base64').toString().replace(/\$$/, '');
+  } catch { return ''; }
+}
+
 export default (csrfProtection) => { 
   const router = express.Router();
 
@@ -44,17 +55,23 @@ export default (csrfProtection) => {
 
   // Render Clerk Sign-Up page
   router.get('/sign-up', (req, res) => {
-    res.render('auth/sign-up', {
+    const pk = process.env.CLERK_PUBLISHABLE_KEY || '';
+    const fapi = clerkFapiDomain(pk);
+    return res.render('auth/sign-up', {
       pageTitle: 'Sign Up',
-      clerkPublishableKey: process.env.CLERK_PUBLISHABLE_KEY
+      clerkPublishableKey: pk,
+      clerkFapiUrl: fapi ? 'https://' + fapi : '',
     });
   });
 
-// Render Clerk User Profile page
+  // Render Clerk User Profile page
   router.get('/user-profile', (req, res) => {
-    res.render('auth/user-profile', {
+    const pk = process.env.CLERK_PUBLISHABLE_KEY || '';
+    const fapi = clerkFapiDomain(pk);
+    return res.render('auth/user-profile', {
       pageTitle: 'User Profile',
-      clerkPublishableKey: process.env.CLERK_PUBLISHABLE_KEY
+      clerkPublishableKey: pk,
+      clerkFapiUrl: fapi ? 'https://' + fapi : '',
     });
   });
 

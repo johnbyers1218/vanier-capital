@@ -75,7 +75,7 @@
         <div class="form-group">
           <label for="blog-content-editor">Content <span style="color:#dc3545">*</span></label>
           <textarea id="blog-content-editor" name="content" class="richtext-editor" style="visibility:hidden; min-height: 500px;"><%= post && post.content ? post.content : '' %></textarea>
-          <small class="muted">Use the editor toolbar for formatting. <a href="/AUTHORING_GUIDE.md" target="_blank" rel="noopener noreferrer">Authoring Guide</a></small>
+          <small class="muted">Use the editor toolbar for formatting.</small>
         </div>
       </div>
 
@@ -107,9 +107,25 @@
             <div class="muted" style="margin-bottom:0.75rem;">Featured publications can appear in spotlight sections.</div>
 
             <div class="form-group" style="margin-top:0.5rem;">
-              <label for="authorDisplayName">Author Display Name (Public)</label>
-              <input type="text" id="authorDisplayName" name="authorDisplayName" value="<%= post && post.authorDisplayName ? post.authorDisplayName : '' %>" placeholder="Defaults to: <%= typeof currentAdminFullName !== 'undefined' ? currentAdminFullName : 'Your Name' %>" maxlength="100">
-              <small class="muted">Leave blank to use: <%= typeof currentAdminFullName !== 'undefined' ? currentAdminFullName : 'your full name' %>.</small>
+              <label for="author">Author <span style="color:#dc3545">*</span></label>
+              <% const authorOptions = [
+                  'John Byers, Partner & Chief Investment Officer',
+                  'Matthew Moellering, Partner & Chief Executive Officer',
+                  'Logan Mayfield, Partner & Chief Operating Officer',
+                  'Vanier Capital'
+              ]; %>
+              <select id="author" name="author" required style="border-radius:0; border:1px solid rgba(15,46,34,0.2); padding:0.5rem 0.75rem; width:100%; font-size:0.95rem; outline:none;" onfocus="this.style.boxShadow='0 0 0 2px #0f2e22'" onblur="this.style.boxShadow='none'">
+                <% authorOptions.forEach(function(opt) { %>
+                  <option value="<%= opt %>" <%= (post && post.author === opt) ? 'selected' : '' %>><%= opt %></option>
+                <% }); %>
+              </select>
+              <small class="muted">Byline displayed on the public publication page.</small>
+            </div>
+
+            <div class="form-group" style="margin-top:0.5rem;">
+              <label for="publishedAt">Publication Date</label>
+              <input type="date" id="publishedAt" name="publishedAt" value="<%= (post && post.publishedAt) ? new Date(post.publishedAt).toISOString().split('T')[0] : '' %>" style="border-radius:0; border:1px solid rgba(15,46,34,0.2); padding:0.5rem 0.75rem; width:100%; font-size:0.95rem; outline:none;" onfocus="this.style.boxShadow='0 0 0 2px #0f2e22'" onblur="this.style.boxShadow='none'">
+              <small class="muted">Override the publication date for historical case studies or firm updates. Defaults to today if left blank.</small>
             </div>
 
             <% if (editing && typeof post !== 'undefined') { %>

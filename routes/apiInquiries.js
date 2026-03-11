@@ -8,11 +8,11 @@ import { sendTeamNotification, sendUserConfirmation } from '../services/sendgrid
 const router = express.Router();
 
 const rules = [
-  body('name').trim().notEmpty().withMessage('Name is required.').isLength({ min: 2, max: 100 }),
+  body('name').trim().notEmpty().withMessage('Name is required.').isLength({ min: 2, max: 100 }).escape(),
   body('email').isEmail().withMessage('Valid email required.').normalizeEmail(),
-  body('phone').optional({ checkFalsy: true }).trim().isLength({ max: 20 }),
-  body('subject').trim().notEmpty().withMessage('Subject required.').isLength({ max: 150 }),
-  body('message').trim().isLength({ min: 10, max: 5000 }).withMessage('Message: 10-5000 chars.'),
+  body('phone').optional({ checkFalsy: true }).trim().isLength({ max: 20 }).escape(),
+  body('subject').trim().notEmpty().withMessage('Subject required.').isLength({ max: 150 }).escape(),
+  body('message').trim().isLength({ min: 10, max: 5000 }).withMessage('Message: 10-5000 chars.').escape(),
 ];
 
 router.post('/contact-submission', rules, async (req, res, next) => {

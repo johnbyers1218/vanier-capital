@@ -6,8 +6,8 @@
 }) %>
 
 <!-- ═══════════════ HERO — WARM BEIGE ═══════════════ -->
-<section class="bg-[#f9f8f6] pt-32 pb-16">
-    <div class="max-w-[1200px] mx-auto px-8 md:px-16">
+<section class="bg-[#f9f8f6] pt-24 md:pt-32 pb-10 md:pb-16">
+    <div class="max-w-[1200px] mx-auto px-6 md:px-16">
         <!-- Breadcrumb -->
         <nav class="mb-8">
             <ol class="flex items-center space-x-2 font-sans text-sm text-gray-500">
@@ -26,7 +26,7 @@
         <% } %>
 
         <!-- Title -->
-        <h1 class="font-serif text-5xl md:text-6xl text-[#0f2e22] tracking-tight mb-8"><%= asset.title %></h1>
+        <h1 class="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[#0f2e22] tracking-tight mb-8"><%= asset.title %></h1>
 
         <!-- Summary -->
         <% if (asset.summary) { %>
@@ -35,44 +35,44 @@
     </div>
 </section>
 
-<!-- ═══════════════ METRICS GRID — WARM BEIGE ═══════════════ -->
-<section class="bg-[#f9f8f6] border-t border-[#0f2e22]/10">
-    <div class="max-w-[1200px] mx-auto px-8 md:px-16 py-12">
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-10">
+<!-- ═══════════════ METRICS GRID ═══════════════ -->
+<section class="bg-white border-t border-[#0f2e22]/10">
+    <div class="max-w-[1200px] mx-auto px-6 md:px-16 py-8 md:py-12">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 md:gap-10">
             <% if (asset.doors) { %>
             <div>
                 <p class="font-sans text-[10px] uppercase tracking-widest text-[#1a1a1a]/40 mb-2">Doors</p>
-                <p class="font-serif text-4xl text-[#0f2e22]"><%= asset.doors %></p>
+                <p class="font-serif text-2xl md:text-4xl text-[#0f2e22]"><%= asset.doors %></p>
             </div>
             <% } %>
             <% if (asset.occupancy) { %>
             <div>
                 <p class="font-sans text-[10px] uppercase tracking-widest text-[#1a1a1a]/40 mb-2">Occupancy</p>
-                <p class="font-serif text-4xl text-[#0f2e22]"><%= asset.occupancy %></p>
+                <p class="font-serif text-2xl md:text-4xl text-[#0f2e22]"><%= asset.occupancy %></p>
             </div>
             <% } %>
             <% if (asset.strategy) { %>
             <div>
                 <p class="font-sans text-[10px] uppercase tracking-widest text-[#1a1a1a]/40 mb-2">Strategy</p>
-                <p class="font-serif text-4xl text-[#0f2e22]"><%= asset.strategy %></p>
+                <p class="font-serif text-2xl md:text-4xl text-[#0f2e22]"><%= asset.strategy %></p>
             </div>
             <% } %>
             <% if (asset.assetClass) { %>
             <div>
                 <p class="font-sans text-[10px] uppercase tracking-widest text-[#1a1a1a]/40 mb-2">Asset Class</p>
-                <p class="font-serif text-4xl text-[#0f2e22]"><%= asset.assetClass %></p>
+                <p class="font-serif text-2xl md:text-4xl text-[#0f2e22]"><%= asset.assetClass %></p>
             </div>
             <% } %>
             <% if (asset.status) { %>
             <div>
                 <p class="font-sans text-[10px] uppercase tracking-widest text-[#1a1a1a]/40 mb-2">Status</p>
-                <p class="font-serif text-4xl text-[#0f2e22]"><%= asset.status %></p>
+                <p class="font-serif text-2xl md:text-4xl text-[#0f2e22]"><%= asset.status %></p>
             </div>
             <% } %>
             <% if (asset.holdPeriod) { %>
             <div>
                 <p class="font-sans text-[10px] uppercase tracking-widest text-[#1a1a1a]/40 mb-2">Hold Period</p>
-                <p class="font-serif text-4xl text-[#0f2e22]"><%= asset.holdPeriod %></p>
+                <p class="font-serif text-2xl md:text-4xl text-[#0f2e22]"><%= asset.holdPeriod %></p>
             </div>
             <% } %>
         </div>
@@ -82,7 +82,7 @@
 <!-- ═══════════════ COVER IMAGE ═══════════════ -->
 <% if (asset.image) { %>
 <section class="bg-white">
-    <div class="max-w-[1200px] mx-auto px-8 md:px-16 py-12">
+    <div class="max-w-[1200px] mx-auto px-6 md:px-16 py-8 md:py-12">
         <div class="aspect-[16/7] bg-gray-200 overflow-hidden border border-gray-200">
             <img src="<%= asset.image %>" alt="<%= asset.title %>" class="w-full h-full object-cover rounded-none">
         </div>
@@ -92,7 +92,7 @@
 
 <!-- ═══════════════ EDITORIAL BODY — 2-COL ═══════════════ -->
 <section class="bg-white">
-    <div class="max-w-[1200px] mx-auto px-8 md:px-16 py-20 grid grid-cols-1 md:grid-cols-3 gap-16">
+    <div class="max-w-[1200px] mx-auto px-6 md:px-16 py-12 md:py-20 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-16">
 
         <!-- Left Column (Span 2) — Thesis & Execution -->
         <div class="md:col-span-2">
@@ -163,10 +163,10 @@
 
 <!-- ═══════════════ GALLERY ═══════════════ -->
 <% if (asset.galleryImages && asset.galleryImages.length > 0) { %>
-<section class="bg-[#f9f8f6] border-t border-[#0f2e22]/10">
-    <div class="max-w-[1200px] mx-auto px-8 md:px-16 py-16">
+<section class="bg-white border-t border-[#0f2e22]/10">
+    <div class="max-w-[1200px] mx-auto px-6 md:px-16 py-10 md:py-16">
         <h3 class="font-serif text-2xl text-[#0f2e22] mb-8">Gallery</h3>
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <% asset.galleryImages.forEach(function(img) { %>
             <div class="aspect-[4/3] bg-gray-200 overflow-hidden border border-gray-200">
                 <img src="<%= img %>" alt="<%= asset.title %> Gallery" class="w-full h-full object-cover rounded-none" loading="lazy">
@@ -179,8 +179,8 @@
 
 <!-- ═══════════════ SEC DISCLAIMER ═══════════════ -->
 <section class="bg-white border-t border-[#0f2e22]/10">
-    <div class="max-w-[1200px] mx-auto px-8 md:px-16 py-12">
-        <div class="border border-[#0f2e22]/10 p-8">
+    <div class="max-w-[1200px] mx-auto px-6 md:px-16 py-8 md:py-12">
+        <div class="border border-[#0f2e22]/10 p-5 md:p-8">
             <p class="font-sans text-[10px] font-bold uppercase tracking-widest text-[#1a1a1a]/40 mb-3">Important Disclosures</p>
             <p class="font-sans text-xs text-gray-500 leading-relaxed mb-3">This case study is provided for informational purposes only and does not constitute an offer to sell, a solicitation of an offer to buy, or a recommendation for any security or investment product. Past performance is not indicative of future results. All investments involve risk, including the possible loss of principal.</p>
             <p class="font-sans text-xs text-gray-500 leading-relaxed mb-3">The information presented herein reflects historical performance of specific assets or strategies and may not be representative of current or future investments. Financial metrics shown are based on internal calculations and have not been independently audited. Target returns are forward-looking estimates and are not guaranteed.</p>
@@ -190,13 +190,13 @@
 </section>
 
 <!-- ═══════════════ CTA — EXPLORE APPROACH ═══════════════ -->
-<section class="bg-[#0f2e22]">
-    <div class="max-w-[1200px] mx-auto px-8 md:px-16 py-20 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+<section class="bg-slate-50 border-t border-[#0f2e22]/10">
+    <div class="max-w-[1200px] mx-auto px-6 md:px-16 py-14 md:py-20 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
         <div>
-            <h2 class="font-serif text-3xl md:text-4xl text-white mb-3">Explore Our Approach.</h2>
-            <p class="font-sans text-lg text-white/70 max-w-xl">Learn more about our investment strategy, underwriting discipline, and how we create value across our portfolio.</p>
+            <h2 class="font-serif text-3xl md:text-4xl text-[#0f2e22] mb-3">Explore Our Approach.</h2>
+            <p class="font-sans text-lg text-gray-600 max-w-xl">Learn more about our investment strategy, underwriting discipline, and how we create value across our portfolio.</p>
         </div>
-        <a href="/strategy" class="inline-block font-sans text-sm font-bold text-[#0f2e22] bg-white px-10 py-4 uppercase tracking-wider hover:bg-[#f9f8f6] transition-colors rounded-none whitespace-nowrap">Investment Strategy</a>
+        <a href="/strategy" class="inline-block font-sans text-sm font-bold text-white bg-[#0f2e22] px-10 py-4 uppercase tracking-wider hover:bg-[#1a3a2a] transition-colors rounded-none whitespace-nowrap">Investment Strategy</a>
     </div>
 </section>
 

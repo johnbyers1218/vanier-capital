@@ -33,6 +33,17 @@
         <style>
             :root { color-scheme: light; }
         </style>
+
+    <%# Clerk Frontend SDK — required for UserButton mount in admin nav %>
+    <% if (typeof clerkPublishableKey !== 'undefined' && clerkPublishableKey) { %>
+    <script
+        async
+        crossorigin="anonymous"
+        data-clerk-publishable-key="<%= clerkPublishableKey %>"
+        src="<%= typeof clerkFapiUrl !== 'undefined' && clerkFapiUrl ? clerkFapiUrl : '' %>/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+        type="text/javascript"
+    ></script>
+    <% } %>
 </head>
 <body class="bg-[#f9f8f6] text-[#1a1a1a] font-sans">
     <div class="admin-layout min-h-screen flex">
@@ -49,7 +60,54 @@
                     </div>
                 </form>
                 <% if (typeof isAuthenticated !== 'undefined' && isAuthenticated && typeof adminUser !== 'undefined' && adminUser) { %>
-                    <span class="text-sm text-gray-600 whitespace-nowrap">Welcome, <strong class="text-[#1a1a1a] font-medium"><%= adminUser.fullName || adminUser.username %></strong></span>
+                    <div class="flex items-center gap-4 ml-auto">
+                        <div id="clerk-user-button"></div>
+                        <button type="button" id="custom-sign-out" class="text-sm font-medium text-red-600 hover:text-red-800 underline cursor-pointer" style="background:none;border:none;padding:0;">Sign Out</button>
+                    </div>
+                    <script>
+                        // Official Clerk CDN pattern: wait for page load, then
+                        // await Clerk.load() which resolves once the SDK + UI are ready.
+                        window.addEventListener('load', async function () {
+                            await window.Clerk.load({
+                                signInUrl: '/admin/login',
+                                signInForceRedirectUrl: '/admin/dashboard',
+                                afterSignOutUrl: '/admin/login',
+                            });
+
+                            // Mount the UserButton avatar
+                            var el = document.getElementById('clerk-user-button');
+                            if (el) {
+                                window.Clerk.mountUserButton(el, {
+                                    afterSignOutUrl: '/admin/login',
+                                    appearance: {
+                                        elements: { userButtonAvatarBox: 'w-10 h-10' }
+                                    }
+                                });
+                            }
+
+                            // Wire the manual Sign Out button
+                            var btn = document.getElementById('custom-sign-out');
+                            if (btn) {
+                                btn.addEventListener('click', function (e) {
+                                    e.preventDefault();
+                                    btn.textContent = 'Signing out\u2026';
+                                    btn.disabled = true;
+                                    // Call Clerk.signOut() with a redirectUrl.
+                                    // If it fails (network error, etc.), fall back
+                                    // to a server-side logout which clears cookies.
+                                    window.Clerk.signOut({ redirectUrl: '/admin/login' })
+                                        .catch(function () {
+                                            window.location.href = '/admin/logout';
+                                        });
+                                    // Safety net: if signOut hangs for >4 seconds,
+                                    // fall back to server-side logout.
+                                    setTimeout(function () {
+                                        window.location.href = '/admin/logout';
+                                    }, 4000);
+                                });
+                            }
+                        });
+                    </script>
                 <% } %>
             </header>
 

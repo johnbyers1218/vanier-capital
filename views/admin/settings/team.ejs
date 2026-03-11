@@ -8,9 +8,6 @@
       <p class="text-gray-500 text-sm mt-1">Administrative users and access control.</p>
     </div>
     <div class="flex items-center gap-3">
-      <button type="button" disabled class="bg-[#0f2e22] text-white uppercase tracking-widest text-xs font-bold px-6 py-3 border border-[#0f2e22] opacity-50 cursor-not-allowed" title="Coming soon — Clerk integration">
-        <i class="fas fa-user-plus"></i> Invite Team Member (Clerk)
-      </button>
       <a href="/admin/settings" class="inline-flex items-center gap-2 bg-white text-[#0f2e22] font-bold py-2.5 px-5 border border-[#0f2e22]/20 hover:bg-[#f9f8f6] text-xs uppercase tracking-widest">
         <i class="fas fa-arrow-left"></i> Back
       </a>
@@ -25,7 +22,6 @@
           <th class="px-6 py-4 text-[#1a1a1a] font-sans text-xs font-bold uppercase tracking-widest">User</th>
           <th class="px-6 py-4 text-[#1a1a1a] font-sans text-xs font-bold uppercase tracking-widest">Role</th>
           <th class="px-6 py-4 text-[#1a1a1a] font-sans text-xs font-bold uppercase tracking-widest">Last Login</th>
-          <th class="px-6 py-4 text-[#1a1a1a] font-sans text-xs font-bold uppercase tracking-widest text-right">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -57,14 +53,11 @@
                 <span class="text-gray-400">Never</span>
               <% } %>
             </td>
-            <td class="px-6 py-4 text-right">
-              <button type="button" disabled class="text-xs text-[#0f2e22] font-bold uppercase tracking-widest hover:underline opacity-50 cursor-not-allowed" title="Coming soon">Edit Role</button>
-            </td>
           </tr>
         <% }) %>
         <% if (!teamUsers || teamUsers.length === 0) { %>
           <tr>
-            <td colspan="4" class="px-6 py-12 text-center text-gray-500">No team members found.</td>
+            <td colspan="3" class="px-6 py-12 text-center text-gray-500">No team members found.</td>
           </tr>
         <% } %>
       </tbody>
@@ -73,7 +66,7 @@
 
   <!-- Info Box -->
   <div class="bg-[#0f2e22]/5 border border-[#0f2e22]/20 p-4">
-    <p class="text-xs text-gray-600"><strong class="text-[#1a1a1a]">Note:</strong> Role editing and team invitations will be available after Clerk SSO integration. Currently, team members are managed via the database directly.</p>
+    <p class="text-xs text-gray-600"><strong class="text-[#1a1a1a]">Note:</strong> Authentication and team access control are managed via Clerk. To invite new administrators, enforce 2FA, or revoke access, visit your <a href="https://dashboard.clerk.com" target="_blank" rel="noopener noreferrer" class="text-[#0f2e22] underline hover:no-underline">Clerk Dashboard</a>.</p>
   </div>
 </div>
 
