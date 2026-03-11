@@ -494,8 +494,7 @@ router.get('/blog', async (req, res, next) => {
                 expertArticles: totalPublishedPosts,
                 expertContributors: expertContributors,
                 yearsCombinedExperience: yearsCombinedExperience,
-                expertiseCategories: expertiseCategoriesCount,
-                businessLeadersInformed: businessLeadersInformed
+                expertiseCategories: expertiseCategoriesCount
             }
         });
 
@@ -630,8 +629,7 @@ async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeadi
                 expertArticles: totalPublishedPosts,
                 expertContributors,
                 yearsCombinedExperience,
-                expertiseCategories: expertiseCategoriesCount,
-                businessLeadersInformed: '15+'
+                expertiseCategories: expertiseCategoriesCount
             }
         });
     } catch (error) {
