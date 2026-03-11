@@ -143,39 +143,45 @@
         async
         crossorigin="anonymous"
         data-clerk-publishable-key="<%= clerkPublishableKey %>"
-        src="https://secure-macaque-46.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+        src="<%= clerkFapiUrl %>/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
         type="text/javascript"
     ></script>
     <script>
+        // Official Clerk CDN pattern: wait for the page to load, then
+        // await Clerk.load() which resolves once the SDK is fully ready.
         window.addEventListener('load', async function () {
-            await window.Clerk.load();
+            // Clerk.load() is safe to call multiple times; it no-ops if already loaded.
+            // Pass signInForceRedirectUrl so the SDK knows where to navigate after sign-in.
+            await window.Clerk.load({
+                signInForceRedirectUrl: '/admin/dashboard',
+                signInFallbackRedirectUrl: '/admin/dashboard',
+                afterSignOutUrl: '/admin/login',
+            });
 
-            // If already signed in, redirect straight to dashboard
+            // If the user is already signed in (session cookie valid),
+            // immediately redirect to the dashboard instead of showing the form.
             if (window.Clerk.user) {
-                window.location.href = '/admin/dashboard';
+                window.location.replace('/admin/dashboard');
                 return;
             }
 
-            // Poll until Clerk UI components are ready before mounting
-            const interval = setInterval(() => {
-                if (window.Clerk && window.Clerk.isReady()) {
-                    clearInterval(interval);
-                    const signInDiv = document.getElementById('sign-in-widget');
-                    signInDiv.innerHTML = ''; // clear loading state
-                    window.Clerk.mountSignIn(signInDiv, {
-                        appearance: {
-                            variables: { colorPrimary: '#0f2e22' },
-                            elements: {
-                                card: 'shadow-none border-0',
-                                rootBox: 'w-full',
-                                formButtonPrimary: 'bg-[#0f2e22] hover:bg-[#1a4a38] rounded-none uppercase tracking-widest text-xs font-bold',
-                            }
-                        },
-                        redirectUrl: '/admin/dashboard',
-                        afterSignInUrl: '/admin/dashboard',
-                    });
-                }
-            }, 100);
+            var signInDiv = document.getElementById('sign-in-widget');
+            if (!signInDiv) return;
+            signInDiv.innerHTML = ''; // clear "Loading authentication…"
+
+            window.Clerk.mountSignIn(signInDiv, {
+                appearance: {
+                    variables: { colorPrimary: '#0f2e22' },
+                    elements: {
+                        card: 'shadow-none border-0',
+                        rootBox: 'w-full',
+                        formButtonPrimary: 'bg-[#0f2e22] hover:bg-[#1a4a38] rounded-none uppercase tracking-widest text-xs font-bold',
+                    }
+                },
+                forceRedirectUrl: '/admin/dashboard',
+                fallbackRedirectUrl: '/admin/dashboard',
+                signUpUrl: '/admin/login',
+            });
         });
     </script>
 </body>
