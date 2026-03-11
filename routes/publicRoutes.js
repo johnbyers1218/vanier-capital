@@ -395,7 +395,7 @@ router.get('/investors/apply', (req, res) => {
 // GET /blog - Articles Index Page (with Pagination & Optional Tag Filter)
 router.get('/blog', async (req, res, next) => {
     const page = parseInt(req.query.page) || 1;
-    const postsPerPage = 6; // Two rows of three per page
+    const postsPerPage = 10;
     const categoryQuery = (req.query.category || req.query.cat || '').toString().toLowerCase().trim() || null;
 
     if (page < 1) { return res.redirect(categoryQuery ? `/blog?category=${categoryQuery}&page=1` : '/blog?page=1'); } // Redirect invalid page
@@ -451,29 +451,8 @@ router.get('/blog', async (req, res, next) => {
     const expertiseCategoriesCount = blogCategories.length;
         const yearsCombinedExperience = 8; // configurable; compute later if desired
 
-        // Always compute a hero post (featured if available, else latest), regardless of page or tag
-        let heroPost = null;
-        {
-            const explicitHero = await BlogPost.find({ isPublished: true, isFeatured: true })
-                                               .sort({ publishedDate: -1 })
-                                               .limit(1)
-                                               .lean();
-            if (explicitHero && explicitHero.length) {
-                heroPost = explicitHero[0];
-            } else {
-                const fallback = await BlogPost.find({ isPublished: true })
-                                               .sort({ publishedDate: -1 })
-                                               .limit(1)
-                                               .lean();
-                heroPost = (fallback && fallback.length) ? fallback[0] : null;
-            }
-        }
-
-        // Build main list query, excluding hero if present
+        // Build main list query (all published posts, no hero exclusion)
         const mainListQuery = { ...baseQuery };
-        if (heroPost && heroPost._id) {
-            mainListQuery._id = { $ne: heroPost._id };
-        }
 
         const totalPosts = await BlogPost.countDocuments(mainListQuery);
         const totalPages = Math.ceil(Math.max(0, totalPosts) / postsPerPage);
@@ -485,38 +464,21 @@ router.get('/blog', async (req, res, next) => {
 
     let posts = await BlogPost.find(mainListQuery)
                                      .populate('categories', 'name slug')
-                                     .sort({ publishedDate: -1 })    // Sort by newest published
+                                     .sort({ publishedAt: -1, publishedDate: -1 })
                                      .skip((page - 1) * postsPerPage)
                                      .limit(postsPerPage)
-                                     .lean(); // Use lean() for read-only performance boost
+                                     .lean();
     posts = (posts || []).map(p => ({ ...p }));
-    // Compute a robust featured excerpt for hero (if any)
-        function buildFeaturedExcerpt(postDoc) {
-            if (!postDoc) return '';
-            if (postDoc.excerpt && postDoc.excerpt.trim()) return postDoc.excerpt.trim();
-            if (postDoc.metaDescription && postDoc.metaDescription.trim()) return postDoc.metaDescription.trim();
-            // Derive from HTML content (strip tags, collapse whitespace)
-            try {
-                const raw = String(postDoc.content || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-                return raw.length > 0 ? raw.slice(0, 180) + (raw.length > 180 ? '…' : '') : '';
-            } catch { return ''; }
-        }
-    const featuredOverrideComputed = heroPost ? [{ ...heroPost, featuredExcerpt: buildFeaturedExcerpt(heroPost) }] : [];
-    // (Deprecated in UI) Popular posts list not used
-    const popularPosts = [];
-
-    // Public metric: business leaders informed (temporarily static until subscribers are live)
-    const businessLeadersInformed = '15+';
 
     const pageTitle = 'Perspectives';
 
-        return res.render('articles-index', { // Renders views/articles-index.ejs
+        return res.render('articles-index', {
             pageTitle: pageTitle,
-            path: '/blog', // For nav highlight
+            path: '/blog',
             posts: posts,
-            popularPosts: popularPosts,
+            popularPosts: [],
             isFirstPage: page === 1,
-            featuredOverride: featuredOverrideComputed,
+            featuredOverride: [],
             blogCategories,
             categoryCounts,
             tagQuery: null,
@@ -567,7 +529,7 @@ const PERSPECTIVES_CATEGORIES = {
 // Helper: shared query logic for perspectives pages
 async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeading, pageDescription }) {
     const page = parseInt(req.query.page) || 1;
-    const postsPerPage = 6;
+    const postsPerPage = 10;
 
     if (page < 1) {
         const base = categorySlug ? `/perspectives/${categorySlug}` : '/perspectives';
@@ -622,26 +584,8 @@ async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeadi
         const expertiseCategoriesCount = blogCategories.length;
         const yearsCombinedExperience = 8;
 
-        // Hero post
-        let heroPost = null;
-        {
-            const heroQuery = { isPublished: true, isFeatured: true };
-            if (selectedCategory) heroQuery.categories = { $in: [selectedCategory._id] };
-            const explicitHero = await BlogPost.find(heroQuery).sort({ publishedDate: -1 }).limit(1).lean();
-            if (explicitHero && explicitHero.length) {
-                heroPost = explicitHero[0];
-            } else {
-                const fallbackQuery = { ...baseQuery };
-                const fallback = await BlogPost.find(fallbackQuery).sort({ publishedDate: -1 }).limit(1).lean();
-                heroPost = (fallback && fallback.length) ? fallback[0] : null;
-            }
-        }
-
-        // Main list (excluding hero)
+        // Main list (all published posts, no hero exclusion)
         const mainListQuery = { ...baseQuery };
-        if (heroPost && heroPost._id) {
-            mainListQuery._id = { $ne: heroPost._id };
-        }
 
         const totalPosts = await BlogPost.countDocuments(mainListQuery);
         const totalPages = Math.ceil(Math.max(0, totalPosts) / postsPerPage);
@@ -653,22 +597,11 @@ async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeadi
 
         let posts = await BlogPost.find(mainListQuery)
             .populate('categories', 'name slug')
-            .sort({ publishedDate: -1 })
+            .sort({ publishedAt: -1, publishedDate: -1 })
             .skip((page - 1) * postsPerPage)
             .limit(postsPerPage)
             .lean();
         posts = (posts || []).map(p => ({ ...p }));
-
-        function buildFeaturedExcerpt(postDoc) {
-            if (!postDoc) return '';
-            if (postDoc.excerpt && postDoc.excerpt.trim()) return postDoc.excerpt.trim();
-            if (postDoc.metaDescription && postDoc.metaDescription.trim()) return postDoc.metaDescription.trim();
-            try {
-                const raw = String(postDoc.content || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-                return raw.length > 0 ? raw.slice(0, 180) + (raw.length > 180 ? '…' : '') : '';
-            } catch { return ''; }
-        }
-        const featuredOverrideComputed = heroPost ? [{ ...heroPost, featuredExcerpt: buildFeaturedExcerpt(heroPost) }] : [];
 
         const baseUrl = categorySlug ? `/perspectives/${categorySlug}` : '/perspectives';
 
@@ -680,7 +613,7 @@ async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeadi
             posts,
             popularPosts: [],
             isFirstPage: page === 1,
-            featuredOverride: featuredOverrideComputed,
+            featuredOverride: [],
             blogCategories,
             categoryCounts,
             tagQuery: null,

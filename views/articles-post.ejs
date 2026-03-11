@@ -9,8 +9,8 @@
     "headline": post.title,
     "alternativeHeadline": post.subtitle || undefined,
     "description": pageDescription,
-    "datePublished": post.publishedDate || undefined,
-    "dateModified": post.updatedAt || post.publishedDate || undefined,
+    "datePublished": post.publishedAt || post.publishedDate || undefined,
+    "dateModified": post.updatedAt || post.publishedAt || post.publishedDate || undefined,
     "author": post.author || 'Vanier Capital',
     "image": post.featuredImage || undefined,
     "mainEntityOfPage": {
@@ -33,8 +33,8 @@
     <div class="max-w-3xl mx-auto">
         <!-- Eyebrow: Date & Category -->
         <div class="flex flex-wrap items-center gap-3 mb-6">
-            <% if (post.publishedDate) { %>
-                <span class="font-sans text-sm font-bold text-gray-500 uppercase tracking-widest"><%= post.publishedDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+            <% if (post.publishedAt || post.publishedDate) { %>
+                <span class="font-sans text-sm font-bold text-gray-500 uppercase tracking-widest"><%= new Date(post.publishedAt || post.publishedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></span>
             <% } %>
             <% if (primaryTag) { %>
                 <span class="font-sans text-sm text-gray-400">|</span>
@@ -129,7 +129,7 @@
                         <img src="<%= rp.featuredImage %>" alt="" loading="lazy" decoding="async" class="w-full h-48 object-cover rounded-none mb-4">
                     <% } %>
                     <span class="font-sans text-xs font-bold text-gray-500 uppercase tracking-widest block mb-2">
-                        <%= rp.publishedDate ? new Date(rp.publishedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '' %>
+                        <%= (rp.publishedAt || rp.publishedDate) ? new Date(rp.publishedAt || rp.publishedDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '' %>
                     </span>
                     <h4 class="font-serif text-xl text-[#1a1a1a] group-hover:text-[#0f2e22] transition-colors leading-tight mb-2"><%= rp.title %></h4>
                     <% if (rp.excerpt) { %>
