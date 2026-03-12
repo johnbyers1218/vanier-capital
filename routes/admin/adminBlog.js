@@ -63,7 +63,7 @@ export default (csrfProtection) => {
 
     // --- Reusable Validation Rules ---
     const blogPostValidationRules = [
-        body('title', 'Title must be 5-200 characters.').trim().isLength({ min: 5, max: 200 }).escape(),
+        body('title', 'Title must be 5-200 characters.').trim().isLength({ min: 5, max: 200 }),
         body('slug', 'Slug format invalid (lowercase, numbers, hyphens only, max 250 chars).')
             .optional({ checkFalsy: true }).trim().isSlug().isLength({ max: 250 })
             .custom(async (value, { req }) => { // Check uniqueness
@@ -74,22 +74,19 @@ export default (csrfProtection) => {
                 if (existingPost) { throw new Error('Slug is already in use.'); } return true;
             }),
         body('excerpt')
+            .optional({ checkFalsy: true })
             .trim()
             .custom((val) => {
-                if (!val || !val.trim()) throw new Error('Excerpt is required.');
-                const len = val.trim().length;
-                if (len < 1) throw new Error('Excerpt is required.');
-                if (len > 300) throw new Error(`Excerpt cannot exceed 300 characters (currently ${len}).`);
+                if (val && val.trim().length > 300) throw new Error(`Excerpt cannot exceed 300 characters (currently ${val.trim().length}).`);
                 return true;
             })
-            .escape(),
+            ,
         body('content', 'Blog content must be at least 50 characters.')
             .trim().isLength({ min: 50 }), // Raw HTML, sanitize later
         body('author', 'Author is required.')
             .trim()
             .notEmpty()
-            .isLength({ max: 150 })
-            .escape(),
+            .isLength({ max: 150 }),
         body('publishedAt', 'Publication date must be a valid date.')
             .optional({ checkFalsy: true })
             .isISO8601()

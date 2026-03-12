@@ -46,11 +46,11 @@
         <% } %>
 
         <!-- Title -->
-        <h1 class="font-serif text-3xl md:text-5xl lg:text-6xl text-[#0f2e22] font-bold tracking-tight leading-tight"><%= typeof decodeHtmlEntities === 'function' ? decodeHtmlEntities(post.title) : post.title %></h1>
+        <h1 class="font-serif text-2xl md:text-3xl lg:text-4xl text-[#0f2e22] font-bold tracking-tight leading-tight"><%= typeof decodeHtmlEntities === 'function' ? decodeHtmlEntities(post.title) : post.title %></h1>
 
         <!-- Subtitle -->
         <% if (post.subtitle) { %>
-        <p class="font-serif text-lg md:text-2xl text-gray-500 italic font-light tracking-wide border-t border-[#0f2e22]/10 pt-6 mt-6"><%= post.subtitle %></p>
+        <p class="font-serif text-lg md:text-2xl text-gray-500 italic font-light tracking-wide border-t border-[#0f2e22]/10 pt-6 mt-6"><%= typeof decodeHtmlEntities === 'function' ? decodeHtmlEntities(post.subtitle) : post.subtitle %></p>
         <% } %>
     </div>
 </section>
@@ -62,8 +62,9 @@
         <% if (post.pdfDocumentUrl) { %>
         <!-- PDF Viewer -->
         <div class="mb-10">
-            <div class="border border-gray-200 bg-[#f9f8f6]" style="min-height: 800px;">
-                <iframe src="<%= post.pdfDocumentUrl %>" class="w-full" style="min-height: 800px; height: 80vh; border: none;" title="<%= post.title %> — PDF Document"></iframe>
+            <% const cleanPdfUrl = post.pdfDocumentUrl.includes('/upload/') ? post.pdfDocumentUrl.replace('/upload/', '/upload/fl_attachment:false/') : post.pdfDocumentUrl; %>
+            <div class="w-full border border-gray-200 bg-[#f9f8f6] flex justify-center" style="min-height: 900px;">
+                <embed src="<%= cleanPdfUrl %>#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf" width="100%" height="900px" class="border-0">
             </div>
             <div class="mt-4 flex items-center gap-4">
                 <a href="<%= post.pdfDocumentUrl %>" target="_blank" rel="noopener noreferrer" class="inline-block font-sans text-sm font-bold text-[#0f2e22] uppercase tracking-wider border-b border-[#0f2e22] pb-1 hover:text-slate-600 hover:border-slate-600 transition-colors">Download PDF &rarr;</a>

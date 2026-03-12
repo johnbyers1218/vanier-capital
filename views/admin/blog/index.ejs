@@ -60,7 +60,7 @@
                         <tr class="bg-white border-b border-gray-200 text-[#1a1a1a] hover:bg-gray-50">
                             <td class="px-6 py-4 text-sm text-[#1a1a1a]">
                                 <a href="/admin/blog/edit/<%= post._id %>" class="font-medium text-[#1a1a1a] hover:text-[#0f2e22]">
-                                    <%= post.title %>
+                                    <%= typeof decodeHtmlEntities === 'function' ? decodeHtmlEntities(post.title) : post.title %>
                                 </a>
                                 <div class="text-xs text-gray-500">Slug: <%= post.slug %>
                                     <% if(post.isPublished && post.slug) { %>

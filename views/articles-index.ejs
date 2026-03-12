@@ -59,10 +59,11 @@
                         </p>
                         <h2 class="font-serif text-2xl lg:text-3xl text-[#0f2e22] mb-3 leading-tight"><a href="/blog/<%= post.slug %>" class="hover:text-slate-600 transition-colors"><%= typeof decodeHtmlEntities === 'function' ? decodeHtmlEntities(post.title) : post.title %></a></h2>
                         <% if (post.subtitle) { %>
-                        <p class="font-sans text-lg text-slate-600 italic mb-3"><%= post.subtitle %></p>
+                        <p class="font-sans text-lg text-slate-600 italic mb-3"><%= typeof decodeHtmlEntities === 'function' ? decodeHtmlEntities(post.subtitle) : post.subtitle %></p>
                         <% } %>
                         <% if (post.excerpt) { %>
-                        <p class="font-sans text-slate-600 leading-relaxed mb-6"><%= post.excerpt.length > 220 ? post.excerpt.substring(0, 220) + '…' : post.excerpt %></p>
+                        <% const _exc = typeof decodeHtmlEntities === 'function' ? decodeHtmlEntities(post.excerpt) : post.excerpt; %>
+                        <p class="font-sans text-slate-600 leading-relaxed mb-6"><%= _exc.length > 220 ? _exc.substring(0, 220) + '…' : _exc %></p>
                         <% } %>
                         <a href="/blog/<%= post.slug %>" class="font-sans text-sm font-bold tracking-widest text-[#0f2e22] uppercase border-b border-[#0f2e22] pb-1 self-start hover:text-slate-600 hover:border-slate-600 transition-all">Read Report &rarr;</a>
                     </div>

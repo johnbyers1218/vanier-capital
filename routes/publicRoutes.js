@@ -410,6 +410,14 @@ router.get('/blog', async (req, res, next) => {
             selectedCategory = await Category.findOne({ slug: categoryQuery }).select('_id slug name').lean();
             if (selectedCategory) baseQuery.categories = { $in: [selectedCategory._id] };
         } catch {}
+    } else {
+        // Unfiltered /blog: exclude Firm Updates (now hosted at /firm/communications)
+        try {
+            const firmUpdatesCat = await Category.findOne({ slug: 'firm-updates' }).select('_id').lean();
+            if (firmUpdatesCat) {
+                baseQuery.categories = { $nin: [firmUpdatesCat._id] };
+            }
+        } catch {}
     }
 
     // Build category filters and counts
@@ -543,6 +551,12 @@ async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeadi
             selectedCategory = await Category.findOne({ slug: categorySlug }).select('_id slug name').lean();
             if (selectedCategory) {
                 baseQuery.categories = { $in: [selectedCategory._id] };
+            }
+        } else {
+            // Unfiltered perspectives: exclude Firm Updates (now hosted at /firm/communications)
+            const firmUpdatesCat = await Category.findOne({ slug: 'firm-updates' }).select('_id').lean();
+            if (firmUpdatesCat) {
+                baseQuery.categories = { $nin: [firmUpdatesCat._id] };
             }
         }
 
