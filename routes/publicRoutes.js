@@ -413,21 +413,39 @@ router.get('/blog', async (req, res, next) => {
     try {
     // Base query for main list; we'll optionally exclude the hero post
     const baseQuery = { isPublished: true };
+
+    // Always resolve firm-updates category for exclusion
+    let firmUpdatesCatId = null;
+    try {
+        const firmUpdatesCat = await Category.findOne({ slug: 'firm-updates' }).select('_id').lean();
+        if (firmUpdatesCat) firmUpdatesCatId = firmUpdatesCat._id;
+    } catch {}
+
     // Optional: filter by curated Category slug
     let selectedCategory = null;
     if (categoryQuery) {
         try {
             selectedCategory = await Category.findOne({ slug: categoryQuery }).select('_id slug name').lean();
-            if (selectedCategory) baseQuery.categories = { $in: [selectedCategory._id] };
-        } catch {}
-    } else {
-        // Unfiltered /blog: exclude Firm Updates (now hosted at /firm/communications)
-        try {
-            const firmUpdatesCat = await Category.findOne({ slug: 'firm-updates' }).select('_id').lean();
-            if (firmUpdatesCat) {
-                baseQuery.categories = { $nin: [firmUpdatesCat._id] };
+            if (selectedCategory) {
+                // HARD isolation: match the requested category AND exclude firm-updates
+                if (firmUpdatesCatId) {
+                    baseQuery.$and = [
+                        { categories: { $in: [selectedCategory._id] } },
+                        { categories: { $nin: [firmUpdatesCatId] } },
+                        { publicationType: { $ne: 'Firm Updates' } }
+                    ];
+                } else {
+                    baseQuery.categories = { $in: [selectedCategory._id] };
+                    baseQuery.publicationType = { $ne: 'Firm Updates' };
+                }
             }
         } catch {}
+    } else {
+        // Unfiltered /blog: exclude Firm Updates by both category and publicationType
+        if (firmUpdatesCatId) {
+            baseQuery.categories = { $nin: [firmUpdatesCatId] };
+        }
+        baseQuery.publicationType = { $ne: 'Firm Updates' };
     }
 
     // Build category filters and counts
@@ -555,19 +573,32 @@ async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeadi
     try {
         const baseQuery = { isPublished: true };
 
+        // Always resolve the firm-updates category so it can be excluded everywhere
+        const firmUpdatesCat = await Category.findOne({ slug: 'firm-updates' }).select('_id').lean();
+
         // If a category slug is specified, resolve it from the Category collection
         let selectedCategory = null;
         if (categorySlug) {
             selectedCategory = await Category.findOne({ slug: categorySlug }).select('_id slug name').lean();
             if (selectedCategory) {
-                baseQuery.categories = { $in: [selectedCategory._id] };
+                // HARD isolation: match the requested category AND exclude firm-updates
+                if (firmUpdatesCat) {
+                    baseQuery.$and = [
+                        { categories: { $in: [selectedCategory._id] } },
+                        { categories: { $nin: [firmUpdatesCat._id] } },
+                        { publicationType: { $ne: 'Firm Updates' } }
+                    ];
+                } else {
+                    baseQuery.categories = { $in: [selectedCategory._id] };
+                    baseQuery.publicationType = { $ne: 'Firm Updates' };
+                }
             }
         } else {
-            // Unfiltered perspectives: exclude Firm Updates (now hosted at /firm/communications)
-            const firmUpdatesCat = await Category.findOne({ slug: 'firm-updates' }).select('_id').lean();
+            // Unfiltered perspectives: exclude Firm Updates by both category and publicationType
             if (firmUpdatesCat) {
                 baseQuery.categories = { $nin: [firmUpdatesCat._id] };
             }
+            baseQuery.publicationType = { $ne: 'Firm Updates' };
         }
 
         // Category filter bar data
@@ -700,10 +731,13 @@ router.get('/firm/communications', async (req, res, next) => {
         // Resolve the 'Firm Updates' category
         const firmCategory = await Category.findOne({ slug: 'firm-updates' }).select('_id').lean();
         const baseQuery = { isPublished: true };
+        // HARD isolation: match by category OR publicationType (belt-and-suspenders)
         if (firmCategory) {
-            baseQuery.categories = { $in: [firmCategory._id] };
+            baseQuery.$or = [
+                { categories: { $in: [firmCategory._id] } },
+                { publicationType: 'Firm Updates' }
+            ];
         } else {
-            // Fallback: match by publicationType
             baseQuery.publicationType = 'Firm Updates';
         }
 

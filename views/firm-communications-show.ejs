@@ -46,11 +46,11 @@
         <% } %>
 
         <!-- Title -->
-        <h1 class="font-serif text-2xl md:text-3xl lg:text-4xl text-[#0f2e22] font-bold tracking-tight leading-tight"><%= typeof decodeHtmlEntities === 'function' ? decodeHtmlEntities(post.title) : post.title %></h1>
+        <h1 class="font-serif text-2xl md:text-3xl lg:text-4xl text-[#0f2e22] font-bold tracking-tight leading-tight"><%- typeof decodeHtmlEntities === 'function' ? decodeHtmlEntities(post.title) : post.title %></h1>
 
         <!-- Subtitle -->
         <% if (post.subtitle) { %>
-        <p class="font-serif text-lg md:text-2xl text-gray-500 italic font-light tracking-wide border-t border-[#0f2e22]/10 pt-6 mt-6"><%= typeof decodeHtmlEntities === 'function' ? decodeHtmlEntities(post.subtitle) : post.subtitle %></p>
+        <p class="font-serif text-lg md:text-2xl text-gray-500 italic font-light tracking-wide border-t border-[#0f2e22]/10 pt-6 mt-6"><%- typeof decodeHtmlEntities === 'function' ? decodeHtmlEntities(post.subtitle) : post.subtitle %></p>
         <% } %>
     </div>
 </section>
@@ -62,7 +62,7 @@
         <% if (post.pdfDocumentUrl) { %>
         <!-- PDF Viewer (Google Docs Viewer — prevents auto-download) -->
         <div class="mb-10">
-            <div class="w-full h-[900px] border border-gray-200 bg-[#f9f8f6]">
+            <div class="w-full h-[1150px] border border-gray-200 bg-[#f9f8f6]">
                 <iframe
                     src="https://docs.google.com/viewer?url=<%- encodeURIComponent(post.pdfDocumentUrl) %>&embedded=true"
                     width="100%"
