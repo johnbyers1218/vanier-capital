@@ -79,7 +79,7 @@
         </a>
 
         <!-- Desktop Navigation (lg+ 1024px — tablets get mobile menu) -->
-        <ul class="hidden lg:flex items-center h-full">
+        <ul class="hidden lg:flex items-center h-full ml-auto">
 
             <!-- FIRM — Mega Menu -->
             <li class="group/navitem h-full flex items-center px-4 xl:px-6">
@@ -98,12 +98,13 @@
                             <a href="/firm/leadership" class="text-base font-medium text-[#1a1a1a] hover:text-[#0f2e22] transition-colors block py-1">Leadership</a>
                             <a href="/firm/stewardship" class="text-base font-medium text-[#1a1a1a] hover:text-[#0f2e22] transition-colors block py-1">Stewardship</a>
                             <a href="/firm/overview#philosophy" class="text-base font-medium text-[#1a1a1a] hover:text-[#0f2e22] transition-colors block py-1">Mission &amp; Philosophy</a>
+                            <a href="/firm/communications" class="text-base font-medium text-[#1a1a1a] hover:text-[#0f2e22] transition-colors block py-1">Executive Communications</a>
                         </div>
                         <!-- Col 3: Featured Card -->
                         <% if (typeof latestFirmUpdate !== 'undefined' && latestFirmUpdate) { %>
                         <div class="col-span-3 bg-[#f9f8f6] p-5">
                             <p class="text-xs font-bold tracking-[0.15em] text-gray-500 uppercase mb-3">Latest Firm Update</p>
-                            <a href="/blog/<%= latestFirmUpdate.slug %>" class="block group/card">
+                            <a href="/firm/communications/<%= latestFirmUpdate.slug %>" class="block group/card">
                                 <% if (latestFirmUpdate.featuredImage) { %>
                                 <img src="<%= latestFirmUpdate.featuredImage %>" alt="<%= latestFirmUpdate.title %>" class="h-32 w-full object-cover mb-3">
                                 <% } else { %>
@@ -193,13 +194,12 @@
                     <div class="max-w-[1400px] mx-auto px-8 py-12 grid grid-cols-12 gap-12">
                         <div class="col-span-3">
                             <h3 class="font-serif text-xl font-bold text-[#0f2e22] mb-3">Perspectives</h3>
-                            <p class="text-sm text-gray-600 font-sans leading-relaxed pr-4">Market research, operational case studies, and firm updates from our investment team.</p>
+                            <p class="text-sm text-gray-600 font-sans leading-relaxed pr-4">Market research and operational case studies from our investment team.</p>
                         </div>
                         <div class="col-span-6 flex flex-col space-y-4 pt-1">
                             <a href="/blog" class="text-base font-medium text-[#1a1a1a] hover:text-[#0f2e22] transition-colors block py-1 border-b border-gray-100 pb-3">View All Perspectives</a>
                             <a href="/perspectives/market-research" class="text-base font-medium hover:text-[#0f2e22] transition-colors">Market Research</a>
                             <a href="/perspectives/case-studies" class="text-base font-medium hover:text-[#0f2e22] transition-colors">Case Studies</a>
-                            <a href="/perspectives/firm-updates" class="text-base font-medium hover:text-[#0f2e22] transition-colors">Firm Updates</a>
                         </div>
                         <% if (typeof latestMarketResearch !== 'undefined' && latestMarketResearch) { %>
                         <div class="col-span-3 bg-[#f9f8f6] p-5">
@@ -292,6 +292,7 @@
                 <a href="/firm/overview" class="font-sans text-sm text-white/80 py-1.5 hover:text-white block">Overview</a>
                 <a href="/firm/leadership" class="font-sans text-sm text-white/80 py-1.5 hover:text-white block">Leadership</a>
                 <a href="/firm/stewardship" class="font-sans text-sm text-white/80 py-1.5 hover:text-white block">Stewardship</a>
+                <a href="/firm/communications" class="font-sans text-sm text-white/80 py-1.5 hover:text-white block">Executive Communications</a>
             </div>
         </div>
 
@@ -304,7 +305,6 @@
             <div class="pl-4 pb-3 flex flex-col gap-1">
                 <a href="/perspectives/market-research" class="font-sans text-sm text-white/80 py-1.5 hover:text-white block">Market Research</a>
                 <a href="/perspectives/case-studies" class="font-sans text-sm text-white/80 py-1.5 hover:text-white block">Case Studies</a>
-                <a href="/perspectives/firm-updates" class="font-sans text-sm text-white/80 py-1.5 hover:text-white block">Firm Updates</a>
             </div>
         </div>
 

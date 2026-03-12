@@ -47,27 +47,25 @@
         </div>
 
         <!-- Title -->
-        <h1 class="font-serif text-4xl lg:text-5xl text-[#0f2e22] font-bold tracking-tight leading-tight mb-4"><%= decodeHtmlEntities(post.title) %></h1>
+        <h1 class="font-serif text-3xl md:text-5xl lg:text-6xl text-[#0f2e22] font-bold tracking-tight leading-tight mb-4"><%= decodeHtmlEntities(post.title) %></h1>
 
         <!-- Subtitle -->
         <% if (post.subtitle) { %>
-        <p class="font-serif text-xl lg:text-2xl text-gray-500 italic font-light tracking-wide border-t border-[#0f2e22]/10 pt-6 mt-6"><%= post.subtitle %></p>
+        <p class="font-serif text-lg md:text-2xl text-gray-500 italic font-light tracking-wide border-t border-[#0f2e22]/10 pt-6 mt-6"><%= post.subtitle %></p>
         <% } %>
 
         <!-- Author Line -->
         <% 
             const authorRaw = post.author || 'Vanier Capital';
-            // Split "John Byers, Partner & Chief Investment Officer" into name + title
-            const authorCommaIdx = authorRaw.indexOf(',');
+            const dashIdx = authorRaw.indexOf(' - ');
             let authorName, authorTitle;
-            if (authorCommaIdx > -1) {
-                authorName = authorRaw.substring(0, authorCommaIdx).trim();
-                authorTitle = authorRaw.substring(authorCommaIdx + 1).trim().replace(/\s*&\s*/g, ' & ');
+            if (dashIdx > -1) {
+                authorName = authorRaw.substring(0, dashIdx).trim();
+                authorTitle = authorRaw.substring(dashIdx + 3).trim();
             } else {
                 authorName = authorRaw;
                 authorTitle = null;
             }
-            const authorDisplay = authorName;
         %>
         <p class="font-sans text-base text-gray-500 mt-6">By <span class="text-[#1a1a1a] font-medium"><%= authorName %></span><% if (authorTitle) { %> &mdash; <%= authorTitle %><% } %></p>
     </div>
@@ -83,8 +81,21 @@
 <% } %>
 
 <!-- ═══════════════ ARTICLE BODY ═══════════════ -->
+<style>
+  .editorial-content table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-collapse: collapse;
+  }
+  .editorial-content td,
+  .editorial-content th {
+    min-width: 120px;
+  }
+</style>
 <section class="bg-white">
-    <article class="max-w-3xl mx-auto px-6 md:px-8 py-10 md:py-16 font-serif text-lg text-gray-800 leading-loose
+    <article class="editorial-content max-w-3xl mx-auto px-6 md:px-8 py-10 md:py-16 font-serif text-lg text-gray-800 leading-loose
                     [&_h2]:font-serif [&_h2]:text-2xl [&_h2]:md:text-3xl [&_h2]:text-[#0f2e22] [&_h2]:mt-12 [&_h2]:mb-4 [&_h2]:leading-tight
                     [&_h3]:font-serif [&_h3]:text-xl [&_h3]:md:text-2xl [&_h3]:text-[#1a1a1a] [&_h3]:mt-10 [&_h3]:mb-3 [&_h3]:leading-tight
                     [&_p]:mb-6

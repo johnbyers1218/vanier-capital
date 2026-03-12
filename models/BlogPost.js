@@ -34,14 +34,19 @@ const BlogPostSchema = new Schema({
     excerpt: {
         type: String,
         trim: true,
-        required: [true, 'Excerpt is required.'],
         maxlength: [250, 'Excerpt cannot exceed 250 characters.']
     },
     author: {
         type: String,
         trim: true,
         required: [true, 'Author is required.'],
-        maxlength: [150, 'Author cannot exceed 150 characters.']
+        maxlength: [150, 'Author cannot exceed 150 characters.'],
+        enum: [
+            'John Byers - Partner, Chief Investment Officer',
+            'Matthew Moellering - Partner, Chief Executive Officer',
+            'Logan Mayfield - Partner, Chief Operating Officer',
+            'Vanier Capital'
+        ]
     },
     isPublished: {
         type: Boolean,

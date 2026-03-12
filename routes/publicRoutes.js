@@ -395,7 +395,7 @@ router.get('/investors/apply', (req, res) => {
 // GET /blog - Articles Index Page (with Pagination & Optional Tag Filter)
 router.get('/blog', async (req, res, next) => {
     const page = parseInt(req.query.page) || 1;
-    const postsPerPage = 10;
+    const postsPerPage = 5;
     const categoryQuery = (req.query.category || req.query.cat || '').toString().toLowerCase().trim() || null;
 
     if (page < 1) { return res.redirect(categoryQuery ? `/blog?category=${categoryQuery}&page=1` : '/blog?page=1'); } // Redirect invalid page
@@ -505,7 +505,7 @@ router.get('/blog', async (req, res, next) => {
 });
 
 // ── Perspectives — Category-Filtered Index Pages ──────────────────────
-// Maps: /perspectives → all, /perspectives/market-research, /perspectives/case-studies, /perspectives/firm-updates
+// Maps: /perspectives → all, /perspectives/market-research, /perspectives/case-studies (firm-updates → /firm/communications)
 const PERSPECTIVES_CATEGORIES = {
     'market-research': {
         pageHeading: 'Market Research.',
@@ -516,19 +516,18 @@ const PERSPECTIVES_CATEGORIES = {
         pageDescription: 'Factual breakdowns of our self-funded seed acquisitions, detailing our acquisition thesis, CapEx execution, and operational stabilization.',
     },
     'firm-updates': {
-        pageHeading: 'Firm Updates.',
-        pageDescription: 'Periodic insights from the founding partners regarding underwriting philosophy, debt structuring, and internal standard operating procedures.',
+        redirect: '/firm/communications',
     },
     // Legacy redirects — keep old slugs functional
     'market-commentary': { redirect: '/perspectives/market-research' },
-    'quarterly-letters': { redirect: '/perspectives/firm-updates' },
+    'quarterly-letters': { redirect: '/firm/communications' },
     'news': { redirect: '/perspectives/case-studies' },
 };
 
 // Helper: shared query logic for perspectives pages
 async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeading, pageDescription }) {
     const page = parseInt(req.query.page) || 1;
-    const postsPerPage = 10;
+    const postsPerPage = 5;
 
     if (page < 1) {
         const base = categorySlug ? `/perspectives/${categorySlug}` : '/perspectives';
@@ -643,7 +642,7 @@ router.get('/perspectives', (req, res, next) => {
     renderPerspectivesIndex(req, res, next, {
         categorySlug: null,
         pageHeading: 'Perspectives.',
-        pageDescription: 'Market research, operational case studies, and firm updates from the Vanier Capital investment team.',
+        pageDescription: 'Market research and operational case studies from the Vanier Capital investment team.',
     });
 });
 
@@ -665,6 +664,96 @@ router.get('/perspectives/:category', (req, res, next) => {
     });
 });
 
+// ── Executive Communications (Firm Updates) ──────────────────────────
+// GET /firm/communications — Minimalist SEC-style index
+router.get('/firm/communications', async (req, res, next) => {
+    const page = parseInt(req.query.page) || 1;
+    const postsPerPage = 5;
+
+    if (page < 1) return res.redirect('/firm/communications?page=1');
+
+    try {
+        // Resolve the 'Firm Updates' category
+        const firmCategory = await Category.findOne({ slug: 'firm-updates' }).select('_id').lean();
+        const baseQuery = { isPublished: true };
+        if (firmCategory) {
+            baseQuery.categories = { $in: [firmCategory._id] };
+        } else {
+            // Fallback: match by publicationType
+            baseQuery.publicationType = 'Firm Updates';
+        }
+
+        const totalPosts = await BlogPost.countDocuments(baseQuery);
+        const totalPages = Math.ceil(Math.max(0, totalPosts) / postsPerPage);
+
+        if (page > totalPages && totalPages > 0) {
+            return res.redirect(`/firm/communications?page=${totalPages}`);
+        }
+
+        let posts = await BlogPost.find(baseQuery)
+            .select('title slug publishedAt publishedDate pdfDocumentUrl')
+            .sort({ publishedAt: -1, publishedDate: -1 })
+            .skip((page - 1) * postsPerPage)
+            .limit(postsPerPage)
+            .lean();
+        posts = (posts || []).map(p => ({ ...p }));
+
+        return res.render('firm-communications-index', {
+            pageTitle: 'Executive Communications - Vanier Capital',
+            pageDescription: 'Periodic communications from Vanier Capital leadership regarding investment philosophy, portfolio updates, and firm operations.',
+            path: '/firm',
+            posts,
+            currentPage: page,
+            hasNextPage: page < totalPages,
+            hasPreviousPage: page > 1,
+            nextPage: page + 1,
+            previousPage: page - 1,
+            lastPage: totalPages,
+        });
+    } catch (error) {
+        logger.error('Error fetching executive communications index:', { error: error.message, page });
+        return next(error);
+    }
+});
+
+// GET /firm/communications/:slug — Single Executive Communication
+router.get('/firm/communications/:slug', async (req, res, next) => {
+    try {
+        const slug = req.params.slug;
+        if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
+            logger.warn(`Executive communications: invalid slug format: ${slug}`);
+            return next();
+        }
+
+        const post = await BlogPost.findOne({ slug, isPublished: true }).lean();
+        if (!post) {
+            logger.warn(`Executive communication not found for slug: ${slug}`);
+            return next();
+        }
+
+        // Increment view count (non-blocking)
+        try { BlogPost.updateOne({ _id: post._id }, { $inc: { viewCount: 1 } }).exec(); } catch {}
+        try {
+            const startOfDay = new Date();
+            startOfDay.setUTCHours(0,0,0,0);
+            DailyMetric.updateOne(
+                { key: 'blog_views', date: startOfDay },
+                { $inc: { count: 1 } },
+                { upsert: true }
+            ).exec();
+        } catch {}
+
+        return res.render('firm-communications-show', {
+            pageTitle: `${post.title} | Executive Communications - Vanier Capital`,
+            pageDescription: post.metaDescription || post.excerpt || 'Executive communication from Vanier Capital leadership.',
+            path: '/firm',
+            post,
+        });
+    } catch (error) {
+        logger.error(`Error fetching executive communication slug ${req.params.slug}:`, { error: error.message });
+        return next(error);
+    }
+});
 
 // GET /blog/:slug - Single Blog Post Page
 router.get('/blog/:slug', async (req, res, next) => {
@@ -860,14 +949,14 @@ router.get('/sitemap.xml', async (req, res) => {
             '/perspectives',
             '/perspectives/market-research',
             '/perspectives/case-studies',
-            '/perspectives/firm-updates',
+            '/firm/communications',
             '/contact/investor-relations',
             '/contact/acquisitions'
             // '/investor-club/apply' — REMOVED: SEC 506(b) general solicitation risk
         ];
 
         // Blog posts and blog pagination
-        const postsPerPage = 6; // Keep in sync with /blog route
+        const postsPerPage = 5; // Keep in sync with /blog route
         const totalPosts = await BlogPost.countDocuments({ isPublished: true });
         const totalPages = Math.max(1, Math.ceil(totalPosts / postsPerPage));
         const blogPages = Array.from({ length: totalPages - 1 }, (_, i) => `/blog?page=${i + 2}`); // page=1 is canonical /blog
