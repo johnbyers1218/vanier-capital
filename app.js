@@ -211,7 +211,7 @@ const cspDirectives = {
   frameSrc: ["'self'", "https://*.tiny.cloud", "https://calendar.google.com","https://accounts.google.com", "https://*.clerk.accounts.dev", "https://clerk.com", "https://*.clerk.com", "https://res.cloudinary.com"],
   scriptSrcAttr: [],
   workerSrc: ["'self'", "blob:"],
-  objectSrc: ["'none'"],
+  objectSrc: ["'self'","https://res.cloudinary.com"],
 };
 
 // Dynamically add PUBLIC_SITE_URL (and/or CORS_ORIGIN fallback) to every CSP source array if provided.
