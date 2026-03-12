@@ -208,7 +208,7 @@ const cspDirectives = {
     "https://cdn.jsdelivr.net",
     "https://unpkg.com"
   ],
-  frameSrc: ["'self'", "https://*.tiny.cloud", "https://calendar.google.com","https://accounts.google.com", "https://*.clerk.accounts.dev", "https://clerk.com", "https://*.clerk.com", "https://res.cloudinary.com"],
+  frameSrc: ["'self'", "https://*.tiny.cloud", "https://calendar.google.com","https://accounts.google.com", "https://*.clerk.accounts.dev", "https://clerk.com", "https://*.clerk.com", "https://res.cloudinary.com", "https://docs.google.com"],
   scriptSrcAttr: [],
   workerSrc: ["'self'", "blob:"],
   objectSrc: ["'self'","https://res.cloudinary.com"],

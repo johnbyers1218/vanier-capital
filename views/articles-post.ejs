@@ -51,7 +51,7 @@
 
         <!-- Subtitle -->
         <% if (post.subtitle) { %>
-        <p class="font-serif text-lg md:text-2xl text-gray-500 italic font-light tracking-wide border-t border-[#0f2e22]/10 pt-6 mt-6"><%= post.subtitle %></p>
+        <p class="font-serif text-lg md:text-2xl text-gray-500 italic font-light tracking-wide border-t border-[#0f2e22]/10 pt-6 mt-6"><%= typeof decodeHtmlEntities === 'function' ? decodeHtmlEntities(post.subtitle) : post.subtitle %></p>
         <% } %>
 
         <!-- Author Line -->

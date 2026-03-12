@@ -120,7 +120,7 @@
                   'Logan Mayfield - Partner, Chief Operating Officer',
                   'Vanier Capital'
               ]; %>
-              <select id="author" name="author" required style="border-radius:0; border:1px solid rgba(15,46,34,0.2); padding:0.5rem 0.75rem; width:100%; font-size:0.95rem; outline:none;" onfocus="this.style.boxShadow='0 0 0 2px #0f2e22'" onblur="this.style.boxShadow='none'">
+              <select id="author" name="author" style="border-radius:0; border:1px solid rgba(15,46,34,0.2); padding:0.5rem 0.75rem; width:100%; font-size:0.95rem; outline:none;" onfocus="this.style.boxShadow='0 0 0 2px #0f2e22'" onblur="this.style.boxShadow='none'">
                 <% authorOptions.forEach(function(opt) { %>
                   <option value="<%= opt %>" <%= (post && post.author === opt) ? 'selected' : '' %>><%= opt %></option>
                 <% }); %>
@@ -307,13 +307,6 @@ document.addEventListener('DOMContentLoaded', () => {
         form.addEventListener('submit', function(e) {
             if (typeof tinymce !== 'undefined') {
                 tinymce.triggerSave();
-            }
-            // Validate content client-side since we removed `required` from the hidden textarea
-            const contentField = document.getElementById('blog-content-editor');
-            if (contentField && contentField.value.trim().length < 50) {
-                e.preventDefault();
-                alert('Content is required and must be at least 50 characters.');
-                return false;
             }
         });
     }

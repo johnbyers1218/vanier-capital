@@ -97,21 +97,26 @@
                             <a href="/firm/overview" class="text-base font-medium text-[#1a1a1a] hover:text-[#0f2e22] transition-colors block py-1 border-b border-gray-100 pb-3">Firm Overview</a>
                             <a href="/firm/leadership" class="text-base font-medium text-[#1a1a1a] hover:text-[#0f2e22] transition-colors block py-1">Leadership</a>
                             <a href="/firm/stewardship" class="text-base font-medium text-[#1a1a1a] hover:text-[#0f2e22] transition-colors block py-1">Stewardship</a>
-                            <a href="/firm/overview#philosophy" class="text-base font-medium text-[#1a1a1a] hover:text-[#0f2e22] transition-colors block py-1">Mission &amp; Philosophy</a>
+                            <a href="/firm/philosophy" class="text-base font-medium text-[#1a1a1a] hover:text-[#0f2e22] transition-colors block py-1">Mission &amp; Philosophy</a>
                             <a href="/firm/communications" class="text-base font-medium text-[#1a1a1a] hover:text-[#0f2e22] transition-colors block py-1">Executive Communications</a>
                         </div>
                         <!-- Col 3: Featured Card -->
                         <% if (typeof latestFirmUpdate !== 'undefined' && latestFirmUpdate) { %>
-                        <div class="col-span-3 bg-[#f9f8f6] p-5">
-                            <p class="text-xs font-bold tracking-[0.15em] text-gray-500 uppercase mb-3">Latest Firm Update</p>
-                            <a href="/firm/communications/<%= latestFirmUpdate.slug %>" class="block group/card">
-                                <% if (latestFirmUpdate.featuredImage) { %>
-                                <img src="<%= latestFirmUpdate.featuredImage %>" alt="<%= latestFirmUpdate.title %>" class="h-32 w-full object-cover mb-3">
-                                <% } else { %>
-                                <img src="/images/hero-real-estate.jpg" alt="<%= latestFirmUpdate.title %>" class="h-32 w-full object-cover mb-3">
-                                <% } %>
-                                <h4 class="font-serif text-lg font-semibold text-[#1a1a1a] group-hover/card:text-[#0f2e22] transition-colors"><%= latestFirmUpdate.title %></h4>
-                            </a>
+                        <div class="col-span-3 bg-[#0f2e22] p-6 flex flex-col justify-between">
+                            <div>
+                                <p class="text-xs font-bold tracking-[0.15em] text-white/50 uppercase mb-4">Latest Communication</p>
+                                <!-- VC Monogram -->
+                                <div class="mb-5">
+                                    <span class="font-serif text-3xl font-bold text-white/20 tracking-[0.2em]">VC</span>
+                                </div>
+                                <a href="/firm/communications/<%= latestFirmUpdate.slug %>" class="block group/card">
+                                    <h4 class="font-serif text-lg font-semibold text-white group-hover/card:text-white/80 transition-colors leading-snug mb-3"><%- typeof decodeHtmlEntities === 'function' ? decodeHtmlEntities(latestFirmUpdate.title) : latestFirmUpdate.title %></h4>
+                                    <% if (latestFirmUpdate.publishedAt || latestFirmUpdate.publishedDate) { %>
+                                    <p class="font-sans text-xs text-white/50 uppercase tracking-widest"><%= new Date(latestFirmUpdate.publishedAt || latestFirmUpdate.publishedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+                                    <% } %>
+                                </a>
+                            </div>
+                            <a href="/firm/communications" class="mt-6 inline-block text-xs font-bold uppercase tracking-widest text-white/50 hover:text-white transition-colors">All Communications &rarr;</a>
                         </div>
                         <% } %>
                     </div>
@@ -290,6 +295,7 @@
             <a href="/firm/overview" class="font-serif text-base font-bold uppercase tracking-[0.12em] text-white py-4 hover:text-white/80 block <%= path && path.startsWith('/firm') ? 'text-white' : '' %>">Firm</a>
             <div class="pl-4 pb-3 flex flex-col gap-1">
                 <a href="/firm/overview" class="font-sans text-sm text-white/80 py-1.5 hover:text-white block">Overview</a>
+                <a href="/firm/philosophy" class="font-sans text-sm text-white/80 py-1.5 hover:text-white block">Mission &amp; Philosophy</a>
                 <a href="/firm/leadership" class="font-sans text-sm text-white/80 py-1.5 hover:text-white block">Leadership</a>
                 <a href="/firm/stewardship" class="font-sans text-sm text-white/80 py-1.5 hover:text-white block">Stewardship</a>
                 <a href="/firm/communications" class="font-sans text-sm text-white/80 py-1.5 hover:text-white block">Executive Communications</a>

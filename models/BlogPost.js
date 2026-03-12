@@ -28,8 +28,7 @@ const BlogPostSchema = new Schema({
     },
     content: {
         type: String,
-        required: [true, 'Blog post content is required.'],
-        minlength: [50, 'Blog content must be at least 50 characters.']
+        default: ''
     },
     excerpt: {
         type: String,
@@ -39,14 +38,15 @@ const BlogPostSchema = new Schema({
     author: {
         type: String,
         trim: true,
-        required: [true, 'Author is required.'],
         maxlength: [150, 'Author cannot exceed 150 characters.'],
         enum: [
             'John Byers - Partner, Chief Investment Officer',
             'Matthew Moellering - Partner, Chief Executive Officer',
             'Logan Mayfield - Partner, Chief Operating Officer',
-            'Vanier Capital'
-        ]
+            'Vanier Capital',
+            null, ''
+        ],
+        default: null
     },
     isPublished: {
         type: Boolean,

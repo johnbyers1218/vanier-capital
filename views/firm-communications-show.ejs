@@ -60,14 +60,22 @@
     <div class="max-w-3xl mx-auto">
 
         <% if (post.pdfDocumentUrl) { %>
-        <!-- PDF Viewer -->
+        <!-- PDF Viewer (Google Docs Viewer — prevents auto-download) -->
         <div class="mb-10">
-            <% const cleanPdfUrl = post.pdfDocumentUrl.includes('/upload/') ? post.pdfDocumentUrl.replace('/upload/', '/upload/fl_attachment:false/') : post.pdfDocumentUrl; %>
-            <div class="w-full border border-gray-200 bg-[#f9f8f6] flex justify-center" style="min-height: 900px;">
-                <embed src="<%= cleanPdfUrl %>#toolbar=0&navpanes=0&scrollbar=0" type="application/pdf" width="100%" height="900px" class="border-0">
+            <div class="w-full h-[900px] border border-gray-200 bg-[#f9f8f6]">
+                <iframe
+                    src="https://docs.google.com/viewer?url=<%- encodeURIComponent(post.pdfDocumentUrl) %>&embedded=true"
+                    width="100%"
+                    height="100%"
+                    style="border: none;"
+                    title="<%= typeof decodeHtmlEntities === 'function' ? decodeHtmlEntities(post.title) : post.title %>"
+                    loading="lazy">
+                </iframe>
             </div>
-            <div class="mt-4 flex items-center gap-4">
-                <a href="<%= post.pdfDocumentUrl %>" target="_blank" rel="noopener noreferrer" class="inline-block font-sans text-sm font-bold text-[#0f2e22] uppercase tracking-wider border-b border-[#0f2e22] pb-1 hover:text-slate-600 hover:border-slate-600 transition-colors">Download PDF &rarr;</a>
+            <div class="mt-8 flex justify-center">
+                <a href="<%- post.pdfDocumentUrl %>" download class="font-sans text-xs font-bold tracking-widest text-slate-400 uppercase hover:text-[#0f2e22] transition-colors">
+                    Download Original PDF &rarr;
+                </a>
             </div>
         </div>
         <% } %>

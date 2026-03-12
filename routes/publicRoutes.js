@@ -220,6 +220,16 @@ router.get('/firm/overview', async (req, res) => {
     });
 });
 
+// Firm Mission & Philosophy
+router.get('/firm/philosophy', async (req, res) => {
+    logger.debug(`Rendering view 'firm/philosophy' for path: ${req.originalUrl}`);
+    return res.render('firm/philosophy', {
+        pageTitle: 'Mission & Philosophy | Vanier Capital',
+        pageDescription: 'A partnership forged at West Point and MIT — our investment philosophy, fiduciary standard, and commitment to resident-focused operations.',
+        path: '/firm/philosophy'
+    });
+});
+
 // Firm Leadership
 router.get('/firm/leadership', async (req, res) => {
     logger.debug(`Rendering view 'firm/leadership' for path: ${req.originalUrl}`);
@@ -443,7 +453,7 @@ router.get('/blog', async (req, res, next) => {
         }, {});
     } catch {}
     // Only expose categories that have at least one published post
-    const blogCategories = (blogCategoriesAll || []).filter(c => (categoryCounts[c.slug] || 0) > 0);
+    const blogCategories = (blogCategoriesAll || []).filter(c => (categoryCounts[c.slug] || 0) > 0 && c.slug !== 'firm-updates');
         // Build a unique set of contributor display names from published posts
         const contributorDocs = await BlogPost.find(
             { isPublished: true },
@@ -579,7 +589,7 @@ async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeadi
                 return acc;
             }, {});
         } catch {}
-        const blogCategories = (blogCategoriesAll || []).filter(c => (categoryCounts[c.slug] || 0) > 0);
+        const blogCategories = (blogCategoriesAll || []).filter(c => (categoryCounts[c.slug] || 0) > 0 && c.slug !== 'firm-updates');
 
         // Contributors
         const contributorDocs = await BlogPost.find(
@@ -780,11 +790,19 @@ router.get('/blog/:slug', async (req, res, next) => {
 
     // Find the current post
     const post = await BlogPost.findOne({ slug: slug, isPublished: true })
+                   .populate('categories', 'slug')
                    .lean(); // Use lean for performance
 
         if (!post) {
             logger.warn(`Public blog post not found or not published for slug: ${slug}`);
             return next(); // Pass to 404 handler
+        }
+
+        // Redirect firm-updates posts to their canonical /firm/communications/ URL
+        const isFirmUpdate = (post.categories || []).some(c => c.slug === 'firm-updates')
+            || post.publicationType === 'Firm Updates';
+        if (isFirmUpdate) {
+            return res.redirect(301, `/firm/communications/${post.slug}`);
         }
 
         // Compute estimated read time (approx. 200 wpm)
@@ -952,6 +970,7 @@ router.get('/sitemap.xml', async (req, res) => {
         const staticPaths = [
             '/',
             '/firm/overview',
+            '/firm/philosophy',
             '/firm/leadership',
             '/firm/stewardship',
             '/strategies',

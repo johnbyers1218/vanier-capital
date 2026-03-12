@@ -81,11 +81,12 @@ export default (csrfProtection) => {
                 return true;
             })
             ,
-        body('content', 'Blog content must be at least 50 characters.')
-            .trim().isLength({ min: 50 }), // Raw HTML, sanitize later
+        body('content')
+            .optional({ checkFalsy: true })
+            .trim(), // Raw HTML, sanitize later
         body('author', 'Author is required.')
+            .optional({ checkFalsy: true })
             .trim()
-            .notEmpty()
             .isLength({ max: 150 }),
         body('publishedAt', 'Publication date must be a valid date.')
             .optional({ checkFalsy: true })
@@ -325,7 +326,7 @@ export default (csrfProtection) => {
         }
 
         try {
-            const cleanHtmlContent = DOMPurify.sanitize(req.body.content, { USE_PROFILES: { html: true } });
+            const cleanHtmlContent = req.body.content ? DOMPurify.sanitize(req.body.content, { USE_PROFILES: { html: true } }) : '';
 
             let finalSlug = req.body.slug?.trim();
             if (!finalSlug && req.body.title) {
@@ -346,9 +347,9 @@ export default (csrfProtection) => {
                 title: req.body.title,
                 subtitle: req.body.subtitle || null,
                 slug: finalSlug,
-                excerpt: req.body.excerpt,
+                excerpt: req.body.excerpt || '',
                 content: cleanHtmlContent,
-                author: req.body.author, // String — selected from hardcoded dropdown
+                author: req.body.author || null,
                 featuredImage: req.body.featuredImage || null,
                 categories: categoryIds,
                 publicationType: req.body.publicationType || 'Market Research',
@@ -457,7 +458,7 @@ export default (csrfProtection) => {
         }
 
         try {
-            const cleanHtmlContent = DOMPurify.sanitize(req.body.content, { USE_PROFILES: { html: true } });
+            const cleanHtmlContent = req.body.content ? DOMPurify.sanitize(req.body.content, { USE_PROFILES: { html: true } }) : '';
             let finalSlug = req.body.slug?.trim();
             if (!finalSlug && req.body.title) {
                 finalSlug = req.body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
@@ -472,13 +473,13 @@ export default (csrfProtection) => {
 
             // Prepare the final update data object for BlogPost model
                     const updateData = {
-                 title: req.body.title, subtitle: req.body.subtitle || null, slug: finalSlug, excerpt: req.body.excerpt,
+                 title: req.body.title, subtitle: req.body.subtitle || null, slug: finalSlug, excerpt: req.body.excerpt || '',
                       content: cleanHtmlContent, featuredImage: req.body.featuredImage || null,
                   isPublished: !!req.body.isPublished,
               isFeatured: !!req.body.isFeatured,
               publicationType: req.body.publicationType || 'Market Research',
               pdfDocumentUrl: req.body.pdfDocumentUrl || null,
-              author: req.body.author, // String from hardcoded dropdown
+              author: req.body.author || null,
             };
 
             // publishedAt — custom publication date override
