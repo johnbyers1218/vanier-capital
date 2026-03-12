@@ -427,17 +427,20 @@ router.get('/blog', async (req, res, next) => {
         try {
             selectedCategory = await Category.findOne({ slug: categoryQuery }).select('_id slug name').lean();
             if (selectedCategory) {
-                // HARD isolation: match the requested category AND exclude firm-updates
-                if (firmUpdatesCatId) {
-                    baseQuery.$and = [
-                        { categories: { $in: [selectedCategory._id] } },
-                        { categories: { $nin: [firmUpdatesCatId] } },
-                        { publicationType: { $ne: 'Firm Updates' } }
-                    ];
-                } else {
-                    baseQuery.categories = { $in: [selectedCategory._id] };
-                    baseQuery.publicationType = { $ne: 'Firm Updates' };
+                // Map known category slugs to publicationType for hard isolation
+                const SLUG_TO_TYPE = { 'market-research': 'Market Research', 'case-studies': 'Case Studies' };
+                const andClauses = [
+                    { categories: { $in: [selectedCategory._id] } },
+                    { publicationType: { $ne: 'Firm Updates' } }
+                ];
+                // Enforce publicationType positive match if known
+                if (SLUG_TO_TYPE[categoryQuery]) {
+                    andClauses.push({ publicationType: SLUG_TO_TYPE[categoryQuery] });
                 }
+                if (firmUpdatesCatId) {
+                    andClauses.push({ categories: { $nin: [firmUpdatesCatId] } });
+                }
+                baseQuery.$and = andClauses;
             }
         } catch {}
     } else {
@@ -546,10 +549,12 @@ const PERSPECTIVES_CATEGORIES = {
     'market-research': {
         pageHeading: 'Market Research.',
         pageDescription: 'Data-driven analysis on supply constraints, demographic shifts, and economic catalysts across our target Southeast corridor — spanning from Raleigh-Durham through Alabama and Florida.',
+        publicationType: 'Market Research',
     },
     'case-studies': {
         pageHeading: 'Case Studies.',
         pageDescription: 'Factual breakdowns of our self-funded seed acquisitions, detailing our acquisition thesis, CapEx execution, and operational stabilization.',
+        publicationType: 'Case Studies',
     },
     'firm-updates': {
         redirect: '/firm/communications',
@@ -561,7 +566,7 @@ const PERSPECTIVES_CATEGORIES = {
 };
 
 // Helper: shared query logic for perspectives pages
-async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeading, pageDescription }) {
+async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeading, pageDescription, publicationType }) {
     const page = parseInt(req.query.page) || 1;
     const postsPerPage = 5;
 
@@ -581,17 +586,19 @@ async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeadi
         if (categorySlug) {
             selectedCategory = await Category.findOne({ slug: categorySlug }).select('_id slug name').lean();
             if (selectedCategory) {
-                // HARD isolation: match the requested category AND exclude firm-updates
-                if (firmUpdatesCat) {
-                    baseQuery.$and = [
-                        { categories: { $in: [selectedCategory._id] } },
-                        { categories: { $nin: [firmUpdatesCat._id] } },
-                        { publicationType: { $ne: 'Firm Updates' } }
-                    ];
-                } else {
-                    baseQuery.categories = { $in: [selectedCategory._id] };
-                    baseQuery.publicationType = { $ne: 'Firm Updates' };
+                // HARD isolation: match publicationType AND category, exclude firm-updates
+                const andClauses = [
+                    { categories: { $in: [selectedCategory._id] } },
+                    { publicationType: { $ne: 'Firm Updates' } }
+                ];
+                // If we have a known publicationType for this slug, enforce it as a positive match
+                if (publicationType) {
+                    andClauses.push({ publicationType: publicationType });
                 }
+                if (firmUpdatesCat) {
+                    andClauses.push({ categories: { $nin: [firmUpdatesCat._id] } });
+                }
+                baseQuery.$and = andClauses;
             }
         } else {
             // Unfiltered perspectives: exclude Firm Updates by both category and publicationType
@@ -716,6 +723,7 @@ router.get('/perspectives/:category', (req, res, next) => {
         categorySlug: slug,
         pageHeading: config.pageHeading,
         pageDescription: config.pageDescription,
+        publicationType: config.publicationType || null,
     });
 });
 

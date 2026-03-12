@@ -510,18 +510,18 @@ li.group\/navitem {
    ============================================ */
 @layer components {
   .section-metrics {
-    padding: 6rem 0;
+    padding: 4rem 0;
     background-color: #ffffff;
   }
 
   @media (min-width: 768px) {
     .section-metrics {
-      padding: 8rem 0;
+      padding: 5rem 0;
     }
   }
 
   .metrics-header {
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
   }
 
   .metrics-title {
@@ -598,35 +598,35 @@ li.group\/navitem {
    ============================================ */
 @layer components {
   .section {
-    padding: 5rem 0;
+    padding: 3.5rem 0;
   }
 
   @media (min-width: 768px) {
     .section {
-      padding: 6rem 0;
+      padding: 4.5rem 0;
     }
   }
 
   @media (min-width: 1024px) {
     .section {
-      padding: 8rem 0;
+      padding: 5rem 0;
     }
   }
 
   .section-institutional {
-    padding: 6rem 0;
+    padding: 3.5rem 0;
     background-color: var(--color-warm-beige);
   }
 
   @media (min-width: 768px) {
     .section-institutional {
-      padding: 8rem 0;
+      padding: 4.5rem 0;
     }
   }
 
   @media (min-width: 1024px) {
     .section-institutional {
-      padding: 10rem 0;
+      padding: 5rem 0;
     }
   }
 
@@ -635,13 +635,13 @@ li.group\/navitem {
   }
 
   .section-header-left {
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
     max-width: 700px;
   }
 
   @media (min-width: 768px) {
     .section-header-left {
-      margin-bottom: 4rem;
+      margin-bottom: 2.5rem;
     }
   }
 
@@ -667,12 +667,12 @@ li.group\/navitem {
   }
 
   .section-cta {
-    margin-top: 3rem;
+    margin-top: 2rem;
   }
 
   @media (min-width: 768px) {
     .section-cta {
-      margin-top: 4rem;
+      margin-top: 2.5rem;
     }
   }
 
