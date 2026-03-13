@@ -239,7 +239,7 @@ router.get('/firm/leadership', async (req, res) => {
             slug: 'matthew-moellering',
             fullName: 'Matthew Moellering',
             role: 'Partner, Chief Executive Officer',
-            shortBio: 'Mat sets the strategic vision for Vanier Capital, guiding macro-market thesis development, firm operations, and long-term portfolio structuring.',
+            shortBio: 'Matt sets the strategic vision for Vanier Capital, guiding macro-market thesis development, firm operations, and long-term portfolio structuring.',
             avatarUrl: '/images/MoeBW.png',
             education: [
                 'B.S. Economics, United States Military Academy at West Point'
