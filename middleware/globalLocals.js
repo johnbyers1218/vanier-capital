@@ -20,7 +20,7 @@ const BLOG_CACHE_TTL = 60_000; // 60 seconds
  *   res.locals.portfolioHoldings      — Property[] where lifecycle === 'Holding'
  *   res.locals.portfolioPipeline      — Property[] where lifecycle === 'Pipeline'
  *   res.locals.featuredAsset          — single Property with isFeatured === true (or null)
- *   res.locals.latestFirmUpdate       — most recent published BlogPost with publicationType === 'Firm Updates'
+ *   res.locals.latestFirmUpdate       — most recent published BlogPost with publicationType === 'Executive Communications'
  *   res.locals.latestMarketResearch   — most recent published BlogPost (any type, for Perspectives dropdown)
  */
 export default async function globalLocals(req, res, next) {
@@ -51,8 +51,8 @@ export default async function globalLocals(req, res, next) {
         // ── Blog cache (header featured cards) ────────────────────────────
         if (now - _blogCacheTs > BLOG_CACHE_TTL && dbReady) {
             const [latestFirmUpdate, latestMarketResearch] = await Promise.all([
-                // Firm dropdown: most recent 'Firm Updates' post (or isFeatured fallback)
-                BlogPost.findOne({ isPublished: true, publicationType: 'Firm Updates' })
+                // Firm dropdown: most recent 'Executive Communications' post (or isFeatured fallback)
+                BlogPost.findOne({ isPublished: true, publicationType: 'Executive Communications' })
                     .select('title slug featuredImage publishedDate')
                     .sort({ publishedDate: -1 })
                     .lean(),

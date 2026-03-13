@@ -58,12 +58,14 @@
 <!-- Site Header - Brookfield Institutional Mega Menu Architecture -->
 <%
     const __home = (typeof isHomepage !== 'undefined' && isHomepage === true);
-    let __headerClasses = 'fixed top-0 left-0 w-full z-50 transition-colors duration-300 group/header';
+    let __headerClasses = 'fixed top-0 left-0 w-full z-50 transition-colors duration-300';
     let __headerBehavior = 'static-opaque';
 
     if (__home) {
         // Homepage only: transparent over hero image, scroll-to-opaque
-        __headerClasses += ' bg-transparent text-white hover:bg-white hover:text-[#1a1a1a] hover:shadow-sm';
+        // NOTE: hover:bg-white removed from header — JS adds .header-mega-active
+        // only when a mega panel is actually open, preventing empty-space bleed.
+        __headerClasses += ' bg-transparent text-white';
         __headerBehavior = 'scroll-transparent';
     } else {
         // Every other page: solid white with dark text, no scroll effects
@@ -74,16 +76,16 @@
     <div class="flex items-center justify-between h-full max-w-[1400px] mx-auto px-4 md:px-8 lg:px-16">
 
         <!-- Text Logo -->
-        <a href="/" class="font-serif font-bold text-lg md:text-2xl tracking-[0.15em] uppercase transition-colors duration-300 group-hover/header:text-[#1a1a1a]" aria-label="Vanier Capital Home">
+        <a href="/" class="header-logo font-serif font-bold text-lg md:text-2xl tracking-[0.15em] uppercase transition-colors duration-300" aria-label="Vanier Capital Home">
             VANIER CAPITAL
         </a>
 
         <!-- Desktop Navigation (lg+ 1024px — tablets get mobile menu) -->
-        <ul class="hidden lg:flex items-center h-full ml-auto">
+        <ul class="desktop-nav hidden lg:flex items-center h-full ml-auto">
 
             <!-- FIRM — Mega Menu -->
-            <li class="group/navitem relative h-full flex items-center px-4 xl:px-6">
-                <a href="#" class="desktop-dropdown-toggle cursor-pointer text-sm font-sans font-bold uppercase tracking-wider py-8 transition-colors duration-300 group-hover/header:text-[#1a1a1a] <%= path && path.startsWith('/firm') ? 'border-b-2 border-current' : '' %>">Firm</a>
+            <li class="navitem group/navitem relative h-full flex items-center px-4 xl:px-6">
+                <a href="#" class="desktop-dropdown-toggle desktop-nav-link cursor-pointer text-sm font-sans font-bold uppercase tracking-wider py-8 transition-colors duration-300 <%= path && path.startsWith('/firm') ? 'border-b-2 border-current' : '' %>">Firm</a>
                 <!-- Full-width Mega Dropdown -->
                 <div class="mega-panel absolute top-full left-0 w-full bg-white border-t border-[#0f2e22]/10 shadow-xl invisible opacity-0 group-hover/navitem:visible group-hover/navitem:opacity-100 transition-all duration-300 ease-in-out z-40 group-hover/navitem:z-50 cursor-default text-[#1a1a1a]">
                     <div class="max-w-[1400px] mx-auto px-8 py-12 grid grid-cols-12 gap-12">
@@ -123,13 +125,13 @@
                 </div>
             </li>
 
-            <!-- STRATEGIES — Mega Menu -->
-            <li class="group/navitem relative h-full flex items-center px-4 xl:px-6">
-                <a href="#" class="desktop-dropdown-toggle cursor-pointer text-sm font-sans font-bold uppercase tracking-wider py-8 transition-colors duration-300 group-hover/header:text-[#1a1a1a] <%= path === '/strategy' || path === '/strategies' ? 'border-b-2 border-current' : '' %>">Strategies</a>
+            <!-- STRATEGY — Mega Menu -->
+            <li class="navitem group/navitem relative h-full flex items-center px-4 xl:px-6">
+                <a href="#" class="desktop-dropdown-toggle desktop-nav-link cursor-pointer text-sm font-sans font-bold uppercase tracking-wider py-8 transition-colors duration-300 <%= path === '/strategy' || path === '/strategies' ? 'border-b-2 border-current' : '' %>">Strategy</a>
                 <div class="mega-panel absolute top-full left-0 w-full bg-white border-t border-[#0f2e22]/10 shadow-xl invisible opacity-0 group-hover/navitem:visible group-hover/navitem:opacity-100 transition-all duration-300 ease-in-out z-40 group-hover/navitem:z-50 cursor-default text-[#1a1a1a]">
                     <div class="max-w-[1400px] mx-auto px-8 py-12 grid grid-cols-12 gap-12">
                         <div class="col-span-3">
-                            <h3 class="font-serif text-xl font-bold text-[#0f2e22] mb-3">Strategies</h3>
+                            <h3 class="font-serif text-xl font-bold text-[#0f2e22] mb-3">Strategy</h3>
                             <p class="text-sm text-gray-600 font-sans leading-relaxed pr-4">Institutional discipline across resilient residential asset classes.</p>
                         </div>
                         <div class="col-span-6 flex flex-col space-y-4 pt-1">
@@ -151,8 +153,8 @@
             </li>
 
             <!-- PORTFOLIO — Mega Menu -->
-            <li class="group/navitem relative h-full flex items-center px-4 xl:px-6">
-                <a href="#" class="desktop-dropdown-toggle cursor-pointer text-sm font-sans font-bold uppercase tracking-wider py-8 transition-colors duration-300 group-hover/header:text-[#1a1a1a] <%= path === '/portfolio' ? 'border-b-2 border-current' : '' %>">Portfolio</a>
+            <li class="navitem group/navitem relative h-full flex items-center px-4 xl:px-6">
+                <a href="#" class="desktop-dropdown-toggle desktop-nav-link cursor-pointer text-sm font-sans font-bold uppercase tracking-wider py-8 transition-colors duration-300 <%= path === '/portfolio' ? 'border-b-2 border-current' : '' %>">Portfolio</a>
                 <div class="mega-panel absolute top-full left-0 w-full bg-white border-t border-[#0f2e22]/10 shadow-xl invisible opacity-0 group-hover/navitem:visible group-hover/navitem:opacity-100 transition-all duration-300 ease-in-out z-40 group-hover/navitem:z-50 cursor-default text-[#1a1a1a]">
                     <div class="max-w-[1400px] mx-auto px-8 py-12 grid grid-cols-12 gap-12">
                         <div class="col-span-3">
@@ -193,8 +195,8 @@
             </li>
 
             <!-- PERSPECTIVES — Mega Menu -->
-            <li class="group/navitem relative h-full flex items-center px-4 xl:px-6">
-                <a href="#" class="desktop-dropdown-toggle cursor-pointer text-sm font-sans font-bold uppercase tracking-wider py-8 transition-colors duration-300 group-hover/header:text-[#1a1a1a] <%= path === '/blog' || path === '/articles' ? 'border-b-2 border-current' : '' %>">Perspectives</a>
+            <li class="navitem group/navitem relative h-full flex items-center px-4 xl:px-6">
+                <a href="#" class="desktop-dropdown-toggle desktop-nav-link cursor-pointer text-sm font-sans font-bold uppercase tracking-wider py-8 transition-colors duration-300 <%= path === '/blog' || path === '/articles' ? 'border-b-2 border-current' : '' %>">Perspectives</a>
                 <div class="mega-panel absolute top-full left-0 w-full bg-white border-t border-[#0f2e22]/10 shadow-xl invisible opacity-0 group-hover/navitem:visible group-hover/navitem:opacity-100 transition-all duration-300 ease-in-out z-40 group-hover/navitem:z-50 cursor-default text-[#1a1a1a]">
                     <div class="max-w-[1400px] mx-auto px-8 py-12 grid grid-cols-12 gap-12">
                         <div class="col-span-3">
@@ -225,8 +227,8 @@
             </li>
 
             <!-- CONTACT — Mega Menu -->
-            <li class="group/navitem relative h-full flex items-center px-4 xl:px-6">
-                <a href="#" class="desktop-dropdown-toggle cursor-pointer text-sm font-sans font-bold uppercase tracking-wider py-8 transition-colors duration-300 group-hover/header:text-[#1a1a1a] <%= path === '/contact' ? 'border-b-2 border-current' : '' %>">Contact</a>
+            <li class="navitem group/navitem relative h-full flex items-center px-4 xl:px-6">
+                <a href="#" class="desktop-dropdown-toggle desktop-nav-link cursor-pointer text-sm font-sans font-bold uppercase tracking-wider py-8 transition-colors duration-300 <%= path === '/contact' ? 'border-b-2 border-current' : '' %>">Contact</a>
                 <div class="mega-panel absolute top-full left-0 w-full bg-white border-t border-[#0f2e22]/10 shadow-xl invisible opacity-0 group-hover/navitem:visible group-hover/navitem:opacity-100 transition-all duration-300 ease-in-out z-40 group-hover/navitem:z-50 cursor-default text-[#1a1a1a]">
                     <div class="max-w-[1400px] mx-auto px-8 py-12 grid grid-cols-12 gap-12">
                         <div class="col-span-3">
@@ -251,8 +253,8 @@
             </li>
 
             <!-- INVESTORS — Mega Menu -->
-            <li class="group/navitem relative h-full flex items-center px-4 xl:px-6">
-                <a href="#" class="desktop-dropdown-toggle cursor-pointer text-sm font-sans font-bold uppercase tracking-wider py-8 transition-colors duration-300 group-hover/header:text-[#1a1a1a] <%= path && path.startsWith('/investor') ? 'border-b-2 border-current' : '' %>">Investors</a>
+            <li class="navitem group/navitem relative h-full flex items-center px-4 xl:px-6">
+                <a href="#" class="desktop-dropdown-toggle desktop-nav-link cursor-pointer text-sm font-sans font-bold uppercase tracking-wider py-8 transition-colors duration-300 <%= path && path.startsWith('/investor') ? 'border-b-2 border-current' : '' %>">Investors</a>
                 <!-- Full-width Mega Dropdown -->
                 <div class="mega-panel absolute top-full left-0 w-full bg-white border-t border-[#0f2e22]/10 shadow-xl invisible opacity-0 group-hover/navitem:visible group-hover/navitem:opacity-100 transition-all duration-300 ease-in-out z-40 group-hover/navitem:z-50 cursor-default text-[#1a1a1a]">
                     <div class="max-w-[1400px] mx-auto px-8 py-12 grid grid-cols-12 gap-12">
@@ -286,6 +288,9 @@
         </button>
     </div>
 
+    <!-- Shared mega-panel backdrop: single persistent white rectangle behind all dropdowns -->
+    <div id="mega-backdrop" class="mega-backdrop"></div>
+
     <!-- Mobile Navigation Panel (phones + tablets, hidden on lg+ 1024px desktops) -->
     <div id="mobile-nav" class="hidden lg:hidden flex-col bg-[#0f2e22] text-white border-t border-white/10 px-8 py-8 pb-24 fixed left-0 right-0 overflow-y-auto" style="top: 88px; bottom: 0; z-index: 999;">
         <a href="/" class="font-serif text-base font-bold uppercase tracking-[0.12em] text-white py-4 border-b border-white/10 hover:text-white/80 block <%= path === '/' ? 'text-white' : '' %>">Home</a>
@@ -302,7 +307,7 @@
             </div>
         </div>
 
-        <a href="/strategies" class="font-serif text-base font-bold uppercase tracking-[0.12em] text-white py-4 border-b border-white/10 hover:text-white/80 block <%= path === '/strategy' || path === '/strategies' ? 'text-white' : '' %>">Strategies</a>
+        <a href="/strategies" class="font-serif text-base font-bold uppercase tracking-[0.12em] text-white py-4 border-b border-white/10 hover:text-white/80 block <%= path === '/strategy' || path === '/strategies' ? 'text-white' : '' %>">Strategy</a>
         <a href="/portfolio" class="font-serif text-base font-bold uppercase tracking-[0.12em] text-white py-4 border-b border-white/10 hover:text-white/80 block <%= path === '/portfolio' ? 'text-white' : '' %>">Portfolio</a>
 
         <!-- Perspectives (with sublinks) -->
@@ -338,36 +343,110 @@
 
 <!-- Mega-dropdown hover engine: JS-managed for seamless cross-fade, zero dead zones -->
 <style>
-    /* Kill CSS group-hover so JS has full control on desktop (lg+) */
     @media (min-width: 1024px) {
-        .group\/navitem > div.absolute.mega-panel {
+        /* ── 1. Tight Hit Areas ──
+         * Kill h-full on <li> so bounding box wraps tightly around nav text.
+         * pointer-events: none on the <ul> gap space, auto only on <li> items. */
+        #main-header .desktop-nav {
+            pointer-events: none;          /* dead space between items is inert */
+        }
+        #main-header .desktop-nav > .navitem {
+            pointer-events: auto;          /* only the <li> items themselves respond */
+            height: auto !important;       /* override h-full — shrink-wrap to content */
+            align-self: stretch;           /* still vertically center via parent align-items */
+            display: flex;
+            align-items: center;
+        }
+
+        /* ── 2. Shared Persistent Background ──
+         * A single white rectangle behind ALL mega panels.
+         * It stays mounted when switching between nav items — only content changes. */
+        .mega-backdrop {
+            position: fixed;
+            top: 88px;                     /* header height */
+            left: 0;
+            width: 100%;
+            background: #ffffff;
+            border-top: 1px solid rgba(15, 46, 34, 0.10);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            height: 0;
+            opacity: 0;
+            pointer-events: none;
+            overflow: hidden;
+            transition: opacity 200ms ease, height 220ms ease;
+            z-index: 40;
+        }
+        .mega-backdrop.backdrop-open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ── 3. Panel visibility (JS-controlled) ──
+         * Panels use fixed positioning to break out of the <li> containing block
+         * and span the full viewport width. JS toggles .mega-open to cross-fade. */
+        .navitem > div.mega-panel {
+            position: fixed !important;
+            top: 88px !important;          /* header height */
+            left: 0 !important;
+            right: 0 !important;
+            width: 100% !important;
             visibility: hidden !important;
             opacity: 0 !important;
             pointer-events: none;
             transition: opacity 180ms ease, visibility 0s linear 180ms;
         }
-        .group\/navitem > div.absolute.mega-panel.mega-open {
+        .navitem > div.mega-panel.mega-open {
             visibility: visible !important;
             opacity: 1 !important;
             pointer-events: auto;
             transition: opacity 180ms ease, visibility 0s linear 0s;
+            z-index: 50;
         }
         /* Force-open via click/touch — same as mega-open */
-        .group\/navitem.force-open > div.absolute.mega-panel {
+        .navitem.force-open > div.mega-panel {
             visibility: visible !important;
             opacity: 1 !important;
             pointer-events: auto;
             transition: opacity 180ms ease, visibility 0s linear 0s;
+            z-index: 50;
         }
-        /* Hover bridge: invisible 12px zone below each <li> to bridge to dropdown */
-        .group\/navitem::after {
+
+        /* ── 4. Hover Bridge ──
+         * 16px invisible zone below each <li> to bridge mouse travel to dropdown.
+         * Also extends 8px above the panel to cover any gap. */
+        .navitem::after {
             content: '';
             position: absolute;
             left: 0;
             width: 100%;
             top: 100%;
+            height: 16px;
+            background: transparent;
+            pointer-events: auto;
+        }
+        /* Secondary bridge on the backdrop itself — covers the 1px border gap */
+        .mega-backdrop::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 0;
+            width: 100%;
             height: 12px;
             background: transparent;
+        }
+
+        /* ── 5. Homepage header: opaque only when mega panel is open ──
+         * Replaces the old hover:bg-white on <header> which fired on empty space. */
+        #main-header.header-mega-active {
+            background-color: #ffffff !important;
+            color: #1a1a1a !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        #main-header.header-mega-active .desktop-nav-link {
+            color: #1a1a1a !important;
+        }
+        #main-header.header-mega-active .header-logo {
+            color: #1a1a1a !important;
         }
     }
 </style>
@@ -375,42 +454,111 @@
 <!-- Desktop dropdown engine + mobile menu scripts -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    /* ── 1. Desktop Mega-Dropdown Engine (lg+ only) ── */
-    const navGroups = document.querySelectorAll('.group\\/navitem');
-    const panels = document.querySelectorAll('.mega-panel');
-    let activeGroup = null;
-    let closeTimer = null;
-    const CLOSE_DELAY = 120; // ms grace period when mouse leaves
+    /* ══════════════════════════════════════════════════════════════
+     * 1. DESKTOP MEGA-DROPDOWN ENGINE — "Persistent Background" Pattern
+     *
+     * Architecture:
+     *   - One shared #mega-backdrop div stays mounted at all times
+     *   - When ANY panel opens, backdrop fades in and sizes to panel height
+     *   - When switching panels, backdrop stays open and morphs to new height
+     *   - Only when mouse fully leaves ALL nav items + backdrop does it close
+     *   - Hit areas are tight: pointer-events: none on <ul> gaps
+     * ══════════════════════════════════════════════════════════════ */
+    const navGroups = document.querySelectorAll('.navitem');
+    const panels    = document.querySelectorAll('.mega-panel');
+    const backdrop  = document.getElementById('mega-backdrop');
+    const header    = document.getElementById('main-header');
 
+    let activeGroup = null;
+    let closeTimer  = null;
+    const CLOSE_DELAY = 180;   // ms grace period when mouse leaves
+
+    /**
+     * Open a specific nav group's panel.
+     * Cross-fades content; backdrop stays persistent.
+     */
     function openPanel(group) {
         if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
-        if (activeGroup === group) return;
-        // Close previous instantly (no fade-out overlap)
-        if (activeGroup) {
+
+        // Close previous panel content (NOT the backdrop)
+        if (activeGroup && activeGroup !== group) {
             const prevPanel = activeGroup.querySelector(':scope > .mega-panel');
             if (prevPanel) prevPanel.classList.remove('mega-open');
         }
+
         activeGroup = group;
         const panel = group.querySelector(':scope > .mega-panel');
-        if (panel) panel.classList.add('mega-open');
+        if (!panel || !backdrop) return;
+
+        // Measure panel height: temporarily force visibility for measurement
+        panel.classList.add('mega-open');
+        const panelHeight = panel.offsetHeight;
+
+        // Size and open the shared backdrop
+        backdrop.style.height = panelHeight + 'px';
+        backdrop.classList.add('backdrop-open');
+
+        // Toggle header opaque state (homepage transparent → white)
+        header.classList.add('header-mega-active');
     }
 
+    /**
+     * Schedule a delayed close of everything.
+     * Any re-entry cancels the timer → seamless switching.
+     */
     function scheduleClose() {
         if (closeTimer) clearTimeout(closeTimer);
         closeTimer = setTimeout(() => {
-            if (activeGroup) {
-                const panel = activeGroup.querySelector(':scope > .mega-panel');
-                if (panel) panel.classList.remove('mega-open');
-                activeGroup = null;
-            }
+            closeAll();
         }, CLOSE_DELAY);
+    }
+
+    /**
+     * Immediately close all panels + backdrop.
+     */
+    function closeAll() {
+        if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+        if (activeGroup) {
+            const panel = activeGroup.querySelector(':scope > .mega-panel');
+            if (panel) panel.classList.remove('mega-open');
+            activeGroup = null;
+        }
+        if (backdrop) {
+            backdrop.classList.remove('backdrop-open');
+            // Reset height after transition completes
+            setTimeout(() => {
+                if (!backdrop.classList.contains('backdrop-open')) {
+                    backdrop.style.height = '0';
+                }
+            }, 250);
+        }
+        // Remove header opaque override (let scroll state take over)
+        header.classList.remove('header-mega-active');
+        // Clear any force-open states
+        navGroups.forEach(g => g.classList.remove('force-open'));
+        // Re-evaluate scroll state (homepage: restore transparency if at top)
+        window.dispatchEvent(new Event('scroll'));
     }
 
     function cancelClose() {
         if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
     }
 
-    // Only attach mouse listeners on lg+ viewports
+    /* ── Event Handlers ── */
+    function handleGroupEnter() {
+        // Clear any click-forced state
+        navGroups.forEach(g => {
+            g.classList.remove('force-open');
+            const d = g.querySelector(':scope > .mega-panel');
+            if (d) { d.style.visibility = ''; d.style.opacity = ''; }
+        });
+        openPanel(this);
+    }
+    function handleGroupLeave()  { scheduleClose(); }
+    function handleBackdropEnter() { cancelClose(); }
+    function handleBackdropLeave() { scheduleClose(); }
+
+    /* ── Viewport-Aware Listener Management ── */
     const mql = window.matchMedia('(min-width: 1024px)');
 
     function attachDesktopListeners() {
@@ -418,10 +566,16 @@ document.addEventListener('DOMContentLoaded', () => {
             group.addEventListener('mouseenter', handleGroupEnter);
             group.addEventListener('mouseleave', handleGroupLeave);
         });
+        // Panels are fixed-positioned, so they need their own mouse listeners
+        // to cancel close when mouse enters the dropdown content
         panels.forEach(panel => {
-            panel.addEventListener('mouseenter', handlePanelEnter);
-            panel.addEventListener('mouseleave', handlePanelLeave);
+            panel.addEventListener('mouseenter', handleBackdropEnter);
+            panel.addEventListener('mouseleave', handleBackdropLeave);
         });
+        if (backdrop) {
+            backdrop.addEventListener('mouseenter', handleBackdropEnter);
+            backdrop.addEventListener('mouseleave', handleBackdropLeave);
+        }
     }
 
     function detachDesktopListeners() {
@@ -430,29 +584,15 @@ document.addEventListener('DOMContentLoaded', () => {
             group.removeEventListener('mouseleave', handleGroupLeave);
         });
         panels.forEach(panel => {
-            panel.removeEventListener('mouseenter', handlePanelEnter);
-            panel.removeEventListener('mouseleave', handlePanelLeave);
+            panel.removeEventListener('mouseenter', handleBackdropEnter);
+            panel.removeEventListener('mouseleave', handleBackdropLeave);
         });
-        // Clean up any open state
-        if (activeGroup) {
-            const p = activeGroup.querySelector(':scope > .mega-panel');
-            if (p) p.classList.remove('mega-open');
-            activeGroup = null;
+        if (backdrop) {
+            backdrop.removeEventListener('mouseenter', handleBackdropEnter);
+            backdrop.removeEventListener('mouseleave', handleBackdropLeave);
         }
+        closeAll();
     }
-
-    function handleGroupEnter() {
-        // Wipe any click-forced state when mouse enters
-        navGroups.forEach(g => {
-            g.classList.remove('force-open');
-            const d = g.querySelector(':scope > .mega-panel');
-            if (d) { d.style.visibility = ''; d.style.opacity = ''; }
-        });
-        openPanel(this);
-    }
-    function handleGroupLeave() { scheduleClose(); }
-    function handlePanelEnter() { cancelClose(); }
-    function handlePanelLeave() { scheduleClose(); }
 
     if (mql.matches) attachDesktopListeners();
     mql.addEventListener('change', (e) => {
@@ -460,12 +600,14 @@ document.addEventListener('DOMContentLoaded', () => {
         else detachDesktopListeners();
     });
 
-    /* ── 2. Click/Touch Toggle (fallback for touch-screen laptops) ── */
+    /* ══════════════════════════════════════════════════════════════
+     * 2. CLICK/TOUCH TOGGLE (fallback for touch-screen laptops)
+     * ══════════════════════════════════════════════════════════════ */
     const toggles = document.querySelectorAll('.desktop-dropdown-toggle');
     toggles.forEach(toggle => {
         toggle.addEventListener('click', (e) => {
             e.preventDefault();
-            const parentGroup = toggle.closest('.group\\/navitem');
+            const parentGroup = toggle.closest('.navitem');
             if (!parentGroup) return;
             const dropdown = parentGroup.querySelector(':scope > .mega-panel');
             if (!dropdown) return;
@@ -485,29 +627,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 dropdown.classList.remove('mega-open');
                 dropdown.style.visibility = '';
                 dropdown.style.opacity = '';
+                if (backdrop) {
+                    backdrop.classList.remove('backdrop-open');
+                    backdrop.style.height = '0';
+                }
+                header.classList.remove('header-mega-active');
                 activeGroup = null;
             } else {
                 parentGroup.classList.add('force-open');
                 dropdown.classList.add('mega-open');
+                // Size backdrop
+                if (backdrop) {
+                    backdrop.style.height = dropdown.scrollHeight + 'px';
+                    backdrop.classList.add('backdrop-open');
+                }
+                header.classList.add('header-mega-active');
                 activeGroup = parentGroup;
             }
         });
     });
 
-    // Close when clicking outside
+    // Close when clicking outside header
     document.addEventListener('click', (e) => {
-        if (!e.target.closest('.group\\/navitem')) {
-            navGroups.forEach(g => {
-                g.classList.remove('force-open');
-                const d = g.querySelector(':scope > .mega-panel');
-                if (d) { d.classList.remove('mega-open'); d.style.visibility = ''; d.style.opacity = ''; }
-            });
-            activeGroup = null;
+        if (!e.target.closest('.navitem') && !e.target.closest('#mega-backdrop')) {
+            closeAll();
         }
     });
 
-    /* ── 3. Mobile Menu Color Lock ── */
-    const mobileBtn = document.getElementById('mobile-menu-btn');
+    /* ══════════════════════════════════════════════════════════════
+     * 3. MOBILE MENU COLOR LOCK
+     * ══════════════════════════════════════════════════════════════ */
+    const mobileBtn  = document.getElementById('mobile-menu-btn');
     const mobileMenu = document.getElementById('mobile-nav');
     const mainHeader = document.getElementById('main-header');
 

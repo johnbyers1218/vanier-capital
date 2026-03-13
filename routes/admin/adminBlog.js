@@ -108,7 +108,7 @@ export default (csrfProtection) => {
             .optional({ nullable: true, checkFalsy: true }).isMongoId(),
         body('publicationType', 'Invalid publication type.')
             .optional({ checkFalsy: true }).trim()
-            .isIn(['Market Research', 'Case Studies', 'Firm Updates']),
+            .isIn(['Market Research', 'Case Studies', 'Executive Communications']),
         body('pdfDocumentUrl', 'PDF Document URL must be a valid URL.')
             .optional({ checkFalsy: true }).trim().isURL()
     ];

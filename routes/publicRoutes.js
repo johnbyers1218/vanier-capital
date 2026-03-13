@@ -411,15 +411,8 @@ router.get('/blog', async (req, res, next) => {
     if (page < 1) { return res.redirect(categoryQuery ? `/blog?category=${categoryQuery}&page=1` : '/blog?page=1'); } // Redirect invalid page
 
     try {
-    // Base query for main list; we'll optionally exclude the hero post
+    // Base query for main list — publicationType is the SOLE authority for content isolation
     const baseQuery = { isPublished: true };
-
-    // Always resolve firm-updates category for exclusion
-    let firmUpdatesCatId = null;
-    try {
-        const firmUpdatesCat = await Category.findOne({ slug: 'firm-updates' }).select('_id').lean();
-        if (firmUpdatesCat) firmUpdatesCatId = firmUpdatesCat._id;
-    } catch {}
 
     // Optional: filter by curated Category slug
     let selectedCategory = null;
@@ -429,26 +422,19 @@ router.get('/blog', async (req, res, next) => {
             if (selectedCategory) {
                 // Map known category slugs to publicationType for hard isolation
                 const SLUG_TO_TYPE = { 'market-research': 'Market Research', 'case-studies': 'Case Studies' };
-                const andClauses = [
-                    { categories: { $in: [selectedCategory._id] } },
-                    { publicationType: { $ne: 'Firm Updates' } }
-                ];
-                // Enforce publicationType positive match if known
                 if (SLUG_TO_TYPE[categoryQuery]) {
-                    andClauses.push({ publicationType: SLUG_TO_TYPE[categoryQuery] });
+                    // DEFINITIVE: filter by publicationType ONLY — no category ObjectId matching
+                    baseQuery.publicationType = SLUG_TO_TYPE[categoryQuery];
+                } else {
+                    // Unknown category slug — show posts with that category but exclude Executive Communications
+                    baseQuery.categories = { $in: [selectedCategory._id] };
+                    baseQuery.publicationType = { $nin: ['Executive Communications'] };
                 }
-                if (firmUpdatesCatId) {
-                    andClauses.push({ categories: { $nin: [firmUpdatesCatId] } });
-                }
-                baseQuery.$and = andClauses;
             }
         } catch {}
     } else {
-        // Unfiltered /blog: exclude Firm Updates by both category and publicationType
-        if (firmUpdatesCatId) {
-            baseQuery.categories = { $nin: [firmUpdatesCatId] };
-        }
-        baseQuery.publicationType = { $ne: 'Firm Updates' };
+        // Unfiltered /blog: exclude Executive Communications (they live at /firm/communications)
+        baseQuery.publicationType = { $nin: ['Executive Communications'] };
     }
 
     // Build category filters and counts
@@ -474,7 +460,7 @@ router.get('/blog', async (req, res, next) => {
         }, {});
     } catch {}
     // Only expose categories that have at least one published post
-    const blogCategories = (blogCategoriesAll || []).filter(c => (categoryCounts[c.slug] || 0) > 0 && c.slug !== 'firm-updates');
+    const blogCategories = (blogCategoriesAll || []).filter(c => (categoryCounts[c.slug] || 0) > 0 && c.slug !== 'firm-updates' && c.slug !== 'executive-communications');
         // Build a unique set of contributor display names from published posts
         const contributorDocs = await BlogPost.find(
             { isPublished: true },
@@ -544,19 +530,24 @@ router.get('/blog', async (req, res, next) => {
 });
 
 // ── Perspectives — Category-Filtered Index Pages ──────────────────────
-// Maps: /perspectives → all, /perspectives/market-research, /perspectives/case-studies (firm-updates → /firm/communications)
+// Maps: /perspectives → all, /perspectives/market-research, /perspectives/case-studies (executive-communications → /firm/communications)
 const PERSPECTIVES_CATEGORIES = {
     'market-research': {
         pageHeading: 'Market Research.',
         pageDescription: 'Data-driven analysis on supply constraints, demographic shifts, and economic catalysts across our target Southeast corridor — spanning from Raleigh-Durham through Alabama and Florida.',
         publicationType: 'Market Research',
+        pageOverline: 'Perspectives',
     },
     'case-studies': {
         pageHeading: 'Case Studies.',
         pageDescription: 'Factual breakdowns of our self-funded seed acquisitions, detailing our acquisition thesis, CapEx execution, and operational stabilization.',
         publicationType: 'Case Studies',
+        pageOverline: 'Perspectives',
     },
     'firm-updates': {
+        redirect: '/firm/communications',
+    },
+    'executive-communications': {
         redirect: '/firm/communications',
     },
     // Legacy redirects — keep old slugs functional
@@ -566,7 +557,7 @@ const PERSPECTIVES_CATEGORIES = {
 };
 
 // Helper: shared query logic for perspectives pages
-async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeading, pageDescription, publicationType }) {
+async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeading, pageDescription, publicationType, pageOverline }) {
     const page = parseInt(req.query.page) || 1;
     const postsPerPage = 5;
 
@@ -578,34 +569,13 @@ async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeadi
     try {
         const baseQuery = { isPublished: true };
 
-        // Always resolve the firm-updates category so it can be excluded everywhere
-        const firmUpdatesCat = await Category.findOne({ slug: 'firm-updates' }).select('_id').lean();
-
-        // If a category slug is specified, resolve it from the Category collection
-        let selectedCategory = null;
-        if (categorySlug) {
-            selectedCategory = await Category.findOne({ slug: categorySlug }).select('_id slug name').lean();
-            if (selectedCategory) {
-                // HARD isolation: match publicationType AND category, exclude firm-updates
-                const andClauses = [
-                    { categories: { $in: [selectedCategory._id] } },
-                    { publicationType: { $ne: 'Firm Updates' } }
-                ];
-                // If we have a known publicationType for this slug, enforce it as a positive match
-                if (publicationType) {
-                    andClauses.push({ publicationType: publicationType });
-                }
-                if (firmUpdatesCat) {
-                    andClauses.push({ categories: { $nin: [firmUpdatesCat._id] } });
-                }
-                baseQuery.$and = andClauses;
-            }
+        // publicationType is the SOLE authority for content isolation — no category-based filtering
+        if (publicationType) {
+            // Specific perspectives sub-page: ONLY show this exact type
+            baseQuery.publicationType = publicationType;
         } else {
-            // Unfiltered perspectives: exclude Firm Updates by both category and publicationType
-            if (firmUpdatesCat) {
-                baseQuery.categories = { $nin: [firmUpdatesCat._id] };
-            }
-            baseQuery.publicationType = { $ne: 'Firm Updates' };
+            // Unfiltered /perspectives: show Market Research + Case Studies, exclude Executive Communications
+            baseQuery.publicationType = { $in: ['Market Research', 'Case Studies'] };
         }
 
         // Category filter bar data
@@ -627,7 +597,7 @@ async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeadi
                 return acc;
             }, {});
         } catch {}
-        const blogCategories = (blogCategoriesAll || []).filter(c => (categoryCounts[c.slug] || 0) > 0 && c.slug !== 'firm-updates');
+        const blogCategories = (blogCategoriesAll || []).filter(c => (categoryCounts[c.slug] || 0) > 0 && c.slug !== 'firm-updates' && c.slug !== 'executive-communications');
 
         // Contributors
         const contributorDocs = await BlogPost.find(
@@ -669,6 +639,7 @@ async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeadi
             pageTitle: pageHeading.replace('.', '') + ' - Vanier Capital',
             pageHeading,
             pageDescription,
+            pageOverline: pageOverline || null,
             path: '/blog',
             posts,
             popularPosts: [],
@@ -724,10 +695,11 @@ router.get('/perspectives/:category', (req, res, next) => {
         pageHeading: config.pageHeading,
         pageDescription: config.pageDescription,
         publicationType: config.publicationType || null,
+        pageOverline: config.pageOverline || null,
     });
 });
 
-// ── Executive Communications (Firm Updates) ──────────────────────────
+// ── Executive Communications ──────────────────────────────────────
 // GET /firm/communications — Minimalist SEC-style index
 router.get('/firm/communications', async (req, res, next) => {
     const page = parseInt(req.query.page) || 1;
@@ -736,18 +708,8 @@ router.get('/firm/communications', async (req, res, next) => {
     if (page < 1) return res.redirect('/firm/communications?page=1');
 
     try {
-        // Resolve the 'Firm Updates' category
-        const firmCategory = await Category.findOne({ slug: 'firm-updates' }).select('_id').lean();
-        const baseQuery = { isPublished: true };
-        // HARD isolation: match by category OR publicationType (belt-and-suspenders)
-        if (firmCategory) {
-            baseQuery.$or = [
-                { categories: { $in: [firmCategory._id] } },
-                { publicationType: 'Firm Updates' }
-            ];
-        } else {
-            baseQuery.publicationType = 'Firm Updates';
-        }
+        // DEFINITIVE: publicationType is the sole authority — no category matching needed
+        const baseQuery = { isPublished: true, publicationType: 'Executive Communications' };
 
         const totalPosts = await BlogPost.countDocuments(baseQuery);
         const totalPages = Math.ceil(Math.max(0, totalPosts) / postsPerPage);
@@ -840,10 +802,10 @@ router.get('/blog/:slug', async (req, res, next) => {
             return next(); // Pass to 404 handler
         }
 
-        // Redirect firm-updates posts to their canonical /firm/communications/ URL
-        const isFirmUpdate = (post.categories || []).some(c => c.slug === 'firm-updates')
-            || post.publicationType === 'Firm Updates';
-        if (isFirmUpdate) {
+        // Redirect Executive Communications posts to their canonical /firm/communications/ URL
+        const isExecComm = post.publicationType === 'Executive Communications'
+            || (post.categories || []).some(c => c.slug === 'firm-updates');
+        if (isExecComm) {
             return res.redirect(301, `/firm/communications/${post.slug}`);
         }
 

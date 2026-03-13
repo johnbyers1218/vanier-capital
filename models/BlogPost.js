@@ -74,8 +74,9 @@ const BlogPostSchema = new Schema({
     },
     publicationType: {
         type: String,
-        enum: ['Market Research', 'Case Studies', 'Firm Updates'],
-        default: 'Market Research'
+        enum: ['Market Research', 'Case Studies', 'Executive Communications'],
+        default: 'Market Research',
+        index: true
     },
     pdfDocumentUrl: {
         type: String,

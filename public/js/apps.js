@@ -2669,8 +2669,8 @@ function getHeaderOffset() {
 }
 
 // --- Smart Header Controller (Brookfield Scroll Logic) ---
-// JS ONLY manages baseline scroll-position classes.
-// CSS hover states on group/header handle the rest without conflict.
+// JS manages scroll-position classes. Mega-panel engine in header.ejs
+// adds .header-mega-active when a dropdown is open.
 function initSmartHeader() {
     const header = document.getElementById('main-header');
     if (!header) return;
@@ -2680,8 +2680,9 @@ function initSmartHeader() {
     // Only manage scroll transparency if EJS told us to (homepage + hero pages)
     if (behavior === 'scroll-transparent') {
         const handleScroll = () => {
-            // Don't override colors while mobile menu is open
+            // Don't override colors while mobile menu or mega panel is open
             if (header.dataset.menuLocked === 'true') return;
+            if (header.classList.contains('header-mega-active')) return;
 
             if (window.scrollY > 10) {
                 // Scrolled: solid white background
