@@ -137,6 +137,10 @@ app.locals.formatDate = (date) => { // Simplified
     } catch (e) { return 'Invalid Date'; }
 };
 app.locals.NODE_ENV = process.env.NODE_ENV;
+
+// Google Analytics 4 — pass measurement ID to templates (empty string disables)
+app.locals.gaMeasurementId = process.env.GA_MEASUREMENT_ID || '';
+
 // Basic cache-busting token for assets (updates per process start)
 
 // Asset version for cache-busting
@@ -191,7 +195,7 @@ app.use(httpLoggerMiddleware);
 
 const cspDirectives = {
   defaultSrc: ["'self'"],
-  scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud", "https://www.googletagmanager.com", "https://calendar.google.com", "https://apis.google.com","https://www.gstatic.com", "https://unpkg.com", "https://cdn.jsdelivr.net", "https://*.clerk.accounts.dev", "https://*.clerk.com"],
+  scriptSrc: ["'self'","https://clerk.vaniercapital.com","'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud", "https://www.googletagmanager.com", "https://calendar.google.com", "https://apis.google.com","https://www.gstatic.com", "https://unpkg.com", "https://cdn.jsdelivr.net", "https://*.clerk.accounts.dev", "https://*.clerk.com"],
   styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://cdn.tiny.cloud", "https://calendar.google.com","https://apis.google.com", "https://unpkg.com", "https://*.clerk.accounts.dev", "https://*.clerk.com"],
   fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
   imgSrc: ["'self'", "data:", "blob:", "https://res.cloudinary.com", "https://apis.google.com", "https://img.clerk.com", "https://www.googletagmanager.com", "https://sp.tinymce.com"],
@@ -204,6 +208,7 @@ const cspDirectives = {
     "https://calendar.google.com",
     "https://apis.google.com",
     "https://*.clerk.accounts.dev",
+    "https://clerk.vaniercapital.com",
     "https://*.clerk.com",
     "https://cdn.jsdelivr.net",
     "https://unpkg.com"

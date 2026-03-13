@@ -239,7 +239,7 @@ router.get('/firm/leadership', async (req, res) => {
             slug: 'matthew-moellering',
             fullName: 'Matthew Moellering',
             role: 'Partner, Chief Executive Officer',
-            shortBio: 'Matthew sets the strategic vision for Vanier Capital, guiding macro-market thesis development, firm operations, and long-term portfolio structuring.',
+            shortBio: 'Mat sets the strategic vision for Vanier Capital, guiding macro-market thesis development, firm operations, and long-term portfolio structuring.',
             avatarUrl: '/images/MoeBW.png',
             education: [
                 'B.S. Economics, United States Military Academy at West Point'
@@ -249,7 +249,7 @@ router.get('/firm/leadership', async (req, res) => {
             slug: 'logan-mayfield',
             fullName: 'Logan Mayfield',
             role: 'Partner, Chief Operating Officer',
-            shortBio: 'Logan directs asset execution, CapEx management, and portfolio stabilization. He builds and enforces the standard operating procedures that minimize friction and drive ground-level cash flow.',
+            shortBio: 'Logan directs asset execution, CapEx management, and portfolio stabilization. He builds and enforces standard operating procedures that minimize friction and drive ground-level cash flow.',
             avatarUrl: '/images/LoganBW.png',
             education: [
                 'B.S. Engineering Management, United States Military Academy at West Point'
@@ -287,7 +287,7 @@ router.get('/firm/leadership/:slug', async (req, res, next) => {
             fullName: 'Matthew Moellering',
             role: 'Partner, Chief Executive Officer',
             avatarUrl: '/images/MoeBW.png',
-            bio: `Matthew sets the strategic vision for Vanier Capital, guiding macro-market thesis development, firm operations, and long-term portfolio structuring. He oversees property management systems, tenant screening programs, lease enforcement protocols, and internal accounting controls across the seed portfolio. Matthew ensures operational consistency and capital preservation through disciplined process execution and transparent reporting.`,
+            bio: `Mat sets the strategic vision for Vanier Capital, guiding macro-market thesis development, firm operations, and long-term portfolio structuring. He oversees property management systems, tenant screening programs, lease enforcement protocols, and internal accounting controls across the seed portfolio. Mat ensures operational consistency and capital preservation through disciplined process execution and transparent reporting.`,
             education: [
                 'B.S. Economics, United States Military Academy at West Point'
             ],
