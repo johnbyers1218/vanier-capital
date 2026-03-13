@@ -428,13 +428,13 @@ router.get('/blog', async (req, res, next) => {
                 } else {
                     // Unknown category slug — show posts with that category but exclude Executive Communications
                     baseQuery.categories = { $in: [selectedCategory._id] };
-                    baseQuery.publicationType = { $nin: ['Executive Communications'] };
+                    baseQuery.publicationType = { $nin: ['Executive Communications', 'Firm Updates'] };
                 }
             }
         } catch {}
     } else {
         // Unfiltered /blog: exclude Executive Communications (they live at /firm/communications)
-        baseQuery.publicationType = { $nin: ['Executive Communications'] };
+        baseQuery.publicationType = { $nin: ['Executive Communications', 'Firm Updates'] };
     }
 
     // Build category filters and counts
@@ -709,7 +709,8 @@ router.get('/firm/communications', async (req, res, next) => {
 
     try {
         // DEFINITIVE: publicationType is the sole authority — no category matching needed
-        const baseQuery = { isPublished: true, publicationType: 'Executive Communications' };
+        // Support both 'Executive Communications' and legacy 'Firm Updates' until migration runs
+        const baseQuery = { isPublished: true, publicationType: { $in: ['Executive Communications', 'Firm Updates'] } };
 
         const totalPosts = await BlogPost.countDocuments(baseQuery);
         const totalPages = Math.ceil(Math.max(0, totalPosts) / postsPerPage);
@@ -771,6 +772,11 @@ router.get('/firm/communications/:slug', async (req, res, next) => {
             ).exec();
         } catch {}
 
+        // Sanitize post.content: escape stray EJS delimiters that would crash the template engine
+        if (post.content) {
+            post.content = post.content.replace(/<%/g, '&lt;%');
+        }
+
         return res.render('firm-communications-show', {
             pageTitle: `${post.title} | Executive Communications - Vanier Capital`,
             pageDescription: post.metaDescription || post.excerpt || 'Executive communication from Vanier Capital leadership.',
@@ -804,9 +810,15 @@ router.get('/blog/:slug', async (req, res, next) => {
 
         // Redirect Executive Communications posts to their canonical /firm/communications/ URL
         const isExecComm = post.publicationType === 'Executive Communications'
+            || post.publicationType === 'Firm Updates'
             || (post.categories || []).some(c => c.slug === 'firm-updates');
         if (isExecComm) {
             return res.redirect(301, `/firm/communications/${post.slug}`);
+        }
+
+        // Sanitize post.content: escape stray EJS delimiters that would crash the template engine
+        if (post.content) {
+            post.content = post.content.replace(/<%/g, '&lt;%');
         }
 
         // Compute estimated read time (approx. 200 wpm)
