@@ -1,43 +1,52 @@
 # Vanier Capital - Real Estate Investment & Asset Management
-#
-# We believe in open access for helpful bots that contribute to a better web!
+# https://www.vaniercapital.com
 
 User-agent: *
-# By default, allow all content to be crawled.
 Allow: /
-# Add any specific Disallow directives here if needed for standard crawlers.
-# For example, if you had an /admin/ section:
-# Disallow sensitive/admin surface to avoid 401 crawl noise
 Disallow: /admin/
-# Based on your current site structure from the CSV, there are no obvious
-# general content pages that need disallowing.
+Disallow: /api/
+Disallow: /investor-club/request-received
 
-# Location of your XML Sitemap (very important for all crawlers)
+# XML Sitemap
 Sitemap: https://www.vaniercapital.com/sitemap.xml
 
-# ---------------------------------------------------------------------
-# AI Engine Optimization (AEO) & Specific Bot Instructions
-# Granting explicit access to AI crawlers to help your content
-# be discoverable and usable by LLMs and AI-powered search.
-# ---------------------------------------------------------------------
+# -----------------------------------------------------------------
+# AI Engine Optimization (AEO)
+# Explicit access for AI crawlers so content is discoverable by
+# LLMs and AI-powered search engines.
+# -----------------------------------------------------------------
 
+# OpenAI
 User-agent: GPTBot
 Allow: /
 
 User-agent: ChatGPT-User
 Allow: /
 
-# Google's crawler for its generative AI models (Bard, Vertex AI, etc.)
+# Google Generative AI (Gemini, Vertex AI)
 User-agent: Google-Extended
+Allow: /
+
+# Anthropic
+User-agent: ClaudeBot
+Allow: /
+
+# Apple Intelligence / Siri
+User-agent: Applebot-Extended
+Allow: /
+
+# Meta AI
+User-agent: meta-externalagent
 Allow: /
 
 # Perplexity AI
 User-agent: PerplexityBot
 Allow: /
 
-# Common Crawl - data from CCBot is used to train many LLMs.
-# Allowing CCBot can help your content be part of future model training.
-User-agent: CCBot
+# ByteDance AI
+User-agent: Bytespider
 Allow: /
 
-# --- End of Vanier Capital robots.txt ---
+# Common Crawl (training data for many LLMs)
+User-agent: CCBot
+Allow: /
