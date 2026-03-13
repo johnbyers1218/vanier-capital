@@ -287,7 +287,7 @@ router.get('/firm/leadership/:slug', async (req, res, next) => {
             fullName: 'Matthew Moellering',
             role: 'Partner, Chief Executive Officer',
             avatarUrl: '/images/MoeBW.png',
-            bio: `Mat sets the strategic vision for Vanier Capital, guiding macro-market thesis development, firm operations, and long-term portfolio structuring. He oversees property management systems, tenant screening programs, lease enforcement protocols, and internal accounting controls across the seed portfolio. Mat ensures operational consistency and capital preservation through disciplined process execution and transparent reporting.`,
+            bio: `Matt sets the strategic vision for Vanier Capital, guiding macro-market thesis development, firm operations, and long-term portfolio structuring. He oversees the strategic performance of the portfolio as a whole, driving high-level firm operations and overarching growth initiatives. Matt ensures operational consistency and capital preservation through disciplined process execution and transparent reporting.`,
             education: [
                 'B.S. Economics, United States Military Academy at West Point'
             ],
