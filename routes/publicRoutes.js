@@ -9,6 +9,12 @@ import Property from '../models/Property.js';
 // Testimonial import REMOVED: feature eradicated
 import DailyMetric from '../models/DailyMetric.js';
 import Settings from '../models/Settings.js';
+import {
+    buildWebPageSchema,
+    buildBreadcrumbSchema,
+    buildArticleSchema,
+    buildPropertySchema,
+} from '../utils/structuredData.js';
 
 
 const router = express.Router();
@@ -103,7 +109,14 @@ router.get('/', async (req, res, next) => { // Make route async
             isHomepage: true,
             featuredProperties,
             managedStats,
-            properties: mappedRentals
+            properties: mappedRentals,
+            structuredData: [
+                buildWebPageSchema({
+                    name: 'Vanier Capital | Real Estate Investment & Asset Management',
+                    description: 'Vanier Capital is a real estate investment firm focused on building long-term, risk-adjusted returns through strategic acquisition and disciplined management of single-family and multifamily assets.',
+                    url: '/',
+                }),
+            ],
         });
     } catch (error) {
         logger.error(`[Homepage] Error fetching data for homepage:`, { error: error.message, stack: error.stack });
@@ -127,7 +140,18 @@ async function renderStrategyPage(req, res) {
         return res.render('investment-strategy', {
             pageTitle: 'Investment Strategy | Vanier Capital',
             pageDescription: 'Disciplined, data-driven, and long-term. We target resilient cash-flowing assets in growth corridors, applying conservative underwriting and active asset management.',
-            path: '/strategies'
+            path: '/strategies',
+            structuredData: [
+                buildWebPageSchema({
+                    name: 'Investment Strategy | Vanier Capital',
+                    description: 'Disciplined, data-driven, and long-term. We target resilient cash-flowing assets in growth corridors, applying conservative underwriting and active asset management.',
+                    url: '/strategies',
+                }),
+                buildBreadcrumbSchema([
+                    { name: 'Home', url: '/' },
+                    { name: 'Strategy', url: '/strategies' },
+                ]),
+            ],
         });
     } catch (err) {
         logger.error('[Strategy] Failed to render strategy page', { error: err?.message });
@@ -151,7 +175,18 @@ router.get('/portfolio', async (req, res) => {
             pageTitle: 'Portfolio Track Record | Vanier Capital',
             pageDescription: 'Representative assets demonstrating our disciplined approach to capital stewardship, value-add execution, and long-term wealth creation.',
             path: '/portfolio',
-            properties
+            properties,
+            structuredData: [
+                buildWebPageSchema({
+                    name: 'Portfolio Track Record | Vanier Capital',
+                    description: 'Representative assets demonstrating our disciplined approach to capital stewardship, value-add execution, and long-term wealth creation.',
+                    url: '/portfolio',
+                }),
+                buildBreadcrumbSchema([
+                    { name: 'Home', url: '/' },
+                    { name: 'Portfolio', url: '/portfolio' },
+                ]),
+            ],
         });
     } catch (err) {
         logger.error('[Portfolio] Error fetching portfolio assets:', err);
@@ -183,7 +218,22 @@ router.get('/portfolio/:slug', async (req, res) => {
             pageDescription: (asset.summary || '').substring(0, 157) + '...',
             path: `/portfolio/${asset.slug}`,
             isHeroPage: true,
-            asset
+            asset,
+            structuredData: [
+                buildPropertySchema({
+                    name: asset.title,
+                    description: (asset.summary || '').substring(0, 157),
+                    url: `/portfolio/${asset.slug}`,
+                    image: asset.image || undefined,
+                    address: asset.address || undefined,
+                    updatedAt: asset.updatedAt || undefined,
+                }),
+                buildBreadcrumbSchema([
+                    { name: 'Home', url: '/' },
+                    { name: 'Portfolio', url: '/portfolio' },
+                    { name: asset.title, url: `/portfolio/${asset.slug}` },
+                ]),
+            ],
         });
     } catch (err) {
         logger.error('[Portfolio Detail] Error fetching asset:', err);
@@ -216,7 +266,19 @@ router.get('/firm/overview', async (req, res) => {
     return res.render('firm/overview', {
         pageTitle: 'Our Firm | Vanier Capital',
         pageDescription: 'Learn about Vanier Capital\'s mission, investment philosophy, and commitment to disciplined real estate investing.',
-        path: '/firm/overview'
+        path: '/firm/overview',
+        structuredData: [
+            buildWebPageSchema({
+                name: 'Our Firm | Vanier Capital',
+                description: 'Learn about Vanier Capital\'s mission, investment philosophy, and commitment to disciplined real estate investing.',
+                url: '/firm/overview',
+            }),
+            buildBreadcrumbSchema([
+                { name: 'Home', url: '/' },
+                { name: 'The Firm', url: '/firm/overview' },
+                { name: 'Overview', url: '/firm/overview' },
+            ]),
+        ],
     });
 });
 
@@ -226,7 +288,19 @@ router.get('/firm/philosophy', async (req, res) => {
     return res.render('firm/philosophy', {
         pageTitle: 'Mission & Philosophy | Vanier Capital',
         pageDescription: 'A partnership forged at West Point and MIT — our investment philosophy, fiduciary standard, and commitment to resident-focused operations.',
-        path: '/firm/philosophy'
+        path: '/firm/philosophy',
+        structuredData: [
+            buildWebPageSchema({
+                name: 'Mission & Philosophy | Vanier Capital',
+                description: 'A partnership forged at West Point and MIT — our investment philosophy, fiduciary standard, and commitment to resident-focused operations.',
+                url: '/firm/philosophy',
+            }),
+            buildBreadcrumbSchema([
+                { name: 'Home', url: '/' },
+                { name: 'The Firm', url: '/firm/overview' },
+                { name: 'Philosophy', url: '/firm/philosophy' },
+            ]),
+        ],
     });
 });
 
@@ -273,7 +347,19 @@ router.get('/firm/leadership', async (req, res) => {
         pageDescription: 'A partnership built on process and execution. Strict operational discipline and data-driven underwriting applied to middle-market residential real estate.',
         path: '/firm/leadership',
         isHeroPage: true,
-        team
+        team,
+        structuredData: [
+            buildWebPageSchema({
+                name: 'Leadership - Vanier Capital',
+                description: 'A partnership built on process and execution. Strict operational discipline and data-driven underwriting applied to middle-market residential real estate.',
+                url: '/firm/leadership',
+            }),
+            buildBreadcrumbSchema([
+                { name: 'Home', url: '/' },
+                { name: 'The Firm', url: '/firm/overview' },
+                { name: 'Leadership', url: '/firm/leadership' },
+            ]),
+        ],
     });
 });
 
@@ -329,7 +415,20 @@ router.get('/firm/leadership/:slug', async (req, res, next) => {
         pageDescription: `${member.fullName} is the ${member.role} at Vanier Capital.`,
         path: '/firm/leadership',
         isHeroPage: true,
-        member
+        member,
+        structuredData: [
+            buildWebPageSchema({
+                name: `${member.fullName} | Vanier Capital`,
+                description: `${member.fullName} is the ${member.role} at Vanier Capital.`,
+                url: `/firm/leadership/${member.slug}`,
+            }),
+            buildBreadcrumbSchema([
+                { name: 'Home', url: '/' },
+                { name: 'The Firm', url: '/firm/overview' },
+                { name: 'Leadership', url: '/firm/leadership' },
+                { name: member.fullName, url: `/firm/leadership/${member.slug}` },
+            ]),
+        ],
     });
 });
 
@@ -339,7 +438,19 @@ router.get('/firm/stewardship', async (req, res) => {
     return res.render('firm/stewardship', {
         pageTitle: 'Stewardship | Vanier Capital',
         pageDescription: 'Our commitment to operational excellence, asset preservation, and responsible capital management.',
-        path: '/firm/stewardship'
+        path: '/firm/stewardship',
+        structuredData: [
+            buildWebPageSchema({
+                name: 'Stewardship | Vanier Capital',
+                description: 'Our commitment to operational excellence, asset preservation, and responsible capital management.',
+                url: '/firm/stewardship',
+            }),
+            buildBreadcrumbSchema([
+                { name: 'Home', url: '/' },
+                { name: 'The Firm', url: '/firm/overview' },
+                { name: 'Stewardship', url: '/firm/stewardship' },
+            ]),
+        ],
     });
 });
 
@@ -349,7 +460,19 @@ router.get('/contact/investor-relations', (req, res) => {
         pageTitle: 'Investor Relations - Vanier Capital',
         pageDescription: 'Connect with the Vanier Capital investor relations team regarding capital partnerships, fund commitments, and LP reporting.',
         path: '/contact',
-        isHeroPage: true
+        isHeroPage: true,
+        structuredData: [
+            buildWebPageSchema({
+                name: 'Investor Relations - Vanier Capital',
+                description: 'Connect with the Vanier Capital investor relations team regarding capital partnerships, fund commitments, and LP reporting.',
+                url: '/contact/investor-relations',
+            }),
+            buildBreadcrumbSchema([
+                { name: 'Home', url: '/' },
+                { name: 'Contact', url: '/contact' },
+                { name: 'Investor Relations', url: '/contact/investor-relations' },
+            ]),
+        ],
     });
 });
 
@@ -359,7 +482,19 @@ router.get('/contact/acquisitions', (req, res) => {
         pageTitle: 'Acquisitions - Vanier Capital',
         pageDescription: 'Reach the Vanier Capital acquisitions team to discuss off-market opportunities, property dispositions, and joint venture partnerships.',
         path: '/contact',
-        isHeroPage: true
+        isHeroPage: true,
+        structuredData: [
+            buildWebPageSchema({
+                name: 'Acquisitions - Vanier Capital',
+                description: 'Reach the Vanier Capital acquisitions team to discuss off-market opportunities, property dispositions, and joint venture partnerships.',
+                url: '/contact/acquisitions',
+            }),
+            buildBreadcrumbSchema([
+                { name: 'Home', url: '/' },
+                { name: 'Contact', url: '/contact' },
+                { name: 'Acquisitions', url: '/contact/acquisitions' },
+            ]),
+        ],
     });
 });
 
@@ -371,7 +506,18 @@ router.get('/contact', (req, res) => {
         pageDescription: 'Reach out to the Vanier Capital leadership team regarding capital partnerships, asset acquisitions, or general inquiries.',
         path: '/contact',
         isHeroPage: true,
-        topic: topic
+        topic: topic,
+        structuredData: [
+            buildWebPageSchema({
+                name: 'Connect - Vanier Capital',
+                description: 'Reach out to the Vanier Capital leadership team regarding capital partnerships, asset acquisitions, or general inquiries.',
+                url: '/contact',
+            }),
+            buildBreadcrumbSchema([
+                { name: 'Home', url: '/' },
+                { name: 'Contact', url: '/contact' },
+            ]),
+        ],
     });
 });
 
@@ -381,7 +527,18 @@ router.get('/investors', (req, res) => {
         pageTitle: 'Investor Relations | Vanier Capital',
         pageDescription: 'Capital partnerships for family offices, RIAs, and accredited individuals seeking durable real estate yields.',
         path: '/investors',
-        isHeroPage: true
+        isHeroPage: true,
+        structuredData: [
+            buildWebPageSchema({
+                name: 'Investor Relations | Vanier Capital',
+                description: 'Capital partnerships for family offices, RIAs, and accredited individuals seeking durable real estate yields.',
+                url: '/investors',
+            }),
+            buildBreadcrumbSchema([
+                { name: 'Home', url: '/' },
+                { name: 'Investors', url: '/investors' },
+            ]),
+        ],
     });
 });
 
@@ -391,7 +548,19 @@ router.get('/investors/disclosures', (req, res) => {
         pageTitle: 'Fund Roadmap & Disclosures | Vanier Capital',
         pageDescription: 'Transparent regulatory disclosures, fund roadmap, and institutional pedigree for Vanier Capital.',
         path: '/investors/disclosures',
-        isHeroPage: true
+        isHeroPage: true,
+        structuredData: [
+            buildWebPageSchema({
+                name: 'Fund Roadmap & Disclosures | Vanier Capital',
+                description: 'Transparent regulatory disclosures, fund roadmap, and institutional pedigree for Vanier Capital.',
+                url: '/investors/disclosures',
+            }),
+            buildBreadcrumbSchema([
+                { name: 'Home', url: '/' },
+                { name: 'Investors', url: '/investors' },
+                { name: 'Disclosures', url: '/investors/disclosures' },
+            ]),
+        ],
     });
 });
 
@@ -514,7 +683,18 @@ router.get('/blog', async (req, res, next) => {
             nextPage: page + 1,
             previousPage: page - 1,
             lastPage: totalPages,
-            baseUrl: '/blog', // Base URL for pagination links (JS/EJS can add tag query)
+            baseUrl: '/blog',
+            structuredData: [
+                buildWebPageSchema({
+                    name: 'Perspectives - Vanier Capital',
+                    description: 'Market research and institutional perspectives from the Vanier Capital investment team.',
+                    url: '/blog',
+                }),
+                buildBreadcrumbSchema([
+                    { name: 'Home', url: '/' },
+                    { name: 'Perspectives', url: '/blog' },
+                ]),
+            ],
             blogMetrics: {
                 expertArticles: totalPublishedPosts,
                 expertContributors: expertContributors,
@@ -635,6 +815,12 @@ async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeadi
 
         const baseUrl = categorySlug ? `/perspectives/${categorySlug}` : '/perspectives';
 
+        // Build breadcrumbs for perspectives pages
+        const breadcrumbs = [{ name: 'Home', url: '/' }, { name: 'Perspectives', url: '/perspectives' }];
+        if (categorySlug) {
+            breadcrumbs.push({ name: pageHeading.replace('.', ''), url: `/perspectives/${categorySlug}` });
+        }
+
         return res.render('articles-index', {
             pageTitle: pageHeading.replace('.', '') + ' - Vanier Capital',
             pageHeading,
@@ -657,6 +843,14 @@ async function renderPerspectivesIndex(req, res, next, { categorySlug, pageHeadi
             lastPage: totalPages,
             baseUrl,
             perspectivesBaseUrl: '/perspectives',
+            structuredData: [
+                buildWebPageSchema({
+                    name: pageHeading.replace('.', '') + ' - Vanier Capital',
+                    description: pageDescription,
+                    url: baseUrl,
+                }),
+                buildBreadcrumbSchema(breadcrumbs),
+            ],
             blogMetrics: {
                 expertArticles: totalPublishedPosts,
                 expertContributors,
@@ -738,6 +932,18 @@ router.get('/firm/communications', async (req, res, next) => {
             nextPage: page + 1,
             previousPage: page - 1,
             lastPage: totalPages,
+            structuredData: [
+                buildWebPageSchema({
+                    name: 'Executive Communications - Vanier Capital',
+                    description: 'Periodic communications from Vanier Capital leadership regarding investment philosophy, portfolio updates, and firm operations.',
+                    url: '/firm/communications',
+                }),
+                buildBreadcrumbSchema([
+                    { name: 'Home', url: '/' },
+                    { name: 'The Firm', url: '/firm/overview' },
+                    { name: 'Executive Communications', url: '/firm/communications' },
+                ]),
+            ],
         });
     } catch (error) {
         logger.error('Error fetching executive communications index:', { error: error.message, page });
@@ -782,6 +988,22 @@ router.get('/firm/communications/:slug', async (req, res, next) => {
             pageDescription: post.metaDescription || post.excerpt || 'Executive communication from Vanier Capital leadership.',
             path: '/firm',
             post,
+            structuredData: [
+                buildArticleSchema({
+                    title: post.title,
+                    description: post.metaDescription || post.excerpt || '',
+                    url: `/firm/communications/${post.slug}`,
+                    publishedAt: post.publishedAt || post.publishedDate || undefined,
+                    updatedAt: post.updatedAt || post.publishedAt || post.publishedDate || undefined,
+                    author: '',
+                }),
+                buildBreadcrumbSchema([
+                    { name: 'Home', url: '/' },
+                    { name: 'The Firm', url: '/firm/overview' },
+                    { name: 'Executive Communications', url: '/firm/communications' },
+                    { name: post.title, url: `/firm/communications/${post.slug}` },
+                ]),
+            ],
         });
     } catch (error) {
         logger.error(`Error fetching executive communication slug ${req.params.slug}:`, { error: error.message });
@@ -906,16 +1128,33 @@ router.get('/blog/:slug', async (req, res, next) => {
     // Pass the slugs (or null) to the render function
         return res.render('articles-post', {
             pageTitle: `${post.title} | Vanier Capital Perspectives`,
-            pageDescription: post.excerpt || post.metaDescription || 'Market research and institutional perspectives from the Vanier Capital investment team.', // Use excerpt/meta if available
+            pageDescription: post.excerpt || post.metaDescription || 'Market research and institutional perspectives from the Vanier Capital investment team.',
             post: post,
-            path: '/blog', // Keep blog nav active
-            prevPostSlug: prevPostSlug, // Pass previous slug
-            nextPostSlug: nextPostSlug,  // Pass next slug
+            path: '/blog',
+            prevPostSlug: prevPostSlug,
+            nextPostSlug: nextPostSlug,
             readTimeMinutes: readTimeMinutes,
             shareUrl: shareUrl,
             primaryTag: primaryTag,
             primaryTagLabel: primaryTagLabel,
-            relatedPosts: relatedPosts
+            relatedPosts: relatedPosts,
+            structuredData: [
+                buildArticleSchema({
+                    title: post.title,
+                    description: post.excerpt || post.metaDescription || '',
+                    url: shareUrl,
+                    publishedAt: post.publishedAt || post.publishedDate || undefined,
+                    updatedAt: post.updatedAt || post.publishedAt || post.publishedDate || undefined,
+                    author: post.author || '',
+                    image: post.featuredImage || undefined,
+                    subtitle: post.subtitle || undefined,
+                }),
+                buildBreadcrumbSchema([
+                    { name: 'Home', url: '/' },
+                    { name: 'Perspectives', url: '/perspectives' },
+                    { name: post.title, url: `/blog/${post.slug}` },
+                ]),
+            ],
         });
 
     } catch (error) {

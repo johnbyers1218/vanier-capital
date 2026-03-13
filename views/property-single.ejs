@@ -1,25 +1,6 @@
 <%# views/project-single.ejs — Enterprise-grade case study layout %>
 
-<%- include('partials/header', { pageTitle: pageTitle, p: pageDescription }) %>
-
-<!-- Structured Data: Project/Case Study -->
-<script type="application/ld+json">
-<%- JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "Project",
-    "name": property.title,
-    "description": pageDescription,
-    "image": property.image || undefined,
-    "service": (property.serviceTypes && property.serviceTypes.length) ? property.serviceTypes.map(s => s.name) : undefined,
-    "url": shareUrl || (process.env.SITE_URL ? process.env.SITE_URL + req.originalUrl : undefined),
-    "identifier": property._id || undefined,
-    "creator": {
-        "@type": "Organization",
-        "name": "Vanier Capital",
-        "url": "https://www.vaniercapital.com/"
-    }
-}, null, 2) %>
-</script>
+<%- include('partials/header', { pageTitle: pageTitle, p: pageDescription, structuredData: typeof structuredData !== 'undefined' ? structuredData : [] }) %>
 
 <main class="pb-12">
     <% /* Precompute friendly values */ %>

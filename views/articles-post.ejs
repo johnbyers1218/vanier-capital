@@ -1,32 +1,5 @@
 <%# views/articles-post.ejs - Institutional Research Report Layout %>
-<%- include('partials/header', { pageTitle: pageTitle, pageDescription: pageDescription, path: '/blog', isHeroPage: false }) %>
-
-<!-- Structured Data: Article -->
-<script type="application/ld+json">
-<%- JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": post.title,
-    "alternativeHeadline": post.subtitle || undefined,
-    "description": pageDescription,
-    "datePublished": post.publishedAt || post.publishedDate || undefined,
-    "dateModified": post.updatedAt || post.publishedAt || post.publishedDate || undefined,
-    "author": post.author || 'Vanier Capital',
-    "image": post.featuredImage || undefined,
-    "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": shareUrl
-    },
-    "publisher": {
-        "@type": "Organization",
-        "name": "Vanier Capital",
-        "logo": {
-            "@type": "ImageObject",
-            "url": "https://www.vaniercapital.com/images/vanier-logo.svg"
-        }
-    }
-}, null, 2) %>
-</script>
+<%- include('partials/header', { pageTitle: pageTitle, pageDescription: pageDescription, path: '/blog', isHeroPage: false, structuredData: typeof structuredData !== 'undefined' ? structuredData : [] }) %>
 
 <!-- ═══════════════ ARTICLE HERO ═══════════════ -->
 <section class="bg-[#f9f8f6] pt-24 md:pt-32 pb-10 md:pb-16 px-6 md:px-16">

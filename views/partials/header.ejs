@@ -37,21 +37,33 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
 
-    <!-- Structured Data -->
+    <!-- Structured Data: Organization (site-wide) -->
     <script type="application/ld+json">
-    <%= JSON.stringify({
+    <%- JSON.stringify({
         "@context": "https://schema.org",
-        "@type": "Organization",
+        "@type": "FinancialService",
         "name": "Vanier Capital",
-        "url": "https://vaniercapital.com",
-        "logo": "https://vaniercapital.com/images/vanier-logo.svg",
-        "contactPoint": {
-            "@type": "ContactPoint",
-            "contactType": "investor-relations",
-            "email": "info@vaniercapital.com"
-        }
-    }, null, 2) %>
+        "alternateName": "Vanier Capital, LLC",
+        "url": "https://www.vaniercapital.com",
+        "logo": "https://www.vaniercapital.com/images/vanier-logo.svg",
+        "image": "https://www.vaniercapital.com/images/vanier-og-image.jpg",
+        "description": "Vanier Capital is a real estate investment and asset management firm focused on long-term value creation through disciplined acquisition, development, and stewardship.",
+        "foundingDate": "2023",
+        "areaServed": "US",
+        "contactPoint": [
+            { "@type": "ContactPoint", "contactType": "Investor Relations", "email": "ir@vaniercapital.com", "url": "https://www.vaniercapital.com/contact/investor-relations" },
+            { "@type": "ContactPoint", "contactType": "General Inquiries", "email": "info@vaniercapital.com", "url": "https://www.vaniercapital.com/contact" }
+        ]
+    }) %>
     </script>
+    <% /* Render page-level structured data passed from route controllers */ %>
+    <% if (typeof structuredData !== 'undefined' && Array.isArray(structuredData)) { %>
+        <% structuredData.forEach(function(schema) { %>
+    <script type="application/ld+json">
+    <%- JSON.stringify(schema) %>
+    </script>
+        <% }); %>
+    <% } %>
 
     <!-- Google Analytics 4 -->
     <% if (typeof gaMeasurementId !== 'undefined' && gaMeasurementId) { %>

@@ -2,7 +2,8 @@
 <%- include('../partials/header', {
     pageTitle: pageTitle,
     pageDescription: pageDescription,
-    path: path
+    path: path,
+    structuredData: typeof structuredData !== 'undefined' ? structuredData : []
 }) %>
 
 <!-- Hero -->

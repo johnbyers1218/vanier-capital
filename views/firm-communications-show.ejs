@@ -5,32 +5,9 @@
     pageTitle: pageTitle,
     pageDescription: pageDescription,
     path: '/firm',
-    isHeroPage: false
+    isHeroPage: false,
+    structuredData: typeof structuredData !== 'undefined' ? structuredData : []
 }) %>
-
-<!-- Structured Data: Article -->
-<script type="application/ld+json">
-<%- JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": post.title,
-    "description": pageDescription,
-    "datePublished": post.publishedAt || post.publishedDate || undefined,
-    "dateModified": post.updatedAt || post.publishedAt || post.publishedDate || undefined,
-    "author": {
-        "@type": "Organization",
-        "name": "Vanier Capital"
-    },
-    "publisher": {
-        "@type": "Organization",
-        "name": "Vanier Capital",
-        "logo": {
-            "@type": "ImageObject",
-            "url": "https://www.vaniercapital.com/images/vanier-logo.svg"
-        }
-    }
-}, null, 2) %>
-</script>
 
 <!-- ═══════════════ COMMUNICATION HEADER ═══════════════ -->
 <section class="bg-[#f9f8f6] pt-24 md:pt-32 pb-10 md:pb-16 px-6 md:px-16">
