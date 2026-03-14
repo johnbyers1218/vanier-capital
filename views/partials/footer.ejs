@@ -95,6 +95,9 @@
 <!-- Main application script (should contain most JS logic) -->
 <script src="/js/apps.js"></script>
 
+<!-- GA4 Custom Event Tracking -->
+<script src="/js/ga4-events.js"></script>
+
 <!-- Inline script for essential immediate execution (like dynamic year) -->
 <style>body.nav-active{overflow:hidden}</style>
 <script>
@@ -171,20 +174,6 @@
 </script>
 
 <!-- Header scroll logic now handled by initSmartHeader() in apps.js -->
-
-<!-- Optional: Analytics Script (Conditional for Production) -->
-<% if (process.env.NODE_ENV === 'production' && process.env.GA_MEASUREMENT_ID) { %> <!-- Check for ID -->
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=<%= process.env.GA_MEASUREMENT_ID %>"></script>
-<script>
- window.dataLayer = window.dataLayer || [];
- function gtag(){dataLayer.push(arguments);}
- gtag('js', new Date());
- gtag('config', '<%= process.env.GA_MEASUREMENT_ID %>'); // Use env variable
-</script>
-<% } else if (process.env.NODE_ENV === 'production' && !process.env.GA_MEASUREMENT_ID) { %>
-<!-- GA Measurement ID not configured -->
-<% } %>
 
 </body>
 </html>

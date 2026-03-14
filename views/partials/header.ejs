@@ -65,16 +65,14 @@
         <% }); %>
     <% } %>
 
-    <!-- Google Analytics 4 -->
-    <% if (typeof gaMeasurementId !== 'undefined' && gaMeasurementId) { %>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=<%= gaMeasurementId %>"></script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TGD9MT734K"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', '<%= gaMeasurementId %>');
+        gtag('config', 'G-TGD9MT734K');
     </script>
-    <% } %>
 </head>
 <body class="body-institutional" data-hero-page="<%= __isHeroPage %>">
 
